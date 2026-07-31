@@ -167,8 +167,20 @@
     flex-wrap: wrap;
     align-items: baseline;
     gap: 6px 14px;
-    padding: 18px 20px 4px;
+    padding: 16px 20px;
+    cursor: pointer;
+    user-select: none;
   }
+  .band-head:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .band-head .chevron {
+    margin-left: auto;
+    align-self: center;
+    color: var(--muted);
+    font-size: 20px;
+    line-height: 1;
+    transition: transform .2s ease;
+  }
+  section.band-card.open .band-head .chevron { transform: rotate(180deg); }
   .band-head h3 {
     margin: 0;
     font-size: 24px;
@@ -190,6 +202,7 @@
     font-variant-numeric: tabular-nums;
   }
   .band-body { padding: 12px 20px 20px; display: grid; gap: 18px; }
+  section.band-card:not(.open) .band-body { display: none; }
   .label {
     font-size: 11px;
     text-transform: uppercase;
@@ -669,6 +682,28 @@
     $("h3", sec).textContent = band.name;
     $(".band-time", sec).textContent = band.time;
     $(".chip", sec).textContent = band.dur;
+    const head = $(".band-head", sec);
+    const chevron = document.createElement("span");
+    chevron.className = "chevron";
+    chevron.textContent = "\u25be";
+    chevron.setAttribute("aria-hidden", "true");
+    head.appendChild(chevron);
+    const body = $(".band-body", sec);
+    body.id = band.id + "-body";
+    head.setAttribute("role", "button");
+    head.setAttribute("tabindex", "0");
+    head.setAttribute("aria-controls", body.id);
+    head.setAttribute("aria-expanded", "false");
+    function toggleCard(force) {
+      const open = force === undefined ? !sec.classList.contains("open") : force;
+      sec.classList.toggle("open", open);
+      head.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+    sec._toggleCard = toggleCard;
+    head.addEventListener("click", () => toggleCard());
+    head.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleCard(); }
+    });
     if (band.plot) {
       const wrap = $('[data-role="plotwrap"]', sec);
       wrap.hidden = false;
@@ -680,6 +715,19 @@
     bandsRoot.appendChild(node);
     wireBand(band);
   }
+
+  /* Abrir (desplegar) la banda enlazada desde el Horario o desde el hash. */
+  function openBandFromHash() {
+    const id = decodeURIComponent(location.hash.slice(1));
+    if (!id) return;
+    const sec = document.getElementById(id);
+    if (sec && sec.classList.contains("band-card") && sec._toggleCard) {
+      sec._toggleCard(true);
+      sec.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+  window.addEventListener("hashchange", openBandFromHash);
+  openBandFromHash();
 
   function wireBand(band) {
     const sec = document.getElementById(band.id);
