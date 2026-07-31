@@ -276,6 +276,28 @@
     min-width: 0;
   }
   .itemform input:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+  .itemform.bulk { grid-template-columns: 1fr; }
+  .itemform textarea {
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    min-width: 0;
+    min-height: 140px;
+    resize: vertical;
+  }
+  .itemform textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 0; }
+  .itemform .hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
   .itemform .actions {
     grid-column: 1 / -1;
     display: flex;
@@ -488,7 +510,7 @@
     </div>
     <div class="band-body">
       <div>
-        <p class="label"><span>Backline · Equipo que usa la banda</span><button class="mini" type="button" data-role="additem">＋ Agregar ítem</button></p>
+        <p class="label"><span>Backline · Equipo que usa la banda</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini" type="button" data-role="bulkadd">≡ Pegar lista</button><button class="mini" type="button" data-role="additem">＋ Agregar ítem</button></span></p>
         <ul class="backline" data-role="items"></ul>
       </div>
       <figure data-role="plotwrap" hidden>
@@ -683,6 +705,11 @@
       openItemForm(itemsUl, band.id, null);
     });
 
+    $('[data-role="bulkadd"]', sec).addEventListener("click", async () => {
+      if (!await askPin()) return;
+      openBulkForm(itemsUl, band.id, band.name);
+    });
+
     /* Fotos en vivo (estáticas primero) */
     const photosQ = query(collection(db, "bands", band.id, "photos"), orderBy("ts"));
     onSnapshot(photosQ, snap => {
@@ -811,6 +838,74 @@
     cancel.addEventListener("click", () => form.remove());
     if (replaceLi) replaceLi.after(form); else itemsUl.prepend(form);
     catIn.focus();
+  }
+
+  /* Convierte un bloque de texto en una lista de ítems { cat, text }.
+     - Cada línea no vacía es un ítem.
+     - "Categoría : detalle"  ->  { cat: "Categoría", text: "detalle" }
+     - Una línea sin ":"       ->  { cat: "", text: "línea completa" }
+     - Se ignora una línea de encabezado que sea el nombre de la banda. */
+  function parseBulkItems(raw, bandName) {
+    const header = (bandName || "").trim().toLowerCase();
+    return raw.split(/\r?\n/).map(line => {
+      const clean = line.trim();
+      if (!clean) return null;
+      if (clean.replace(/:\s*$/, "").toLowerCase() === header) return null; // encabezado
+      const i = clean.indexOf(":");
+      if (i === -1) return { cat: "", text: clean };
+      const cat = clean.slice(0, i).trim();
+      const text = clean.slice(i + 1).trim();
+      if (!text) return { cat: "", text: cat }; // "Algo:" sin detalle -> texto
+      return { cat, text };
+    }).filter(Boolean);
+  }
+
+  function openBulkForm(itemsUl, bandId, bandName) {
+    const old = itemsUl.querySelector(".itemform");
+    if (old) old.remove();
+    const form = document.createElement("li");
+    form.className = "itemform bulk";
+
+    const hint = document.createElement("p");
+    hint.className = "hint";
+    hint.textContent = "Pega o escribe una línea por ítem. Usa “Categoría: detalle” para separar (ej. “Platillos: 1 ride, 1 crash 18”). Las líneas sin “:” se agregan como ítem suelto.";
+
+    const area = document.createElement("textarea");
+    area.placeholder = "Platillos: 1 ride, 1 crash 18, 1 crash 17, 1 splash 12, hi hat\nBases: la misma cantidad de platos\nUna base de teclado\n1 HotRod Deville\n1 Montage 8\n3 bases de instrumento";
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    const save = document.createElement("button");
+    save.className = "mini";
+    save.type = "button";
+    save.textContent = "Publicar lista";
+    const cancel = document.createElement("button");
+    cancel.className = "ghost";
+    cancel.type = "button";
+    cancel.textContent = "Cancelar";
+    actions.append(save, cancel);
+    form.append(hint, area, actions);
+
+    save.addEventListener("click", async () => {
+      const items = parseBulkItems(area.value, bandName);
+      if (!items.length) { toast("Escribe al menos una línea"); return; }
+      save.disabled = true;
+      try {
+        // Se agregan en orden para conservar la secuencia (orderBy "ts").
+        for (const it of items) {
+          await addDoc(collection(db, "bands", bandId, "items"), { cat: it.cat, text: it.text, ts: serverTimestamp() });
+        }
+        toast(`${items.length} ítem${items.length === 1 ? "" : "s"} publicado${items.length === 1 ? "" : "s"} ✓`);
+        form.remove();
+      } catch (err) {
+        console.error(err);
+        toast("No se pudo guardar la lista");
+        save.disabled = false;
+      }
+    });
+    cancel.addEventListener("click", () => form.remove());
+    itemsUl.prepend(form);
+    area.focus();
   }
 
   function compress(file) {
