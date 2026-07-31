@@ -510,7 +510,7 @@
     </div>
     <div class="band-body">
       <div>
-        <p class="label"><span>Backline · Equipo que usa la banda</span><span style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini" type="button" data-role="bulkadd">≡ Pegar lista</button><button class="mini" type="button" data-role="additem">＋ Agregar ítem</button></span></p>
+        <p class="label"><span>Backline · Equipo que usa la banda</span><button class="mini" type="button" data-role="additem">＋ Agregar ítems</button></p>
         <ul class="backline" data-role="items"></ul>
       </div>
       <figure data-role="plotwrap" hidden>
@@ -674,7 +674,7 @@
         const li = document.createElement("li");
         li.className = "empty";
         li.style.gridColumn = "1 / -1";
-        li.textContent = "Sin ítems todavía — usa “Agregar ítem”.";
+        li.textContent = "Sin ítems todavía — usa “Agregar ítems”.";
         itemsUl.appendChild(li);
       }
       snap.forEach(d => {
@@ -701,11 +701,6 @@
     }, err => connError(err));
 
     $('[data-role="additem"]', sec).addEventListener("click", async () => {
-      if (!await askPin()) return;
-      openItemForm(itemsUl, band.id, null);
-    });
-
-    $('[data-role="bulkadd"]', sec).addEventListener("click", async () => {
       if (!await askPin()) return;
       openBulkForm(itemsUl, band.id, band.name);
     });
