@@ -835,10 +835,30 @@
     catIn.focus();
   }
 
+  /* Reglas para adivinar la categoría por palabras clave (orden = prioridad).
+     "Bases" va primero para que "bases de teclado" no caiga en "Teclado". */
+  const CAT_RULES = [
+    ["Bases",          /(\bbases?\b|\batril|\bstand\b|pie de micr[oó])/i],
+    ["Ampli bajo",     /(\bampeg\b|\bsvt\b|gallien|\bgk\b|markbass|hartke|\brumble\b|aguilar|ampli(ficador)? de bajo|cabezal de bajo)/i],
+    ["Ampli guitarra", /(hot ?rod|deville|blues junior|bassbreaker|twin reverb|deluxe reverb|jazz chorus|jc[- ]?120|marshall|vox ac|\borange\b|mesa|boogie|princeton|katana|ampli(ficador)? de guitarra|cabezal de guitarra)/i],
+    ["Teclado",        /(montage|\bnord\b|fantom|\bjuno\b|motif|kurzweil|\bkorg\b|\bmoog\b|kronos|rd-?88|cp-?88|teclado|\bpiano\b|keyboard|sintetizador|\bsynth\b)/i],
+    ["Platillos",      /(platillo|\bride\b|crash|splash|hi ?-?hat|charles|c[ií]mbal|cymbal)/i],
+    ["Batería",        /(bater[ií]a|redoblante|bombo|\btoms?\b|snare|\bkick\b|drum)/i],
+    ["Monitores",      /(monitor|cu[ñn]a|wedge|in ?-?ear|\biem\b)/i],
+    ["DI",             /(caja directa|direct box|di box|\bdi\b)/i],
+    ["Micrófono",      /(micr[oó]fono|sm ?5[78]|beta ?5[28]|e604|condensador)/i],
+    ["Guitarra",       /(guitarra)/i],
+    ["Bajo",           /(\bbajo\b)/i],
+  ];
+  function detectCategory(text) {
+    for (const [cat, re] of CAT_RULES) if (re.test(text)) return cat;
+    return "";
+  }
+
   /* Convierte un bloque de texto en una lista de ítems { cat, text }.
      - Cada línea no vacía es un ítem.
      - "Categoría : detalle"  ->  { cat: "Categoría", text: "detalle" }
-     - Una línea sin ":"       ->  { cat: "", text: "línea completa" }
+     - Una línea sin ":"       ->  se intenta adivinar la categoría por palabras clave.
      - Se ignora una línea de encabezado que sea el nombre de la banda. */
   function parseBulkItems(raw, bandName) {
     const header = (bandName || "").trim().toLowerCase();
@@ -847,10 +867,10 @@
       if (!clean) return null;
       if (clean.replace(/:\s*$/, "").toLowerCase() === header) return null; // encabezado
       const i = clean.indexOf(":");
-      if (i === -1) return { cat: "", text: clean };
+      if (i === -1) return { cat: detectCategory(clean), text: clean };
       const cat = clean.slice(0, i).trim();
       const text = clean.slice(i + 1).trim();
-      if (!text) return { cat: "", text: cat }; // "Algo:" sin detalle -> texto
+      if (!text) return { cat: detectCategory(cat), text: cat }; // "Algo:" sin detalle -> texto
       return { cat, text };
     }).filter(Boolean);
   }
@@ -863,7 +883,7 @@
 
     const hint = document.createElement("p");
     hint.className = "hint";
-    hint.textContent = "Pega o escribe una línea por ítem. Usa “Categoría: detalle” para separar (ej. “Platillos: 1 ride, 1 crash 18”). Las líneas sin “:” se agregan como ítem suelto.";
+    hint.textContent = "Pega o escribe una línea por ítem. Usa “Categoría: detalle” para separar (ej. “Platillos: 1 ride, 1 crash 18”). Si una línea no trae “:”, se intenta adivinar la categoría (ej. “1 HotRod Deville” → Ampli guitarra). Siempre puedes corregirla con ✎.";
 
     const area = document.createElement("textarea");
     area.placeholder = "Platillos: 1 ride, 1 crash 18, 1 crash 17, 1 splash 12, hi hat\nBases: la misma cantidad de platos\nUna base de teclado\n1 HotRod Deville\n1 Montage 8\n3 bases de instrumento";
