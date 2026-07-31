@@ -234,6 +234,31 @@
     color: var(--muted);
     font-size: 14px;
   }
+  ul.backline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 8px;
+  }
+  ul.backline li {
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  ul.backline li .cat {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 2px;
+  }
   footer {
     margin-top: 48px;
     color: var(--muted);
@@ -329,6 +354,18 @@
       <span class="chip">2:00</span>
     </div>
     <div class="band-body">
+      <div>
+        <p class="label">Backline · Equipo que usa la banda</p>
+        <ul class="backline">
+          <li><span class="cat">Batería</span>Yamaha</li>
+          <li><span class="cat">Platillos</span>2 rides, crash, splash y hi-hat</li>
+          <li><span class="cat">Bases de platillo</span>5 — una por cada platillo</li>
+          <li><span class="cat">Teclado</span>Yamaha Montage 8</li>
+          <li><span class="cat">Bases de teclado</span>2</li>
+          <li><span class="cat">Bajo</span>Amplificador acostado</li>
+          <li><span class="cat">Percusión</span>Congas con base y timbal</li>
+        </ul>
+      </div>
       <figure>
         <p class="label">Stage plot · Plano de ubicación en tarima</p>
         <button class="imgbtn" type="button" aria-label="Ampliar stage plot de One 4 All">
