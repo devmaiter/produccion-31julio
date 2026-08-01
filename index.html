@@ -627,7 +627,9 @@
       plotAlt: "Stage plot de Andy Caicedo: al fondo un riser de 10 x 3 x 0.60 m con percusión, vientos y teclado (Mix 5 a Mix 9); dos risers laterales de 2 x 2 x 0.30 m con trompetas y trombones (Mix 10 a Mix 13); al frente monitores de piso Mix 2 y Mix 3 a los costados y Mix 1 al centro para la voz. 13 envíos de monitor en total." },
     { id: "john-onofre", name: "John Onofre", time: "10:00 – 11:00", dur: "1:00" },
     { id: "banda-la-mb", name: "Banda La MB", time: "11:15 – 12:00", dur: "0:45" },
-    { id: "homenaje-jose-alfredo", name: "Homenaje a José Alfredo Jiménez", time: "15:05 – 15:55", dur: "0:50" }
+    { id: "homenaje-jose-alfredo", name: "Homenaje a José Alfredo Jiménez", time: "15:05 – 15:55", dur: "0:50" },
+    { id: "proyecto-a", name: "Proyecto A", time: "17:20 – 18:10", dur: "0:50" },
+    { id: "luister-la-voz", name: "Luister La Voz", time: "18:25 – 19:15", dur: "0:50" }
   ];
 
   /* Programación por día. El día 1 conserva su horario y bandas originales. */
@@ -653,7 +655,7 @@
     },
     {
       id: "sabado-1", tab: "Sáb 1 ago",
-      date: "Sábado <strong>1 de agosto</strong>", inicio: "9:00", final: "17:00",
+      date: "Sábado <strong>1 de agosto</strong>", inicio: "9:00", final: "20:20",
       sched: [
         { t:"section", name:"Pruebas · 9:00" },
         { t:"band",  time:"9:00 – 9:45",   name:"Andy Caicedo", dur:"0:45", id:"andy-caicedo" },
@@ -666,7 +668,13 @@
         { t:"pause", time:"14:50 – 15:05", name:"Cambio",       dur:"0:15" },
         { t:"band",  time:"15:05 – 15:55", name:"Homenaje a José Alfredo Jiménez", dur:"0:50", id:"homenaje-jose-alfredo" },
         { t:"pause", time:"15:55 – 16:10", name:"Cambio",       dur:"0:15" },
-        { t:"band",  time:"16:10 – 17:00", name:"Andy Caicedo", dur:"0:50", id:"andy-caicedo" }
+        { t:"band",  time:"16:10 – 17:00", name:"Andy Caicedo", dur:"0:50", id:"andy-caicedo" },
+        { t:"pause", time:"17:00 – 17:20", name:"Cambio",       dur:"0:20" },
+        { t:"band",  time:"17:20 – 18:10", name:"Proyecto A",   dur:"0:50", id:"proyecto-a" },
+        { t:"pause", time:"18:10 – 18:25", name:"Cambio",       dur:"0:15" },
+        { t:"band",  time:"18:25 – 19:15", name:"Luister La Voz", dur:"0:50", id:"luister-la-voz" },
+        { t:"pause", time:"19:15 – 19:30", name:"Cambio",       dur:"0:15" },
+        { t:"band",  time:"19:30 – 20:20", name:"John Onofre",  dur:"0:50", id:"john-onofre" }
       ],
       bands: BANDS2
     }
