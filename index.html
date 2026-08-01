@@ -592,11 +592,14 @@
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import {
-    getFirestore, collection, doc, addDoc, setDoc, deleteDoc,
-    onSnapshot, query, orderBy, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+  /* Firebase se carga de forma diferida (import dinámico) para que el horario y
+     los stage plots funcionen aun SIN internet. El backline en vivo se activa
+     cuando hay conexión y usa caché local (IndexedDB) para trabajar sin señal. */
+  let initializeApp, initializeFirestore, getFirestore,
+      collection, doc, addDoc, setDoc, deleteDoc,
+      onSnapshot, query, orderBy, serverTimestamp,
+      persistentLocalCache, persistentMultipleTabManager;
+  let db = null;
 
   const firebaseConfig = { apiKey: "AIzaSyAsJhlwzryVBK87bexe216oVP2BeuiXVs4", authDomain: "backline-2797d.firebaseapp.com", projectId: "backline-2797d", storageBucket: "backline-2797d.firebasestorage.app", messagingSenderId: "172502129724", appId: "1:172502129724:web:1872d06cdcc73028adf739" };
   const PIN = "3107";
@@ -680,10 +683,67 @@
     }
   ];
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
   const $ = (sel, el = document) => el.querySelector(sel);
+
+  /* ---- Aviso de conexión (banner inferior) ---- */
+  let netbanner;
+  function showBanner(msg) {
+    if (!netbanner) {
+      netbanner = document.createElement("div");
+      netbanner.setAttribute("role", "status");
+      Object.assign(netbanner.style, {
+        position: "fixed", left: "0", right: "0", bottom: "0", zIndex: "9999",
+        background: "#b45309", color: "#fff",
+        font: "600 14px/1.35 system-ui,-apple-system,sans-serif",
+        padding: "10px 14px", textAlign: "center",
+        transform: "translateY(110%)", transition: "transform .25s ease"
+      });
+      document.body.appendChild(netbanner);
+    }
+    netbanner.textContent = msg;
+    netbanner.style.transform = "translateY(0)";
+  }
+  function hideBanner() { if (netbanner) netbanner.style.transform = "translateY(110%)"; }
+  const MSG_LOADED  = "Sin conexión — tus cambios se guardan y suben al reconectar.";
+  const MSG_NOFB    = "Sin conexión — el horario está disponible; el backline se activará al reconectar.";
+
+  /* Las bandas se dibujan de inmediato; su conexión a Firestore se aplaza
+     hasta que Firebase termine de cargar (para no bloquear el horario). */
+  const pendingWire = [];
+  function registerBandWiring(band, sec) {
+    if (db) wireBand(band, sec);
+    else pendingWire.push([band, sec]);
+  }
+
+  /* Carga diferida de Firebase + caché offline. No bloquea el render del horario. */
+  async function setupFirebase() {
+    try {
+      const [appMod, fsMod] = await Promise.all([
+        import("https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js"),
+        import("https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js")
+      ]);
+      initializeApp = appMod.initializeApp;
+      ({ getFirestore, collection, doc, addDoc, setDoc, deleteDoc,
+         onSnapshot, query, orderBy, serverTimestamp,
+         initializeFirestore, persistentLocalCache, persistentMultipleTabManager } = fsMod);
+      const app = initializeApp(firebaseConfig);
+      try {
+        db = initializeFirestore(app, {
+          localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() })
+        });
+      } catch (_) {
+        db = getFirestore(app);          // sin caché persistente (p. ej. ventana privada)
+      }
+      pendingWire.splice(0).forEach(([b, s]) => wireBand(b, s));
+      navigator.onLine ? hideBanner() : showBanner(MSG_LOADED);
+    } catch (_) {
+      // Sin internet en la primera carga: el horario y los stage plots ya están
+      // visibles; reintentamos cargar Firebase cuando vuelva la conexión.
+      showBanner(MSG_NOFB);
+    }
+  }
+  window.addEventListener("online",  () => { db ? hideBanner() : setupFirebase(); });
+  window.addEventListener("offline", () => showBanner(db ? MSG_LOADED : MSG_NOFB));
   const toastEl = $("#toast");
   let toastTimer;
   function toast(msg) {
@@ -793,7 +853,7 @@
       $("button.imgbtn", wrap).setAttribute("aria-label", `Ampliar stage plot de ${band.name}`);
     }
     mount.appendChild(node);
-    wireBand(band, sec);
+    registerBandWiring(band, sec);
   }
 
   /* Construye la fila de un rengl\u00f3n del horario. */
@@ -902,6 +962,17 @@
   const initDay = initHash ? dayIndexOfBand(initHash) : -1;
   showDay(initDay >= 0 ? initDay : 0);
   openBandFromHash();
+
+  /* Arranca Firebase (backline en vivo + caché offline) tras dibujar el horario. */
+  setupFirebase();
+
+  /* Service Worker: guarda la app y el SDK de Firebase para abrir SIN internet
+     en visitas posteriores (requiere una primera carga con conexión). */
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+  }
 
   function wireBand(band, sec) {
     sec = sec || document.getElementById(band.id);
