@@ -564,7 +564,7 @@
       </figure>
       <div>
         <p class="label"><span>Fotos</span>
-          <label class="mini">Subir foto<input type="file" accept="image/*" multiple hidden data-role="file"></label>
+          <label class="mini">Tomar foto<input type="file" accept="image/*" capture="environment" hidden data-role="file"></label>
         </p>
         <div class="gallery" data-role="gallery"></div>
       </div>
@@ -635,6 +635,19 @@
     { id: "luister-la-voz", name: "Luister La Voz", time: "18:25 – 19:15", dur: "0:50" }
   ];
 
+  /* Bandas del domingo (día 3). Tarjetas base para fotos/backline en vivo. */
+  const BANDS3 = [
+    { id: "one-4-all-dom",   name: "One 4 All",             time: "14:00 – 14:25", dur: "0:25" },
+    { id: "aviva-band-dom",  name: "Aviva Band",            time: "14:30 – 14:55", dur: "0:25" },
+    { id: "eliminatorias-1", name: "Banda Eliminatorias 1", time: "15:10 – 15:30", dur: "0:20" },
+    { id: "eliminatorias-2", name: "Banda Eliminatorias 2", time: "15:35 – 15:55", dur: "0:20" },
+    { id: "eliminatorias-3", name: "Banda Eliminatorias 3", time: "16:00 – 16:20", dur: "0:20" },
+    { id: "cales-louima",    name: "Cales Louima",          time: "16:30 – 17:15", dur: "0:45" },
+    { id: "rescate",         name: "Rescate",               time: "17:30 – 18:30", dur: "1:00" },
+    { id: "miel-san-marcos", name: "Miel San Marcos",       time: "18:45 – 19:45", dur: "1:00" },
+    { id: "alex-zurdo",      name: "Alex Zurdo",            time: "20:00 – 21:00", dur: "1:00" }
+  ];
+
   /* Programación por día. El día 1 conserva su horario y bandas originales. */
   const DAYS = [
     {
@@ -680,6 +693,39 @@
         { t:"band",  time:"19:30 – 20:20", name:"John Onofre",  dur:"0:50", id:"john-onofre" }
       ],
       bands: BANDS2
+    },
+    {
+      id: "domingo-2", tab: "Dom 2 ago",
+      date: "Domingo <strong>2 de agosto</strong>", inicio: "8:00", final: "21:00",
+      sched: [
+        { t:"section", name:"Pruebas · 8:00" },
+        { t:"band",  time:"8:00 – 8:45",   name:"Alex Zurdo",            dur:"0:45", id:"alex-zurdo" },
+        { t:"pause", time:"8:45 – 9:00",   name:"Cambio",                dur:"0:15" },
+        { t:"band",  time:"9:00 – 9:45",   name:"Miel San Marcos",       dur:"0:45", id:"miel-san-marcos" },
+        { t:"pause", time:"9:45 – 10:00",  name:"Cambio",                dur:"0:15" },
+        { t:"band",  time:"10:00 – 10:45", name:"Rescate",               dur:"0:45", id:"rescate" },
+        { t:"pause", time:"10:45 – 11:00", name:"Cambio",                dur:"0:15" },
+        { t:"band",  time:"11:00 – 11:45", name:"Cales Louima",          dur:"0:45", id:"cales-louima" },
+        { t:"section", name:"Puertas · 13:00" },
+        { t:"band",  time:"14:00 – 14:25", name:"One 4 All",             dur:"0:25", id:"one-4-all-dom" },
+        { t:"pause", time:"14:25 – 14:30", name:"Cambio",                dur:"0:05" },
+        { t:"band",  time:"14:30 – 14:55", name:"Aviva Band",            dur:"0:25", id:"aviva-band-dom" },
+        { t:"pause", time:"14:55 – 15:10", name:"Cambio",                dur:"0:15" },
+        { t:"band",  time:"15:10 – 15:30", name:"Banda Eliminatorias 1", dur:"0:20", id:"eliminatorias-1" },
+        { t:"pause", time:"15:30 – 15:35", name:"Cambio",                dur:"0:05" },
+        { t:"band",  time:"15:35 – 15:55", name:"Banda Eliminatorias 2", dur:"0:20", id:"eliminatorias-2" },
+        { t:"pause", time:"15:55 – 16:00", name:"Cambio",                dur:"0:05" },
+        { t:"band",  time:"16:00 – 16:20", name:"Banda Eliminatorias 3", dur:"0:20", id:"eliminatorias-3" },
+        { t:"pause", time:"16:20 – 16:30", name:"Cambio",                dur:"0:10" },
+        { t:"band",  time:"16:30 – 17:15", name:"Cales Louima",          dur:"0:45", id:"cales-louima" },
+        { t:"pause", time:"17:15 – 17:30", name:"Cambio",                dur:"0:15" },
+        { t:"band",  time:"17:30 – 18:30", name:"Rescate",               dur:"1:00", id:"rescate" },
+        { t:"pause", time:"18:30 – 18:45", name:"Cambio",                dur:"0:15" },
+        { t:"band",  time:"18:45 – 19:45", name:"Miel San Marcos",       dur:"1:00", id:"miel-san-marcos" },
+        { t:"pause", time:"19:45 – 20:00", name:"Cambio",                dur:"0:15" },
+        { t:"band",  time:"20:00 – 21:00", name:"Alex Zurdo",            dur:"1:00", id:"alex-zurdo" }
+      ],
+      bands: BANDS3
     }
   ];
 
@@ -1034,7 +1080,7 @@
         const e = document.createElement("div");
         e.className = "empty";
         e.style.gridColumn = "1 / -1";
-        e.textContent = "Sin fotos todavía — usa “Subir foto”.";
+        e.textContent = "Sin fotos todavía — usa “Tomar foto”.";
         gallery.appendChild(e);
       }
       markConn();
