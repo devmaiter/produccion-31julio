@@ -638,8 +638,8 @@
 
   /* Bandas del domingo (día 3). Tarjetas base para fotos/backline en vivo. */
   const BANDS3 = [
-    { id: "one-4-all-dom",   name: "One 4 All",             time: "14:00 – 14:25", dur: "0:25" },
-    { id: "aviva-band-dom",  name: "Aviva Band",            time: "14:30 – 14:55", dur: "0:25" },
+    { id: "one-4-all-dom",   name: "One 4 All",             time: "14:00 – 14:25", dur: "0:25", dataId: "one-4-all" },
+    { id: "aviva-band-dom",  name: "Aviva Band",            time: "14:30 – 14:55", dur: "0:25", dataId: "one-4-all" },
     { id: "eliminatorias-1", name: "Banda Eliminatorias 1", time: "15:10 – 15:30", dur: "0:20" },
     { id: "eliminatorias-2", name: "Banda Eliminatorias 2", time: "15:35 – 15:55", dur: "0:20" },
     { id: "eliminatorias-3", name: "Banda Eliminatorias 3", time: "16:00 – 16:20", dur: "0:20" },
@@ -1028,8 +1028,15 @@
     const fileInput = $('[data-role="file"]', sec);
     const uploadInput = $('[data-role="upload"]', sec);
 
+    /* Clave de datos en Firestore. Una misma banda puede aparecer en varios días
+       con un id de tarjeta distinto (p. ej. "one-4-all" el viernes y
+       "one-4-all-dom" el domingo). Con `dataId` esas tarjetas comparten fotos e
+       ítems: se leen y escriben en la misma ruta, así las fotos tomadas un día
+       aparecen cuando la banda vuelve a salir otro día. */
+    const dataId = band.dataId || band.id;
+
     /* Ítems en vivo */
-    const itemsQ = query(collection(db, "bands", band.id, "items"), orderBy("ts"));
+    const itemsQ = query(collection(db, "bands", dataId, "items"), orderBy("ts"));
     onSnapshot(itemsQ, snap => {
       itemsUl.innerHTML = "";
       if (snap.empty) {
@@ -1054,7 +1061,7 @@
         edit.setAttribute("aria-label", `Editar ${it.cat || "ítem"}`);
         edit.addEventListener("click", async () => {
           if (!await askPin()) return;
-          openItemForm(itemsUl, band.id, { id: d.id, ...it }, li);
+          openItemForm(itemsUl, dataId, { id: d.id, ...it }, li);
         });
         li.appendChild(edit);
         attachItemPhotos(li, band, it);
@@ -1065,18 +1072,18 @@
 
     $('[data-role="additem"]', sec).addEventListener("click", async () => {
       if (!await askPin()) return;
-      openBulkForm(itemsUl, band.id, band.name);
+      openBulkForm(itemsUl, dataId, band.name);
     });
 
     /* Fotos en vivo (estáticas primero) */
-    const photosQ = query(collection(db, "bands", band.id, "photos"), orderBy("ts"));
+    const photosQ = query(collection(db, "bands", dataId, "photos"), orderBy("ts"));
     onSnapshot(photosQ, snap => {
       gallery.innerHTML = "";
       (band.staticPhotos || []).forEach((src, i) => {
-        gallery.appendChild(photoNode(src, `Foto ${i + 1} de ${band.name}`, null, band.id));
+        gallery.appendChild(photoNode(src, `Foto ${i + 1} de ${band.name}`, null, dataId));
       });
       snap.forEach(d => {
-        gallery.appendChild(photoNode(d.data().data, `Foto subida por el equipo — ${band.name}`, d.id, band.id));
+        gallery.appendChild(photoNode(d.data().data, `Foto subida por el equipo — ${band.name}`, d.id, dataId));
       });
       if (!gallery.children.length) {
         const e = document.createElement("div");
@@ -1098,7 +1105,7 @@
           toast("Comprimiendo foto…");
           const data = await compress(f);
           if (data.length > 950000) { toast("Foto demasiado grande, intenta otra"); continue; }
-          await addDoc(collection(db, "bands", band.id, "photos"), { data, ts: serverTimestamp() });
+          await addDoc(collection(db, "bands", dataId, "photos"), { data, ts: serverTimestamp() });
           toast("Foto publicada ✓");
         } catch (err) {
           console.error(err);
