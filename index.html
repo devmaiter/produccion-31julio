@@ -425,6 +425,109 @@
     cursor: pointer;
   }
   .gallery button.delph:focus-visible { outline: 2px solid var(--accent); }
+
+  /* ---- Stage plot desplegable (dropdown) ---- */
+  details.plotwrap {
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  details.plotwrap > summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  details.plotwrap > summary::-webkit-details-marker { display: none; }
+  details.plotwrap > summary::after {
+    content: "▾";
+    margin-left: auto;
+    color: var(--muted);
+    transition: transform .2s ease;
+  }
+  details.plotwrap[open] > summary::after { transform: rotate(180deg); }
+  details.plotwrap .plotbody { padding: 0 12px 12px; }
+  details.plotwrap .plotbody button.imgbtn { width: 100%; }
+  .stagephotos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .stagephotos .ph { position: relative; }
+  .stagephotos button.imgbtn { aspect-ratio: 4 / 3; width: 100%; }
+  .stagephotos button.imgbtn img { width: 100%; height: 100%; object-fit: cover; }
+  .stagephotos button.delph {
+    position: absolute; top: 6px; right: 6px;
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 0; background: rgba(10, 10, 12, .65); color: #fff;
+    font-size: 14px; line-height: 1; cursor: pointer;
+  }
+
+  /* ---- Foto por ítem del backline ---- */
+  ul.backline li button.addphoto {
+    display: inline-block;
+    margin-top: 8px;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 3px 10px;
+    cursor: pointer;
+  }
+  ul.backline li button.addphoto:hover,
+  ul.backline li button.addphoto:focus-visible { background: var(--line); }
+  ul.backline li .itemphotos figure { position: relative; }
+  ul.backline li .itemphotos button.delph {
+    position: absolute; top: 2px; right: 2px;
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 0; background: rgba(10, 10, 12, .7); color: #fff;
+    font-size: 12px; line-height: 1; cursor: pointer; padding: 0;
+  }
+
+  /* ---- Diálogo: ¿a qué ítem pertenece la foto? ---- */
+  #assignbox {
+    position: fixed; inset: 0;
+    background: rgba(8, 8, 10, .8);
+    display: none; align-items: center; justify-content: center;
+    padding: 18px; z-index: 80;
+  }
+  #assignbox.open { display: flex; }
+  #assignbox .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    width: min(440px, 100%);
+    max-height: 90vh; overflow: auto;
+    box-shadow: var(--shadow);
+    display: grid; gap: 10px;
+  }
+  #assignbox h4 { margin: 0; font-size: 16px; }
+  #assignbox img.thumb {
+    width: 100%; max-height: 200px; object-fit: contain;
+    border-radius: 10px; background: var(--surface-2);
+  }
+  #assignbox .ai-guess { margin: 0; font-size: 13px; color: var(--muted); }
+  #assignbox .ai-guess b { color: var(--accent); }
+  #assignbox label.fld { font-size: 12px; color: var(--muted); display: grid; gap: 4px; }
+  #assignbox select {
+    font: inherit; padding: 10px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+  }
+  #assignbox .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
   .empty {
     border: 1px dashed var(--line);
     border-radius: 8px;
@@ -558,12 +661,16 @@
         <p class="label"><span>Backline · Equipo que usa la banda</span><button class="mini" type="button" data-role="additem">＋ Agregar ítems</button></p>
         <ul class="backline" data-role="items"></ul>
       </div>
-      <figure data-role="plotwrap" hidden>
-        <p class="label"><span>Stage plot · Plano de ubicación en tarima</span></p>
-        <button class="imgbtn" type="button"><img data-role="plot" alt=""></button>
-      </figure>
+      <details class="plotwrap" data-role="plotwrap" hidden>
+        <summary>Stage plot · Ubicación en tarima</summary>
+        <div class="plotbody">
+          <button class="imgbtn" type="button" data-role="plotbtn" hidden><img data-role="plot" alt=""></button>
+          <p class="label" data-role="stagelabel" hidden><span>Fotos del escenario</span></p>
+          <div class="stagephotos" data-role="stagephotos"></div>
+        </div>
+      </details>
       <div>
-        <p class="label"><span>Fotos</span>
+        <p class="label"><span>Fotos generales</span>
           <label class="mini">Tomar foto<input type="file" accept="image/*" capture="environment" hidden data-role="file"></label>
           <label class="mini">Subir foto<input type="file" accept="image/*" multiple hidden data-role="upload"></label>
         </p>
@@ -588,6 +695,21 @@
     <div class="row">
       <button class="ghost itemform-btn" type="button" id="pincancel" style="font:inherit;font-size:12px;font-weight:700;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer">Cancelar</button>
       <button class="mini" type="button" id="pinok">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<div id="assignbox" role="dialog" aria-modal="true" aria-label="Asignar foto a un ítem">
+  <div class="card">
+    <h4>¿A qué pertenece esta foto?</h4>
+    <img class="thumb" id="assignthumb" alt="Foto por clasificar">
+    <p class="ai-guess" id="assignguess"></p>
+    <label class="fld">Ubicar en
+      <select id="assignselect"></select>
+    </label>
+    <div class="row">
+      <button class="ghost itemform-btn" type="button" id="assigncancel" style="font:inherit;font-size:12px;font-weight:700;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer">Cancelar</button>
+      <button class="mini" type="button" id="assignok">Guardar foto</button>
     </div>
   </div>
 </div>
@@ -894,10 +1016,12 @@
     if (band.plot) {
       const wrap = $('[data-role="plotwrap"]', sec);
       wrap.hidden = false;
+      const plotBtn = $('[data-role="plotbtn"]', sec);
+      plotBtn.hidden = false;
       const img = $('[data-role="plot"]', sec);
       img.src = band.plot;
       img.alt = band.plotAlt || `Stage plot de ${band.name}`;
-      $("button.imgbtn", wrap).setAttribute("aria-label", `Ampliar stage plot de ${band.name}`);
+      plotBtn.setAttribute("aria-label", `Ampliar stage plot de ${band.name}`);
     }
     mount.appendChild(node);
     registerBandWiring(band, sec);
@@ -1021,26 +1145,251 @@
     });
   }
 
+  /* ================= Motor de reconocimiento (en el navegador) =================
+     Usa MobileNet (TensorFlow.js) para adivinar el TIPO de equipo de una foto y
+     sugerir el ítem al subir. Se carga bajo demanda (solo al subir la primera
+     foto), reutiliza las categorías del backline (CAT_RULES) y aprende de las
+     correcciones del equipo (localStorage). Si no hay red o el modelo falla,
+     simplemente se pide el ítem a mano: nunca bloquea la subida. */
+
+  const STAGE_ID = "__stage";   // destino reservado: fotos del escenario / stage plot
+
+  /* Etiquetas típicas de ImageNet -> nuestras categorías. MobileNet no separa
+     "ride" de "crash", pero sí reconoce guitarra, piano, batería, micrófono… */
+  const LABEL_MAP = [
+    [/electric guitar|acoustic guitar|\bbanjo\b/i, "Guitarra"],
+    [/grand piano|upright piano|\bpiano\b|\borgan\b|accordion|synthes/i, "Teclado"],
+    [/\bdrum\b|steel drum|\bgong\b|marimba|maraca/i, "Batería"],
+    [/microphone|\bmike\b/i, "Micrófono"],
+    [/loudspeaker|\bspeaker\b|amplifier/i, "Monitores"],
+    [/\bbass\b/i, "Bajo"],
+  ];
+
+  function learnedMap() {
+    try { return JSON.parse(localStorage.getItem("aiLabelMap") || "{}"); }
+    catch (_) { return {}; }
+  }
+  function learnLabel(label, cat) {
+    if (!label || !cat) return;
+    try {
+      const m = learnedMap();
+      m[label.toLowerCase()] = cat;
+      localStorage.setItem("aiLabelMap", JSON.stringify(m));
+    } catch (_) {}
+  }
+  function labelToCategory(label) {
+    const l = (label || "").toLowerCase();
+    const learned = learnedMap();
+    if (learned[l]) return learned[l];
+    for (const key in learned) if (l.includes(key)) return learned[key];
+    for (const [re, cat] of LABEL_MAP) if (re.test(l)) return cat;
+    return detectCategory(l);   // reutiliza las reglas del backline
+  }
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      if (document.querySelector(`script[data-src="${src}"]`)) return resolve();
+      const s = document.createElement("script");
+      s.src = src; s.dataset.src = src;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("No cargó " + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  let _visionPromise = null;
+  function ensureVision() {
+    if (_visionPromise) return _visionPromise;
+    _visionPromise = (async () => {
+      await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js");
+      await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js");
+      return await window.mobilenet.load({ version: 1, alpha: 0.5 });
+    })().catch(err => { console.warn("Reconocimiento no disponible:", err); _visionPromise = null; return null; });
+    return _visionPromise;
+  }
+
+  function loadImage(src) {
+    return new Promise((resolve, reject) => {
+      const im = new Image();
+      im.onload = () => resolve(im);
+      im.onerror = reject;
+      im.src = src;
+    });
+  }
+
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise(resolve => setTimeout(() => resolve(null), ms))
+    ]);
+  }
+
+  /* Devuelve { cat, label, prob } o null. Nunca lanza ni se queda colgado. */
+  async function recognizePhoto(dataUrl) {
+    try {
+      if (!navigator.onLine) return null;
+      const model = await withTimeout(ensureVision(), 15000);
+      if (!model) return null;
+      const img = await loadImage(dataUrl);
+      const preds = await withTimeout(model.classify(img, 5), 8000);
+      if (!preds) return null;
+      for (const p of preds) {
+        for (const piece of (p.className || "").split(",")) {
+          const cat = labelToCategory(piece.trim());
+          if (cat) return { cat, label: piece.trim().toLowerCase(), prob: p.probability };
+        }
+      }
+      return preds[0]
+        ? { cat: "", label: preds[0].className.split(",")[0].trim().toLowerCase(), prob: preds[0].probability }
+        : null;
+    } catch (err) {
+      console.warn(err);
+      return null;
+    }
+  }
+
+  /* Diálogo modal: ¿a qué ítem va la foto? Devuelve { itemId, cat } o null. */
+  function assignPhotoDialog(band, dataUrl, guess, items) {
+    const box = $("#assignbox");
+    const thumb = $("#assignthumb");
+    const guessP = $("#assignguess");
+    const select = $("#assignselect");
+    const okBtn = $("#assignok");
+    const cancelBtn = $("#assigncancel");
+
+    thumb.src = dataUrl;
+    select.innerHTML = "";
+    select.add(new Option("General (sin ítem)", "general"));
+    select.add(new Option("Escenario / Stage plot", STAGE_ID));
+    items.forEach(it => {
+      const label = (it.cat ? it.cat + " · " : "") + (it.text || "");
+      select.add(new Option((label || "Ítem").slice(0, 60), "item:" + it.id));
+    });
+
+    let preselected = "general";
+    if (guess && guess.cat) {
+      const match = items.find(it => (it.cat || "").toLowerCase() === guess.cat.toLowerCase());
+      if (match) preselected = "item:" + match.id;
+    }
+    select.value = preselected;
+
+    if (guess && guess.cat) {
+      guessP.innerHTML = `Parece <b>${guess.cat}</b>${guess.prob ? ` (${Math.round(guess.prob * 100)}%)` : ""}. Confírmalo o cámbialo.`;
+    } else if (guess && guess.label) {
+      guessP.innerHTML = `No estoy seguro (parece “${guess.label}”). Elige el ítem manualmente.`;
+    } else {
+      guessP.textContent = "Elige a qué ítem pertenece esta foto.";
+    }
+
+    box.classList.add("open");
+    document.body.style.overflow = "hidden";
+    select.focus();
+
+    return new Promise(resolve => {
+      function cleanup(result) {
+        box.classList.remove("open");
+        document.body.style.overflow = "";
+        okBtn.removeEventListener("click", onOk);
+        cancelBtn.removeEventListener("click", onCancel);
+        thumb.src = "";
+        resolve(result);
+      }
+      function onOk() {
+        const v = select.value;
+        let itemId = null, cat = "";
+        if (v === STAGE_ID) { itemId = STAGE_ID; cat = "Escenario"; }
+        else if (v.startsWith("item:")) {
+          itemId = v.slice(5);
+          const it = items.find(x => x.id === itemId);
+          cat = it ? (it.cat || "") : "";
+        }
+        cleanup({ itemId, cat });
+      }
+      function onCancel() { cleanup(null); }
+      okBtn.addEventListener("click", onOk);
+      cancelBtn.addEventListener("click", onCancel);
+    });
+  }
+
   function wireBand(band, sec) {
     sec = sec || document.getElementById(band.id);
     const itemsUl = $('[data-role="items"]', sec);
     const gallery = $('[data-role="gallery"]', sec);
+    const plotwrap = $('[data-role="plotwrap"]', sec);
+    const stageWrap = $('[data-role="stagephotos"]', sec);
+    const stageLabel = $('[data-role="stagelabel"]', sec);
     const fileInput = $('[data-role="file"]', sec);
     const uploadInput = $('[data-role="upload"]', sec);
 
-    /* Ítems en vivo */
-    const itemsQ = query(collection(db, "bands", band.id, "items"), orderBy("ts"));
-    onSnapshot(itemsQ, snap => {
+    const state = { items: [], photos: [] };
+
+    async function deletePhoto(docId) {
+      if (!await askPin()) return;
+      if (!confirm("¿Borrar esta foto para todos?")) return;
+      await deleteDoc(doc(db, "bands", band.id, "photos", docId));
+      toast("Foto borrada");
+    }
+
+    /* Miniatura de foto dentro de un ítem del backline. */
+    function itemPhotoNode(p, catName) {
+      const fig = document.createElement("figure");
+      const btn = document.createElement("button");
+      btn.className = "imgbtn"; btn.type = "button";
+      btn.setAttribute("aria-label", "Ampliar foto");
+      const img = document.createElement("img");
+      img.src = p.data; img.alt = `Foto — ${catName || band.name}`; img.loading = "lazy";
+      btn.appendChild(img); fig.appendChild(btn);
+      const del = document.createElement("button");
+      del.className = "delph"; del.type = "button"; del.textContent = "✕";
+      del.setAttribute("aria-label", "Borrar foto");
+      del.addEventListener("click", e => { e.stopPropagation(); deletePhoto(p.id); });
+      fig.appendChild(del);
+      return fig;
+    }
+
+    /* Foto del escenario (dentro del desplegable de stage plot). */
+    function stagePhotoNode(p) {
+      const wrap = document.createElement("div");
+      wrap.className = "ph";
+      const btn = document.createElement("button");
+      btn.className = "imgbtn"; btn.type = "button";
+      btn.setAttribute("aria-label", "Ampliar foto del escenario");
+      const img = document.createElement("img");
+      img.src = p.data; img.alt = `Escenario — ${band.name}`; img.loading = "lazy";
+      btn.appendChild(img); wrap.appendChild(btn);
+      const del = document.createElement("button");
+      del.className = "delph"; del.type = "button"; del.textContent = "✕";
+      del.setAttribute("aria-label", "Borrar foto");
+      del.addEventListener("click", e => { e.stopPropagation(); deletePhoto(p.id); });
+      wrap.appendChild(del);
+      return wrap;
+    }
+
+    /* Redibuja ítems + fotos combinando los dos snapshots. */
+    function renderAll() {
+      const byItem = new Map();
+      const stage = [];
+      const general = [];
+      for (const p of state.photos) {
+        if (p.itemId === STAGE_ID) stage.push(p);
+        else if (p.itemId && state.items.some(it => it.id === p.itemId)) {
+          if (!byItem.has(p.itemId)) byItem.set(p.itemId, []);
+          byItem.get(p.itemId).push(p);
+        } else {
+          general.push(p);   // sin ítem, o ítem que ya no existe
+        }
+      }
+
+      /* ---- Ítems ---- */
       itemsUl.innerHTML = "";
-      if (snap.empty) {
+      if (!state.items.length) {
         const li = document.createElement("li");
         li.className = "empty";
         li.style.gridColumn = "1 / -1";
         li.textContent = "Sin ítems todavía — usa “Agregar ítems”.";
         itemsUl.appendChild(li);
       }
-      snap.forEach(d => {
-        const it = d.data();
+      for (const it of state.items) {
         const li = document.createElement("li");
         const cat = document.createElement("span");
         cat.className = "cat";
@@ -1054,13 +1403,70 @@
         edit.setAttribute("aria-label", `Editar ${it.cat || "ítem"}`);
         edit.addEventListener("click", async () => {
           if (!await askPin()) return;
-          openItemForm(itemsUl, band.id, { id: d.id, ...it }, li);
+          openItemForm(itemsUl, band.id, it, li);
         });
         li.appendChild(edit);
-        attachItemPhotos(li, band, it);
+
+        attachItemPhotos(li, band, it);           // fotos estáticas del código
+        const live = byItem.get(it.id) || [];     // fotos en vivo del equipo
+        if (live.length) {
+          li.classList.add("has-photos");
+          let strip = li.querySelector(".itemphotos");
+          if (!strip) { strip = document.createElement("div"); strip.className = "itemphotos"; li.appendChild(strip); }
+          live.forEach(p => strip.appendChild(itemPhotoNode(p, it.cat)));
+        }
+
+        const addPh = document.createElement("button");
+        addPh.className = "addphoto";
+        addPh.type = "button";
+        addPh.textContent = "＋ Foto";
+        addPh.setAttribute("aria-label", `Agregar foto a ${it.cat || it.text || "ítem"}`);
+        addPh.addEventListener("click", () => pickPhotoFor(it.id, it.cat));
+        li.appendChild(addPh);
+
         itemsUl.appendChild(li);
+      }
+
+      /* ---- Fotos del escenario (stage plot) ---- */
+      stageWrap.innerHTML = "";
+      if (stage.length) {
+        plotwrap.hidden = false;
+        stageLabel.hidden = false;
+        stage.forEach(p => stageWrap.appendChild(stagePhotoNode(p)));
+      } else {
+        stageLabel.hidden = true;
+      }
+
+      /* ---- Galería general ---- */
+      gallery.innerHTML = "";
+      (band.staticPhotos || []).forEach((src, i) => {
+        gallery.appendChild(photoNode(src, `Foto ${i + 1} de ${band.name}`, null, band.id));
       });
+      general.forEach(p => {
+        gallery.appendChild(photoNode(p.data, `Foto subida por el equipo — ${band.name}`, p.id, band.id));
+      });
+      if (!gallery.children.length) {
+        const e = document.createElement("div");
+        e.className = "empty";
+        e.style.gridColumn = "1 / -1";
+        e.textContent = "Sin fotos generales — usa “Tomar foto”, “Subir foto” o “＋ Foto” en un ítem.";
+        gallery.appendChild(e);
+      }
       markConn();
+    }
+
+    /* Ítems en vivo */
+    const itemsQ = query(collection(db, "bands", band.id, "items"), orderBy("ts"));
+    onSnapshot(itemsQ, snap => {
+      state.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAll();
+    }, err => connError(err));
+
+    /* Fotos en vivo */
+    const photosQ = query(collection(db, "bands", band.id, "photos"), orderBy("ts"));
+    onSnapshot(photosQ, snap => {
+      state.photos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderAll();
     }, err => connError(err));
 
     $('[data-role="additem"]', sec).addEventListener("click", async () => {
@@ -1068,25 +1474,26 @@
       openBulkForm(itemsUl, band.id, band.name);
     });
 
-    /* Fotos en vivo (estáticas primero) */
-    const photosQ = query(collection(db, "bands", band.id, "photos"), orderBy("ts"));
-    onSnapshot(photosQ, snap => {
-      gallery.innerHTML = "";
-      (band.staticPhotos || []).forEach((src, i) => {
-        gallery.appendChild(photoNode(src, `Foto ${i + 1} de ${band.name}`, null, band.id));
+    /* Sube una foto con destino ya conocido (botón “＋ Foto” de un ítem). */
+    async function pickPhotoFor(itemId, catName) {
+      if (!await askPin()) return;
+      const inp = document.createElement("input");
+      inp.type = "file"; inp.accept = "image/*"; inp.hidden = true;
+      document.body.appendChild(inp);
+      inp.addEventListener("change", async () => {
+        const f = inp.files[0];
+        inp.remove();
+        if (!f) return;
+        try {
+          toast("Comprimiendo foto…");
+          const data = await compress(f);
+          if (data.length > 950000) { toast("Foto demasiado grande, intenta otra"); return; }
+          await addDoc(collection(db, "bands", band.id, "photos"), { data, ts: serverTimestamp(), itemId, cat: catName || "" });
+          toast("Foto agregada al ítem ✓");
+        } catch (err) { console.error(err); toast("No se pudo subir la foto"); }
       });
-      snap.forEach(d => {
-        gallery.appendChild(photoNode(d.data().data, `Foto subida por el equipo — ${band.name}`, d.id, band.id));
-      });
-      if (!gallery.children.length) {
-        const e = document.createElement("div");
-        e.className = "empty";
-        e.style.gridColumn = "1 / -1";
-        e.textContent = "Sin fotos todavía — usa “Tomar foto” o “Subir foto”.";
-        gallery.appendChild(e);
-      }
-      markConn();
-    }, err => connError(err));
+      inp.click();
+    }
 
     async function handlePhotos(input) {
       const files = [...input.files];
@@ -1098,8 +1505,17 @@
           toast("Comprimiendo foto…");
           const data = await compress(f);
           if (data.length > 950000) { toast("Foto demasiado grande, intenta otra"); continue; }
-          await addDoc(collection(db, "bands", band.id, "photos"), { data, ts: serverTimestamp() });
-          toast("Foto publicada ✓");
+          toast("Reconociendo…");
+          const guess = await recognizePhoto(data);
+          const dest = await assignPhotoDialog(band, data, guess, state.items);
+          if (!dest) { toast("Foto descartada"); continue; }
+          const payload = { data, ts: serverTimestamp() };
+          if (dest.itemId) payload.itemId = dest.itemId;
+          if (dest.cat) payload.cat = dest.cat;
+          if (guess && guess.label) learnLabel(guess.label, dest.cat || "");
+          await addDoc(collection(db, "bands", band.id, "photos"), payload);
+          toast(dest.itemId === STAGE_ID ? "Foto de escenario publicada ✓"
+              : dest.itemId ? "Foto asignada al ítem ✓" : "Foto publicada ✓");
         } catch (err) {
           console.error(err);
           toast("No se pudo subir la foto");
@@ -1108,6 +1524,8 @@
     }
     fileInput.addEventListener("change", () => handlePhotos(fileInput));
     if (uploadInput) uploadInput.addEventListener("change", () => handlePhotos(uploadInput));
+
+    renderAll();
   }
 
   function photoNode(src, alt, docId, bandId) {
