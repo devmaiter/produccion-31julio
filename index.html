@@ -565,6 +565,7 @@
       <div>
         <p class="label"><span>Fotos</span>
           <label class="mini">Tomar foto<input type="file" accept="image/*" capture="environment" hidden data-role="file"></label>
+          <label class="mini">Subir foto<input type="file" accept="image/*" multiple hidden data-role="upload"></label>
         </p>
         <div class="gallery" data-role="gallery"></div>
       </div>
@@ -1025,6 +1026,7 @@
     const itemsUl = $('[data-role="items"]', sec);
     const gallery = $('[data-role="gallery"]', sec);
     const fileInput = $('[data-role="file"]', sec);
+    const uploadInput = $('[data-role="upload"]', sec);
 
     /* Ítems en vivo */
     const itemsQ = query(collection(db, "bands", band.id, "items"), orderBy("ts"));
@@ -1080,15 +1082,15 @@
         const e = document.createElement("div");
         e.className = "empty";
         e.style.gridColumn = "1 / -1";
-        e.textContent = "Sin fotos todavía — usa “Tomar foto”.";
+        e.textContent = "Sin fotos todavía — usa “Tomar foto” o “Subir foto”.";
         gallery.appendChild(e);
       }
       markConn();
     }, err => connError(err));
 
-    fileInput.addEventListener("change", async () => {
-      const files = [...fileInput.files];
-      fileInput.value = "";
+    async function handlePhotos(input) {
+      const files = [...input.files];
+      input.value = "";
       if (!files.length) return;
       if (!await askPin()) return;
       for (const f of files) {
@@ -1103,7 +1105,9 @@
           toast("No se pudo subir la foto");
         }
       }
-    });
+    }
+    fileInput.addEventListener("change", () => handlePhotos(fileInput));
+    if (uploadInput) uploadInput.addEventListener("change", () => handlePhotos(uploadInput));
   }
 
   function photoNode(src, alt, docId, bandId) {
