@@ -640,9 +640,9 @@
   const BANDS3 = [
     { id: "aviva-band-dom",  name: "Aviva Band",            time: "14:00 – 14:25", dur: "0:25" },
     { id: "one-4-all-dom",   name: "One 4 All",             time: "14:30 – 14:55", dur: "0:25" },
-    { id: "diana-paipa-dom", name: "Diana Paipa",           time: "15:10 – 15:30", dur: "0:20" },
-    { id: "rapha-dom",       name: "Rapha",                 time: "15:35 – 15:55", dur: "0:20" },
-    { id: "vasija-de-barro-dom", name: "Vasija de Barro",   time: "16:00 – 16:20", dur: "0:20" },
+    { id: "diana-paipa-dom", dataId: "diana-paipa", name: "Diana Paipa",         time: "15:10 – 15:30", dur: "0:20" },
+    { id: "rapha-dom",       dataId: "rapha",       name: "Rapha",               time: "15:35 – 15:55", dur: "0:20" },
+    { id: "vasija-de-barro-dom", dataId: "vasija-de-barro", name: "Vasija de Barro", time: "16:00 – 16:20", dur: "0:20" },
     { id: "cales-louima",    name: "Cales Louima",          time: "16:30 – 17:15", dur: "0:45" },
     { id: "rescate",         name: "Rescate",               time: "17:30 – 18:30", dur: "1:00" },
     { id: "miel-san-marcos", name: "Miel San Marcos",       time: "18:45 – 19:45", dur: "1:00" },
@@ -1023,13 +1023,14 @@
 
   function wireBand(band, sec) {
     sec = sec || document.getElementById(band.id);
+    const dataId = band.dataId || band.id;
     const itemsUl = $('[data-role="items"]', sec);
     const gallery = $('[data-role="gallery"]', sec);
     const fileInput = $('[data-role="file"]', sec);
     const uploadInput = $('[data-role="upload"]', sec);
 
-    /* Ítems en vivo */
-    const itemsQ = query(collection(db, "bands", band.id, "items"), orderBy("ts"));
+    /* Ítems en vivo (compartidos entre días vía dataId cuando la banda repite) */
+    const itemsQ = query(collection(db, "bands", dataId, "items"), orderBy("ts"));
     onSnapshot(itemsQ, snap => {
       itemsUl.innerHTML = "";
       if (snap.empty) {
@@ -1054,7 +1055,7 @@
         edit.setAttribute("aria-label", `Editar ${it.cat || "ítem"}`);
         edit.addEventListener("click", async () => {
           if (!await askPin()) return;
-          openItemForm(itemsUl, band.id, { id: d.id, ...it }, li);
+          openItemForm(itemsUl, dataId, { id: d.id, ...it }, li);
         });
         li.appendChild(edit);
         attachItemPhotos(li, band, it);
@@ -1065,18 +1066,18 @@
 
     $('[data-role="additem"]', sec).addEventListener("click", async () => {
       if (!await askPin()) return;
-      openBulkForm(itemsUl, band.id, band.name);
+      openBulkForm(itemsUl, dataId, band.name);
     });
 
     /* Fotos en vivo (estáticas primero) */
-    const photosQ = query(collection(db, "bands", band.id, "photos"), orderBy("ts"));
+    const photosQ = query(collection(db, "bands", dataId, "photos"), orderBy("ts"));
     onSnapshot(photosQ, snap => {
       gallery.innerHTML = "";
       (band.staticPhotos || []).forEach((src, i) => {
-        gallery.appendChild(photoNode(src, `Foto ${i + 1} de ${band.name}`, null, band.id));
+        gallery.appendChild(photoNode(src, `Foto ${i + 1} de ${band.name}`, null, dataId));
       });
       snap.forEach(d => {
-        gallery.appendChild(photoNode(d.data().data, `Foto subida por el equipo — ${band.name}`, d.id, band.id));
+        gallery.appendChild(photoNode(d.data().data, `Foto subida por el equipo — ${band.name}`, d.id, dataId));
       });
       if (!gallery.children.length) {
         const e = document.createElement("div");
@@ -1098,7 +1099,7 @@
           toast("Comprimiendo foto…");
           const data = await compress(f);
           if (data.length > 950000) { toast("Foto demasiado grande, intenta otra"); continue; }
-          await addDoc(collection(db, "bands", band.id, "photos"), { data, ts: serverTimestamp() });
+          await addDoc(collection(db, "bands", dataId, "photos"), { data, ts: serverTimestamp() });
           toast("Foto publicada ✓");
         } catch (err) {
           console.error(err);
