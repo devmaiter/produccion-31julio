@@ -389,6 +389,34 @@
     cursor: pointer;
   }
   .itemform button.danger { color: var(--danger); border-color: var(--danger); }
+  .itemform .photos {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .itemform .photos .thumbs { display: contents; }
+  .itemform .photos .thumb {
+    position: relative;
+    width: 64px; height: 64px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .itemform .photos .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .itemform .photos .thumb button {
+    position: absolute;
+    top: 2px; right: 2px;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 0;
+    background: rgba(10, 10, 12, .65);
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+  }
   @media (max-width: 480px) { .itemform { grid-template-columns: 1fr; } }
 
   figure { margin: 0; }
@@ -1144,25 +1172,35 @@
   /* Fotos de equipo asociadas a un ítem del backline (p.ej. cada platillo).
      Se muestran dentro del ítem cuya categoría coincide, no en la galería general. */
   function attachItemPhotos(li, band, it) {
-    if (!band.itemPhotos) return;
-    const key = (it.cat || "").trim().toLowerCase();
-    let photos = band.itemPhotos[key];
-    if (!photos && detectCategory(((it.cat || "") + " " + (it.text || "")).trim()) === "Platillos") {
-      photos = band.itemPhotos.platillos;
+    // Fotos estáticas por categoría (configuradas en el código de cada banda).
+    let staticPhotos = null;
+    if (band.itemPhotos) {
+      const key = (it.cat || "").trim().toLowerCase();
+      staticPhotos = band.itemPhotos[key];
+      if (!staticPhotos && detectCategory(((it.cat || "") + " " + (it.text || "")).trim()) === "Platillos") {
+        staticPhotos = band.itemPhotos.platillos;
+      }
     }
-    if (!photos || !photos.length) return;
+    // Fotos subidas por el equipo, guardadas en el propio ítem.
+    const userPhotos = Array.isArray(it.photos) ? it.photos : [];
+
+    const list = [];
+    (staticPhotos || []).forEach(p => list.push({ src: p.src, label: p.label || "Platillo" }));
+    userPhotos.forEach(src => { if (src) list.push({ src, label: "" }); });
+    if (!list.length) return;
+
     li.classList.add("has-photos");
     const strip = document.createElement("div");
     strip.className = "itemphotos";
-    photos.forEach(p => {
+    list.forEach(p => {
       const fig = document.createElement("figure");
       const btn = document.createElement("button");
       btn.className = "imgbtn";
       btn.type = "button";
-      btn.setAttribute("aria-label", `Ampliar ${p.label || "platillo"}`);
+      btn.setAttribute("aria-label", `Ampliar ${p.label || (it.cat || "foto")}`);
       const img = document.createElement("img");
       img.src = p.src;
-      img.alt = p.label || "Platillo";
+      img.alt = p.label || (it.cat ? `Foto de ${it.cat}` : "Foto del ítem");
       img.loading = "lazy";
       btn.appendChild(img);
       fig.appendChild(btn);
@@ -1187,6 +1225,69 @@
     const textIn = document.createElement("input");
     textIn.placeholder = "Detalle (ej. Yamaha, 1 ride, 2 crash…)";
     textIn.value = existing?.text || "";
+
+    /* Fotos del ítem: se pueden tomar con la cámara o subir desde galería.
+       Se guardan (comprimidas) dentro del propio documento del ítem. */
+    let photos = Array.isArray(existing?.photos) ? existing.photos.filter(Boolean) : [];
+    const ITEM_PHOTO_MAX = 6;
+    const ITEM_PHOTO_BUDGET = 850000; // margen bajo el límite de 1MB por documento
+    const photosWrap = document.createElement("div");
+    photosWrap.className = "photos";
+    const thumbs = document.createElement("div");
+    thumbs.className = "thumbs";
+    const camLabel = document.createElement("label");
+    camLabel.className = "mini";
+    camLabel.textContent = "Tomar foto";
+    const camIn = document.createElement("input");
+    camIn.type = "file"; camIn.accept = "image/*"; camIn.capture = "environment"; camIn.hidden = true;
+    camLabel.appendChild(camIn);
+    const upLabel = document.createElement("label");
+    upLabel.className = "mini";
+    upLabel.textContent = "Subir foto";
+    const upIn = document.createElement("input");
+    upIn.type = "file"; upIn.accept = "image/*"; upIn.multiple = true; upIn.hidden = true;
+    upLabel.appendChild(upIn);
+    photosWrap.append(thumbs, camLabel, upLabel);
+
+    function renderThumbs() {
+      thumbs.innerHTML = "";
+      photos.forEach((src, i) => {
+        const t = document.createElement("div");
+        t.className = "thumb";
+        const im = document.createElement("img");
+        im.src = src; im.alt = "Foto del ítem";
+        t.appendChild(im);
+        const rm = document.createElement("button");
+        rm.type = "button"; rm.textContent = "✕";
+        rm.setAttribute("aria-label", "Quitar foto");
+        rm.addEventListener("click", () => { photos.splice(i, 1); renderThumbs(); });
+        t.appendChild(rm);
+        thumbs.appendChild(t);
+      });
+    }
+    renderThumbs();
+
+    async function addItemPhotos(input) {
+      const files = [...input.files];
+      input.value = "";
+      for (const f of files) {
+        if (photos.length >= ITEM_PHOTO_MAX) { toast(`Máximo ${ITEM_PHOTO_MAX} fotos por ítem`); break; }
+        try {
+          toast("Comprimiendo foto…");
+          const data = await compress(f, 800, 0.62);
+          const used = photos.reduce((n, p) => n + p.length, 0);
+          if (used + data.length > ITEM_PHOTO_BUDGET) { toast("No caben más fotos en este ítem"); break; }
+          photos.push(data);
+          renderThumbs();
+        } catch (err) {
+          console.error(err);
+          toast("No se pudo agregar la foto");
+        }
+      }
+    }
+    camIn.addEventListener("change", () => addItemPhotos(camIn));
+    upIn.addEventListener("change", () => addItemPhotos(upIn));
+
     const actions = document.createElement("div");
     actions.className = "actions";
     const save = document.createElement("button");
@@ -1198,7 +1299,7 @@
     cancel.type = "button";
     cancel.textContent = "Cancelar";
     actions.append(save, cancel);
-    form.append(catIn, textIn, actions);
+    form.append(catIn, textIn, photosWrap, actions);
     if (existing) {
       const del = document.createElement("button");
       del.className = "ghost danger";
@@ -1215,13 +1316,13 @@
     save.addEventListener("click", async () => {
       const cat = catIn.value.trim();
       const text = textIn.value.trim();
-      if (!cat && !text) { toast("Escribe algo primero"); return; }
+      if (!cat && !text && !photos.length) { toast("Escribe algo o agrega una foto"); return; }
       try {
         if (existing) {
-          await setDoc(doc(db, "bands", bandId, "items", existing.id), { cat, text, ts: existing.ts ?? serverTimestamp() }, { merge: true });
+          await setDoc(doc(db, "bands", bandId, "items", existing.id), { cat, text, photos, ts: existing.ts ?? serverTimestamp() }, { merge: true });
           toast("Ítem actualizado ✓");
         } else {
-          await addDoc(collection(db, "bands", bandId, "items"), { cat, text, ts: serverTimestamp() });
+          await addDoc(collection(db, "bands", bandId, "items"), { cat, text, photos, ts: serverTimestamp() });
           toast("Ítem publicado ✓");
         }
         form.remove();
@@ -1294,12 +1395,21 @@
     save.className = "mini";
     save.type = "button";
     save.textContent = "Publicar lista";
+    const single = document.createElement("button");
+    single.className = "ghost";
+    single.type = "button";
+    single.textContent = "📷 Uno con foto";
     const cancel = document.createElement("button");
     cancel.className = "ghost";
     cancel.type = "button";
     cancel.textContent = "Cancelar";
-    actions.append(save, cancel);
+    actions.append(save, single, cancel);
     form.append(hint, area, actions);
+
+    single.addEventListener("click", () => {
+      form.remove();
+      openItemForm(itemsUl, bandId, null);
+    });
 
     save.addEventListener("click", async () => {
       const items = parseBulkItems(area.value, bandName);
@@ -1323,19 +1433,18 @@
     area.focus();
   }
 
-  function compress(file) {
+  function compress(file, max = 1280, quality = 0.72) {
     return new Promise((resolve, reject) => {
       const url = URL.createObjectURL(file);
       const img = new Image();
       img.onload = () => {
-        const max = 1280;
         const ratio = Math.min(1, max / Math.max(img.width, img.height));
         const canvas = document.createElement("canvas");
         canvas.width = Math.round(img.width * ratio);
         canvas.height = Math.round(img.height * ratio);
         canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
         URL.revokeObjectURL(url);
-        resolve(canvas.toDataURL("image/jpeg", 0.72));
+        resolve(canvas.toDataURL("image/jpeg", quality));
       };
       img.onerror = reject;
       img.src = url;
