@@ -258,6 +258,7 @@
     justify-content: space-between;
     gap: 10px;
   }
+  .label .labelbtns { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   button.mini, label.mini {
     font: inherit;
     font-size: 12px;
@@ -583,7 +584,7 @@
     </div>
     <div class="band-body">
       <div>
-        <p class="label"><span>Backline · Equipo que usa la banda</span><button class="mini" type="button" data-role="additem">＋ Agregar ítems</button></p>
+        <p class="label"><span>Backline · Equipo que usa la banda</span><span class="labelbtns"><button class="mini" type="button" data-role="scanitems">📷 De foto</button><button class="mini" type="button" data-role="additem">＋ Agregar ítems</button></span></p>
         <ul class="backline" data-role="items"></ul>
       </div>
       <figure data-role="plotwrap" hidden>
@@ -1099,6 +1100,12 @@
       openBulkForm(itemsUl, band.id, band.name);
     });
 
+    const scanBtn = $('[data-role="scanitems"]', sec);
+    if (scanBtn) scanBtn.addEventListener("click", async () => {
+      if (!await askPin()) return;
+      scanItemsFromPhoto(itemsUl, band.id, band.name);
+    });
+
     /* Fotos en vivo (estáticas primero) */
     const photosQ = query(collection(db, "bands", band.id, "photos"), orderBy("ts"));
     onSnapshot(photosQ, snap => {
@@ -1439,7 +1446,7 @@
     }).filter(Boolean);
   }
 
-  function openBulkForm(itemsUl, bandId, bandName) {
+  function openBulkForm(itemsUl, bandId, bandName, prefill) {
     const old = itemsUl.querySelector(".itemform");
     if (old) old.remove();
     const form = document.createElement("li");
@@ -1447,10 +1454,13 @@
 
     const hint = document.createElement("p");
     hint.className = "hint";
-    hint.textContent = "Pega o escribe una línea por ítem. Usa “Categoría: detalle” para separar (ej. “Platillos: 1 ride, 1 crash 18”). Si una línea no trae “:”, se intenta adivinar la categoría (ej. “1 HotRod Deville” → Ampli guitarra). Siempre puedes corregirla con ✎.";
+    hint.textContent = prefill
+      ? "Texto leído de la foto. Revísalo: una línea por ítem, corrige lo que haga falta y publica. Las categorías se adivinan solas y puedes ajustarlas después con ✎."
+      : "Pega o escribe una línea por ítem. Usa “Categoría: detalle” para separar (ej. “Platillos: 1 ride, 1 crash 18”). Si una línea no trae “:”, se intenta adivinar la categoría (ej. “1 HotRod Deville” → Ampli guitarra). Siempre puedes corregirla con ✎.";
 
     const area = document.createElement("textarea");
     area.placeholder = "Platillos: 1 ride, 1 crash 18, 1 crash 17, 1 splash 12, hi hat\nBases: la misma cantidad de platos\nUna base de teclado\n1 HotRod Deville\n1 Montage 8\n3 bases de instrumento";
+    if (prefill) area.value = prefill;
 
     const actions = document.createElement("div");
     actions.className = "actions";
@@ -1494,6 +1504,72 @@
     cancel.addEventListener("click", () => form.remove());
     itemsUl.prepend(form);
     area.focus();
+  }
+
+  /* ---- Subir foto → sacar los ítems (OCR en el dispositivo) ----
+     Lee el texto de una foto (una lista escrita/impresa: rider, hoja, plano),
+     lo pre-carga en el formulario para revisar y lo clasifica con el motor que
+     aprende. El OCR (Tesseract.js) se descarga solo la primera vez que se usa;
+     el resto de la app sigue funcionando sin internet. */
+  const TESSERACT_URL = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+  let _tessPromise = null;
+  function loadTesseract() {
+    if (_tessPromise) return _tessPromise;
+    _tessPromise = new Promise((resolve, reject) => {
+      if (window.Tesseract) return resolve(window.Tesseract);
+      const s = document.createElement("script");
+      s.src = TESSERACT_URL;
+      s.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error("Tesseract no disponible"));
+      s.onerror = () => { _tessPromise = null; reject(new Error("No se pudo cargar el OCR")); };
+      document.head.appendChild(s);
+    });
+    return _tessPromise;
+  }
+
+  /* Limpia el texto crudo del OCR: quita líneas de ruido y normaliza viñetas. */
+  function cleanOcrText(raw) {
+    return (raw || "")
+      .split(/\r?\n/)
+      .map(l => l.replace(/^[\s•\-*·—>|]+/, "").replace(/\s+/g, " ").trim())
+      .filter(l => l.length >= 2 && /[a-zA-Z0-9]/.test(l))
+      .join("\n");
+  }
+
+  function scanItemsFromPhoto(itemsUl, bandId, bandName) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.hidden = true;
+    document.body.appendChild(input);
+    input.addEventListener("change", async () => {
+      const file = input.files && input.files[0];
+      input.remove();
+      if (!file) return;
+      if (!navigator.onLine && !window.Tesseract) {
+        toast("El lector de fotos necesita internet la primera vez");
+        return;
+      }
+      let worker = null;
+      try {
+        toast("Leyendo la foto… puede tardar unos segundos");
+        const T = await loadTesseract();
+        worker = await T.createWorker("spa");
+        const { data } = await worker.recognize(file);
+        const text = cleanOcrText(data && data.text);
+        if (!text) {
+          toast("No se leyó texto claro en la foto — prueba con más luz o acércate");
+          return;
+        }
+        openBulkForm(itemsUl, bandId, bandName, text);
+        toast("Texto leído ✓ revísalo y publica");
+      } catch (err) {
+        console.error(err);
+        toast("No se pudo leer la foto");
+      } finally {
+        if (worker) { try { await worker.terminate(); } catch (_) {} }
+      }
+    }, { once: true });
+    input.click();
   }
 
   function compress(file, max = 1280, quality = 0.72) {
