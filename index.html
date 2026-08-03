@@ -1088,6 +1088,9 @@
         attachItemPhotos(li, band, it);
         itemsUl.appendChild(li);
       });
+      // Alimenta el motor de aprendizaje con lo que ya hay guardado.
+      itemsByBand[band.id] = snap.docs.map(d => d.data());
+      rebuildCatModel();
       markConn();
     }, err => connError(err));
 
@@ -1353,7 +1356,67 @@
   ];
   function detectCategory(text) {
     for (const [cat, re] of CAT_RULES) if (re.test(text)) return cat;
-    return "";
+    // Las reglas curadas tienen prioridad; si no aciertan, usa lo aprendido.
+    return learnedGuess(text);
+  }
+
+  /* ---- Motor que aprende ----
+     Aprende la categoría a partir de TODOS los ítems ya guardados (y de cada
+     corrección hecha con ✎). Se alimenta de los snapshots en vivo, así que
+     "como ya tenemos bastantes, aprende" sin depender de internet ni de un
+     servidor: es un clasificador tipo bag-of-words en el propio navegador. */
+  const CAT_STOP = new Set([
+    "de","la","el","los","las","un","una","unos","unas","y","o","con","para","por",
+    "en","del","al","que","su","sus","mismo","misma","cantidad","instrumento"
+  ]);
+  const itemsByBand = {};
+  let catModel = { tokens: Object.create(null), cats: Object.create(null) };
+
+  function catTokens(s) {
+    const base = (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const raw = base.match(/[a-z0-9]+/g) || [];
+    return raw.filter(t => t.length >= 2 && !/^\d+$/.test(t) && !CAT_STOP.has(t));
+  }
+
+  function rebuildCatModel() {
+    const tokens = Object.create(null);
+    const cats = Object.create(null);
+    for (const bid in itemsByBand) {
+      for (const it of itemsByBand[bid]) {
+        const cat = (it.cat || "").trim();
+        if (!cat) continue;
+        cats[cat] = (cats[cat] || 0) + 1;
+        const seen = new Set();
+        for (const tk of catTokens(it.cat + " " + it.text)) {
+          if (seen.has(tk)) continue;
+          seen.add(tk);
+          const row = tokens[tk] || (tokens[tk] = Object.create(null));
+          row[cat] = (row[cat] || 0) + 1;
+        }
+      }
+    }
+    catModel = { tokens, cats };
+  }
+
+  function learnedGuess(text) {
+    const toks = catTokens(text);
+    if (!toks.length) return "";
+    const score = Object.create(null);
+    for (const tk of toks) {
+      const row = catModel.tokens[tk];
+      if (!row) continue;
+      let tot = 0;
+      for (const c in row) tot += row[c];
+      // Cada token reparte 1 voto entre las categorías donde ha aparecido.
+      for (const c in row) score[c] = (score[c] || 0) + row[c] / tot;
+    }
+    let best = "", bv = 0, second = 0;
+    for (const c in score) {
+      if (score[c] > bv) { second = bv; bv = score[c]; best = c; }
+      else if (score[c] > second) { second = score[c]; }
+    }
+    // Pide algo de evidencia y un margen claro sobre la segunda opción.
+    return (bv >= 1 && bv - second >= 0.5) ? best : "";
   }
 
   /* Convierte un bloque de texto en una lista de ítems { cat, text }.
