@@ -1,0 +1,13 @@
+{
+  "name": "backline-functions",
+  "private": true,
+  "description": "Extracción automática de ítems de backline a partir de fotos subidas en la app.",
+  "engines": { "node": "20" },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^14.3.0",
+    "firebase-functions": "^7.3.2",
+    "@anthropic-ai/sdk": "^0.120.0",
+    "zod": "^4.4.3"
+  }
+}

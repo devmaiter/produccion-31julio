@@ -328,6 +328,21 @@
     text-align: center;
     margin-top: 3px;
   }
+  .sugg-label { margin-top: 10px; }
+  ul.backline.suggestions { margin-top: 4px; }
+  ul.backline li.suggestion {
+    border-style: dashed;
+    padding-right: 56px;
+  }
+  ul.backline li.suggestion .sugg-actions {
+    position: absolute;
+    top: 4px; right: 4px;
+    display: flex;
+    gap: 2px;
+  }
+  ul.backline li.suggestion button.editbtn { position: static; font-size: 15px; padding: 3px 7px; }
+  ul.backline li.suggestion button.editbtn.accept { color: #16a34a; }
+  ul.backline li.suggestion button.editbtn.reject { color: var(--danger); }
   .itemform {
     grid-column: 1 / -1;
     display: grid;
@@ -557,6 +572,8 @@
       <div>
         <p class="label"><span>Backline · Equipo que usa la banda</span><button class="mini" type="button" data-role="additem">＋ Agregar ítems</button></p>
         <ul class="backline" data-role="items"></ul>
+        <p class="label sugg-label" data-role="suggtitle" hidden><span>Sugerencias del asistente · según las fotos</span></p>
+        <ul class="backline suggestions" data-role="suggestions" hidden></ul>
       </div>
       <figure data-role="plotwrap" hidden>
         <p class="label"><span>Stage plot · Plano de ubicación en tarima</span></p>
@@ -598,7 +615,7 @@
      cuando hay conexión y usa caché local (IndexedDB) para trabajar sin señal. */
   let initializeApp, initializeFirestore, getFirestore,
       collection, doc, addDoc, setDoc, deleteDoc,
-      onSnapshot, query, orderBy, serverTimestamp,
+      onSnapshot, query, orderBy, where, serverTimestamp,
       persistentLocalCache, persistentMultipleTabManager;
   let db = null;
 
@@ -805,7 +822,7 @@
       ]);
       initializeApp = appMod.initializeApp;
       ({ getFirestore, collection, doc, addDoc, setDoc, deleteDoc,
-         onSnapshot, query, orderBy, serverTimestamp,
+         onSnapshot, query, orderBy, where, serverTimestamp,
          initializeFirestore, persistentLocalCache, persistentMultipleTabManager } = fsMod);
       const app = initializeApp(firebaseConfig);
       try {
@@ -1102,6 +1119,65 @@
       if (!await askPin()) return;
       openBulkForm(itemsUl, dataId, band.name);
     });
+
+    /* Sugerencias de ítems generadas por IA a partir de fotos subidas (Cloud
+       Function "suggestItemsFromPhoto", ver /functions). Quedan en una
+       colección aparte para revisión: el equipo las acepta o descarta antes
+       de que pasen al backline real. */
+    const suggTitle = $('[data-role="suggtitle"]', sec);
+    const suggUl = $('[data-role="suggestions"]', sec);
+    if (suggUl) {
+      const suggQ = query(
+        collection(db, "bands", dataId, "itemSuggestions"),
+        where("status", "==", "pending"),
+        orderBy("ts")
+      );
+      onSnapshot(suggQ, snap => {
+        suggUl.innerHTML = "";
+        suggTitle.hidden = snap.empty;
+        suggUl.hidden = snap.empty;
+        snap.forEach(d => {
+          const it = d.data();
+          const li = document.createElement("li");
+          li.className = "suggestion";
+          const cat = document.createElement("span");
+          cat.className = "cat";
+          cat.textContent = it.cat || "Ítem";
+          li.appendChild(cat);
+          li.appendChild(document.createTextNode(it.text || ""));
+
+          const actions = document.createElement("div");
+          actions.className = "sugg-actions";
+          const accept = document.createElement("button");
+          accept.className = "editbtn accept";
+          accept.type = "button";
+          accept.textContent = "✓";
+          accept.setAttribute("aria-label", `Añadir sugerencia: ${it.cat || "ítem"}`);
+          accept.addEventListener("click", async () => {
+            if (!await askPin()) return;
+            try {
+              await addDoc(collection(db, "bands", dataId, "items"),
+                { cat: it.cat || "", text: it.text || "", ts: serverTimestamp() });
+              await deleteDoc(doc(db, "bands", dataId, "itemSuggestions", d.id));
+            } catch (err) { console.error(err); toast("No se pudo añadir la sugerencia"); }
+          });
+          const reject = document.createElement("button");
+          reject.className = "editbtn reject";
+          reject.type = "button";
+          reject.textContent = "✕";
+          reject.setAttribute("aria-label", `Descartar sugerencia: ${it.cat || "ítem"}`);
+          reject.addEventListener("click", async () => {
+            if (!await askPin()) return;
+            try { await deleteDoc(doc(db, "bands", dataId, "itemSuggestions", d.id)); }
+            catch (err) { console.error(err); toast("No se pudo descartar"); }
+          });
+          actions.append(accept, reject);
+          li.appendChild(actions);
+          suggUl.appendChild(li);
+        });
+        markConn();
+      }, err => connError(err));
+    }
 
     /* Fotos en vivo (estáticas primero) */
     const photosQ = query(collection(db, "bands", dataId, "photos"), orderBy("ts"));
