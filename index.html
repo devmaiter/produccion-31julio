@@ -763,21 +763,45 @@
     },
     {
       /* Vallenato al Parque 2026, Parque Simón Bolívar. Horario parcial:
-         solo confirmadas las 3 primeras bandas y el cambio tras la
-         tercera; falta el resto del viernes y aún no hay datos de
-         sábado/domingo de este evento. Completar según llegue la info. */
+         confirmado hasta el almuerzo (13:50); falta la tarde del viernes.
+         El bloque 12:10–12:50 aún no tiene artista asignado en la hoja de
+         producción. */
       id: "vallenato-21", tab: "Vie 21 ago",
       date: "Viernes <strong>21 de agosto</strong>", inicio: "8:00", final: "--:--",
       sched: [
         { t:"section", name:"Pruebas de sonido · 8:00" },
-        { t:"band",  time:"9:00 – 9:30",   name:"VACAP",                                  dur:"0:30", id:"vacap" },
-        { t:"pause", time:"9:30 – 9:45",   name:"Cambio",                                 dur:"0:15" },
-        { t:"band",  time:"9:45 – 10:15",  name:"Combo Nuestra Tierra",                   dur:"0:30" },
-        { t:"pause", time:"10:15 – 10:30", name:"Cambio",                                 dur:"0:15" },
-        { t:"band",  time:"10:30 – 11:00", name:"Alfredo Gómez y Los Hijos de Majagual",  dur:"0:30" },
-        { t:"pause", time:"11:00 – 11:15", name:"Cambio",                                 dur:"0:15" }
+        { t:"band",  time:"9:00 – 9:30",   name:"VACAP",                                    dur:"0:30", id:"vacap" },
+        { t:"pause", time:"9:30 – 9:45",   name:"Cambio",                                   dur:"0:15" },
+        { t:"band",  time:"9:45 – 10:15",  name:"Combo Nuestra Tierra",                     dur:"0:30" },
+        { t:"pause", time:"10:15 – 10:30", name:"Cambio",                                   dur:"0:15" },
+        { t:"band",  time:"10:30 – 11:00", name:"Alfredo Gómez y Los Hijos de Majagual",    dur:"0:30" },
+        { t:"pause", time:"11:00 – 11:15", name:"Cambio",                                   dur:"0:15" },
+        { t:"band",  time:"11:15 – 11:55", name:"Homenaje \"100 años de Rafael Escalona\"", dur:"0:40" },
+        { t:"pause", time:"11:55 – 12:10", name:"Cambio",                                   dur:"0:15" },
+        { t:"band",  time:"12:10 – 12:50", name:"Por confirmar",                            dur:"0:40" },
+        { t:"lunch", time:"12:50 – 13:50", name:"Almuerzo",                                 dur:"1:00" }
       ],
       bands: BANDS4
+    },
+    {
+      /* Vallenato al Parque 2026, sábado 22 de agosto. Horario parcial:
+         confirmado solo hasta la apertura de puertas (12:30). El tramo
+         11:00–11:15 queda así (sin "Cambio" etiquetado) porque así está
+         en la hoja de producción, antes de Beto Zabaleta. */
+      id: "vallenato-22", tab: "Sáb 22 ago",
+      date: "Sábado <strong>22 de agosto</strong>", inicio: "8:00", final: "--:--",
+      sched: [
+        { t:"section", name:"Pruebas de sonido" },
+        { t:"band",  time:"8:00 – 8:45",   name:"Kandymaku",     dur:"0:45" },
+        { t:"pause", time:"8:45 – 9:00",   name:"Cambio",        dur:"0:15" },
+        { t:"band",  time:"9:00 – 9:45",   name:"Los Diablitos", dur:"0:45" },
+        { t:"pause", time:"9:45 – 10:00",  name:"Cambio",        dur:"0:15" },
+        { t:"band",  time:"10:00 – 10:45", name:"Otto Serge",    dur:"0:45" },
+        { t:"pause", time:"10:45 – 11:00", name:"Cambio",        dur:"0:15" },
+        { t:"band",  time:"11:15 – 12:15", name:"Beto Zabaleta", dur:"1:00" },
+        { t:"section", name:"Apertura de puertas · 12:30" }
+      ],
+      bands: []
     }
   ];
 
