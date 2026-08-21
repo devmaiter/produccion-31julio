@@ -727,6 +727,16 @@
         { t:"band",  time:"20:00 – 21:00", name:"Alex Zurdo",            dur:"1:00", id:"alex-zurdo" }
       ],
       bands: BANDS3
+    },
+    {
+      /* Día nuevo: dejar vacío (sin horario ni bandas) hasta tener la
+         info real. Al conocer fecha/horas y bandas, se completan aquí
+         igual que los días anteriores; las fotos/backline de cada banda
+         se suben luego desde la propia tarjeta cuando exista. */
+      id: "nuevo-dia", tab: "Nuevo día",
+      date: "Nuevo día <strong>(por definir)</strong>", inicio: "--:--", final: "--:--",
+      sched: [],
+      bands: []
     }
   ];
 
