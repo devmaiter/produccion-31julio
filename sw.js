@@ -3,7 +3,7 @@
    página y el SDK de Firebase. Los datos en vivo (Firestore) NO se interceptan:
    Firestore maneja su propio modo offline con caché local (IndexedDB). */
 
-const CACHE = "fvb-offline-v5";
+const CACHE = "fvb-offline-v6";
 
 /* App shell + módulos de entrada de Firebase (sus sub-módulos se cachean solos
    la primera vez que se cargan, gracias al handler de fetch). */
