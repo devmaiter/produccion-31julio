@@ -781,12 +781,17 @@
       bands: BANDS3
     },
     {
-      /* Vallenato al Parque 2026, Parque Simón Bolívar. Horario parcial:
-         confirmado hasta el almuerzo (13:50); falta la tarde del viernes.
-         El bloque 12:10–12:50 aún no tiene artista asignado en la hoja de
-         producción. */
-      id: "vallenato-21", tab: "Vie 21 ago",
-      date: "Viernes <strong>21 de agosto</strong>", inicio: "8:00", final: "--:--",
+      /* Vallenato al Parque 2026, Parque Simón Bolívar. Este día es la
+         PRUEBA DE SONIDO / ensayo técnico (hoja de producción interna),
+         no el show al público — por eso las horas no coinciden con las
+         del cartel oficial del sábado/domingo para las mismas bandas
+         (ej. VACAP: prueba 9:00 vie, show 1:30 p.m. sáb). El tab y la
+         fecha lo marcan explícito para no confundirlo con un día de show.
+         Horario parcial: confirmado hasta el almuerzo (13:50); falta la
+         tarde del viernes. El bloque 12:10–12:50 aún no tiene artista
+         asignado en la hoja de producción. */
+      id: "vallenato-21", tab: "Vie 21 ago · Pruebas",
+      date: "Viernes <strong>21 de agosto</strong> · Pruebas de sonido", inicio: "8:00", final: "--:--",
       sched: [
         { t:"section", name:"Pruebas de sonido · 8:00" },
         { t:"band",  time:"9:00 – 9:30",   name:"VACAP",                                    dur:"0:30", id:"vacap" },
