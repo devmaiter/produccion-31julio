@@ -1098,6 +1098,34 @@
     }
   });
 
+  /* Cada banda es UN estado, no una copia por día: el backline en vivo
+     (ítems/fotos subidas) ya se comparte solo con Firestore porque todas
+     las apariciones de una banda usan el mismo dataId. Lo que faltaba
+     compartir era lo "de fábrica" (stage plot, fotos estáticas, fotos por
+     ítem): si una sola aparición de la banda las trae, este registro las
+     copia a cualquier otra aparición de la misma banda en otro día, para
+     que se vea igual en todos lados sin tener que repetir los datos. */
+  const BAND_LIBRARY = {};
+  DAYS.forEach(day => {
+    for (const b of day.bands) {
+      const key = b.dataId || b.id;
+      if (!key) continue;
+      const lib = BAND_LIBRARY[key] || (BAND_LIBRARY[key] = {});
+      if (b.plot && !lib.plot) { lib.plot = b.plot; lib.plotAlt = b.plotAlt; }
+      if (b.staticPhotos && !lib.staticPhotos) lib.staticPhotos = b.staticPhotos;
+      if (b.itemPhotos && !lib.itemPhotos) lib.itemPhotos = b.itemPhotos;
+    }
+  });
+  DAYS.forEach(day => {
+    for (const b of day.bands) {
+      const lib = BAND_LIBRARY[b.dataId || b.id];
+      if (!lib) continue;
+      if (lib.plot && !b.plot) { b.plot = lib.plot; b.plotAlt = lib.plotAlt; }
+      if (lib.staticPhotos && !b.staticPhotos) b.staticPhotos = lib.staticPhotos;
+      if (lib.itemPhotos && !b.itemPhotos) b.itemPhotos = lib.itemPhotos;
+    }
+  });
+
   DAYS.forEach((day, di) => {
     const tab = document.createElement("button");
     tab.type = "button";
