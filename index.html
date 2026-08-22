@@ -1044,6 +1044,31 @@
     setMeta(DAYS[idx]);
   }
 
+  /* Convierte un nombre de banda en un id usable como slug/dataId. */
+  function slugify(name) {
+    return (name || "")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "banda";
+  }
+
+  /* Toda banda del horario debe poder subir fotos/ítems desde ya, aunque
+     todavía no tenga ninguna: si un renglón del horario es una banda sin
+     tarjeta propia en `bands`, se le crea una vacía aquí (y se le asigna
+     id si no traía uno), en vez de dejarla sin forma de recibir fotos. */
+  DAYS.forEach(day => {
+    const known = new Set(day.bands.map(b => b.id));
+    for (const s of day.sched) {
+      if (s.t !== "band" || !s.name) continue;
+      if (!s.id) s.id = slugify(s.name);
+      if (!known.has(s.id)) {
+        day.bands.push({ id: s.id, name: s.name, time: s.time || "", dur: s.dur || "" });
+        known.add(s.id);
+      }
+    }
+  });
+
   DAYS.forEach((day, di) => {
     const tab = document.createElement("button");
     tab.type = "button";
