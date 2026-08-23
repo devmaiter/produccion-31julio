@@ -28,8 +28,7 @@ const ANTHROPIC_API_KEY = defineSecret("ANTHROPIC_API_KEY");
 
 const CATEGORIES = [
   "Batería", "Platillos", "Percusión", "Bajo", "Guitarra",
-  "Ampli bajo", "Ampli guitarra", "Teclado", "Micrófono",
-  "Monitores", "DI", "Bases", "Otro",
+  "Ampli bajo", "Ampli guitarra", "Teclado", "Bases", "Otro",
 ];
 
 const ItemsSchema = z.object({
@@ -44,12 +43,14 @@ const ALLOWED_IMAGE_TYPES = new Set([
 ]);
 
 const SYSTEM_PROMPT = `Eres un técnico de backline revisando fotos de equipo en tarima antes de un show.
-Identifica SOLO el equipo que puedas ver con razonable certeza: instrumentos, amplificadores,
-batería/percusión, teclados, micrófonos, monitores, cajas directas (DI), bases/atriles.
+Identifica SOLO backline: instrumentos, amplificadores, batería/percusión, teclados,
+bases/atriles de instrumento. NO incluyas micrófonos, monitores de piso, cajas directas (DI)
+ni nada de sonido/FOH — eso no es backline, aunque aparezca en la foto.
 No inventes marcas ni modelos que no se lean con claridad en la foto — descríbelo de forma
 genérica si no estás seguro (ej. "1 combo de guitarra" en vez de adivinar la marca).
-Si la foto no muestra equipo identificable (solo personas, público, escenario vacío, etc.)
-devuelve una lista vacía. Responde en español, con textos breves tipo "1 bajo de 5 cuerdas".`;
+Si la foto no muestra backline identificable (solo personas, público, escenario vacío, equipo
+de sonido, etc.) devuelve una lista vacía. Responde en español, con textos breves tipo
+"1 bajo de 5 cuerdas".`;
 
 exports.suggestItemsFromPhoto = onDocumentCreated(
   {
