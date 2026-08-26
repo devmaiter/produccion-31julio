@@ -259,6 +259,10 @@
     justify-content: space-between;
     gap: 10px;
   }
+  /* El atributo [hidden] pierde contra display:flex/grid en .label y
+     ul.backline por especificidad de cascada — se refuerza aquí para que
+     "hidden" sí oculte (ej. "Sugerencias" cuando no hay ninguna). */
+  .label[hidden], ul.backline[hidden] { display: none; }
   button.mini, label.mini {
     font: inherit;
     font-size: 12px;
