@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backline</title>
+  <link rel="stylesheet" href="/src/ui/estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Backline</h1>
+    <label>Evento <select id="evento"></select></label>
+    <nav id="vistas">
+      <button data-vista="backline" aria-pressed="true">Backline</button>
+      <button data-vista="totales">Totales</button>
+      <button data-vista="horario">Horario</button>
+      <button data-vista="lista">Pegar lista</button>
+    </nav>
+    <nav id="dias"></nav>
+    <p id="resumen"></p>
+  </header>
+  <main id="contenido"></main>
+  <script type="module" src="/src/ui/main.ts"></script>
+</body>
+</html>

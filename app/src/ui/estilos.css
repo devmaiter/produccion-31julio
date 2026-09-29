@@ -1,0 +1,19 @@
+/* Estilos mínimos a propósito: el diseño viene después. */
+:root { color-scheme: light dark; --ok: #1a7f37; --mal: #c62828; --warn: #b26a00; --linea: #8884; }
+body { font: 15px/1.4 system-ui, sans-serif; margin: 0; padding: 0 16px 48px; }
+header { position: sticky; top: 0; background: Canvas; padding: 8px 0; border-bottom: 1px solid var(--linea); z-index: 1; }
+h1 { font-size: 18px; margin: 4px 0; }
+nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+button[aria-pressed="true"] { font-weight: 700; outline: 2px solid currentColor; }
+table { border-collapse: collapse; width: 100%; margin: 6px 0 12px; }
+th, td { border-bottom: 1px solid var(--linea); padding: 4px 6px; text-align: left; vertical-align: top; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+input[type="number"] { width: 4em; }
+details { border: 1px solid var(--linea); border-radius: 6px; margin: 8px 0; padding: 4px 10px; }
+summary { cursor: pointer; font-weight: 600; }
+.ok { color: var(--ok); } .falta, .sobra { color: var(--mal); } .pendiente { opacity: .6; }
+.aviso { color: var(--warn); font-size: 12px; }
+.chip { font-size: 12px; border: 1px solid var(--linea); border-radius: 10px; padding: 0 6px; margin-left: 4px; }
+img.plot { max-width: 100%; height: auto; }
+textarea { width: 100%; min-height: 10em; font: inherit; }
+.tabla-scroll { overflow-x: auto; }

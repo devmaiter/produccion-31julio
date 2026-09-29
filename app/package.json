@@ -1,0 +1,25 @@
+{
+  "name": "backline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gestión de backline para festivales: une la hoja de producción (Simón Bolívar / Vallenato al Parque) y la lista de chequeo de Cordillera 2026 en un solo modelo de datos.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "importar": "tsx scripts/importar-prototipos.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  }
+}
