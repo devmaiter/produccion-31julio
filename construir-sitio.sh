@@ -14,4 +14,13 @@ if [ -d extractor/dist ]; then
 else
   echo "aviso: no hay extractor/dist; en la rama extractor corre 'cd extractor && npm install && npm run build' y vuelve a armar" >&2
 fi
+# Bytes de control crudos dentro de cadenas de los scripts minificados → \xNN (igual para JS);
+# así el sitio también se puede publicar como artefacto.
+python3 - <<'PY'
+import re, pathlib
+for p in pathlib.Path("sitio").rglob("*"):
+    if p.suffix in (".js", ".mjs") and p.is_file():
+        b = p.read_bytes(); n, k = re.subn(rb"[\x00-\x08\x0b\x0c\x0e-\x1f]", lambda m: b"\\x%02x" % m.group(0)[0], b)
+        if k: p.write_bytes(n); print(f"escapados {k} bytes en {p}")
+PY
 du -sh sitio
