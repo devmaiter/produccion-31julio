@@ -3,7 +3,10 @@
 Lista de chequeo del backline del **Escenario 2 (Aval Aconcagua)** del festival
 Cordillera 2026, Parque Simón Bolívar, Bogotá.
 
-El entregable es una sola página web sin dependencias: `backline-esc2.html`.
+El entregable es una página web, `backline-esc2.html`, más la carpeta `lector/`
+que usa la pestaña **Subir documento**. Hay que servir la carpeta completa
+(por ejemplo `npx serve cordillera` o `python3 -m http.server` dentro de
+`cordillera/`); abrir el HTML suelto desde el disco no deja cargar el lector.
 
 ## Qué contiene la página
 
@@ -16,6 +19,7 @@ El entregable es una sola página web sin dependencias: `backline-esc2.html`.
 | Pruebas | Load in, soundcheck, linecheck y cambios del viernes 11, sábado 12 y domingo 13 |
 | Stage plots | Los 8 planos de escenario extraídos del desglose |
 | Σ Totales | Cada referencia con lo que pide cada día y lo que hay que tener |
+| ＋ Subir documento | Sueltas el rider (PDF, foto, correo, texto) o el desglose `.xlsx`; se lee en el dispositivo y eliges qué entra a la lista y a qué banda |
 
 Funciona en celular, guarda lo verificado en el dispositivo y lo sincroniza
 entre dispositivos de la misma cuenta.
@@ -80,3 +84,26 @@ Todo esto depende de material que aún no está transcrito:
   Romero, La Piña) = equipo de terceros.
 - La marca `✓ hoja` en la página significa que ese ítem ya tenía chulo a mano
   en el papel.
+
+## Subir documento
+
+La pestaña **＋ Subir documento** lee un rider o el desglose de producción
+con el lector de la rama `lector`, empaquetado en `lector/lector.js` (con
+pdfjs, Tesseract para OCR y exceljs adentro) y `lector/ocr/` (motor e idiomas,
+17 MB). Todo corre en el dispositivo, sin internet ni servicios pagos.
+
+1. Sueltas el archivo (o tomas una foto, o pegas el texto). Si es de una
+   sola banda puedes decir cuál y de qué día; si es el desglose, el lector
+   reconoce las bandas y los días solo.
+2. Aparece una tarjeta por banda con lo leído: cantidad editable, grupo,
+   quién lo pone ("trae la banda" cuando el rider lo dice) y lo dudoso en
+   ámbar con su nota (alternativas que no suman, frases del rider, lecturas
+   del OCR). Lo que el lector no entendió queda en "avisos".
+3. Eliges la banda de destino (o "nueva banda") y agregas. Lo que ya estaba
+   con la misma descripción no se repite. Lo agregado queda en el
+   dispositivo (`state.extra`), se sincroniza con los demás dispositivos
+   igual que lo verificado, entra en los totales y se puede quitar desde la
+   misma pestaña.
+
+Para regenerar `lector/` después de cambiar el lector: en la rama `extractor`,
+`cd extractor && npm run build:cordillera`.

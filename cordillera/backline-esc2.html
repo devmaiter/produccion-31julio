@@ -1,3 +1,9 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
 <title>Backline ESC 2</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
@@ -70,7 +76,7 @@ h1 small{font-size:15px;font-weight:600;color:var(--ink3);letter-spacing:.08em;m
 .note b{color:var(--ink)}
 
 /* Artist section */
-.artist{background:var(--surface);border:1px solid var(--line2);border-radius:12px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
+.artist{scroll-margin-top:150px;background:var(--surface);border:1px solid var(--line2);border-radius:12px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden}
 .artist>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--line2)}
 .artist>summary::-webkit-details-marker{display:none}
 .artist:not([open])>summary{border-bottom:0}
@@ -269,6 +275,42 @@ details.plot[open]>summary{border-bottom:1px solid var(--line2)}
   .qty{justify-content:flex-start;margin-top:4px}
 }
 @media (prefers-reduced-motion:reduce){.chev{transition:none}}
+
+/* Subir documento */
+.sub{max-width:900px}
+.sub-zona{border:2px dashed var(--line);border-radius:12px;padding:22px 16px;text-align:center;background:var(--surface);margin:14px 0 10px;cursor:pointer}
+.sub-zona.encima{border-color:var(--accent);background:var(--accent-soft)}
+.sub-zona p{margin:4px 0}
+.sub-zona small{color:var(--ink3)}
+.sub-zona button.lnk{border:0;background:none;color:var(--accent);text-decoration:underline;padding:0;font-weight:600}
+.sub-opc{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:10px}
+.sub-opc label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--ink3)}
+.sub-opc select,.sub textarea,.sub input[type=text]{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 9px;font:inherit;color:inherit}
+.sub textarea{width:100%;min-height:120px;margin-bottom:8px}
+.sub-prog{display:grid;gap:4px;margin:8px 0}
+.sub-prog div{display:flex;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line2);border-radius:8px;padding:6px 10px;font-size:13px}
+.sub-prog div span:last-child{color:var(--ink3);text-align:right}
+.sub-prog div.ok span:last-child{color:var(--ok)}
+.sub-prog div.err span:last-child{color:var(--bad)}
+.sub-card{background:var(--surface);border:1px solid var(--line2);border-radius:12px;box-shadow:var(--shadow);margin:12px 0;overflow:hidden}
+.sub-card>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--line2)}
+.sub-card>header h2{font-family:var(--display);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin:0;flex:1;min-width:140px}
+.sub-card>header select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;font:inherit;color:inherit;max-width:100%}
+.sub-card>header .abtn.go{border-color:var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:600}
+.sub-item{display:grid;grid-template-columns:28px 64px 1fr;gap:8px;align-items:center;padding:6px 14px;border-top:1px solid var(--line2);font-size:14px}
+.sub-item input[type=number]{width:60px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:4px 6px;font:inherit;color:inherit;text-align:right}
+.sub-item input[type=checkbox]{width:18px;height:18px;accent-color:var(--accent)}
+.sub-item .g{color:var(--ink3);font-size:12px;margin-left:6px}
+.sub-item .n{display:block;color:var(--ink3);font-size:12px}
+.sub-item.dud{background:color-mix(in srgb,var(--warn-soft) 55%,var(--surface))}
+.sub-item .dd{display:inline-block;font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle}
+.sub-item .band{display:inline-block;font-size:11px;color:var(--ok);border:1px solid var(--ok);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle}
+.sub-grp{padding:8px 14px 2px;font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-top:1px solid var(--line2)}
+.sub-info{font-size:13px;color:var(--ink2);margin:8px 0}
+.sub-avisos{font-size:13px;color:var(--ink2)} .sub-avisos summary{cursor:pointer;font-weight:600} .sub-avisos ul{padding-left:18px;margin:6px 0}
+.sub-hist{margin-top:20px;font-size:13px;color:var(--ink2)} .sub-hist div{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line2)}
+.sub-hist div span{flex:1}
+.sub-acciones{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
 </style>
 
 <header class="top">
@@ -1057,12 +1099,31 @@ function refKey(desc){
 }
 // INDEX: referencia → lista de apariciones
 const INDEX = new Map();
-DAYS.forEach((d,di)=>d.artists.forEach(a=>a.rows.forEach((row,r)=>{
-  if(row[0]!=="i") return;
-  const key = refKey(row[1]);
-  if(!INDEX.has(key)) INDEX.set(key, []);
-  INDEX.get(key).push({di, day:d, a, r, id:`${d.id}-${a.id}-${r}`, row});
-})));
+function buildIndex(){
+  INDEX.clear();
+  DAYS.forEach((d,di)=>d.artists.forEach(a=>a.rows.forEach((row,r)=>{
+    if(row[0]!=="i") return;
+    const key = refKey(row[1]);
+    if(!INDEX.has(key)) INDEX.set(key, []);
+    INDEX.get(key).push({di, day:d, a, r, id:`${d.id}-${a.id}-${r}`, row});
+  })));
+}
+// Lo que vino de la hoja impresa, tal cual; lo agregado desde documentos (state.extra) se pone encima.
+const BASE_ROWS = new Map(DAYS.flatMap(d=>d.artists.map(a=>[d.id+"/"+a.id, a.rows.length])));
+const BASE_ARTISTS = new Map(DAYS.map(d=>[d.id, d.artists.map(a=>a.id)]));
+function applyExtras(){
+  for(const d of DAYS){
+    d.artists = d.artists.filter(a=>BASE_ARTISTS.get(d.id).includes(a.id));
+    for(const a of d.artists) a.rows.length = BASE_ROWS.get(d.id+"/"+a.id);
+  }
+  for(const x of (state.extra||[])){
+    const d = DAYS.find(d=>d.id===x.day); if(!d) continue;
+    let a = d.artists.find(a=>a.id===x.aid);
+    if(!a){ a = {id:x.aid, name:x.name, rows:[], extra:true}; d.artists.push(a); }
+    a.rows.push(...x.rows.map(r=>r.slice()));
+  }
+  buildIndex();
+}
 
 // ---------- STATE ----------
 // state.items[id] = {done:bool, cnt:number|null, qty:number|undefined(override)}
@@ -1070,6 +1131,8 @@ let state = {items:{}};
 let dayIdx = 0, filter = "all", query = "";
 const LS_KEY = "backline-esc2-v1";
 try{ const s = localStorage.getItem(LS_KEY); if(s) state = JSON.parse(s) || state; if(!state.items) state.items={}; }catch(e){}
+if(!Array.isArray(state.extra)) state.extra = [];
+applyExtras();
 try{ const d = localStorage.getItem(LS_KEY+":day"); if(d) dayIdx = Math.min(+d||0, DAYS.length); }catch(e){}
 
 let db = null, docRef = null, remoteReady = false;
@@ -1146,6 +1209,7 @@ const HOR = DAYS.length+1;    // pestaña Shows (cartel)
 const PRU = DAYS.length+2;    // pestaña Pruebas (producción)
 const PLT = DAYS.length+3;    // pestaña Stage plots
 const TOT = DAYS.length+4;    // pestaña Totales
+const SUB = DAYS.length+5;    // pestaña Subir documento
 const isSched = ()=> dayIdx===HOR || dayIdx===PRU;
 // Artistas que se muestran en la vista actual
 function viewArtists(){
@@ -1167,7 +1231,8 @@ function renderTabs(){
     + `<button type="button" role="tab" class="tab" id="tab-hor" aria-selected="${dayIdx===HOR}" data-i="${HOR}">Shows</button>`
     + `<button type="button" role="tab" class="tab" id="tab-pru" aria-selected="${dayIdx===PRU}" data-i="${PRU}">Pruebas</button>`
     + `<button type="button" role="tab" class="tab" id="tab-plt" aria-selected="${dayIdx===PLT}" data-i="${PLT}">Stage plots</button>`
-    + `<button type="button" role="tab" class="tab" id="tab-tot" aria-selected="${dayIdx===TOT}" data-i="${TOT}">Σ Totales</button>`;
+    + `<button type="button" role="tab" class="tab" id="tab-tot" aria-selected="${dayIdx===TOT}" data-i="${TOT}">Σ Totales</button>`
+    + `<button type="button" role="tab" class="tab" id="tab-sub" aria-selected="${dayIdx===SUB}" data-i="${SUB}">＋ Subir documento</button>`;
 }
 function plotBlock(a){
   const pl = PLOTS[a.id];
@@ -1184,6 +1249,11 @@ function bandLine(bandId){
 }
 function sigTotal(key){ return totalsFor(key).need; }
 function renderDay(){
+  if(dayIdx===SUB){
+    for(const id of ["filters","progress","reset","note","summary","expand","hint"]) document.getElementById(id).hidden = true;
+    document.getElementById("q").placeholder = "Buscar…";
+    renderSubir(); return;
+  }
   const isTot = dayIdx===TOT, isHor = isSched(), isPlt = dayIdx===PLT;
   document.getElementById("filters").hidden = isTot||isHor||isPlt;
   document.getElementById("progress").hidden = isTot||isHor||isPlt;
@@ -1460,6 +1530,7 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !sheet.hidden) 
 function refreshSigs(){ list.querySelectorAll(".sig").forEach(el=>{ el.textContent = "Σ "+sigTotal(el.dataset.sig); }); }
 
 function applyFilter(){
+  if(dayIdx===SUB) return;
   if(dayIdx===PLT){ renderPlots(); return; }
   if(isSched()){ if(dayIdx===HOR) renderHorarios(); else renderPruebas(); return; }
   renderHint();
@@ -1492,7 +1563,7 @@ function applyFilter(){
   else if(e) e.remove();
 }
 function updateCounts(){
-  if(dayIdx===TOT||isSched()||dayIdx===PLT) return;
+  if(dayIdx===TOT||isSched()||dayIdx===PLT||dayIdx===SUB) return;
   let tot=0, ok=0, bad=0;
   viewArtists().forEach(({day,a})=>{
     let t=0,o=0,b=0;
@@ -1508,7 +1579,7 @@ function updateCounts(){
   document.getElementById("progress").innerHTML = `<i class="p-ok" style="width:${tot?ok/tot*100:0}%"></i><i class="p-bad" style="width:${tot?bad/tot*100:0}%"></i>`;
 }
 function refreshRow(id){
-  if(dayIdx===TOT||isSched()||dayIdx===PLT) return;
+  if(dayIdx===TOT||isSched()||dayIdx===PLT||dayIdx===SUB) return;
   const el = list.querySelector(`.row[data-id="${id}"]`); if(!el) return;
   const fr = findRow(id); if(!fr) return; const row = fr.row;
   el.classList.remove("ok","bad"); const s=status(row,id); if(s) el.classList.add(s);
@@ -1580,6 +1651,194 @@ document.getElementById("expand").addEventListener("click", e=>{
   const dets=[...list.querySelectorAll("details.artist")]; const open = dets.some(d=>!d.open);
   dets.forEach(d=>d.open=open); e.target.textContent = open ? "Cerrar todas" : "Abrir todas";
 });
+// ---------- SUBIR DOCUMENTO ----------
+// Lee un rider (PDF, foto, correo, texto) o el desglose (.xlsx) con el lector
+// empaquetado en lector/ (window.LectorBackline) y deja elegir qué agregar a qué banda.
+const FECHA_DIA = {"2026-09-12":"d1","2026-09-13":"d2"};
+let extraPendiente = false;
+let subLectura = null;      // última extracción, para la vista previa
+let subImagenes = [];       // planos que trajo el desglose
+const subProg = [];         // [{nombre, estado, clase}]
+
+function subBase(){
+  const vistos = new Set();
+  const artistas = DAYS.flatMap(d=>d.artists).filter(a=>!vistos.has(a.name) && vistos.add(a.name)).map(a=>({id:a.id, eventoId:"cordillera-2026", nombre:a.name}));
+  return { evento:{id:"cordillera-2026", nombre:"Cordillera 2026", lugar:"Parque Simón Bolívar", ciudad:"Bogotá", desde:"2026-09-12", hasta:"2026-09-13"},
+    escenarios:[{id:"esc2", eventoId:"cordillera-2026", nombre:"Escenario 2"}],
+    dias:[{id:"d1", eventoId:"cordillera-2026", fecha:"2026-09-12", nombre:"Día 1", tipo:"show"},{id:"d2", eventoId:"cordillera-2026", fecha:"2026-09-13", nombre:"Día 2", tipo:"show"}],
+    artistas, bloques:[], items:[], stagePlots:[], zonas:[], puestos:[], canales:[], requisitos:[] };
+}
+let lectorCargando = null;
+function cargarLector(){
+  if(window.LectorBackline) return Promise.resolve(window.LectorBackline);
+  return lectorCargando ??= new Promise((ok, mal)=>{
+    const sc = document.createElement("script"); sc.src = "lector/lector.js";
+    sc.onload = ()=> window.LectorBackline ? ok(window.LectorBackline) : mal(new Error("lector/lector.js no dejó LectorBackline"));
+    sc.onerror = ()=>{ lectorCargando=null; mal(new Error("No encontré lector/lector.js junto a esta página. Hay que servir la carpeta cordillera/ completa (no abrir el HTML suelto).")); };
+    document.head.appendChild(sc);
+  });
+}
+function renderSubir(){
+  const bandas = DAYS.flatMap(d=>d.artists.map(a=>({d,a})));
+  list.innerHTML = `<div class="sub">
+    <p class="sub-info">Suelta el rider de una banda o el desglose de producción completo. Se lee <b>aquí, en el dispositivo</b>, sin internet: PDF, foto (OCR), correo con adjuntos, texto pegado o el Excel del desglose. Después eliges qué entra a la lista de chequeo y a qué banda.</p>
+    <div class="sub-zona" id="sub-zona" tabindex="0"><input type="file" id="sub-file" multiple hidden accept=".pdf,.png,.jpg,.jpeg,.webp,.eml,.txt,.xlsx,application/pdf,image/*,message/rfc822,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+      <p><b>Suelta aquí el documento</b> o <button type="button" class="lnk" id="sub-elegir">elígelo</button> · <button type="button" class="lnk" id="sub-foto">toma una foto</button></p>
+      <p><small>Rider en PDF · foto de la hoja · correo .eml · .txt · desglose de producción .xlsx</small></p>
+      <input type="file" id="sub-cam" accept="image/*" capture="environment" hidden></div>
+    <div class="sub-opc">
+      <label>Si el documento es de una sola banda<select id="sub-artista"><option value="">La detecta el lector</option>${bandas.map(({d,a})=>`<option value="${esc(a.name)}">${esc(a.name)} · ${esc(d.name)}</option>`).join("")}</select></label>
+      <label>Día<select id="sub-dia"><option value="">Según el documento</option>${DAYS.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join("")}</select></label>
+      <button type="button" class="abtn" id="sub-pegar">Pegar texto</button>
+    </div>
+    <div id="sub-pegado" hidden><textarea id="sub-texto" placeholder="Pega aquí el rider o el correo…"></textarea><div class="sub-acciones"><button type="button" class="abtn" id="sub-leer-texto">Leer el texto</button></div></div>
+    <div class="sub-prog" id="sub-prog"></div>
+    <div id="sub-res"></div>
+    <div class="sub-hist" id="sub-hist"></div>
+  </div>`;
+  renderSubProg(); renderSubRes(); renderSubHist();
+  const zona = document.getElementById("sub-zona"), file = document.getElementById("sub-file"), cam = document.getElementById("sub-cam");
+  document.getElementById("sub-elegir").addEventListener("click", e=>{ e.stopPropagation(); file.click(); });
+  document.getElementById("sub-foto").addEventListener("click", e=>{ e.stopPropagation(); cam.click(); });
+  zona.addEventListener("click", e=>{ if(e.target.tagName!=="BUTTON") file.click(); });
+  file.addEventListener("change", ()=>{ subLeer([...file.files]); file.value=""; });
+  cam.addEventListener("change", ()=>{ subLeer([...cam.files]); cam.value=""; });
+  for(const ev of ["dragenter","dragover"]) zona.addEventListener(ev, e=>{ e.preventDefault(); zona.classList.add("encima"); });
+  for(const ev of ["dragleave","drop"]) zona.addEventListener(ev, e=>{ e.preventDefault(); zona.classList.remove("encima"); });
+  zona.addEventListener("drop", e=>subLeer([...(e.dataTransfer?.files||[])]));
+  document.getElementById("sub-pegar").addEventListener("click", ()=>{ const p=document.getElementById("sub-pegado"); p.hidden=!p.hidden; if(!p.hidden) document.getElementById("sub-texto").focus(); });
+  document.getElementById("sub-leer-texto").addEventListener("click", ()=>{ const t=document.getElementById("sub-texto").value.trim(); if(!t) return; subLeer([{nombre:`texto pegado ${subProg.length+1}`, texto:t}]); document.getElementById("sub-texto").value=""; });
+}
+async function subLeer(entradas){
+  if(!entradas.length) return;
+  const artista = document.getElementById("sub-artista")?.value || undefined;
+  const dia = document.getElementById("sub-dia")?.value || "";
+  const fecha = dia ? Object.keys(FECHA_DIA).find(f=>FECHA_DIA[f]===dia) : undefined;
+  const ver = (nombre)=> subProg.find(x=>x.nombre===nombre);
+  for(const e of entradas){ const n = e instanceof File ? e.name : e.nombre; if(!ver(n)) subProg.push({nombre:n, estado:"en cola", clase:""}); }
+  renderSubProg();
+  let L;
+  try{ L = await cargarLector(); }catch(err){ for(const e of entradas){ const x=ver(e instanceof File?e.name:e.nombre); x.estado=err.message; x.clase="err"; } renderSubProg(); return; }
+  const r = await L.leerTodo(entradas, { rutas:{ pdfWorker:"lector/pdf.worker.min.mjs", ocr:"lector/ocr/" }, base: subBase(), artista, fecha,
+    alProgreso:(nombre, estado)=>{ const x=ver(nombre); if(x){ x.estado=estado; x.clase = /^error/.test(estado) ? "err" : /ítem|bloque|zona|canal/.test(estado) ? "ok" : ""; } if(dayIdx===SUB) renderSubProg(); } });
+  if(dayIdx!==SUB) return;
+  const ext = r.extraccion;
+  if(subLectura){ // se acumula con lo ya leído
+    for(const k of ["items","avisos","zonas","canales","puestos","requisitos","planos","bloques"]) subLectura[k].push(...ext[k]);
+    for(const a of ext.artistas) if(!subLectura.artistas.includes(a)) subLectura.artistas.push(a);
+  } else subLectura = ext;
+  subImagenes.push(...r.imagenes);
+  renderSubRes();
+}
+function renderSubProg(){
+  const el = document.getElementById("sub-prog"); if(!el) return;
+  el.innerHTML = subProg.map(x=>`<div class="${x.clase}"><span>${esc(x.nombre)}</span><span>${esc(x.estado)}</span></div>`).join("");
+}
+function subDestinoDefecto(nombre, items){
+  // la banda que ya está en la lista con ese nombre, y el día que dice el documento
+  const b = DAYS.flatMap(d=>d.artists.map(a=>({d,a}))).filter(({a})=>norm(a.name)===norm(nombre));
+  const fechas = [...new Set(items.map(i=>i.fecha).filter(Boolean))].map(f=>FECHA_DIA[f]).filter(Boolean);
+  const dia = document.getElementById("sub-dia")?.value || fechas[0] || (b[0]&&b[0].d.id) || "d1";
+  const enDia = b.find(({d})=>d.id===dia) || b[0];
+  return { day: dia, aid: enDia ? enDia.a.id : null };
+}
+function subSlug(n){ return "x-"+norm(n).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,""); }
+function renderSubRes(){
+  const el = document.getElementById("sub-res"); if(!el) return;
+  const x = subLectura;
+  if(!x){ el.innerHTML = ""; return; }
+  const porArtista = new Map();
+  x.items.forEach((it,i)=>{ const k=it.artista||"(sin artista)"; if(!porArtista.has(k)) porArtista.set(k,[]); porArtista.get(k).push({it,i}); });
+  const bandas = DAYS.flatMap(d=>d.artists.map(a=>({d,a})));
+  let html = `<p class="sub-info"><b>${x.items.length} ítems</b> de ${porArtista.size} banda(s)${x.items.filter(i=>i.dudoso).length?` · ${x.items.filter(i=>i.dudoso).length} para revisar`:""}${x.zonas.length||x.canales.length?` · además ${x.zonas.length} zonas y ${x.canales.length} canales del IO list (eso lo usa la app nueva; aquí solo entra el backline)`:""}. Marca lo que entra, corrige cantidades y elige la banda de destino.</p>`;
+  if(porArtista.size>1) html += `<div class="sub-acciones"><button type="button" class="abtn" data-act="sub-todo">Agregar todo a la lista</button><button type="button" class="abtn" data-act="sub-limpiar">Descartar lo leído</button></div>`;
+  for(const [nombre, filas] of porArtista){
+    const def = subDestinoDefecto(nombre, filas.map(f=>f.it));
+    const opciones = DAYS.map(d=>`<optgroup label="${esc(d.name)}">${d.artists.map(a=>`<option value="${d.id}/${a.id}" ${d.id===def.day&&a.id===def.aid?"selected":""}>${esc(a.name)}</option>`).join("")}<option value="${d.id}/nueva" ${d.id===def.day&&!def.aid?"selected":""}>＋ Nueva banda: ${esc(nombre)}</option></optgroup>`).join("");
+    html += `<div class="sub-card" data-artista="${esc(nombre)}"><header><h2>${esc(nombre)}</h2><label style="font-size:12px;color:var(--ink3)">a la lista de <select data-act="sub-dest">${opciones}</select></label><button type="button" class="abtn go" data-act="sub-agregar">Agregar <span class="n">${filas.length}</span> ítems</button></header>`;
+    let grupo = null;
+    for(const {it,i} of filas){
+      if(it.grupo!==grupo){ grupo=it.grupo; if(grupo) html += `<div class="sub-grp">${esc(grupo)}</div>`; }
+      html += `<div class="sub-item ${it.dudoso?"dud":""}" data-i="${i}"><input type="checkbox" checked data-act="sub-chk"><input type="number" min="0" value="${it.cantidad}" data-act="sub-qty"><div>${esc(it.descripcion)}${it.proveedor==="ARTISTA"?`<span class="band">trae la banda</span>`:""}${it.dudoso?`<span class="dd">revisar</span>`:""}${it.categoria&&it.categoria!=="Otro"?`<span class="g">${esc(it.categoria)}</span>`:""}${it.nota?`<span class="n">${esc(it.nota)}</span>`:""}</div></div>`;
+    }
+    html += `</div>`;
+  }
+  if(x.avisos.length) html += `<details class="sub-avisos"><summary>${x.avisos.length} aviso(s) del lector: lo que no entendió o no cuadra</summary><ul>${x.avisos.map(a=>`<li>${esc(a)}</li>`).join("")}</ul></details>`;
+  if(!x.items.length) html += `<p class="sub-info">No encontré backline en lo leído. Si es una foto, prueba con una más nítida o más cerca; si es un rider en prosa, pégalo como texto e indica la banda.</p>`;
+  el.innerHTML = html;
+}
+function subAgregar(card){
+  const x = subLectura; if(!x) return 0;
+  const nombre = card.dataset.artista;
+  const [day, aidSel] = card.querySelector('[data-act="sub-dest"]').value.split("/");
+  const d = DAYS.find(d=>d.id===day);
+  let aid = aidSel, name = nombre;
+  if(aidSel==="nueva"){ aid = subSlug(nombre); const ya = d.artists.find(a=>a.id===aid); if(ya) name = ya.name; }
+  const existente = d.artists.find(a=>a.id===aid);
+  if(existente) name = existente.name;
+  const yaHay = new Set((existente?existente.rows:[]).filter(r=>r[0]==="i").map(r=>norm(r[1]).replace(/\s+/g," ").trim()));
+  const rows = []; let grupo = null, repetidos = 0;
+  for(const fila of card.querySelectorAll(".sub-item")){
+    if(!fila.querySelector('[data-act="sub-chk"]').checked) continue;
+    const it = x.items[+fila.dataset.i]; const qty = Math.max(0, Math.round(+fila.querySelector('[data-act="sub-qty"]').value||0));
+    const k = norm(it.descripcion).replace(/\s+/g," ").trim();
+    if(yaHay.has(k)){ repetidos++; continue; }
+    yaHay.add(k);
+    if(it.grupo && it.grupo!==grupo){ grupo=it.grupo; rows.push(["g", it.grupo]); }
+    const f = {}; if(it.dudoso) f.v=1; const nota=[it.nota, it.proveedor==="ARTISTA"?"lo trae la banda":""].filter(Boolean).join(" · "); if(nota) f.n=nota;
+    rows.push(["i", it.descripcion, qty, it.proveedor==="ARTISTA" ? "BANDA" : (it.proveedor||"CN"), Object.keys(f).length?f:undefined].filter((v,i)=>i<4||v!==undefined));
+  }
+  const n = rows.filter(r=>r[0]==="i").length;
+  if(n){
+    state.extra.push({ day, aid, name, rows, origen: subProg.map(p=>p.nombre).join(", "), cuando: new Date().toISOString() });
+    applyExtras(); saveLocal(); subSync();
+  }
+  // saca de la vista previa lo que ya entró
+  const usados = new Set([...card.querySelectorAll(".sub-item")].filter(f=>f.querySelector('[data-act="sub-chk"]').checked).map(f=>+f.dataset.i));
+  subLectura.items = subLectura.items.filter((_,i)=>!usados.has(i));
+  if(!subLectura.items.length && !subLectura.avisos.length) subLectura = null;
+  renderSubRes(); renderSubHist();
+  const h = document.getElementById("sub-hist");
+  h.insertAdjacentHTML("afterbegin", `<p class="sub-info" id="sub-ok"><b>${n} ítem(s) agregados a ${esc(name)} (${esc(d.name)})</b>${repetidos?`; ${repetidos} ya estaban y no se repitieron`:""}. <button type="button" class="abtn" data-act="sub-ver" data-day="${d.id}" data-aid="${aid}">Ver en la lista</button></p>`);
+  return n;
+}
+async function subSync(){
+  if(!(docRef && remoteReady)) return;
+  extraPendiente = true;
+  try{ await docRef.update({extra: state.extra}); setSync(true,"Sincronizado entre dispositivos"); }
+  catch(e){ setSync(false,"Sin conexión, guardado en este dispositivo"); }
+  finally{ extraPendiente = false; }
+}
+function renderSubHist(){
+  const el = document.getElementById("sub-hist"); if(!el) return;
+  if(!state.extra.length){ el.innerHTML = ""; return; }
+  el.innerHTML = `<b>Agregado desde documentos</b>` + state.extra.map((x,i)=>`<div><span>${esc(x.name)} · ${esc((DAYS.find(d=>d.id===x.day)||{}).name||x.day)} · ${x.rows.filter(r=>r[0]==="i").length} ítems <small style="color:var(--ink3)">(${esc(x.origen||"")})</small></span><button type="button" class="abtn" data-act="sub-ver" data-day="${x.day}" data-aid="${x.aid}">Ver</button><button type="button" class="abtn" data-act="sub-quitar" data-i="${i}">Quitar</button></div>`).join("");
+}
+list.addEventListener("click", e=>{
+  const b = e.target.closest("[data-act]"); if(!b || dayIdx!==SUB) return;
+  const act = b.dataset.act;
+  if(act==="sub-agregar"){ subAgregar(b.closest(".sub-card")); }
+  else if(act==="sub-todo"){
+    // cada agregado vuelve a pintar la vista previa: se busca la tarjeta de nuevo por banda
+    const nombres = [...list.querySelectorAll(".sub-card")].map(c=>c.dataset.artista);
+    for(const n of nombres){ const c=[...list.querySelectorAll(".sub-card")].find(c=>c.dataset.artista===n); if(c) subAgregar(c); }
+  }
+  else if(act==="sub-limpiar"){ subLectura=null; subImagenes=[]; subProg.length=0; renderSubProg(); renderSubRes(); }
+  else if(act==="sub-quitar"){
+    const x = state.extra[+b.dataset.i]; if(!x) return;
+    if(!confirm(`¿Quitar los ${x.rows.filter(r=>r[0]==="i").length} ítems agregados a ${x.name}?`)) return;
+    state.extra.splice(+b.dataset.i,1);
+    for(const id of Object.keys(state.items)) if(id.startsWith(`${x.day}-${x.aid}-`)){ const fr=findRow(id); if(!fr || fr.r>=BASE_ROWS.get(x.day+"/"+x.aid)) delete state.items[id]; }
+    applyExtras(); saveLocal(); subSync(); renderSubHist();
+  }
+  else if(act==="sub-ver"){
+    const di = DAYS.findIndex(d=>d.id===b.dataset.day); if(di<0) return;
+    dayIdx = di; try{localStorage.setItem(LS_KEY+":day",dayIdx);}catch(_){}
+    renderTabs(); renderDay();
+    const det = document.getElementById("art-"+b.dataset.aid); if(det){ det.open=true; det.scrollIntoView({behavior:"smooth", block:"start"}); }
+  }
+});
+
 // ---------- BOOT ----------
 renderTabs(); renderDay();
 
@@ -1590,7 +1849,7 @@ renderTabs(); renderDay();
     db = await window.claude.use("db"); if(!db) return;
     docRef = db.doc("chequeo/esc2");
     const snap = await docRef.get();
-    if(!snap.exists){ await docRef.set({items: state.items}); }
+    if(!snap.exists){ await docRef.set({items: state.items, extra: state.extra}); }
     remoteReady = true;
     docRef.onSnapshot(s=>{
       const d=s.data(); if(!d||!d.items) return;
@@ -1598,9 +1857,15 @@ renderTabs(); renderDay();
       const merged = {};
       for(const [id,v] of Object.entries(d.items)){ if(v && typeof v==="object"){ const c={}; for(const k of ["done","cnt","qty"]) if(v[k]!==null && v[k]!==undefined) c[k]=v[k]; merged[id]=c; } }
       for(const [id,v] of Object.entries(pending)) merged[id]=Object.assign({},merged[id]||{},v);
-      state.items = merged; saveLocal();
+      state.items = merged;
+      if(Array.isArray(d.extra) && JSON.stringify(d.extra)!==JSON.stringify(state.extra) && !extraPendiente){
+        state.extra = d.extra; applyExtras(); saveLocal();
+        if(dayIdx<=BANDAS||dayIdx===TOT){ renderDay(); } else if(dayIdx===SUB){ renderSubHist(); }
+        setSync(true,"Sincronizado entre dispositivos"); return;
+      }
+      saveLocal();
       if(dayIdx===TOT){ renderTotals(); }
-      else if(isSched()||dayIdx===PLT){ }
+      else if(isSched()||dayIdx===PLT||dayIdx===SUB){ }
       else { list.querySelectorAll(".row").forEach(el=>refreshRow(el.dataset.id)); refreshSigs(); updateCounts(); if(filter!=="all") applyFilter(); }
       setSync(true, s.metadata.hasPendingWrites ? "Guardando…" : "Sincronizado entre dispositivos");
     }, ()=>{ setSync(false,"Guardando en este dispositivo"); });
