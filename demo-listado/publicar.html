@@ -132,6 +132,17 @@ body[data-paso="2"] .hoja .it.trampa .etq { display: inline-block; grid-column: 
 
 .hallazgos { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 @media (max-width: 979px) {
+  /* En el celular, lo organizado va primero: buscador y cajas; lo demás, debajo. */
+  .tablero { display: flex; flex-direction: column; gap: 14px; }
+  .principal { order: 1; display: flex; flex-direction: column; gap: 12px; }
+  .controles { order: 1; }
+  .cajas { order: 2; }
+  .totales { order: 3; }
+  .lateral { order: 2; }
+  .lateral::before { content: "Por qué cambia la carga"; font: 700 11px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+  body[data-paso="3"] .titular { padding-block: 16px 8px; }
+  body[data-paso="3"] .titular p { display: none; }
+  body[data-paso="3"] .cifras > :nth-child(n + 3) { display: none; }
   .alerta-kit p { display: none; }
   .hallazgo span { display: none; }
   .hallazgo b { font-size: 24px; }
