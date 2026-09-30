@@ -1,16 +1,20 @@
 
 ## Home de demos y publicación
 
-`home/index.html` es la portada con un enlace a cada demo. `./construir-sitio.sh`
-arma `sitio/` con la Home y los frentes tomados de sus ramas (`cordillera`,
-`demo`, `extractor` ya construido) más la app del 31 de julio, y `firebase.json`
-apunta el hosting a esa carpeta:
+GitHub Pages publica la rama `main` en https://devmaiter.github.io/produccion-31julio/.
+La raíz es la Home (`index.html`) con un enlace a cada demo:
 
-```bash
-./construir-sitio.sh
-firebase deploy --only hosting     # proyecto backline-2797d → https://backline-2797d.web.app
-```
+| Carpeta | Demo | Viene de |
+|---|---|---|
+| `cordillera/` | Lista de chequeo ESC 2 con "Subir documento" | rama `cordillera` |
+| `extractor/` | Extractor de backline (build de Vite) | rama `extractor` |
+| `demo-listado/` | Del listado al backline organizado | rama `demo` |
+| `produccion-31-julio/` | Hoja de producción del 31 de julio | aquí mismo (antes estaba en la raíz) |
 
-Para probarlo local: `cd sitio && python3 -m http.server 8000` y abrir
-http://localhost:8000/. Los demos con OCR (Cordillera, Extractor) necesitan
-servirse así; no funcionan abriendo el HTML suelto desde el disco.
+Para renovar los demos desde sus ramas: `./construir-sitio.sh`, commit y push a
+`main`; Pages lo publica solo en uno o dos minutos. Para probar local:
+`python3 -m http.server 8000` en la raíz y abrir http://localhost:8000/.
+Los demos con OCR necesitan servirse así; no funcionan abriendo el HTML suelto.
+
+La app del 31 de julio sigue usando Firestore del proyecto `backline-2797d`
+(`.firebaserc`, `functions/`); Firebase no publica las páginas.
