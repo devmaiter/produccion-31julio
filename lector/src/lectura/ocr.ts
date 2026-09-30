@@ -8,8 +8,21 @@ import type { Linea } from "./documento";
  * Límite conocido: en tablas con bordes, un dígito solo en su celda a veces
  * no se lee; el intérprete marca esos ítems para confirmar la cantidad. */
 
+export interface LineaOcr {
+  texto: string;
+  confianza: number;
+  /** Caja en píxeles de la imagen que se le pasó. */
+  x: number;
+  y: number;
+  ancho: number;
+  alto: number;
+}
+
 export interface Ocr {
+  /** Texto en líneas, respetando columnas (hojas, riders). */
   reconocer(imagen: Blob | Uint8Array): Promise<Linea[]>;
+  /** Etiquetas sueltas con su posición (planos, diagramas). */
+  etiquetas(imagen: Blob | Uint8Array): Promise<LineaOcr[]>;
   terminar(): Promise<void>;
 }
 
@@ -21,7 +34,7 @@ export interface OpcionesOcr {
   cachePath?: string;
 }
 
-interface LineaTesseract { text: string; confidence: number }
+interface LineaTesseract { text: string; confidence: number; bbox: { x0: number; y0: number; x1: number; y1: number } }
 interface BloqueTesseract { paragraphs: Array<{ lines: LineaTesseract[] }> }
 
 export async function crearOcr(op: OpcionesOcr): Promise<Ocr> {
@@ -33,17 +46,28 @@ export async function crearOcr(op: OpcionesOcr): Promise<Ocr> {
     ...(op.cachePath ? { cachePath: op.cachePath } : {}),
   });
   await worker.setParameters({ tessedit_pageseg_mode: PSM.SINGLE_COLUMN, preserve_interword_spaces: "1" });
+  const entrada = (imagen: Blob | Uint8Array) =>
+    // Node lee Buffer; el navegador, Blob.
+    (imagen instanceof Uint8Array
+      ? (typeof Buffer !== "undefined" ? Buffer.from(imagen) : new Blob([imagen as BlobPart]))
+      : imagen) as Parameters<typeof worker.recognize>[0];
   return {
     async reconocer(imagen) {
-      // Node lee Buffer; el navegador, Blob.
-      const entrada = imagen instanceof Uint8Array
-        ? (typeof Buffer !== "undefined" ? Buffer.from(imagen) : new Blob([imagen as BlobPart]))
-        : imagen;
-      const r = await worker.recognize(entrada as Parameters<typeof worker.recognize>[0], { rotateAuto: true }, { blocks: true, text: true });
+      await worker.setParameters({ tessedit_pageseg_mode: PSM.SINGLE_COLUMN });
+      const r = await worker.recognize(entrada(imagen), { rotateAuto: true }, { blocks: true, text: true });
       const bloques = (r.data.blocks ?? []) as BloqueTesseract[];
       const lineas = bloques.flatMap(b => b.paragraphs.flatMap(p => p.lines));
       if (lineas.length) return lineas.map(l => ({ texto: l.text.replace(/\n$/, ""), confianza: Math.round(l.confidence) }));
       return (r.data.text ?? "").split("\n").map(texto => ({ texto, confianza: Math.round(r.data.confidence) }));
+    },
+    async etiquetas(imagen) {
+      await worker.setParameters({ tessedit_pageseg_mode: PSM.SPARSE_TEXT });
+      const r = await worker.recognize(entrada(imagen), {}, { blocks: true });
+      const bloques = (r.data.blocks ?? []) as BloqueTesseract[];
+      return bloques.flatMap(b => b.paragraphs.flatMap(p => p.lines)).map(l => ({
+        texto: l.text.replace(/\n$/, "").trim(), confianza: Math.round(l.confidence),
+        x: l.bbox.x0, y: l.bbox.y0, ancho: l.bbox.x1 - l.bbox.x0, alto: l.bbox.y1 - l.bbox.y0,
+      })).filter(l => l.texto);
     },
     terminar: () => worker.terminate().then(() => undefined),
   };

@@ -10,6 +10,8 @@ export interface Lectores {
   ocr?: () => Promise<Ocr>;
   pdf?: () => Promise<LibPdf>;
   renderizarPagina?: RenderizarPagina;
+  /** Amplía una imagen (PNG/JPEG) y la devuelve como PNG con su tamaño nuevo: los planos se leen 3×. */
+  ampliarImagen?: (bytes: Uint8Array, extension: string, factor: number) => Promise<{ bytes: Uint8Array; ancho: number; alto: number }>;
 }
 
 const EXT_IMAGEN = /\.(jpe?g|png|webp|gif|bmp|tiff?)$/i;

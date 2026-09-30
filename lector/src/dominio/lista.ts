@@ -7,17 +7,20 @@ export interface LineaLista {
   cantidad: number;
 }
 
-const CANTIDAD_INICIAL = /^(\d{1,3})\s*(?:x\s+)?(?=\D)/i;
+const CANTIDAD_INICIAL = /^(?:[-–•·*]\s*)?(?:x\s*)?[(]?(\d{1,3})[)]?\s*(?:x\s*)?(?=\D)/i;
 const CANTIDAD_FINAL = /\s+x\s*(\d{1,3})$/i;
+/** "14\" x 14", "20 x 14": una medida, no "14 unidades". */
+const MEDIDA_FINAL = /(\d|["”″'])\s*x\s*\d{1,3}$/i;
 
-/** Separa "2 Snare stand" o "Snare stand x2" en cantidad y descripción.
- *  Sin número explícito la cantidad es 1. No confunde medidas ("14\" Snare"). */
+/** Separa "2 Snare stand", "X1 Ampeg", "(02) Twin Reverb", "-2x Bombos" o
+ *  "Snare stand x2" en cantidad y descripción. Sin número explícito la
+ *  cantidad es 1. No confunde medidas ("14\" Snare"). */
 export function separarCantidad(texto: string): { cantidad: number; descripcion: string } {
   const t = texto.trim();
   const ini = t.match(CANTIDAD_INICIAL);
   if (ini && !/^\d+\s*["”']/.test(t)) return { cantidad: Number(ini[1]), descripcion: t.slice(ini[0].length).trim() };
   const fin = t.match(CANTIDAD_FINAL);
-  if (fin) return { cantidad: Number(fin[1]), descripcion: t.slice(0, fin.index).trim() };
+  if (fin && !MEDIDA_FINAL.test(t)) return { cantidad: Number(fin[1]), descripcion: t.slice(0, fin.index).trim() };
   return { cantidad: 1, descripcion: t };
 }
 

@@ -6,7 +6,7 @@
  * fusión con lo que ya existe) lo hace integrar.ts.
  */
 import { z } from "zod";
-import { CATEGORIAS, TIPOS_BLOQUE } from "../dominio/entidades";
+import { CATEGORIAS, LADOS, PROFUNDIDADES, RolPuesto, TEMAS_REQUISITO, TIPOS_BLOQUE } from "../dominio/entidades";
 
 export const ExtraccionEvento = z.object({
   nombre: z.string().describe("Nombre del evento o festival, tal como aparece"),
@@ -44,6 +44,69 @@ export const ExtraccionItem = z.object({
   nota: z.string().nullable().describe("Anotaciones relevantes: 'trae la banda', 'confirmar', texto a mano…"),
 });
 
+/* ---- La tarima (vienen del desglose: hojas Risers, IO List y los planos) ---- */
+
+export const ZonaExtraida = z.object({
+  artista: z.string(),
+  nombre: z.string(),
+  tipo: z.enum(["riser", "area"]),
+  ancho: z.number().nullable(),
+  fondo: z.number().nullable(),
+  alto: z.number().nullable(),
+  cantidad: z.number().int().min(1),
+  ruedas: z.boolean().nullable(),
+  lado: z.enum(LADOS).nullable(),
+  profundidad: z.enum(PROFUNDIDADES).nullable(),
+  /** Posición sobre el plano (0–1) si se leyó de ahí. */
+  x: z.number().nullable(),
+  y: z.number().nullable(),
+  dudoso: z.boolean(),
+  nota: z.string().nullable(),
+});
+export type ZonaExtraida = z.infer<typeof ZonaExtraida>;
+
+export const PuestoExtraido = z.object({
+  artista: z.string(),
+  nombre: z.string(),
+  rol: RolPuesto,
+  zona: z.string().nullable(),
+  x: z.number().nullable(),
+  y: z.number().nullable(),
+  corriente: z.string().nullable(),
+  monitor: z.string().nullable(),
+  dudoso: z.boolean(),
+  nota: z.string().nullable(),
+});
+export type PuestoExtraido = z.infer<typeof PuestoExtraido>;
+
+export const CanalExtraido = z.object({
+  artista: z.string(),
+  fecha: z.string().nullable(),
+  tipo: z.enum(["entrada", "salida"]),
+  numero: z.string(),
+  instrumento: z.string(),
+  microfono: z.string().nullable(),
+  base: z.string().nullable(),
+  snake: z.string().nullable(),
+  ubicacion: z.string().nullable(),
+  nota: z.string().nullable(),
+});
+export type CanalExtraido = z.infer<typeof CanalExtraido>;
+
+export const RequisitoExtraido = z.object({
+  artista: z.string(),
+  tema: z.enum(TEMAS_REQUISITO),
+  texto: z.string(),
+});
+export type RequisitoExtraido = z.infer<typeof RequisitoExtraido>;
+
+/** El archivo del plano lo entrega el lector aparte (bytes); aquí va su nombre. */
+export const PlanoExtraido = z.object({
+  artista: z.string(),
+  archivo: z.string(),
+});
+export type PlanoExtraido = z.infer<typeof PlanoExtraido>;
+
 export const Extraccion = z.object({
   evento: ExtraccionEvento.nullable().describe("null si el documento no identifica el evento"),
   escenarios: z.array(z.string()),
@@ -52,5 +115,10 @@ export const Extraccion = z.object({
   bloques: z.array(ExtraccionBloque),
   items: z.array(ExtraccionItem),
   avisos: z.array(z.string()).describe("Lo que no se pudo leer, contradicciones o datos que alguien debe confirmar"),
+  zonas: z.array(ZonaExtraida).default([]),
+  puestos: z.array(PuestoExtraido).default([]),
+  canales: z.array(CanalExtraido).default([]),
+  requisitos: z.array(RequisitoExtraido).default([]),
+  planos: z.array(PlanoExtraido).default([]),
 });
 export type Extraccion = z.infer<typeof Extraccion>;

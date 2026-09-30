@@ -31,7 +31,7 @@ export interface ContextoLectura {
 /** Líneas de OCR por debajo de esta confianza se marcan "confirmar". */
 export const CONFIANZA_MINIMA = 75;
 
-const GRUPOS = /^(drums?|drum ?kit|bater[ií]a|hardware|cymbals?|set cymbals|platillos|percussion|percusi[oó]n|bass|bajo|guitars?|guitarras?|keys|keyboards?|teclados?|dj( set)?|misc(elaneous)?|varios|otros|backline|equipos?|stage|tarima|amps?|amplificadores?|vientos|brass|horns|strings|cuerdas|vocals?|voces|power|energ[ií]a|cables|accesorios)$/i;
+const GRUPOS = /^(drums?|drum ?kit|bater[ií]a|hardware|cymbals?|set cymbals|platillos|percussion|percusi[oó]n|bass|bajo|guitars?|guitarras?|keys|keyboards?|teclados?|dj( set)?|misc(elaneous)?|varios|otros|backline|equipos?|stage|tarima|amps?|amplificadores?|vientos|brass|horns|strings|cuerdas|vocals?|voces|power|energ[ií]a|cables|accesorios|sobre\s*tarimas?|risers?)$/i;
 const MARCAS = /\b(puertas|doors|noise curfew|curfew|almuerzo|lunch|cena|dinner|break|receso|apertura|cierre)\b/i;
 const TIPO_BLOQUE: Array<[RegExp, Extraccion["bloques"][number]["tipo"]]> = [
   [/\b(line ?check)\b/i, "linecheck"],
@@ -54,13 +54,14 @@ const letras = (s: string) => (s.match(/\p{L}/gu) ?? []).length;
 /** "LA TROVA NUEVA" → "La Trova Nueva"; respeta lo que ya viene en mayúsculas y minúsculas. */
 export function nombrePropio(s: string): string {
   const t = s.replace(/\s+/g, " ").replace(/[:\-–·|]+$/, "").trim();
-  if (t !== t.toUpperCase()) return t;
-  return t.toLowerCase().split(" ").map((p, i) =>
-    i > 0 && /^(de|del|la|las|los|y|e|el|en|con)$/.test(p) ? p : p.charAt(0).toUpperCase() + p.slice(1)).join(" ");
+  const fuera = t.replace(/\([^)]*\)/g, "").trim(); // "BAJO (Omar)": lo de fuera del paréntesis decide
+  if (fuera !== fuera.toUpperCase()) return t;
+  return t.toLowerCase().replace(/(^|[\s(])(\p{L}[\p{L}\d'-]*)/gu, (_, pre: string, w: string, off: number) =>
+    pre + (off > 0 && /^(de|del|la|las|los|y|e|el|en|con)$/.test(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)));
 }
 
 export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extraccion {
-  const ext: Extraccion = { evento: null, escenarios: [], dias: [], artistas: [], bloques: [], items: [], avisos: [] };
+  const ext: Extraccion = { evento: null, escenarios: [], dias: [], artistas: [], bloques: [], items: [], avisos: [], zonas: [], puestos: [], canales: [], requisitos: [], planos: [] };
   const base = ctx.base ?? null;
   const conocidos = new Map<string, string>(); // clave → nombre como está registrado
   base?.artistas.forEach(a => conocidos.set(clave(a.nombre), a.nombre));
@@ -73,17 +74,33 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
     let escenario: string | null = null;
     let artista = ctx.artista ? registrarArtista(ctx.artista) : null;
     let grupo: string | null = null;
+    // "La agrupación lleva…" → lo que sigue lo pone el artista; "El festival suministra…" → lo pone la producción.
+    let proveedorActual: string | null = null;
+    // "Sustituciones aceptables:", "Guitarras spare", "Opción 2 …" → lo que sigue es alternativa, no suma.
+    let modoAlternativa = false;
     const sinInterpretar: string[] = [];
+    // Un rider escrito todo en mayúsculas no distingue encabezados de ítems por las mayúsculas.
+    const conLetras = doc.lineas.filter(l => letras(l.texto) >= 3);
+    const docEnMayusculas = conLetras.length > 0 && conLetras.filter(l => l.texto === l.texto.toUpperCase()).length / conLetras.length > 0.5;
 
     if (doc.asunto) tituloEvento(doc.asunto);
 
-    for (const l of doc.lineas) {
+    for (const l of doc.lineas.flatMap(dividirLista)) {
       const texto = limpiar(l.texto);
       if (!texto || letras(texto) + (texto.match(/\d/g) ?? []).length < 2) continue;
+      const quien = quienPone(texto);
+      if (quien !== undefined) { proveedorActual = quien; if (letras(texto) > 40 || texto.split(/\s+/).length <= 5) continue; }
 
       if (!ctx.artista && esEncabezadoArtistaConocido(texto)) { artista = conocidos.get(clave(texto))!; grupo = null; continue; }
       if (PROVEEDOR_SUELTO.test(texto)) continue; // columna de proveedor que el OCR separó de su fila
-      if (GRUPOS.test(texto.replace(/[:\s]+$/, ""))) { grupo = nombrePropio(texto.replace(/[:\s]+$/, "")); continue; }
+      if (nota(texto)) continue;
+      const sinCola = texto.replace(/[\s:·|–—-]+$/, "");
+      if (GRUPOS.test(sinCola)) { grupo = nombrePropio(sinCola); modoAlternativa = false; continue; }
+      if (encabezadoFuerte(sinCola, l)) { grupo = nombrePropio(sinCola); modoAlternativa = false; continue; }
+      const sola = sinCola.match(/^opci[oó]n\s*#?\s*(\d)$/i);
+      if (sola) { modoAlternativa = Number(sola[1]) > 1; continue; }
+      const alt = marcaAlternativa(sinCola);
+      if (alt !== undefined) { modoAlternativa = alt; if (letras(sinCola) < 4 || /^(opci[oó]n|sustitu|alternativa|spare|.*\bspare)/i.test(sinCola) && sinCola.split(/\s+/).length <= 4) continue; }
       if (bloqueHorario(texto)) continue;
       if (item(texto, l)) continue;
       if (!ctx.fecha && diaDeLinea(texto)) continue;
@@ -93,7 +110,9 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
       sinInterpretar.push(texto);
     }
 
-    const utiles = sinInterpretar.filter(t => letras(t) >= 4 && t.length <= 120);
+    // Subtítulos cortos ("Instrumento", "Amplificación", "Configuración:") no hace falta revisarlos.
+    const subtitulo = (t: string) => t.split(/\s+/).length <= 3 && !/\d/.test(t) && /^\p{Lu}/u.test(t) && categorizar(t) === "Otro";
+    const utiles = sinInterpretar.filter(t => letras(t) >= 4 && t.length <= 120 && !subtitulo(t));
     if (utiles.length && doc.tipo !== "correo") {
       ext.avisos.push(`${doc.nombre}: ${utiles.length} línea(s) sin interpretar, p. ej. "${utiles.slice(0, 3).join('", "')}".`);
     }
@@ -106,6 +125,7 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
       if (!m) return false;
       const inicio = normalizarHora(m[1]!);
       if (!inicio) return false;
+      if (/^\s*["”″´'x×]/.test(t.slice(m.index! + m[0].length))) return false; // 12.50" es una medida, no una hora
       const fin = m[2] ? normalizarHora(m[2]) : null;
       let resto = (t.slice(0, m.index) + " " + t.slice(m.index! + m[0].length)).replace(/\s+/g, " ").trim();
       const f = buscarFecha(resto, anio);
@@ -126,7 +146,24 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
     }
 
     function item(t: string, l: Linea): boolean {
-      const cols = t.split(/\t|\s{2,}|\s+\|\s+/).map(c => c.trim()).filter(Boolean);
+      let redactado = false, opcion: string | null = null;
+      // "Opción 2 Fender Precision…" → el ítem es lo que sigue, como alternativa.
+      const op = t.match(/^opci[oó]n\s*#?\s*(\d)\s*[:.)-]?\s+(\p{L}.*)$/iu);
+      if (op) { opcion = op[1]!; t = op[2]!; }
+      // Una frase del rider ("Soporte firme y regulable para tambora. Alternativa: …"): se toma la primera oración.
+      const FRASE = /(?<!\b(?:ref|no|aprox|min|m[aá]x|art|num|ej|pág))[.;]\s+(?=\p{L})/u;
+      if (FRASE.test(t) || (/\.$/.test(t) && t.split(" ").length > 6)) {
+        const [primera, ...resto] = t.replace(/\.$/, "").split(FRASE).map(x => x.trim());
+        const arranque = /^(las?|los|el|es|son|se|debe|deber[aá]n?|cada|todos?|est[aeo]s?|hay|no|si|para|por|en|con)\b/i;
+        if (primera && primera.split(" ").length <= 12 && categorizar(primera) !== "Otro" && !/^\d/.test(primera) && !arranque.test(primera)) {
+          t = primera; redactado = resto.length > 0;
+        }
+      }
+      let cols = t.split(/\t|\s{2,}|\s+\|\s+/).map(c => c.trim()).filter(Boolean);
+      // "Fender  Deville 2x12": dos espacios de más no son columnas si ninguna es cantidad ni proveedor.
+      if (cols.length >= 2 && !cols.some((c, i) => i > 0 && /^(x\s*)?\d{1,3}(\s*x)?$/i.test(c)) && !cols.some(c => PROVEEDOR_SUELTO.test(c) || /^(cn|oml|artista|producci[oó]n)$/i.test(c))) {
+        cols = [cols.join(" ")];
+      }
       let descripcion: string, cantidad: number, proveedor: string | null = null, explicita = false;
 
       if (cols.length >= 2) {
@@ -154,22 +191,58 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
           if (conCat && cuerpo !== t) descripcion = `${conCat[1]}: ${descripcion}`;
         }
       }
-      descripcion = descripcion.replace(/^[\s•·*-]+/, "").trim();
-      if (letras(descripcion) < 2 || descripcion.length > 90) return false;
+      descripcion = descripcion.replace(/^[\s•·*-]+/, "").replace(/[\s:,;.·|–—-]+$/, "").trim();
+      if (!explicita && /:$/.test(t)) return false; // "BASS ASI:" es un encabezado, no un ítem
+      if (letras(descripcion) < 2 || descripcion.length > (explicita ? 140 : 90)) return false;
       const categoria: Categoria = categorizar(`${descripcion} ${grupo ?? ""}`);
-      // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre.
-      if (!explicita && categorizar(descripcion) === "Otro") return false;
-      if (/[.?!]$/.test(descripcion) && descripcion.split(" ").length > 6) return false; // una frase del correo
+      // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
+      // (salvo lo que la banda dice que trae: "Gaita hembra" también cuenta).
+      const loTraeLaBanda = proveedorActual === "ARTISTA" && !proveedor && descripcion.split(" ").length <= 4 && !/[.?!]$/.test(t);
+      if (!explicita && opcion === null && categorizar(descripcion) === "Otro" && !loTraeLaBanda) return false;
+      if (!explicita && descripcion.split(",").length >= 3 && !/\d/.test(descripcion)) return false; // "Ampeg, Markbass, Fender o equivalente": marcas, no equipo
+      if (!explicita && /[.?!]$/.test(descripcion) && descripcion.split(" ").length > 6) return false; // una frase del correo
+      if (!proveedor && proveedorActual) proveedor = proveedorActual;
+      const alternativa = opcion !== null || modoAlternativa;
       if (!artista) { ext.avisos.push(`${doc.nombre}: "${t}" parece backline pero no se sabe de qué artista. Indica el artista y vuelve a leer.`); return true; }
       const deOcr = l.confianza !== undefined;
       const baja = deOcr && l.confianza! < CONFIANZA_MINIMA;
       const sinCantidad = deOcr && !explicita;
+      const notas = [
+        baja ? `lectura dudosa (${l.confianza}%)` : sinCantidad ? "cantidad no leída en la foto" : "",
+        alternativa ? `alternativa aceptada${opcion ? ` (opción ${opcion})` : ""}: no suma` : "",
+        redactado ? "tomado de una frase del rider; revisar" : "",
+      ].filter(Boolean);
       ext.items.push({
         artista, fecha, grupo, descripcion, cantidad: Math.max(0, cantidad), categoria,
-        proveedor: proveedor ? proveedor.toUpperCase() : null, dudoso: baja || sinCantidad,
-        nota: baja ? `lectura dudosa (${l.confianza}%)` : sinCantidad ? "cantidad no leída en la foto" : null,
+        proveedor: proveedor ? proveedor.toUpperCase() : null, dudoso: baja || sinCantidad || alternativa || redactado,
+        nota: notas.length ? notas.join(" · ") : null,
       });
       return true;
+    }
+
+    /** "Nota: los parches deben ser REMO" → se guarda como requisito, no como ítem. */
+    function nota(t: string): boolean {
+      const m = t.match(/^(?:nota|note|nb|observaci[oó]n|importante)\s*[:.-]\s*(.+)$/i);
+      if (!m) return false;
+      if (artista) ext.requisitos.push({ artista, tema: "otro", texto: m[1]!.trim() });
+      return true;
+    }
+
+    /** "BAJO (Omar)", "CUARTETO DE CUERDAS": encabezado en mayúsculas en un rider que no está todo en mayúsculas. */
+    function encabezadoFuerte(t: string, l: Linea): boolean {
+      if (!ctx.artista || docEnMayusculas || l.confianza !== undefined) return false;
+      const base = t.replace(/\s*\([^)]*\)\s*$/, "").trim();
+      if (/\d/.test(base) || letras(base) < 3 || base.split(/\s+/).length > 6 || /[.?!,;]/.test(base)) return false;
+      return base === base.toUpperCase();
+    }
+
+    /** true: empieza un bloque de alternativas; false: vuelve lo preferido; undefined: la línea no dice. */
+    function marcaAlternativa(t: string): boolean | undefined {
+      const corta = t.split(/\s+/).length <= 5;
+      if (!corta) return undefined;
+      if (/^(sustituciones|sustitutos?|alternativas?|opci[oó]n alternativa|opciones alternativas|equivalentes? aceptables?|spare|.*\bspares?)\b/i.test(t)) return true;
+      if (/^opci[oó]n preferida\b|^preferid[oa]s?\b|^instrumentos? solicitados?\b|^instrumentos?$|^amplificaci[oó]n$|^configuraci[oó]n$/i.test(t)) return false;
+      return undefined;
     }
 
     function diaDeLinea(t: string): boolean {
@@ -259,6 +332,36 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
   }
 }
 
+/** "Hardware: 2x soportes de caja, 1x soporte charles, 11x soportes…" → una línea por ítem. */
+function dividirLista(l: Linea): Linea[] {
+  const marca = /(?:^|[,;]|\s(?:y|and|e|\+))\s*(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L}/giu;
+  if ((l.texto.match(marca) ?? []).length < 2) return dividirEnumeracion(l);
+  const [cabeza, ...resto] = l.texto.split(/:\s+(?=(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+\p{L})/iu);
+  const cuerpo = resto.length ? resto.join(": ") : cabeza!;
+  const partes = cuerpo.split(/(?:[,;]\s*|\s+(?:y|and|e|\+)\s+)(?=(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L})/iu).map(t => t.trim()).filter(Boolean);
+  const lineas = partes.map(texto => ({ ...l, texto }));
+  return resto.length ? [{ ...l, texto: cabeza! + ":" }, ...lineas] : lineas;
+}
+
+/** "Quinto, conga, Tumba, bongos con sus bases, cortina" → un ítem por parte, si casi todas se reconocen como equipo. */
+function dividirEnumeracion(l: Linea): Linea[] {
+  if (/:\s/.test(l.texto) || /\d\s*["”″]/.test(l.texto) || /\bequivalente|sugerid|\bmarcas?\b|\bo\s+\p{Lu}/iu.test(l.texto)) return [l];
+  const partes = l.texto.split(/,\s*/).map(t => t.trim()).filter(Boolean);
+  if (partes.length < 3) return [l];
+  const reconocidas = partes.filter(p => categorizar(p) !== "Otro").length;
+  if (reconocidas < partes.length * 0.75) return [l];
+  return partes.map(texto => ({ ...l, texto: texto.replace(/^(y|and|e)\s+/i, "") }));
+}
+
+/** Quién pone lo que sigue: "ARTISTA" si lo trae la banda, null si lo pone la producción; undefined si la línea no dice. */
+function quienPone(t: string): string | null | undefined {
+  const artista = /\b(agrupaci[oó]n|banda|artista|artist|band|grupo|viaja(?:mos)?)\b.{0,25}\b(lleva|llevamos|trae|traemos|viaja con|supplies|provides|brings|propio)\b|\bviaja con su backline\b|\bartist supplies\b/iu;
+  const produccion = /\b(festival|purchaser|promotor|producci[oó]n|contratante|empresa|proveedor)\b.{0,30}\b(suministra|provee|will furnish|will provide|provides|debe suministrar|aporta)\b|\bse requiere lo siguiente\b|\brequerimos\b|\bsolicitamos\b|\bel siguiente es listado\b/iu;
+  const a = t.search(artista), p = t.search(produccion);
+  if (a < 0 && p < 0) return undefined;
+  return a > p ? "ARTISTA" : null;
+}
+
 function limpiar(t: string): string {
-  return t.replace(/[   ]/g, " ").replace(/[|¦]{2,}/g, " ").replace(/^\s*[-•·*]\s+/, "").replace(/\s+$/, "").trim();
+  return t.replace(/[   ]/g, " ").replace(/[|¦]{2,}/g, " ").replace(/\*\*/g, "").replace(/^\s*(?:[-–•·*●▪■➢✓>]+\s*|o\s+)(?=[\p{L}\d(])/u, "").replace(/\s+$/, "").trim();
 }

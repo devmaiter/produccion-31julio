@@ -6,3 +6,8 @@ export * from "./integrar";
 export * from "./leer";
 export * from "./ocr";
 export * from "./pdf";
+export * from "./medidas";
+export * from "./nombres";
+export * from "./xlsx";
+export * from "./plano";
+export * from "./desglose";

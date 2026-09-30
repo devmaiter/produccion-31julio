@@ -2,6 +2,8 @@
  *
  *   npm run leer -- [opciones] archivo1 archivo2 …
  *
+ *   Acepta .eml, .pdf, fotos, .txt y el desglose de producción (.xlsx).
+ *
  *   --evento <id>          evento de data/ al que pertenecen (usa sus artistas y días)
  *   --artista <nombre>     todo lo leído es de este artista (rider de una sola banda)
  *   --fecha <AAAA-MM-DD>   todo lo leído es de este día
@@ -15,7 +17,9 @@ import { basename, join } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { DIR_DATA, cargarEvento } from "../src/datos/eventos";
-import { integrar, interpretar, leerArchivo, type Documento } from "../src/lectura";
+import { Extraccion, integrar, interpretar, leerArchivo, leerDesglose, type Documento, type ImagenPlano } from "../src/lectura";
+import { dirname, join as unir } from "node:path";
+import { mkdirSync } from "node:fs";
 import { lectoresNode } from "../src/lectura/node/lectores";
 
 const { values: op, positionals: archivos } = parseArgs({
@@ -36,15 +40,25 @@ async function main() {
 
   const lectores = lectoresNode();
   const docs: Documento[] = [];
+  const parciales: Extraccion[] = [];
+  const imagenes: ImagenPlano[] = [];
   try {
     for (const ruta of archivos) {
-      docs.push(...await leerArchivo(basename(ruta), new Uint8Array(readFileSync(ruta)), "", lectores));
+      const bytes = new Uint8Array(readFileSync(ruta));
+      if (/\.xlsx$/i.test(ruta)) {
+        const d = await leerDesglose(bytes, basename(ruta), { base, artista: op.artista, fecha: op.fecha, lectores });
+        parciales.push(d.extraccion);
+        imagenes.push(...d.imagenes);
+      } else {
+        docs.push(...await leerArchivo(basename(ruta), bytes, "", lectores));
+      }
     }
   } finally {
     await lectores.cerrar();
   }
 
-  const extraccion = interpretar(docs, { base, artista: op.artista, fecha: op.fecha });
+  if (docs.length) parciales.push(interpretar(docs, { base, artista: op.artista, fecha: op.fecha }));
+  const extraccion = unirExtracciones(parciales);
   for (const a of extraccion.avisos) console.error(`aviso: ${a}`);
 
   if (!op.integrar) {
@@ -55,10 +69,29 @@ async function main() {
   for (const a of resumen.avisos.slice(extraccion.avisos.length)) console.error(`aviso: ${a}`);
   console.log(JSON.stringify({ extraccion, paquete, resumen }, null, 1));
   if (op.guardar) {
+    for (const im of imagenes) {
+      const ruta = unir(DIR_DATA, im.archivo);
+      mkdirSync(dirname(ruta), { recursive: true });
+      writeFileSync(ruta, im.bytes);
+      console.error(`plano guardado: ${ruta}`);
+    }
     const destino = join(DIR_DATA, `${paquete.evento.id}.json`);
     writeFileSync(destino, JSON.stringify(paquete, null, 1) + "\n");
     console.error(`guardado: ${destino}`);
   }
+}
+
+function unirExtracciones(lista: Extraccion[]): Extraccion {
+  const [primera, ...resto] = lista;
+  if (!primera) throw new Error("No se leyó nada.");
+  const out: Extraccion = { ...primera, escenarios: [...primera.escenarios], dias: [...primera.dias], artistas: [...primera.artistas], bloques: [...primera.bloques], items: [...primera.items], avisos: [...primera.avisos], zonas: [...primera.zonas], puestos: [...primera.puestos], canales: [...primera.canales], requisitos: [...primera.requisitos], planos: [...primera.planos] };
+  for (const e of resto) {
+    out.evento ??= e.evento;
+    for (const k of ["escenarios", "artistas"] as const) for (const x of e[k]) if (!out[k].includes(x)) out[k].push(x);
+    for (const d of e.dias) if (!out.dias.some(x => x.fecha === d.fecha)) out.dias.push(d);
+    for (const k of ["bloques", "items", "avisos", "zonas", "puestos", "canales", "requisitos", "planos"] as const) (out[k] as unknown[]).push(...e[k]);
+  }
+  return out;
 }
 
 main().catch(err => {

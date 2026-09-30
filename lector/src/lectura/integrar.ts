@@ -8,9 +8,11 @@
  */
 import {
   PaqueteEvento, categorizar, propietarioDe, referenciaDe,
-  type Bloque, type Dia, type Escenario, type ItemBackline, type ItemBacklineEntrada,
+  type Bloque, type Canal, type Dia, type Escenario, type ItemBackline, type ItemBacklineEntrada,
+  type Puesto, type Requisito, type StagePlot, type Zona,
 } from "../dominio";
 import { slug } from "../datos/slug";
+import { clave } from "./nombres";
 import type { Extraccion } from "./esquema";
 
 export interface Conteo { nuevos: number; actualizados: number; iguales: number }
@@ -22,6 +24,10 @@ export interface Resumen {
   artistas: Conteo;
   bloques: Conteo;
   items: Conteo;
+  zonas: Conteo;
+  puestos: Conteo;
+  canales: Conteo;
+  requisitos: Conteo;
   /** Del modelo (lo que no pudo leer) y de la integración (lo que no cuadró). */
   avisos: string[];
   /** Ids de los ítems de backline nuevos o actualizados en esta importación. */
@@ -37,13 +43,12 @@ function hora(h: string | null | undefined): string | null {
   return hh < 24 && mm < 60 ? `${String(hh).padStart(2, "0")}:${m[2]}` : null;
 }
 const fechaValida = (f: string | null | undefined): f is string => !!f && /^\d{4}-\d{2}-\d{2}$/.test(f) && !Number.isNaN(Date.parse(f));
-const clave = (s: string) => slug(s).replace(/-/g, "");
 
 export function integrar(ext: Extraccion, base: PaqueteEvento | null, origen: string): { paquete: PaqueteEvento; resumen: Resumen } {
   base = base ? structuredClone(base) : null; // nunca modificar el evento que nos pasan
   const avisos = [...ext.avisos];
   const itemsTocados: string[] = [];
-  const resumen: Omit<Resumen, "evento"> = { escenarios: conteo(), dias: conteo(), artistas: conteo(), bloques: conteo(), items: conteo(), avisos, itemsTocados };
+  const resumen: Omit<Resumen, "evento"> = { escenarios: conteo(), dias: conteo(), artistas: conteo(), bloques: conteo(), items: conteo(), zonas: conteo(), puestos: conteo(), canales: conteo(), requisitos: conteo(), avisos, itemsTocados };
 
   /* --- Evento --------------------------------------------------------- */
   const fechas = [...ext.dias.map(d => d.fecha), ext.evento?.desde, ext.evento?.hasta].filter(fechaValida).sort();
@@ -69,6 +74,11 @@ export function integrar(ext: Extraccion, base: PaqueteEvento | null, origen: st
   const artistas = [...(base?.artistas ?? [])];
   const bloques: Bloque[] = [...(base?.bloques ?? [])];
   const items: ItemBackline[] = [...(base?.items ?? [])];
+  const zonas: Zona[] = [...(base?.zonas ?? [])];
+  const puestos: Puesto[] = [...(base?.puestos ?? [])];
+  const canales: Canal[] = [...(base?.canales ?? [])];
+  const requisitos: Requisito[] = [...(base?.requisitos ?? [])];
+  const stagePlots: StagePlot[] = [...(base?.stagePlots ?? [])];
 
   /* --- Escenarios ------------------------------------------------------ */
   function escenarioId(nombre: string | null): string {
@@ -202,6 +212,79 @@ export function integrar(ext: Extraccion, base: PaqueteEvento | null, origen: st
     }
   }
 
+  /* --- Tarima: zonas, puestos, canales; requisitos y planos ------------- */
+  const mismo = (a: string, b: string) => clave(a) === clave(b);
+  for (const z of ext.zonas) {
+    const aId = artistaId(z.artista);
+    const ya = zonas.find(x => x.artistaId === aId && mismo(x.nombre, z.nombre));
+    if (ya) {
+      let cambio = false;
+      const nuevo: Partial<Zona> = { ancho: z.ancho ?? undefined, fondo: z.fondo ?? undefined, alto: z.alto ?? undefined, x: z.x ?? undefined, y: z.y ?? undefined, lado: z.lado ?? undefined, profundidad: z.profundidad ?? undefined };
+      for (const k of ["ancho", "fondo", "alto", "x", "y", "lado", "profundidad"] as const) {
+        if (nuevo[k] !== undefined && ya[k] === undefined) { (ya as Record<string, unknown>)[k] = nuevo[k]; cambio = true; }
+      }
+      if (cambio) resumen.zonas.actualizados++; else resumen.zonas.iguales++;
+      continue;
+    }
+    zonas.push({
+      id: unico(`${eventoId}-${aId}-zona-${slug(z.nombre)}`, new Set(zonas.map(x => x.id))),
+      eventoId, artistaId: aId, nombre: z.nombre, tipo: z.tipo,
+      ancho: z.ancho ?? undefined, fondo: z.fondo ?? undefined, alto: z.alto ?? undefined, cantidad: z.cantidad,
+      ruedas: z.ruedas ?? undefined, lado: z.lado ?? undefined, profundidad: z.profundidad ?? undefined,
+      x: z.x ?? undefined, y: z.y ?? undefined,
+      observacion: z.nota ?? undefined, porConfirmar: z.dudoso, origen,
+    });
+    resumen.zonas.nuevos++;
+  }
+  for (const p of ext.puestos) {
+    const aId = artistaId(p.artista);
+    const zona = p.zona ? zonas.find(x => x.artistaId === aId && mismo(x.nombre, p.zona!)) : undefined;
+    const ya = puestos.find(x => x.artistaId === aId && mismo(x.nombre, p.nombre));
+    if (ya) {
+      // Lo marcado a mano (sin porConfirmar) manda sobre lo que propone el OCR.
+      if (ya.porConfirmar && p.x !== null && p.y !== null && (ya.x !== p.x || ya.y !== p.y)) { ya.x = p.x; ya.y = p.y; resumen.puestos.actualizados++; }
+      else resumen.puestos.iguales++;
+      continue;
+    }
+    puestos.push({
+      id: unico(`${eventoId}-${aId}-puesto-${slug(p.nombre)}`, new Set(puestos.map(x => x.id))),
+      eventoId, artistaId: aId, nombre: p.nombre, rol: p.rol, zonaId: zona?.id,
+      x: p.x ?? undefined, y: p.y ?? undefined, corriente: p.corriente ?? undefined, monitor: p.monitor ?? undefined,
+      porConfirmar: p.dudoso, origen,
+    });
+    resumen.puestos.nuevos++;
+  }
+  for (const c of ext.canales) {
+    const aId = artistaId(c.artista);
+    const dId = fechaValida(c.fecha) ? diaId(c.fecha) : undefined;
+    const ya = canales.find(x => x.artistaId === aId && x.tipo === c.tipo && mismo(x.numero, c.numero) && (x.diaId ?? "") === (dId ?? ""));
+    const datos = { instrumento: c.instrumento, microfono: c.microfono ?? undefined, base: c.base ?? undefined, snake: c.snake ?? undefined, ubicacion: c.ubicacion ?? undefined, observacion: c.nota ?? undefined };
+    if (ya) {
+      const cambio = (Object.keys(datos) as Array<keyof typeof datos>).some(k => datos[k] !== undefined && datos[k] !== ya[k]);
+      if (cambio) { Object.assign(ya, datos); resumen.canales.actualizados++; } else resumen.canales.iguales++;
+      continue;
+    }
+    const zona = c.ubicacion ? zonas.find(x => x.artistaId === aId && clave(c.ubicacion!).includes(clave(x.nombre))) : undefined;
+    canales.push({
+      id: unico(`${eventoId}-${aId}-${c.tipo}-${dId ? dId.slice(-5) + "-" : ""}${slug(c.numero)}`, new Set(canales.map(x => x.id))),
+      eventoId, artistaId: aId, diaId: dId, tipo: c.tipo, numero: c.numero, ...datos, zonaId: zona?.id,
+    });
+    resumen.canales.nuevos++;
+  }
+  for (const q of ext.requisitos) {
+    const aId = artistaId(q.artista);
+    if (requisitos.some(x => x.artistaId === aId && x.tema === q.tema && x.texto === q.texto)) { resumen.requisitos.iguales++; continue; }
+    const previo = requisitos.find(x => x.artistaId === aId && x.tema === q.tema);
+    if (previo) { previo.texto = q.texto; previo.origen = origen; resumen.requisitos.actualizados++; continue; }
+    requisitos.push({ id: unico(`${eventoId}-${aId}-${q.tema}`, new Set(requisitos.map(x => x.id))), eventoId, artistaId: aId, tema: q.tema, texto: q.texto, origen });
+    resumen.requisitos.nuevos++;
+  }
+  for (const pl of ext.planos) {
+    const aId = artistaId(pl.artista);
+    const ya = stagePlots.find(s => s.artistaId === aId);
+    if (ya) ya.archivo = pl.archivo; else stagePlots.push({ artistaId: aId, eventoId, archivo: pl.archivo });
+  }
+
   function diasDelItem(fecha: string | null, aId: string): string[] {
     if (fechaValida(fecha)) return [diaId(fecha)];
     if (fecha) avisos.push(`Fecha ilegible "${fecha}" en el backline de ${nombreArtista(aId)}; se usó su horario.`);
@@ -215,7 +298,7 @@ export function integrar(ext: Extraccion, base: PaqueteEvento | null, origen: st
   const fechasFinales = dias.map(d => d.fecha).sort();
   const paquete = PaqueteEvento.parse({
     evento: { ...evento, desde: fechasFinales[0] ?? evento.desde, hasta: fechasFinales.at(-1) ?? evento.hasta },
-    escenarios, dias, artistas, bloques, items, stagePlots: base?.stagePlots ?? [],
+    escenarios, dias, artistas, bloques, items, stagePlots, zonas, puestos, canales, requisitos,
   });
   return { paquete, resumen: { evento: { id: eventoId, nuevo: !base }, ...resumen } };
 }

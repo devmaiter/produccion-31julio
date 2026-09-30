@@ -110,6 +110,8 @@ export const ItemBackline = z.object({
   chuleadoEnHoja: z.boolean().default(false),
   /** De qué archivo salió (correo, PDF, foto), para poder rastrearlo. */
   origen: z.string().optional(),
+  /** Dónde va en la tarima. */
+  puestoId: Id.optional(),
 });
 export type ItemBackline = z.infer<typeof ItemBackline>;
 export type ItemBacklineEntrada = z.input<typeof ItemBackline>;
@@ -133,6 +135,94 @@ export const Verificacion = z.object({
 });
 export type Verificacion = z.infer<typeof Verificacion>;
 
+/* ---- La tarima: dónde va cada cosa ------------------------------------ */
+
+/** Lados desde el músico mirando al público: SR es su derecha (la izquierda del público). */
+export const LADOS = ["sr", "centro", "sl"] as const;
+export const PROFUNDIDADES = ["us", "centro", "ds"] as const;
+
+/** Un riser (sobretarima) o un área de trabajo (drum tech, guitar world…) de un artista. */
+export const Zona = z.object({
+  id: Id,
+  eventoId: Id,
+  artistaId: Id,
+  nombre: z.string().min(1),
+  tipo: z.enum(["riser", "area"]),
+  /** Metros. */
+  ancho: z.number().positive().optional(),
+  fondo: z.number().positive().optional(),
+  alto: z.number().nonnegative().optional(),
+  cantidad: z.number().int().min(1).default(1),
+  ruedas: z.boolean().optional(),
+  lado: z.enum(LADOS).optional(),
+  profundidad: z.enum(PROFUNDIDADES).optional(),
+  /** Posición sobre el stage plot, de 0 a 1, si se dibujó ahí. */
+  x: z.number().min(0).max(1).optional(),
+  y: z.number().min(0).max(1).optional(),
+  observacion: z.string().optional(),
+  porConfirmar: z.boolean().default(false),
+  origen: z.string().optional(),
+});
+export type Zona = z.infer<typeof Zona>;
+
+export const ROLES_PUESTO = [
+  "bateria", "percusion", "bajo", "guitarra", "teclados", "metales", "cuerdas", "dj", "voz", "playback", "tecnico", "otro",
+] as const;
+export const RolPuesto = z.enum(ROLES_PUESTO);
+export type RolPuesto = z.infer<typeof RolPuesto>;
+
+/** Un músico o rol en la tarima: dónde está, qué corriente y qué monitor tiene. */
+export const Puesto = z.object({
+  id: Id,
+  eventoId: Id,
+  artistaId: Id,
+  nombre: z.string().min(1),
+  rol: RolPuesto,
+  zonaId: Id.optional(),
+  /** Posición sobre el stage plot, de 0 a 1 (x hacia SL, y hacia el público). */
+  x: z.number().min(0).max(1).optional(),
+  y: z.number().min(0).max(1).optional(),
+  corriente: z.string().optional(),
+  monitor: z.string().optional(),
+  porConfirmar: z.boolean().default(false),
+  origen: z.string().optional(),
+});
+export type Puesto = z.infer<typeof Puesto>;
+
+/** Una línea del IO List: qué instrumento entra por qué canal, con qué micrófono, desde dónde. */
+export const Canal = z.object({
+  id: Id,
+  eventoId: Id,
+  artistaId: Id,
+  diaId: Id.optional(),
+  /** Entrada (micrófono/DI) o salida (mezcla de monitor, IEM). */
+  tipo: z.enum(["entrada", "salida"]).default("entrada"),
+  numero: z.string().min(1),
+  instrumento: z.string().min(1),
+  microfono: z.string().optional(),
+  base: z.string().optional(),
+  snake: z.string().optional(),
+  /** Tal como lo escribe el IO List: "RISER A", "DRUMS - SR RISER", "DJ RISER UC". */
+  ubicacion: z.string().optional(),
+  observacion: z.string().optional(),
+  puestoId: Id.optional(),
+  zonaId: Id.optional(),
+});
+export type Canal = z.infer<typeof Canal>;
+
+export const TEMAS_REQUISITO = ["backline", "risers", "corriente", "crew", "otro"] as const;
+
+/** El texto original de un requerimiento del artista, para consultarlo tal cual. */
+export const Requisito = z.object({
+  id: Id,
+  eventoId: Id,
+  artistaId: Id,
+  tema: z.enum(TEMAS_REQUISITO),
+  texto: z.string().min(1),
+  origen: z.string().optional(),
+});
+export type Requisito = z.infer<typeof Requisito>;
+
 /** Todo lo de un evento en un solo documento: es lo que se importa y exporta. */
 export const PaqueteEvento = z.object({
   evento: Evento,
@@ -142,5 +232,9 @@ export const PaqueteEvento = z.object({
   bloques: z.array(Bloque),
   items: z.array(ItemBackline),
   stagePlots: z.array(StagePlot),
+  zonas: z.array(Zona).default([]),
+  puestos: z.array(Puesto).default([]),
+  canales: z.array(Canal).default([]),
+  requisitos: z.array(Requisito).default([]),
 });
 export type PaqueteEvento = z.infer<typeof PaqueteEvento>;

@@ -33,6 +33,20 @@ export function lectoresNavegador(rutas: RutasNavegador): Lectores {
       workerPath: base(`${dirOcr}/worker.min.js`),
       corePath: base(`${dirOcr}/core`),
     }).catch(err => { ocr = null; throw err; })),
+    async ampliarImagen(bytes, extension, factor) {
+      const img = await createImageBitmap(new Blob([bytes as BlobPart], { type: extension === "png" ? "image/png" : "image/jpeg" }));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * factor);
+      canvas.height = Math.round(img.height * factor);
+      const cx = canvas.getContext("2d")!;
+      cx.imageSmoothingQuality = "high";
+      cx.fillStyle = "#fff";
+      cx.fillRect(0, 0, canvas.width, canvas.height);
+      cx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.close();
+      const blob = await new Promise<Blob>((ok, mal) => canvas.toBlob(b => (b ? ok(b) : mal(new Error("No se pudo ampliar la imagen"))), "image/png"));
+      return { bytes: new Uint8Array(await blob.arrayBuffer()), ancho: canvas.width, alto: canvas.height };
+    },
     async renderizarPagina(pagina) {
       const p = pagina as PaginaRenderizable;
       const viewport = p.getViewport({ scale: 2.5 });
