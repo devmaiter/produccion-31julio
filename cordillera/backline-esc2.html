@@ -1,36 +1,22 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
 <link rel="icon" href="data:,">
 <title>Backline ESC 2</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 :root{
-  --bg:#EDEFF2; --surface:#FFFFFF; --surface2:#F6F7F9; --line:#D3D8DE; --line2:#E5E8EC;
-  --ink:#171A1E; --ink2:#4B5563; --ink3:#7B8592;
-  --accent:#D9541E; --accent-ink:#FFFFFF; --accent-soft:#FBE9E0;
-  --ok:#1F8A4C; --ok-soft:#DFF3E7; --bad:#C4322E; --bad-soft:#FADEDD; --warn:#B9720F; --warn-soft:#FBEFD6;
-  --chip:#E8EBEF; --shadow:0 1px 2px rgba(23,26,30,.08),0 6px 20px rgba(23,26,30,.06);
+  --bg:#000000; --surface:#121212; --surface2:#1A1A1A; --line:#333333; --line2:#242424;
+  --ink:#FFFFFF; --ink2:#D6D6D6; --ink3:#9A9A9A;
+  --accent:#FF6A1F; --accent-ink:#000000; --accent-soft:#3A1E0C;
+  --ok:#3FBF77; --ok-soft:#14301F; --bad:#FF5A55; --bad-soft:#3B1715; --warn:#FFA83A; --warn-soft:#3A2810;
+  --chip:#262626; --shadow:0 1px 2px rgba(0,0,0,.6),0 6px 20px rgba(0,0,0,.5);
   --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#15181C; --surface:#1E2228; --surface2:#242930; --line:#3A414A; --line2:#2C323A;
-    --ink:#ECEEF1; --ink2:#B4BCC6; --ink3:#7F8894;
-    --accent:#F0703A; --accent-ink:#1A1410; --accent-soft:#3A241A;
-    --ok:#3FBF77; --ok-soft:#1B3527; --bad:#F06A66; --bad-soft:#42211F; --warn:#E5A03A; --warn-soft:#3D2E14;
-    --chip:#2C333C; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35);
-  }
-}
-:root[data-theme="dark"]{
-  --bg:#15181C; --surface:#1E2228; --surface2:#242930; --line:#3A414A; --line2:#2C323A;
-  --ink:#ECEEF1; --ink2:#B4BCC6; --ink3:#7F8894;
-  --accent:#F0703A; --accent-ink:#1A1410; --accent-soft:#3A241A;
-  --ok:#3FBF77; --ok-soft:#1B3527; --bad:#F06A66; --bad-soft:#42211F; --warn:#E5A03A; --warn-soft:#3D2E14;
-  --chip:#2C333C; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35);
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -42,14 +28,15 @@ button{cursor:pointer}
 /* Header */
 .top{position:sticky;top:0;z-index:20;margin-inline:-16px;padding:10px 16px 10px;background:var(--bg);border-bottom:1px solid var(--line)}
 .top-row{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-h1{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:.02em;text-transform:uppercase;margin:0;line-height:1}
+h1{font-family:var(--display);font-weight:700;font-size:30px;letter-spacing:.02em;text-transform:uppercase;margin:0;line-height:1;color:var(--accent)}
 h1 small{font-size:15px;font-weight:600;color:var(--ink3);letter-spacing:.08em;margin-left:6px}
 .sync{font-size:12px;color:var(--ink3);display:flex;align-items:center;gap:6px;margin-left:auto}
 .sync i{width:8px;height:8px;border-radius:50%;background:var(--ink3);display:inline-block}
 .sync.on i{background:var(--ok)}
 .tabs{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .tab{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 14px;font-family:var(--display);font-size:18px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink2)}
-.tab[aria-selected="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.tab:hover{border-color:var(--accent)}
 .tools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
 .search{flex:1 1 200px;display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:0 10px}
 .search input{border:0;background:transparent;padding:9px 0;flex:1;min-width:0;outline:none}
@@ -65,7 +52,7 @@ h1 small{font-size:15px;font-weight:600;color:var(--ink3);letter-spacing:.08em;m
 .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
 @media (max-width:560px){.summary{grid-template-columns:repeat(2,1fr)}}
 .stat{background:var(--surface);border:1px solid var(--line2);border-radius:10px;padding:10px 12px}
-.stat b{display:block;font-family:var(--display);font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.stat b{display:block;font-family:var(--display);font-size:30px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--accent)}
 .stat span{font-size:12px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em}
 .stat.ok b{color:var(--ok)} .stat.bad b{color:var(--bad)}
 .progress{height:6px;background:var(--line2);border-radius:3px;overflow:hidden;margin:0 0 16px;display:flex}
@@ -80,7 +67,7 @@ h1 small{font-size:15px;font-weight:600;color:var(--ink3);letter-spacing:.08em;m
 .artist>summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;background:var(--surface2);border-bottom:1px solid var(--line2)}
 .artist>summary::-webkit-details-marker{display:none}
 .artist:not([open])>summary{border-bottom:0}
-.artist>summary h2{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin:0;line-height:1;flex:1;min-width:0}
+.artist>summary h2{color:var(--accent);font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin:0;line-height:1;flex:1;min-width:0}
 .artist>summary h2 small{display:block;font-family:var(--body);font-size:12px;font-weight:500;letter-spacing:.04em;color:var(--ink3);text-transform:none;margin-top:3px}
 .acount{font-variant-numeric:tabular-nums;font-size:13px;color:var(--ink2);white-space:nowrap;text-align:right}
 .acount b{font-family:var(--display);font-size:20px;font-weight:700;color:var(--ink)}
@@ -89,7 +76,7 @@ h1 small{font-size:15px;font-weight:600;color:var(--ink3);letter-spacing:.08em;m
 .artist[open] .chev{transform:rotate(180deg)}
 .abtn{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:5px 9px;font-size:12px;color:var(--ink2);white-space:nowrap}
 
-.grp{display:flex;align-items:center;gap:8px;padding:12px 14px 4px;font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.grp{color:var(--accent);display:flex;align-items:center;gap:8px;padding:12px 14px 4px;font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
 .grp::after{content:"";flex:1;height:1px;background:var(--line2)}
 
 /* Row */
@@ -148,7 +135,7 @@ h1 small{font-size:15px;font-weight:600;color:var(--ink3);letter-spacing:.08em;m
 .sheet.show{transform:none}
 @media (min-width:720px){.sheet{left:50%;right:auto;width:640px;transform:translate(-50%,105%)}.sheet.show{transform:translate(-50%,0)}}
 .sh-head{padding:14px 16px 10px;border-bottom:1px solid var(--line2);display:flex;gap:12px;align-items:flex-start}
-.sh-head h3{font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;margin:0;line-height:1.05;flex:1;text-wrap:balance}
+.sh-head h3{color:var(--accent);font-family:var(--display);font-size:24px;font-weight:700;letter-spacing:.02em;text-transform:uppercase;margin:0;line-height:1.05;flex:1;text-wrap:balance}
 .sh-head h3 small{display:block;font-family:var(--body);font-size:12px;font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink3);margin-top:4px}
 .sh-close{all:unset;cursor:pointer;width:34px;height:34px;border-radius:50%;background:var(--chip);display:flex;align-items:center;justify-content:center;color:var(--ink2);flex:none}
 .sh-close:focus-visible{outline:2px solid var(--accent)}
@@ -175,7 +162,7 @@ h1 small{font-size:15px;font-weight:600;color:var(--ink3);letter-spacing:.08em;m
 .stagechips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .stagechips button.esc2[aria-pressed="false"]{border-color:var(--accent);color:var(--accent)}
 .sched-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:4px 0 10px}
-.sched-title h2{font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin:0;line-height:1}
+.sched-title h2{color:var(--accent);font-family:var(--display);font-size:26px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;margin:0;line-height:1}
 .sched-title span{font-size:13px;color:var(--ink3)}
 .sched-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line2);border-radius:12px;box-shadow:var(--shadow);padding:10px 10px 14px}
 .sched{display:grid;grid-template-columns:42px repeat(4,minmax(104px,1fr));grid-auto-rows:13px;column-gap:6px;min-width:520px;position:relative}
@@ -256,7 +243,7 @@ details.plot[open]>summary{border-bottom:1px solid var(--line2)}
 .zoom{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;opacity:0;transition:opacity .18s}
 .zoom.show{opacity:1}
 .z-bar{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--surface)}
-.z-bar strong{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.z-bar strong{color:var(--accent);font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .z-levels{display:flex;gap:3px;background:var(--chip);border-radius:8px;padding:3px}
 .z-levels button{border:0;background:transparent;border-radius:6px;padding:6px 10px;font-size:13px;font-weight:600;color:var(--ink2)}
 .z-levels button[aria-pressed="true"]{background:var(--surface);color:var(--ink)}
@@ -294,7 +281,7 @@ details.plot[open]>summary{border-bottom:1px solid var(--line2)}
 .sub-prog div.err span:last-child{color:var(--bad)}
 .sub-card{background:var(--surface);border:1px solid var(--line2);border-radius:12px;box-shadow:var(--shadow);margin:12px 0;overflow:hidden}
 .sub-card>header{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--line2)}
-.sub-card>header h2{font-family:var(--display);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin:0;flex:1;min-width:140px}
+.sub-card>header h2{color:var(--accent);font-family:var(--display);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;margin:0;flex:1;min-width:140px}
 .sub-card>header select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 8px;font:inherit;color:inherit;max-width:100%}
 .sub-card>header .abtn.go{border-color:var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:600}
 .sub-item{display:grid;grid-template-columns:28px 64px 1fr;gap:8px;align-items:center;padding:6px 14px;border-top:1px solid var(--line2);font-size:14px}
@@ -305,7 +292,7 @@ details.plot[open]>summary{border-bottom:1px solid var(--line2)}
 .sub-item.dud{background:color-mix(in srgb,var(--warn-soft) 55%,var(--surface))}
 .sub-item .dd{display:inline-block;font-size:11px;color:var(--warn);border:1px solid var(--warn);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle}
 .sub-item .band{display:inline-block;font-size:11px;color:var(--ok);border:1px solid var(--ok);border-radius:4px;padding:0 5px;margin-left:6px;vertical-align:middle}
-.sub-grp{padding:8px 14px 2px;font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);border-top:1px solid var(--line2)}
+.sub-grp{padding:8px 14px 2px;font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);border-top:1px solid var(--line2)}
 .sub-info{font-size:13px;color:var(--ink2);margin:8px 0}
 .sub-avisos{font-size:13px;color:var(--ink2)} .sub-avisos summary{cursor:pointer;font-weight:600} .sub-avisos ul{padding-left:18px;margin:6px 0}
 .sub-hist{margin-top:20px;font-size:13px;color:var(--ink2)} .sub-hist div{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line2)}
@@ -1678,6 +1665,19 @@ function cargarLector(){
     document.head.appendChild(sc);
   });
 }
+let ocrCalentado = null;
+async function prepararLector(){
+  const el = ()=>document.getElementById("sub-estado");
+  try{
+    const L = await cargarLector();
+    if(el()) el().innerHTML = `<b style="color:var(--ok)">Lector listo</b> · PDF, correo y Excel se leen al instante. Preparando el OCR para fotos y planos…`;
+    ocrCalentado ??= L.lectoresNavegador({ pdfWorker:"lector/pdf.worker.min.mjs", ocr:"lector/ocr/" }).ocr().then(()=>true).catch(e=>{ ocrCalentado=null; throw e; });
+    await ocrCalentado;
+    if(el()) el().innerHTML = `<b style="color:var(--ok)">Lector y OCR listos</b> · todo se lee en este dispositivo, sin internet.`;
+  }catch(e){
+    if(el()) el().innerHTML = `<b style="color:var(--bad)">${esc(e.message)}</b>`;
+  }
+}
 function renderSubir(){
   const bandas = DAYS.flatMap(d=>d.artists.map(a=>({d,a})));
   list.innerHTML = `<div class="sub">
@@ -1692,11 +1692,12 @@ function renderSubir(){
       <button type="button" class="abtn" id="sub-pegar">Pegar texto</button>
     </div>
     <div id="sub-pegado" hidden><textarea id="sub-texto" placeholder="Pega aquí el rider o el correo…"></textarea><div class="sub-acciones"><button type="button" class="abtn" id="sub-leer-texto">Leer el texto</button></div></div>
+    <p class="sub-info" id="sub-estado">Preparando el lector…</p>
     <div class="sub-prog" id="sub-prog"></div>
     <div id="sub-res"></div>
     <div class="sub-hist" id="sub-hist"></div>
   </div>`;
-  renderSubProg(); renderSubRes(); renderSubHist();
+  renderSubProg(); renderSubRes(); renderSubHist(); prepararLector();
   const zona = document.getElementById("sub-zona"), file = document.getElementById("sub-file"), cam = document.getElementById("sub-cam");
   document.getElementById("sub-elegir").addEventListener("click", e=>{ e.stopPropagation(); file.click(); });
   document.getElementById("sub-foto").addEventListener("click", e=>{ e.stopPropagation(); cam.click(); });
