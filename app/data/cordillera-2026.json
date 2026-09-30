@@ -1,0 +1,7477 @@
+{
+ "evento": {
+  "id": "cordillera-2026",
+  "nombre": "Cordillera 2026",
+  "lugar": "Parque Simón Bolívar",
+  "ciudad": "Bogotá",
+  "desde": "2026-09-11",
+  "hasta": "2026-09-13"
+ },
+ "escenarios": [
+  {
+   "id": "cordillera",
+   "eventoId": "cordillera-2026",
+   "nombre": "Escenario Cordillera"
+  },
+  {
+   "id": "aconcagua",
+   "eventoId": "cordillera-2026",
+   "nombre": "Aval Aconcagua"
+  },
+  {
+   "id": "cotopaxi",
+   "eventoId": "cordillera-2026",
+   "nombre": "Escenario Cotopaxi"
+  },
+  {
+   "id": "cocuy",
+   "eventoId": "cordillera-2026",
+   "nombre": "Escenario Cocuy"
+  }
+ ],
+ "dias": [
+  {
+   "id": "cordillera-vie-11",
+   "eventoId": "cordillera-2026",
+   "fecha": "2026-09-11",
+   "nombre": "Viernes 11 · Pruebas",
+   "tipo": "pruebas"
+  },
+  {
+   "id": "cordillera-sab-12",
+   "eventoId": "cordillera-2026",
+   "fecha": "2026-09-12",
+   "nombre": "Sábado 12",
+   "tipo": "show"
+  },
+  {
+   "id": "cordillera-dom-13",
+   "eventoId": "cordillera-2026",
+   "fecha": "2026-09-13",
+   "nombre": "Domingo 13",
+   "tipo": "show"
+  }
+ ],
+ "artistas": [
+  {
+   "id": "nelda-pina",
+   "nombre": "Nelda Piña"
+  },
+  {
+   "id": "ed-maverick",
+   "nombre": "Ed Maverick"
+  },
+  {
+   "id": "cultura-profetica",
+   "nombre": "Cultura Profética"
+  },
+  {
+   "id": "grupo-niche",
+   "nombre": "Grupo Niche"
+  },
+  {
+   "id": "sean-paul",
+   "nombre": "Sean Paul"
+  },
+  {
+   "id": "estramboticos",
+   "nombre": "Estrambóticos"
+  },
+  {
+   "id": "tan-bionica",
+   "nombre": "Tan Bionica"
+  },
+  {
+   "id": "mago-de-oz",
+   "nombre": "Mago de Oz"
+  },
+  {
+   "id": "kany-garcia",
+   "nombre": "Kany García"
+  },
+  {
+   "id": "panteon-rococo",
+   "nombre": "Panteón Rococó"
+  },
+  {
+   "id": "kei-linch",
+   "nombre": "Kei Linch"
+  },
+  {
+   "id": "dread-mar-i",
+   "nombre": "Dread Mar I"
+  },
+  {
+   "id": "fobia",
+   "nombre": "Fobia"
+  },
+  {
+   "id": "andres-calamaro",
+   "nombre": "Andrés Calamaro"
+  },
+  {
+   "id": "beele",
+   "nombre": "Beéle"
+  },
+  {
+   "id": "latin-brothers",
+   "nombre": "Latin Brothers"
+  },
+  {
+   "id": "emmanuel-horvilleur",
+   "nombre": "Emmanuel Horvilleur"
+  },
+  {
+   "id": "ke-personajes",
+   "nombre": "Ke Personajes"
+  },
+  {
+   "id": "meme-del-real",
+   "nombre": "Meme del Real"
+  },
+  {
+   "id": "miguel-mateos",
+   "nombre": "Miguel Mateos"
+  },
+  {
+   "id": "paula-pera",
+   "nombre": "Paula Pera"
+  },
+  {
+   "id": "kapanga",
+   "nombre": "Kapanga"
+  },
+  {
+   "id": "poligamia",
+   "nombre": "Poligamia"
+  },
+  {
+   "id": "virus",
+   "nombre": "Virus"
+  },
+  {
+   "id": "lido-pimienta",
+   "nombre": "Lido Pimienta"
+  },
+  {
+   "id": "ricky-martin",
+   "nombre": "Ricky Martin"
+  },
+  {
+   "id": "andres-cepeda",
+   "nombre": "Andrés Cepeda"
+  },
+  {
+   "id": "caifanes",
+   "nombre": "Caifanes"
+  },
+  {
+   "id": "draco-rosa",
+   "nombre": "Draco Rosa"
+  },
+  {
+   "id": "briela-ojeda",
+   "nombre": "Briela Ojeda"
+  },
+  {
+   "id": "dr-krapula",
+   "nombre": "Dr. Krápula"
+  },
+  {
+   "id": "vicente-garcia",
+   "nombre": "Vicente García"
+  },
+  {
+   "id": "dante-spinetta",
+   "nombre": "Dante Spinetta"
+  },
+  {
+   "id": "los-de-adentro",
+   "nombre": "Los de Adentro"
+  },
+  {
+   "id": "arbol-de-ojos",
+   "nombre": "Árbol de Ojos"
+  },
+  {
+   "id": "los-amigos-invisibles",
+   "nombre": "Los Amigos Invisibles"
+  },
+  {
+   "id": "diamante-electrico",
+   "nombre": "Diamante Eléctrico"
+  },
+  {
+   "id": "bonka",
+   "nombre": "Bonka"
+  },
+  {
+   "id": "jarabe-de-palo",
+   "nombre": "Jarabe de Palo"
+  },
+  {
+   "id": "flor-de-lava",
+   "nombre": "Flor de Lava"
+  }
+ ],
+ "bloques": [
+  {
+   "id": "cordillera-sab-12-kei-linch-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "kei-linch",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:15",
+   "fin": "15:00"
+  },
+  {
+   "id": "cordillera-sab-12-dread-mar-i-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "dread-mar-i",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:45",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-sab-12-fobia-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "fobia",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "17:45",
+   "fin": "18:45"
+  },
+  {
+   "id": "cordillera-sab-12-andres-calamaro-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "andres-calamaro",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "20:00",
+   "fin": "21:15"
+  },
+  {
+   "id": "cordillera-sab-12-beele-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "beele",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "22:30",
+   "fin": "23:45"
+  },
+  {
+   "id": "cordillera-sab-12-nelda-pina-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "nelda-pina",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:00",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "ed-maverick",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "16:45",
+   "fin": "17:45"
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "cultura-profetica",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "18:45",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "grupo-niche",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "21:15",
+   "fin": "22:30"
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "sean-paul",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "23:45",
+   "fin": "01:00"
+  },
+  {
+   "id": "cordillera-sab-12-latin-brothers-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "latin-brothers",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:15",
+   "fin": "15:00"
+  },
+  {
+   "id": "cordillera-sab-12-emmanuel-horvilleur-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "emmanuel-horvilleur",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:45",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-sab-12-ke-personajes-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "ke-personajes",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "17:45",
+   "fin": "18:45"
+  },
+  {
+   "id": "cordillera-sab-12-meme-del-real-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "meme-del-real",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "20:00",
+   "fin": "21:00"
+  },
+  {
+   "id": "cordillera-sab-12-miguel-mateos-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "miguel-mateos",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "22:45",
+   "fin": "23:45"
+  },
+  {
+   "id": "cordillera-sab-12-paula-pera-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "paula-pera",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:00",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-sab-12-kapanga-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "kapanga",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "16:45",
+   "fin": "17:45"
+  },
+  {
+   "id": "cordillera-sab-12-poligamia-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "poligamia",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "18:45",
+   "fin": "19:45"
+  },
+  {
+   "id": "cordillera-sab-12-virus-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "virus",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "21:30",
+   "fin": "22:30"
+  },
+  {
+   "id": "cordillera-sab-12-lido-pimienta-show",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "lido-pimienta",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "00:00",
+   "fin": "01:00"
+  },
+  {
+   "id": "cordillera-vie-11-p0",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cordillera",
+   "artistaId": "fobia",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "15:00",
+   "fin": "17:30"
+  },
+  {
+   "id": "cordillera-vie-11-p1",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cordillera",
+   "artistaId": "beele",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "18:00",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-vie-11-p2",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cordillera",
+   "artistaId": "beele",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "20:00",
+   "fin": "22:00"
+  },
+  {
+   "id": "cordillera-vie-11-p3",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cordillera",
+   "artistaId": "fobia",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "22:00",
+   "fin": "23:00"
+  },
+  {
+   "id": "cordillera-vie-11-p4",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cordillera",
+   "artistaId": "fobia",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "12:00",
+   "fin": "15:00"
+  },
+  {
+   "id": "cordillera-vie-11-p5",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cordillera",
+   "artistaId": "beele",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "16:00",
+   "fin": "18:00"
+  },
+  {
+   "id": "cordillera-vie-11-p6",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cordillera",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "20:00",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-vie-11-p7",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "aconcagua",
+   "artistaId": "grupo-niche",
+   "titulo": "Load in + soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "17:00",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-vie-11-p8",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "aconcagua",
+   "artistaId": "grupo-niche",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "20:00",
+   "fin": "21:00"
+  },
+  {
+   "id": "cordillera-vie-11-p9",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "aconcagua",
+   "artistaId": "sean-paul",
+   "titulo": "Load in risers",
+   "tipo": "load-in",
+   "inicio": "22:30",
+   "fin": "00:30"
+  },
+  {
+   "id": "cordillera-vie-11-p10",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "aconcagua",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "20:00",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-vie-11-p11",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cotopaxi",
+   "artistaId": "meme-del-real",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "18:00",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-vie-11-p12",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cotopaxi",
+   "artistaId": "meme-del-real",
+   "titulo": "LX · VX (slot 1)",
+   "tipo": "montaje",
+   "inicio": "20:00",
+   "fin": "21:00"
+  },
+  {
+   "id": "cordillera-vie-11-p13",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cotopaxi",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "20:00",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-vie-11-p14",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cocuy",
+   "artistaId": "poligamia",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "18:00",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-vie-11-p15",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cocuy",
+   "artistaId": "poligamia",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "20:00",
+   "fin": "21:00"
+  },
+  {
+   "id": "cordillera-vie-11-p16",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cocuy",
+   "artistaId": "lido-pimienta",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "21:00",
+   "fin": "23:00"
+  },
+  {
+   "id": "cordillera-vie-11-p17",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cocuy",
+   "artistaId": "poligamia",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "16:30",
+   "fin": "18:00"
+  },
+  {
+   "id": "cordillera-vie-11-p18",
+   "diaId": "cordillera-vie-11",
+   "escenarioId": "cocuy",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "20:00",
+   "fin": "20:00"
+  },
+  {
+   "id": "cordillera-sab-12-p0",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "07:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-sab-12-p1",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "dread-mar-i",
+   "titulo": "Load in + soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "07:30",
+   "fin": "09:30"
+  },
+  {
+   "id": "cordillera-sab-12-p2",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "andres-calamaro",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "10:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p3",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p4",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "kei-linch",
+   "titulo": "Linecheck",
+   "tipo": "linecheck",
+   "inicio": "13:15",
+   "fin": "14:15"
+  },
+  {
+   "id": "cordillera-sab-12-p6",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "titulo": "Changeover",
+   "tipo": "cambio",
+   "inicio": "15:00",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-sab-12-p7",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "07:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-sab-12-p8",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "andres-calamaro",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "08:00",
+   "fin": "10:00"
+  },
+  {
+   "id": "cordillera-sab-12-p9",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p10",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cordillera",
+   "artistaId": "fobia",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "15:30",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-sab-12-p11",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "sean-paul",
+   "titulo": "LX · VX · load in",
+   "tipo": "load-in",
+   "inicio": "04:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-sab-12-p12",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "sean-paul",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "07:00",
+   "fin": "08:30"
+  },
+  {
+   "id": "cordillera-sab-12-p13",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "ed-maverick",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "09:00",
+   "fin": "10:00"
+  },
+  {
+   "id": "cordillera-sab-12-p14",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "cultura-profetica",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "10:45",
+   "fin": "12:00"
+  },
+  {
+   "id": "cordillera-sab-12-p15",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "nelda-pina",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "12:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p16",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p18",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "ed-maverick",
+   "titulo": "Changeover",
+   "tipo": "cambio",
+   "inicio": "15:45",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-sab-12-p19",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "07:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-sab-12-p20",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "ed-maverick",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "07:30",
+   "fin": "09:00"
+  },
+  {
+   "id": "cordillera-sab-12-p21",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "cultura-profetica",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "09:15",
+   "fin": "10:45"
+  },
+  {
+   "id": "cordillera-sab-12-p22",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "nelda-pina",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "11:15",
+   "fin": "12:00"
+  },
+  {
+   "id": "cordillera-sab-12-p23",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p24",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "aconcagua",
+   "artistaId": "cultura-profetica",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "16:00",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-sab-12-p25",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "miguel-mateos",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "03:00",
+   "fin": "06:30"
+  },
+  {
+   "id": "cordillera-sab-12-p26",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "miguel-mateos",
+   "titulo": "Load in",
+   "tipo": "load-in",
+   "inicio": "06:30",
+   "fin": "07:30"
+  },
+  {
+   "id": "cordillera-sab-12-p27",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "miguel-mateos",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "07:30",
+   "fin": "09:30"
+  },
+  {
+   "id": "cordillera-sab-12-p28",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "emmanuel-horvilleur",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "10:00",
+   "fin": "11:00"
+  },
+  {
+   "id": "cordillera-sab-12-p29",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "ke-personajes",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "11:15",
+   "fin": "12:00"
+  },
+  {
+   "id": "cordillera-sab-12-p30",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "latin-brothers",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "12:15",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p31",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p33",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "titulo": "Changeover",
+   "tipo": "cambio",
+   "inicio": "15:00",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-sab-12-p34",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "07:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-sab-12-p35",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "emmanuel-horvilleur",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "08:45",
+   "fin": "10:00"
+  },
+  {
+   "id": "cordillera-sab-12-p36",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "ke-personajes",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "10:00",
+   "fin": "11:15"
+  },
+  {
+   "id": "cordillera-sab-12-p37",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "latin-brothers",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "11:15",
+   "fin": "12:15"
+  },
+  {
+   "id": "cordillera-sab-12-p38",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p39",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cotopaxi",
+   "artistaId": "ke-personajes",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "15:30",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-sab-12-p40",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "lido-pimienta",
+   "titulo": "Load in + soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "07:00",
+   "fin": "09:30"
+  },
+  {
+   "id": "cordillera-sab-12-p41",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "virus",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "10:00",
+   "fin": "11:30"
+  },
+  {
+   "id": "cordillera-sab-12-p42",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "kei-linch",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "12:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p43",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "paula-pera",
+   "titulo": "Linecheck",
+   "tipo": "linecheck",
+   "inicio": "13:00",
+   "fin": "15:00"
+  },
+  {
+   "id": "cordillera-sab-12-p45",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "kapanga",
+   "titulo": "Changeover",
+   "tipo": "cambio",
+   "inicio": "15:45",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-sab-12-p46",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "07:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-sab-12-p47",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "virus",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "08:30",
+   "fin": "10:00"
+  },
+  {
+   "id": "cordillera-sab-12-p48",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "kei-linch",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "11:00",
+   "fin": "12:00"
+  },
+  {
+   "id": "cordillera-sab-12-p49",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-sab-12-p50",
+   "diaId": "cordillera-sab-12",
+   "escenarioId": "cocuy",
+   "artistaId": "poligamia",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "16:30",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-dom-13-p0",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "ricky-martin",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "00:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-dom-13-p1",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "ricky-martin",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "07:00",
+   "fin": "08:00"
+  },
+  {
+   "id": "cordillera-dom-13-p2",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "andres-cepeda",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "08:15",
+   "fin": "09:45"
+  },
+  {
+   "id": "cordillera-dom-13-p3",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "caifanes",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "10:00",
+   "fin": "11:30"
+  },
+  {
+   "id": "cordillera-dom-13-p4",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "draco-rosa",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "11:45",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p5",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p6",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "briela-ojeda",
+   "titulo": "Linecheck",
+   "tipo": "linecheck",
+   "inicio": "13:15",
+   "fin": "14:15"
+  },
+  {
+   "id": "cordillera-dom-13-p7",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "briela-ojeda",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:15",
+   "fin": "15:00"
+  },
+  {
+   "id": "cordillera-dom-13-p8",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "titulo": "Changeover",
+   "tipo": "cambio",
+   "inicio": "15:00",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-dom-13-p9",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "draco-rosa",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:45",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-dom-13-p10",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "andres-cepeda",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "06:45",
+   "fin": "08:15"
+  },
+  {
+   "id": "cordillera-dom-13-p11",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "caifanes",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "08:30",
+   "fin": "10:00"
+  },
+  {
+   "id": "cordillera-dom-13-p12",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "draco-rosa",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "10:15",
+   "fin": "11:45"
+  },
+  {
+   "id": "cordillera-dom-13-p13",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "briela-ojeda",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "11:45",
+   "fin": "13:15"
+  },
+  {
+   "id": "cordillera-dom-13-p14",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p15",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cordillera",
+   "artistaId": "andres-cepeda",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "15:30",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-dom-13-p16",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "kany-garcia",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "03:00",
+   "fin": "06:00"
+  },
+  {
+   "id": "cordillera-dom-13-p17",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "kany-garcia",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "07:00",
+   "fin": "08:00"
+  },
+  {
+   "id": "cordillera-dom-13-p18",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "mago-de-oz",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "08:30",
+   "fin": "09:30"
+  },
+  {
+   "id": "cordillera-dom-13-p19",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "panteon-rococo",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "10:30",
+   "fin": "11:30"
+  },
+  {
+   "id": "cordillera-dom-13-p20",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "tan-bionica",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "12:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p21",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "estramboticos",
+   "titulo": "Linecheck",
+   "tipo": "linecheck",
+   "inicio": "13:00",
+   "fin": "14:00"
+  },
+  {
+   "id": "cordillera-dom-13-p22",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "estramboticos",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:00",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-dom-13-p23",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "tan-bionica",
+   "titulo": "Changeover",
+   "tipo": "cambio",
+   "inicio": "15:45",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-dom-13-p24",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "07:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-dom-13-p25",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "mago-de-oz",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "07:30",
+   "fin": "08:30"
+  },
+  {
+   "id": "cordillera-dom-13-p26",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "panteon-rococo",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "09:00",
+   "fin": "10:30"
+  },
+  {
+   "id": "cordillera-dom-13-p27",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "tan-bionica",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "11:00",
+   "fin": "12:00"
+  },
+  {
+   "id": "cordillera-dom-13-p28",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "estramboticos",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "12:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p29",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p30",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "aconcagua",
+   "artistaId": "mago-de-oz",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "16:30",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-dom-13-p31",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "dr-krapula",
+   "titulo": "LX · VX",
+   "tipo": "montaje",
+   "inicio": "01:00",
+   "fin": "03:00"
+  },
+  {
+   "id": "cordillera-dom-13-p32",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "vicente-garcia",
+   "titulo": "LX · VX · load in",
+   "tipo": "load-in",
+   "inicio": "03:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-dom-13-p33",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "vicente-garcia",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "07:00",
+   "fin": "08:00"
+  },
+  {
+   "id": "cordillera-dom-13-p34",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "dr-krapula",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "08:30",
+   "fin": "09:30"
+  },
+  {
+   "id": "cordillera-dom-13-p35",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "dante-spinetta",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "09:45",
+   "fin": "10:45"
+  },
+  {
+   "id": "cordillera-dom-13-p36",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "los-de-adentro",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "11:00",
+   "fin": "12:00"
+  },
+  {
+   "id": "cordillera-dom-13-p37",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "arbol-de-ojos",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "12:15",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p38",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p39",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "arbol-de-ojos",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:15",
+   "fin": "15:00"
+  },
+  {
+   "id": "cordillera-dom-13-p40",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "titulo": "Changeover",
+   "tipo": "cambio",
+   "inicio": "15:00",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-dom-13-p41",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "los-de-adentro",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:45",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-dom-13-p42",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "titulo": "Noise curfew",
+   "tipo": "marca",
+   "inicio": "07:00",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-dom-13-p43",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "dr-krapula",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "07:30",
+   "fin": "08:30"
+  },
+  {
+   "id": "cordillera-dom-13-p44",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "dante-spinetta",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "08:30",
+   "fin": "09:45"
+  },
+  {
+   "id": "cordillera-dom-13-p45",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "los-de-adentro",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "09:45",
+   "fin": "11:00"
+  },
+  {
+   "id": "cordillera-dom-13-p46",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "arbol-de-ojos",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "11:00",
+   "fin": "12:15"
+  },
+  {
+   "id": "cordillera-dom-13-p47",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p48",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cotopaxi",
+   "artistaId": "dante-spinetta",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "15:30",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-dom-13-p49",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "los-amigos-invisibles",
+   "titulo": "Load in",
+   "tipo": "load-in",
+   "inicio": "05:30",
+   "fin": "07:00"
+  },
+  {
+   "id": "cordillera-dom-13-p50",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "los-amigos-invisibles",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "07:00",
+   "fin": "07:45"
+  },
+  {
+   "id": "cordillera-dom-13-p51",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "diamante-electrico",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "08:00",
+   "fin": "09:15"
+  },
+  {
+   "id": "cordillera-dom-13-p52",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "bonka",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "09:45",
+   "fin": "11:00"
+  },
+  {
+   "id": "cordillera-dom-13-p53",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "jarabe-de-palo",
+   "titulo": "Soundcheck",
+   "tipo": "soundcheck",
+   "inicio": "11:30",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p54",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "flor-de-lava",
+   "titulo": "Load in + linecheck",
+   "tipo": "linecheck",
+   "inicio": "13:00",
+   "fin": "15:00"
+  },
+  {
+   "id": "cordillera-dom-13-p55",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "flor-de-lava",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:00",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-dom-13-p56",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "jarabe-de-palo",
+   "titulo": "Changeover",
+   "tipo": "cambio",
+   "inicio": "15:45",
+   "fin": "16:45"
+  },
+  {
+   "id": "cordillera-dom-13-p57",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "diamante-electrico",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "06:30",
+   "fin": "08:00"
+  },
+  {
+   "id": "cordillera-dom-13-p58",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "bonka",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "08:15",
+   "fin": "09:45"
+  },
+  {
+   "id": "cordillera-dom-13-p59",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "jarabe-de-palo",
+   "titulo": "Load in (off stage)",
+   "tipo": "load-in",
+   "inicio": "10:00",
+   "fin": "11:30"
+  },
+  {
+   "id": "cordillera-dom-13-p60",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "titulo": "Puertas",
+   "tipo": "marca",
+   "inicio": "13:00",
+   "fin": "13:00"
+  },
+  {
+   "id": "cordillera-dom-13-p61",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "jarabe-de-palo",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "14:15",
+   "fin": "15:45"
+  },
+  {
+   "id": "cordillera-dom-13-p62",
+   "diaId": "cordillera-dom-13",
+   "escenarioId": "cocuy",
+   "artistaId": "bonka",
+   "titulo": "Working areas (off stage)",
+   "tipo": "montaje",
+   "inicio": "16:15",
+   "fin": "16:45"
+  }
+ ],
+ "items": [
+  {
+   "id": "cordillera-sab-12-nelda-pina-0",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "nelda-pina",
+   "descripcion": "Single keyboard stand KS210B",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand doble Hercules KS210B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-nelda-pina-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "nelda-pina",
+   "descripcion": "LP stand para alegre Cradle 636",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "LP Cradle 636 (base de conga)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-nelda-pina-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "nelda-pina",
+   "descripcion": "Music stool",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Bar stool / music stool",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": true,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-nelda-pina-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "nelda-pina",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-nelda-pina-5",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "nelda-pina",
+   "grupo": "Bass",
+   "descripcion": "Ampeg 4x10 cabinet",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg 4x10 cabinet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-nelda-pina-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "nelda-pina",
+   "grupo": "Bass",
+   "descripcion": "Aguilar Tone Hammer 500",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Aguilar Tone Hammer 500",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-nelda-pina-7",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "nelda-pina",
+   "grupo": "Bass",
+   "descripcion": "Single Hercules guitar stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Hercules single guitar stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Drum DW Collectors Series Orange",
+   "descripcion": "20\" Kick",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "20\" Kick",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Drum DW Collectors Series Orange",
+   "descripcion": "12\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "12\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Drum DW Collectors Series Orange",
+   "descripcion": "14\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Drum DW Collectors Series Orange",
+   "descripcion": "14\" Snare Ludwig Black Magic",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Snare Ludwig Black Magic 14\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "MANUEL MARTIN"
+   },
+   "observacion": "MANUEL MARTIN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Hardware",
+   "descripcion": "Single kick pedal Ludwig",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Single kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-7",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Hardware",
+   "descripcion": "Hit hat stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Hi-hat stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-8",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Hardware",
+   "descripcion": "Snare stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Hardware",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Hardware",
+   "descripcion": "Stand SPD",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Stand SPD",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-11",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Hardware",
+   "descripcion": "Drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-12",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Hardware",
+   "descripcion": "Drum carpet",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-14",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Set cymbals",
+   "descripcion": "14\" Hit hat Zildjian K",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "14\" Hit hat Zildjian K",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "BACKLINE COP"
+   },
+   "observacion": "BACKLINE COP",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-15",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Set cymbals",
+   "descripcion": "22\" Ride Zildjian K",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "22\" Ride Zildjian K",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "BACKLINE COP"
+   },
+   "observacion": "BACKLINE COP",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-16",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Set cymbals",
+   "descripcion": "18\" Crash Zildjian K",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "18\" Crash Zildjian K",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "BACKLINE COP"
+   },
+   "observacion": "BACKLINE COP",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-18",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Bass",
+   "descripcion": "Fender Jazz Bass 4 string",
+   "cantidad": 1,
+   "categoria": "Bajo",
+   "referencia": "Fender Jazz Bass 4 string",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-19",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Bass",
+   "descripcion": "Ampeg SVT Classic",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg SVT Classic",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Bass",
+   "descripcion": "Ampeg SVT cabinet 8x10E",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg cabinet 8x10",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Guitar",
+   "descripcion": "Yamaha CX40",
+   "cantidad": 1,
+   "categoria": "Guitarra",
+   "referencia": "Yamaha CX40",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Guitar",
+   "descripcion": "Fender Twin Reverb",
+   "cantidad": 2,
+   "categoria": "Ampli guitarra",
+   "referencia": "Fender Twin Reverb",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-25",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Keyboard",
+   "descripcion": "Dummie de piano vertical",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Dummy de piano",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "DIEGO REYES"
+   },
+   "observacion": "DIEGO REYES",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-26",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Keyboard",
+   "descripcion": "Nord Stage 3",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Nord Stage 3",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-27",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Keyboard",
+   "descripcion": "Roland Jazz Chorus JC-120",
+   "cantidad": 1,
+   "categoria": "Ampli guitarra",
+   "referencia": "Roland Jazz Chorus JC-120",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-28",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Keyboard",
+   "descripcion": "Cuerdas",
+   "cantidad": 1,
+   "categoria": "Guitarra",
+   "referencia": "Cuerdas",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": true,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-29",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Keyboard",
+   "descripcion": "Music stand w/light",
+   "cantidad": 4,
+   "categoria": "Bases",
+   "referencia": "Music stand (atril)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-30",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Keyboard",
+   "descripcion": "Silla negra para músicos",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Sillas para músicos",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-32",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Misc",
+   "descripcion": "Magician percussion table",
+   "cantidad": 3,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-33",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Misc",
+   "descripcion": "Faldón",
+   "cantidad": 3,
+   "categoria": "Escenario",
+   "referencia": "Faldón",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-34",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Misc",
+   "descripcion": "Single Hercules guitar stand",
+   "cantidad": 7,
+   "categoria": "Bases",
+   "referencia": "Hercules single guitar stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-35",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Misc",
+   "descripcion": "Guitar boat 8 spaces",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Guitar boat / guitarrero",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "DIEGO REYES"
+   },
+   "observacion": "DIEGO REYES",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-36",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Misc",
+   "descripcion": "Bar stool",
+   "cantidad": 4,
+   "categoria": "Bases",
+   "referencia": "Bar stool / music stool",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-37",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Misc",
+   "descripcion": "LP Aspire percussion table",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "LP Aspire percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-ed-maverick-38",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "ed-maverick",
+   "grupo": "Misc",
+   "descripcion": "Single Hercules keyboard stand KS120B",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand sencillo Hercules KS120B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Drum Collector's Series Black Satin",
+   "descripcion": "22\" Kick",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "22\" Kick",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Drum Collector's Series Black Satin",
+   "descripcion": "10\" 12\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "10\" 12\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Drum Collector's Series Black Satin",
+   "descripcion": "14\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Drum Collector's Series Black Satin",
+   "descripcion": "14\" x 5\" Snare spare",
+   "cantidad": 2,
+   "categoria": "Batería",
+   "referencia": "14\" x 5\" Snare spare",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Hardware",
+   "descripcion": "Snare stand",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": true,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-7",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Hardware",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 6,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-8",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Hardware",
+   "descripcion": "Hit hat stand 3 legs",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Hi-hat stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Hardware",
+   "descripcion": "Drum throne",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": true,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Hardware",
+   "descripcion": "Drum carpet",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-11",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Hardware",
+   "descripcion": "Set de parches Remo Pinstripe Clear",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Parches (drum heads)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-13",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Bass",
+   "descripcion": "Ampeg SVT 4 Pro",
+   "cantidad": 2,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg SVT 4 Pro",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-14",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Bass",
+   "descripcion": "Ampeg cabinet 8x10",
+   "cantidad": 2,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg cabinet 8x10",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-16",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Guitar",
+   "descripcion": "Fender Twin Reverb",
+   "cantidad": 1,
+   "categoria": "Ampli guitarra",
+   "referencia": "Fender Twin Reverb",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-17",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Guitar",
+   "descripcion": "Vox AC30",
+   "cantidad": 1,
+   "categoria": "Ampli guitarra",
+   "referencia": "Vox AC30",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-18",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Guitar",
+   "descripcion": "Gibson Les Paul Standard",
+   "cantidad": 1,
+   "categoria": "Guitarra",
+   "referencia": "Gibson Les Paul Standard",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-19",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Guitar",
+   "descripcion": "Taylor 412 CE",
+   "cantidad": 1,
+   "categoria": "Guitarra",
+   "referencia": "Taylor 412 CE",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Guitar",
+   "descripcion": "Hercules guitar stand",
+   "cantidad": 4,
+   "categoria": "Bases",
+   "referencia": "Hercules single guitar stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Keyboard",
+   "descripcion": "Nord Stage 2 88 keys",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Nord Stage 2 88",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Keyboard",
+   "descripcion": "Single Hercules keyboard stand KS120B",
+   "cantidad": 5,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand sencillo Hercules KS120B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-24",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Keyboard",
+   "descripcion": "Double Hercules keyboard stand KS210B",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand doble Hercules KS210B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-26",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Percussion",
+   "descripcion": "Magician percussion table",
+   "cantidad": 4,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-28",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Misc",
+   "descripcion": "Stage fan",
+   "cantidad": 6,
+   "categoria": "Escenario",
+   "referencia": "Stage fan",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-cultura-profetica-29",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "cultura-profetica",
+   "grupo": "Misc",
+   "descripcion": "Music stand",
+   "cantidad": 4,
+   "categoria": "Bases",
+   "referencia": "Music stand (atril)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "22\" Kick",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "22\" Kick",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "10\", 12\" Rack toms",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "10\", 12\" Rack toms",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "14\", 16\" Floor tom w/legs",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\", 16\" Floor tom w/legs",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "14\" x 6.5\" Snare",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" x 6.5\" Snare",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN · Tiene una anotación a mano al lado (poco legible)",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-5",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "Snare stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "Boom cymbal stand",
+   "cantidad": 7,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-7",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "Single kick pedal",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Single kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-8",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "Drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "Drum carpet",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Drum Yamaha Absolute",
+   "descripcion": "Plexiglass 5 piezas",
+   "cantidad": 1,
+   "categoria": "Escenario",
+   "referencia": "Plexiglass",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-12",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Cymbal set",
+   "descripcion": "20\" Ride, 16\"-18\" Crash, 18\" China, 14\" Hi-hats, 10\" Splash",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "20\" Ride, 16\"-18\" Crash, 18\" China, 14\" Hi-hats, 10\" Splash",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-14",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Bass",
+   "descripcion": "Ampeg 8x10E cabinet",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg cabinet 8x10",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-15",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Bass",
+   "descripcion": "Ampeg SVT Classic",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg SVT Classic",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-17",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Keyboards",
+   "descripcion": "Nord Stage 3 88HA",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Nord Stage 3",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-18",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Keyboards",
+   "descripcion": "Hercules single keyboard stand KS120B",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand sencillo Hercules KS120B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Percussion",
+   "descripcion": "Timbal Tito Puente 14\", 15\" w/stand (jamblock, chachabell, cencerro)",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Timbales Tito Puente + stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-21",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Percussion",
+   "descripcion": "LP Congas Galaxy Giovanni Hidalgo (conga y tumba) + stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "LP Congas Galaxy Giovanni Hidalgo",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Percussion",
+   "descripcion": "13\" Snare piccolo Mapex",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "13\" Snare piccolo Mapex",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Percussion",
+   "descripcion": "Tall snare stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Tall snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-24",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Percussion",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-25",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Percussion",
+   "descripcion": "LP Bongo Galaxy w/stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "LP Bongo + stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-27",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Misc",
+   "descripcion": "Music stand (partiture w/light)",
+   "cantidad": 8,
+   "categoria": "Bases",
+   "referencia": "Music stand (atril)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-28",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Misc",
+   "descripcion": "Drum throne Gibraltar",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "Drum throne Gibraltar",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-29",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Misc",
+   "descripcion": "Magician percussion table",
+   "cantidad": 4,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-30",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Misc",
+   "descripcion": "Bar stool",
+   "cantidad": 4,
+   "categoria": "Bases",
+   "referencia": "Bar stool / music stool",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-grupo-niche-31",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "grupo-niche",
+   "grupo": "Misc",
+   "descripcion": "Stage fan",
+   "cantidad": 4,
+   "categoria": "Escenario",
+   "referencia": "Stage fan",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Drum DW Collectors Series Greys Oyster",
+   "descripcion": "22\" Kick",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "22\" Kick",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Drum DW Collectors Series Greys Oyster",
+   "descripcion": "10\" 12\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "10\" 12\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Drum DW Collectors Series Greys Oyster",
+   "descripcion": "16\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "16\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Drum DW Collectors Series Greys Oyster",
+   "descripcion": "14\" x 6.5\" Pearl Master Custom (snare)",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" x 6.5\" Pearl Master Custom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-5",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Drum DW Collectors Series Greys Oyster",
+   "descripcion": "14\" x 5\" Snare DW Satin Oil",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Snare DW Satin Oil 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Drum DW Collectors Series Greys Oyster",
+   "descripcion": "10\" x 5\" Snare Mini Musashi",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "10\" x 5\" Snare Mini Musashi",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-7",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Drum DW Collectors Series Greys Oyster",
+   "descripcion": "Drum heads 10\" 12\" 16\" Evans G2 – 22\" Evans EMAD",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Parches (drum heads)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Hardware",
+   "descripcion": "DW 9000 single kick pedal",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Single kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Hardware",
+   "descripcion": "Hit hat stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Hi-hat stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-11",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Hardware",
+   "descripcion": "Snare stand",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-12",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Hardware",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 12,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-13",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Hardware",
+   "descripcion": "Drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-14",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Hardware",
+   "descripcion": "Drum carpet",
+   "cantidad": 2,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-16",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Misc",
+   "descripcion": "Stage fan 14\"",
+   "cantidad": 1,
+   "categoria": "Escenario",
+   "referencia": "Stage fan",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-17",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Misc",
+   "descripcion": "Roland SPD stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Stand SPD",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-18",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Misc",
+   "descripcion": "Roland SPD-SX Pro",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Roland SPD-SX Pro",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-19",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Misc",
+   "descripcion": "Porter & Davies BC2 + drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Porter & Davies BC2 (+ throne)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Misc",
+   "descripcion": "Plexiglass 6 spaces",
+   "cantidad": 1,
+   "categoria": "Escenario",
+   "referencia": "Plexiglass",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "AA Ride 21\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AA Ride 21\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "AA Crash 19\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AA Crash 19\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-24",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "AA Raw Bell Crash 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AA Raw Bell Crash 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-25",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "K Custom Dark Crash 16\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "K Custom Dark Crash 16\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-26",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "HHX Evolution O-Zone 16\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "HHX Evolution O-Zone 16\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-27",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "Avedis Thin Crash 15\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "Avedis Thin Crash 15\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-28",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "New Beat Hi Hat top 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "New Beat Hi Hat top 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-29",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "New Beat Hi Hat bottom 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "New Beat Hi Hat bottom 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-30",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "ZBT Splash 8\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "ZBT Splash 8\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-31",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "A Avedis Splash 10\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Avedis Splash 10\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-32",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "AA Splash 8\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AA Splash 8\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-33",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "Mini Chinese B8 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "Mini Chinese B8 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-34",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Set cymbals",
+   "descripcion": "ZBT China 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "ZBT China 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-36",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Bass",
+   "descripcion": "Aguilar DB 751 bass head (x1) + Aguilar Tone Hammer 500 spare (x1)",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Aguilar Tone Hammer 500",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-37",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Bass",
+   "descripcion": "Aguilar DB 410 cabinet",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Aguilar DB 410 cabinet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-38",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Bass",
+   "descripcion": "Aguilar DB 410 cabinet",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Aguilar DB 410 cabinet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-39",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Bass",
+   "descripcion": "Speakers cables",
+   "cantidad": 3,
+   "categoria": "Cables y energía",
+   "referencia": "Speaker cables",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": true,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-40",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Bass",
+   "descripcion": "Single Hercules guitar stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Hercules single guitar stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-42",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Keyboards left",
+   "descripcion": "Yamaha Motif XF6",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Yamaha Motif XF6",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-43",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Keyboards left",
+   "descripcion": "Korg Kronos II (x1 88 keys, x1 73 keys, x1 61 keys)",
+   "cantidad": 3,
+   "categoria": "Teclado",
+   "referencia": "Korg Kronos II",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-44",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Keyboards left",
+   "descripcion": "Ultimate AX-48 double stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Ultimate AX-48 double stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-46",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Keyboards right",
+   "descripcion": "Korg Triton Extreme 88",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Korg Triton Extreme 88",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": true,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-47",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Keyboards right",
+   "descripcion": "Korg M1",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Korg M1",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "BACKLINE COP"
+   },
+   "observacion": "BACKLINE COP",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-48",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Keyboards right",
+   "descripcion": "Korg Triton Classic LE",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Korg Triton Classic LE",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "BACKLINE COP"
+   },
+   "observacion": "BACKLINE COP",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-49",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Keyboards right",
+   "descripcion": "Consola Behringer 2442",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Consola Behringer 2442",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": true,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-50",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Keyboards right",
+   "descripcion": "Ultimate AX-48 double stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Ultimate AX-48 double stand",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "AUDIO ROOM"
+   },
+   "observacion": "AUDIO ROOM / AUDIO ROAD",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-52",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "DJ set",
+   "descripcion": "Pioneer DJM-S7 mixer",
+   "cantidad": 1,
+   "categoria": "DJ",
+   "referencia": "Pioneer DJM-S7 mixer",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "FABIAN ROMERO"
+   },
+   "observacion": "FABIAN ROMERO · En la hoja el encabezado DJ SET dice OML/CN/DIEGO REYES",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-53",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "DJ set",
+   "descripcion": "Pioneer CDJ-2000 NXS2",
+   "cantidad": 1,
+   "categoria": "DJ",
+   "referencia": "Pioneer CDJ-2000 NXS2",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "FABIAN ROMERO"
+   },
+   "observacion": "FABIAN ROMERO",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-54",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "DJ set",
+   "descripcion": "Prolyte Stage Dex 2x1x1",
+   "cantidad": 1,
+   "categoria": "Escenario",
+   "referencia": "Prolyte Stage Dex 2x1x1",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "FABIAN ROMERO"
+   },
+   "observacion": "FABIAN ROMERO",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-sab-12-sean-paul-56",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-sab-12",
+   "artistaId": "sean-paul",
+   "grupo": "Misc",
+   "descripcion": "Mesa plegable + silla para playback + 1 stage fan",
+   "cantidad": 1,
+   "categoria": "Escenario",
+   "referencia": "Mesa plegable + silla playback",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Drum Yamaha Absolute Maple Custom",
+   "descripcion": "22\" Kick",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "22\" Kick",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Drum Yamaha Absolute Maple Custom",
+   "descripcion": "10\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "10\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Drum Yamaha Absolute Maple Custom",
+   "descripcion": "12\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "12\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Drum Yamaha Absolute Maple Custom",
+   "descripcion": "14\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-5",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Drum Yamaha Absolute Maple Custom",
+   "descripcion": "16\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "16\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Drum Yamaha Absolute Maple Custom",
+   "descripcion": "14\" Snare DW Satin Oil",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Snare DW Satin Oil 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-8",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "HHX Stage Ride 20\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "HHX Stage Ride 20\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "HHX Xplosion Crash 19\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "HHX Xplosion Crash 19\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "HHX Evolution Crash 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "HHX Evolution Crash 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-11",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "HHX Evolution O-Zone 16\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "HHX Evolution O-Zone 16\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-12",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "HHX Evolution Crash 16\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "HHX Evolution Crash 16\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-13",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "HHX Evolution Hi Hat top 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "HHX Evolution Hi Hat top 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-14",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "HHX Evolution Hi Hat bottom 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "HHX Evolution Hi Hat bottom 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-15",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "A Custom Splash 10\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Custom Splash 10\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-16",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "A Avedis Splash 10\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Avedis Splash 10\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-17",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "ZHT China 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "ZHT China 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-18",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Set cymbal HHX",
+   "descripcion": "AA China 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AA China 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Hardware",
+   "descripcion": "Double kick pedal Iron Cobra",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Double kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-21",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Hardware",
+   "descripcion": "Hit hat stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Hi-hat stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Hardware",
+   "descripcion": "Snare stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Hardware",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 7,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-24",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Hardware",
+   "descripcion": "Drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-25",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Hardware",
+   "descripcion": "Drum carpet",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-27",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Guitar",
+   "descripcion": "Amp Fender Blues DeVille 4x10",
+   "cantidad": 1,
+   "categoria": "Ampli guitarra",
+   "referencia": "Fender Blues DeVille 4x10",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-28",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Guitar",
+   "descripcion": "Amp Fender Blues DeVille 4x10",
+   "cantidad": 1,
+   "categoria": "Ampli guitarra",
+   "referencia": "Fender Blues DeVille 4x10",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-29",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Guitar",
+   "descripcion": "Hercules guitarrero 5 espacios",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Guitar boat / guitarrero",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-31",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Keyboard",
+   "descripcion": "Amp Roland Jazz Chorus",
+   "cantidad": 2,
+   "categoria": "Ampli guitarra",
+   "referencia": "Roland Jazz Chorus JC-120",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "DIEGO REYES"
+   },
+   "observacion": "DIEGO REYES",
+   "porConfirmar": true,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-32",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Keyboard",
+   "descripcion": "Single Hercules keyboard stand KS120B",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand sencillo Hercules KS120B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-34",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Bass",
+   "descripcion": "Ampeg cabinet 8x10",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg cabinet 8x10",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-35",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Bass",
+   "descripcion": "Ampeg SVT 4 Pro bass head",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg SVT 4 Pro",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-36",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Bass",
+   "descripcion": "Single Hercules guitar stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Hercules single guitar stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-38",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Percussion",
+   "descripcion": "Congas Galaxy Giovanni Hidalgo (quinto, conga y tumba)",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "LP Congas Galaxy Giovanni Hidalgo",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN · En la hoja aparece un 5 junto al encabezado PERCUSSION",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-39",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Percussion",
+   "descripcion": "LP 636 cradles stand",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "LP Cradle 636 (base de conga)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-40",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Percussion",
+   "descripcion": "LP Chimes",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "LP Chimes",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-41",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Percussion",
+   "descripcion": "LP 760A percussion table",
+   "cantidad": 2,
+   "categoria": "Percusión",
+   "referencia": "LP 760A percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-42",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Percussion",
+   "descripcion": "Boom cymbal stand",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-43",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Percussion",
+   "descripcion": "Drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-44",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Percussion",
+   "descripcion": "Cencerro",
+   "cantidad": 3,
+   "categoria": "Percusión",
+   "referencia": "Cencerro / cowbell",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-estramboticos-45",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "estramboticos",
+   "grupo": "Percussion",
+   "descripcion": "LP Timbal Matador + stand (jamblock, cencerro, cha cha bell)",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "LP Timbal Matador",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Drum Ludwig Classic Maple",
+   "descripcion": "24\" Kick",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "24\" Kick",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Drum Ludwig Classic Maple",
+   "descripcion": "13\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "13\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Drum Ludwig Classic Maple",
+   "descripcion": "16\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "16\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Drum Ludwig Classic Maple",
+   "descripcion": "18\" Floor tom (DW Collectors Series) – mismo color",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "18\" Floor tom – mismo color",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-5",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Drum Ludwig Classic Maple",
+   "descripcion": "14\" Snare Ludwig Black Magic",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Snare Ludwig Black Magic 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Drum Ludwig Classic Maple",
+   "descripcion": "14\" Snare spare",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" Snare spare",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-8",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "Single kick pedal 9000",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Single kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "Snare stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "Boom cymbal stand",
+   "cantidad": 5,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-11",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "Hit hat stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Hi-hat stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-12",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "Drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-13",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "Drum carpet",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-14",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "SPD-SX Pro + stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Roland SPD-SX Pro",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-15",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "Pad Roland PDX-8",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Pad Roland PDX-8",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-16",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Hardware",
+   "descripcion": "Porter & Davies BC2 + drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Porter & Davies BC2 (+ throne)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-18",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Guitar & bass",
+   "descripcion": "Taylor 412 CE",
+   "cantidad": 1,
+   "categoria": "Guitarra",
+   "referencia": "Taylor 412 CE",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-19",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Guitar & bass",
+   "descripcion": "Fender Jazz Bass 4 string",
+   "cantidad": 1,
+   "categoria": "Bajo",
+   "referencia": "Fender Jazz Bass 4 string",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Guitar & bass",
+   "descripcion": "Guitar Telecaster Mex",
+   "cantidad": 1,
+   "categoria": "Guitarra",
+   "referencia": "Guitar Telecaster Mex",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Keyboards",
+   "descripcion": "Korg Kronos II 88 keys + sustain pedal",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Korg Kronos II",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Keyboards",
+   "descripcion": "Stand de teclado tipo Z",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Stand de teclado tipo Z",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-25",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Misc",
+   "descripcion": "Single Hercules guitar stand",
+   "cantidad": 6,
+   "categoria": "Bases",
+   "referencia": "Hercules single guitar stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-26",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Misc",
+   "descripcion": "Hercules guitar boat",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Guitar boat / guitarrero",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-tan-bionica-27",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "tan-bionica",
+   "grupo": "Misc",
+   "descripcion": "Bar stool",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Bar stool / music stool",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Drum Pearl Master Black",
+   "descripcion": "22\" Kick",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "22\" Kick",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Drum Pearl Master Black",
+   "descripcion": "10\" – 12\" – 14\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "10\" – 12\" – 14\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Drum Pearl Master Black",
+   "descripcion": "16\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "16\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Drum Pearl Master Black",
+   "descripcion": "18\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "18\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-5",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Drum Pearl Master Black",
+   "descripcion": "14\" x 6.5\" Snare",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" x 6.5\" Snare",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-7",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Snare stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-8",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Hit hat stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Hi-hat stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "X hat + clamp",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "X-hat + clamp",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 11,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-11",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Tom stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Tom stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-12",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Clamps Hollow",
+   "cantidad": 4,
+   "categoria": "Batería",
+   "referencia": "Clamps",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-13",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-14",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Drum carpet 3x2",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-15",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Twin pedal Iron Cobra",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Double kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-16",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Hardware",
+   "descripcion": "Magician percussion table",
+   "cantidad": 2,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-18",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "A Custom Medium Ride 20\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Custom Medium Ride 20\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN/BACKLINE COP",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-19",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "A Custom Crash 19\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Custom Crash 19\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "A Custom Crash 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Custom Crash 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-21",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "A Custom Crash 16\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Custom Crash 16\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "A Custom Top Hi Hat 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Custom Top Hi Hat 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "A Custom Bottom Hi Hat 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Custom Bottom Hi Hat 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-24",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "A Custom Splash 12\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Custom Splash 12\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-25",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "K Custom Hybrid Splash 8\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "K Custom Hybrid Splash 8\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-26",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "A Chinese Boy Low 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "A Chinese Boy Low 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-27",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "Magician percussion table",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-28",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "Set de parches Evans G2 Clear, snare coated",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Parches (drum heads)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-29",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "Set cuerdas guitarra electroacústica de acero",
+   "cantidad": 2,
+   "categoria": "Guitarra",
+   "referencia": "Cuerdas",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-30",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "Guitar Taylor 414 CE",
+   "cantidad": 2,
+   "categoria": "Guitarra",
+   "referencia": "Taylor 414 CE",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-31",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "Hercules guitar stand",
+   "cantidad": 5,
+   "categoria": "Bases",
+   "referencia": "Hercules single guitar stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-32",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Set cymbal A Custom + set 5 CN + China Wuhan 13\" Backline COP",
+   "descripcion": "Guitar boat 6 spaces",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Guitar boat / guitarrero",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-34",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Keyboard",
+   "descripcion": "Yamaha Motif XF8 / Yamaha Montage 8 + x2 sustain pedal",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Yamaha Motif XF8 / Montage 8",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "DIEGO REYES"
+   },
+   "observacion": "DIEGO REYES",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-35",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Keyboard",
+   "descripcion": "Single keyboard stand KS120B",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand sencillo Hercules KS120B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-37",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Misc",
+   "descripcion": "Convertidor AC American/USA",
+   "cantidad": 6,
+   "categoria": "Cables y energía",
+   "referencia": "Convertidor AC",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-38",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Misc",
+   "descripcion": "Transformadores 110/220 V",
+   "cantidad": 4,
+   "categoria": "Cables y energía",
+   "referencia": "Transformadores 110/220 V",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-39",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Misc",
+   "descripcion": "Stage fan",
+   "cantidad": 2,
+   "categoria": "Escenario",
+   "referencia": "Stage fan",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-40",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Misc",
+   "descripcion": "UPS 700 W",
+   "cantidad": 2,
+   "categoria": "Cables y energía",
+   "referencia": "UPS 700 W",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-41",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Misc",
+   "descripcion": "Sand bags",
+   "cantidad": 5,
+   "categoria": "Escenario",
+   "referencia": "Sand bags",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-mago-de-oz-42",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "mago-de-oz",
+   "grupo": "Misc",
+   "descripcion": "Mesa tipo mago",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum DW Collectors Series",
+   "descripcion": "22\" Kick",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "22\" Kick",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum DW Collectors Series",
+   "descripcion": "10\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "10\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum DW Collectors Series",
+   "descripcion": "12\" Rack tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "12\" Rack tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum DW Collectors Series",
+   "descripcion": "14\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-5",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum DW Collectors Series",
+   "descripcion": "16\" Floor tom",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "16\" Floor tom",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum DW Collectors Series",
+   "descripcion": "14\" x 6.5\" Snare Gretsch Maple",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "14\" x 6.5\" Snare Gretsch Maple",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-7",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum DW Collectors Series",
+   "descripcion": "14\" x 5\" Snare Ludwig Supraphonic",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Snare Ludwig Supraphonic 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "Single kick pedal",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Single kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "Hit hat stand 3 legs",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Hi-hat stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-11",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "Snare stand",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-12",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 6,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-13",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "Multi clamp genérico x4 + boom arm",
+   "cantidad": 4,
+   "categoria": "Batería",
+   "referencia": "Clamps",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-14",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "Clamp DW DWSM2141 claw hook clamp",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Clamps",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-15",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "LP Cowbell",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Cencerro / cowbell",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-16",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "Drum throne Porter & Davies",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Porter & Davies BC2 (+ throne)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-17",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware",
+   "descripcion": "Drum carpet",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-19",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Raw Bell Dry Ride 21\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Raw Bell Dry Ride 21\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Thin Crash 19\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Thin Crash 19\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-21",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Stage Crash 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Stage Crash 18\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Thin Crash 16\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Thin Crash 16\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Studio Crash 15\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Studio Crash 15\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-24",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Studio Crash 14\" (roto en base)",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "AAX Studio Crash 14\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-25",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Medium Hats top 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Medium Hats top 14\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-26",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Medium Hats bottom 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Medium Hats bottom 14\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-27",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX Splash 8\" (con golpe)",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Splash 8\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-28",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Set cymbal AAX",
+   "descripcion": "AAX X-treme Chinese 19\" (roto en base)",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "AAX X-treme Chinese 19\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-30",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum 2",
+   "descripcion": "Kick 26\" x 16\" Gretsch Rock",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Kick 26\" x 16\" Gretsch Rock",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "OML"
+   },
+   "observacion": "OML",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-31",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum 2",
+   "descripcion": "Snare Tama Starclassic 14\" x 6.5\" (wooden)",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Snare Tama Starclassic 14\" x 6.5\"",
+   "propietario": {
+    "tipo": "tercero",
+    "nombre": "LA PIÑA"
+   },
+   "observacion": "LA PIÑA",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-32",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Drum 2",
+   "descripcion": "AAX Raw Bell Dry Ride 21\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Raw Bell Dry Ride 21\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-34",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware 2",
+   "descripcion": "Single kick pedal",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Single kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-35",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware 2",
+   "descripcion": "Tall snare stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Tall snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-36",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware 2",
+   "descripcion": "Boom cymbals stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-37",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Hardware 2",
+   "descripcion": "Drum throne",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-39",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Percussion",
+   "descripcion": "LP Galaxy Giovanni Hidalgo congas (quinto, conga y tumba + stand)",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "LP Congas Galaxy Giovanni Hidalgo",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-40",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Percussion",
+   "descripcion": "LP Bongo Giovanni Series + small stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "LP Bongo + stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-41",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Percussion",
+   "descripcion": "LP Cencerro para mano salsa",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Cencerro / cowbell",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-42",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Percussion",
+   "descripcion": "LP Cencerro rock montable",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Cencerro / cowbell",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-43",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Percussion",
+   "descripcion": "Clave",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Clave",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-44",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Percussion",
+   "descripcion": "Roland SPD-SX Pro + stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Roland SPD-SX Pro",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-46",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Bass",
+   "descripcion": "Aguilar Tone Hammer 500",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Aguilar Tone Hammer 500",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-47",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Bass",
+   "descripcion": "Ampeg 4x10",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Ampeg 4x10 cabinet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-49",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Nord Stage 4 + sustain pedal",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Nord Stage 4",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-50",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Yamaha Motif XF7 + sustain pedal",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Yamaha Motif XF7",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-51",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Ultimate AX90B keyboard stand",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Ultimate AX90B keyboard stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-52",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Yamaha FC4 sustain pedal",
+   "cantidad": 2,
+   "categoria": "Teclado",
+   "referencia": "Sustain pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-53",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Roland DP-10 sustain pedal",
+   "cantidad": 2,
+   "categoria": "Teclado",
+   "referencia": "Sustain pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-54",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Yamaha FC7 pedal de volumen",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Yamaha FC7 pedal de volumen",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-55",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Magician percussion table",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-56",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Laptop stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Laptop stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-57",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Grand dummy de piano negro",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Dummy de piano",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-58",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Keyboard",
+   "descripcion": "Yamaha ES7 + sustain pedal para dummie",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Yamaha ES7",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-60",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Stage fan",
+   "cantidad": 7,
+   "categoria": "Escenario",
+   "referencia": "Stage fan",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-61",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Single Hercules guitar stand",
+   "cantidad": 13,
+   "categoria": "Bases",
+   "referencia": "Hercules single guitar stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-62",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Guitar boat",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Guitar boat / guitarrero",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-63",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Cable jack to jack 1/4",
+   "cantidad": 6,
+   "categoria": "Cables y energía",
+   "referencia": "Cable jack 1/4",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-64",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Sillas para músicos negras sin brazos",
+   "cantidad": 9,
+   "categoria": "Bases",
+   "referencia": "Sillas para músicos",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-65",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Magician percussion table",
+   "cantidad": 4,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-66",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Drum carpet 2x2 mtrs",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-67",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Bar stool",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Bar stool / music stool",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-68",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Sand bags",
+   "cantidad": 8,
+   "categoria": "Escenario",
+   "referencia": "Sand bags",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-kany-garcia-69",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "kany-garcia",
+   "grupo": "Misc",
+   "descripcion": "Drum heads new Remo Emperor Coated + Control Sound",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Parches (drum heads)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-1",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Drum Gretsch Renown Maple",
+   "descripcion": "Kick 22\" x 18\"",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Kick 22\" x 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-2",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Drum Gretsch Renown Maple",
+   "descripcion": "Rack tom 12\" x 9\"",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Rack tom 12\" x 9\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-3",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Drum Gretsch Renown Maple",
+   "descripcion": "Floor tom 16\" x 16\"",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Floor tom 16\" x 16\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-4",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Drum Gretsch Renown Maple",
+   "descripcion": "Timbal Hi LP Matador 14\"",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "LP Timbal Matador",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-5",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Drum Gretsch Renown Maple",
+   "descripcion": "Snare 14\" Ludwig Supraphonic",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Snare Ludwig Supraphonic 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-6",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Drum Gretsch Renown Maple",
+   "descripcion": "New heads Evans G2: 12\", 16\"",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Parches (drum heads)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-8",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Hardware",
+   "descripcion": "Pedal de bombo sencillo Tama Iron Cobra",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Single kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-9",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Hardware",
+   "descripcion": "Base de hi-hat",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Hi-hat stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-10",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Hardware",
+   "descripcion": "Base de redoblante",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Snare stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-11",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Hardware",
+   "descripcion": "Base de platillo tipo boom",
+   "cantidad": 5,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-12",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Hardware",
+   "descripcion": "Silla de batería",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Drum throne",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-13",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Hardware",
+   "descripcion": "Tapete de batería",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-15",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Raw Bell Dry Ride 21\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Raw Bell Dry Ride 21\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-16",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Thin Crash 19\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Thin Crash 19\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-17",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Stage Crash 18\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Stage Crash 18\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-18",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Thin Crash 16\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Thin Crash 16\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-19",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Studio Crash 15\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Studio Crash 15\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-20",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Studio Crash 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Studio Crash 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-21",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Medium Hats top 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Medium Hats top 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-22",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Medium Hats bottom 14\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Medium Hats bottom 14\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-23",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX Splash 8\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX Splash 8\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-24",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Platillos Sabian AAX",
+   "descripcion": "AAX X-treme Chinese 19\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "AAX X-treme Chinese 19\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-26",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Set de congas (conga, quinto, tumba) LP Galaxy Giovanni Hidalgo",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "LP Congas Galaxy Giovanni Hidalgo",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-27",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Base de conga doble",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Base de conga doble",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-28",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Base de conga LP Cradle 636",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "LP Cradle 636 (base de conga)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-29",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Bongos LP Generation II + stand",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "LP Bongo + stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-30",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Timbales Tito Puente 14\", 15\" + stand + toys (jamblock, chachabell, cencerro)",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Timbales Tito Puente + stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-31",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Base de platillo tipo boom",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Boom cymbal stand",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-32",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Crash 16\"",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "Crash 16\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-33",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Pedal de bombo sencillo",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Single kick pedal",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-34",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Set de toys",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Set de toys",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-35",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Shekere LP",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Shekere LP",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-36",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Surdo Meinl 20\" (tom de piso)",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Surdo Meinl 20\"",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-37",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Mesa de percusión LP 760A",
+   "cantidad": 4,
+   "categoria": "Percusión",
+   "referencia": "LP 760A percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN · Impreso 4, corregido a mano a 2",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-38",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Percusión",
+   "descripcion": "Mesa de percusión tipo mago",
+   "cantidad": 2,
+   "categoria": "Percusión",
+   "referencia": "Magician percussion table",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-40",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Teclados",
+   "descripcion": "Base de teclado doble Hercules KS410B",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand doble Hercules KS410B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-41",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Teclados",
+   "descripcion": "Base de teclado sencilla Hercules KS120B",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Keyboard stand sencillo Hercules KS120B",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-43",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Misceláneos",
+   "descripcion": "Tapete de batería",
+   "cantidad": 2,
+   "categoria": "Batería",
+   "referencia": "Drum carpet",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-44",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Misceláneos",
+   "descripcion": "Atril de partitura con luz",
+   "cantidad": 3,
+   "categoria": "Bases",
+   "referencia": "Music stand (atril)",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  },
+  {
+   "id": "cordillera-dom-13-panteon-rococo-45",
+   "eventoId": "cordillera-2026",
+   "diaId": "cordillera-dom-13",
+   "artistaId": "panteon-rococo",
+   "grupo": "Misceláneos",
+   "descripcion": "Guitarrero 6 espacios",
+   "cantidad": 2,
+   "categoria": "Bases",
+   "referencia": "Guitar boat / guitarrero",
+   "propietario": {
+    "tipo": "propio"
+   },
+   "observacion": "CN",
+   "porConfirmar": false,
+   "chuleadoEnHoja": true
+  }
+ ],
+ "stagePlots": [
+  {
+   "artistaId": "nelda-pina",
+   "eventoId": "cordillera-2026",
+   "archivo": "stage-plots/cordillera-2026/nelda-pina.png"
+  },
+  {
+   "artistaId": "ed-maverick",
+   "eventoId": "cordillera-2026",
+   "archivo": "stage-plots/cordillera-2026/ed-maverick.png"
+  },
+  {
+   "artistaId": "cultura-profetica",
+   "eventoId": "cordillera-2026",
+   "archivo": "stage-plots/cordillera-2026/cultura-profetica.jpg"
+  },
+  {
+   "artistaId": "grupo-niche",
+   "eventoId": "cordillera-2026",
+   "archivo": "stage-plots/cordillera-2026/grupo-niche.png"
+  },
+  {
+   "artistaId": "sean-paul",
+   "eventoId": "cordillera-2026",
+   "archivo": "stage-plots/cordillera-2026/sean-paul.png"
+  },
+  {
+   "artistaId": "estramboticos",
+   "eventoId": "cordillera-2026",
+   "archivo": "stage-plots/cordillera-2026/estramboticos.png"
+  },
+  {
+   "artistaId": "mago-de-oz",
+   "eventoId": "cordillera-2026",
+   "archivo": "stage-plots/cordillera-2026/mago-de-oz.png"
+  },
+  {
+   "artistaId": "kany-garcia",
+   "eventoId": "cordillera-2026",
+   "archivo": "stage-plots/cordillera-2026/kany-garcia.png"
+  }
+ ]
+}

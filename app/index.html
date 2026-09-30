@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Backline</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="dist/elm.js"></script>
+  <script>
+    // Los eventos llegan como flags. Más adelante los cargará la tienda del
+    // dispositivo (IndexedDB) por un port; por ahora se leen de data/.
+    Promise.all(["cordillera-2026", "vallenato-al-parque-2026", "simon-bolivar-2026"]
+      .map(id => fetch(`data/${id}.json`).then(r => r.json())))
+      .then(eventos => Elm.Main.init({ node: document.getElementById("app"), flags: eventos }))
+      .catch(err => { document.getElementById("app").textContent = "No se pudieron cargar los datos: " + err; });
+  </script>
+</body>
+</html>
