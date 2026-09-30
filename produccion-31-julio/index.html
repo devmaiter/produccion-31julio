@@ -4,36 +4,26 @@
 <meta charset="utf-8">
 <title>Producción · Parque Simón Bolívar · Vie 31 julio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#000000">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
   :root {
-    --bg: #14151a;
-    --surface: #1d1f26;
-    --surface-2: #262933;
-    --line: #33363f;
-    --ink: #ece9e2;
-    --muted: #9d9aa4;
-    --accent: #f0a63c;
-    --accent-ink: #181205;
-    --live: #5fc768;
-    --live-dim: rgba(95, 199, 104, .14);
-    --danger: #e06a5a;
-    --shadow: 0 10px 30px rgba(0, 0, 0, .35);
-  }
-  @media (prefers-color-scheme: light) {
-    :root {
-      --bg: #f4f2ec;
-      --surface: #ffffff;
-      --surface-2: #eceae2;
-      --line: #d9d5ca;
-      --ink: #24232b;
-      --muted: #6d6a75;
-      --accent: #c97f14;
-      --accent-ink: #ffffff;
-      --live: #2e8f3c;
-      --live-dim: rgba(46, 143, 60, .12);
-      --danger: #bb4433;
-      --shadow: 0 8px 24px rgba(40, 35, 20, .12);
-    }
+    --bg: #000000;
+    --surface: #121212;
+    --surface-2: #1a1a1a;
+    --line: #2c2c2c;
+    --ink: #ffffff;
+    --muted: #a3a3a3;
+    --accent: #ff6a1f;
+    --accent-ink: #000000;
+    --accent-dim: rgba(255, 106, 31, .12);
+    --live: #3fbf77;
+    --live-dim: rgba(63, 191, 119, .14);
+    --danger: #ff5a55;
+    --shadow: 0 10px 30px rgba(0, 0, 0, .55);
+    --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+    --body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+    color-scheme: dark;
   }
 
   * { box-sizing: border-box; }
@@ -46,7 +36,7 @@
     margin: 0;
     background: var(--bg);
     color: var(--ink);
-    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    font-family: var(--body);
     line-height: 1.5;
   }
   .wrap { max-width: 780px; margin: 0 auto; padding: 0 20px 80px; }
@@ -62,9 +52,12 @@
   }
   h1 {
     margin: 0;
-    font-size: clamp(28px, 6vw, 40px);
-    font-weight: 800;
-    letter-spacing: -.01em;
+    font-family: var(--display);
+    font-size: clamp(38px, 9vw, 60px);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent);
+    letter-spacing: .01em;
     text-wrap: balance;
     line-height: 1.15;
   }
@@ -94,18 +87,21 @@
   #conn.on::before { background: var(--live); }
 
   h2 {
-    font-size: 13px;
+    font-family: var(--display);
+    font-size: 20px;
     text-transform: uppercase;
-    letter-spacing: .16em;
-    color: var(--muted);
+    letter-spacing: .12em;
+    color: var(--accent);
     font-weight: 700;
-    margin: 44px 0 14px;
+    margin: 40px 0 12px;
+    display: flex; align-items: center; gap: 12px;
   }
+  h2::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 
   .sched {
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 10px;
+    border-radius: 14px;
     overflow: hidden;
     box-shadow: var(--shadow);
   }
@@ -123,39 +119,34 @@
   .slot .time {
     font-variant-numeric: tabular-nums;
     font-size: 14px;
-    color: var(--muted);
+    color: var(--ink);
+    opacity: .75;
     white-space: nowrap;
   }
   .slot .name { font-weight: 600; font-size: 15px; }
+  a.slot.band .name { font-family: var(--display); font-size: 21px; font-weight: 700; text-transform: uppercase; letter-spacing: .02em; line-height: 1; }
   .slot .dur {
     font-variant-numeric: tabular-nums;
     font-size: 12px;
     color: var(--muted);
     white-space: nowrap;
   }
-  a.slot.band { background: var(--live-dim); }
-  a.slot.band .name::before {
-    content: "";
-    display: inline-block;
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--live);
-    margin-right: 9px;
-    vertical-align: 1px;
-  }
+  a.slot.band { background: var(--accent-dim); box-shadow: inset 4px 0 0 var(--accent); }
+  a.slot.band .name::before { content: none; }
   a.slot.band:hover, a.slot.band:focus-visible { background: var(--surface-2); }
   a.slot.band:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  a.slot.band .dur::after { content: " ↓"; color: var(--accent); }
+  a.slot.band .dur { color: var(--accent); font-weight: 700; }
+  a.slot.band .dur::after { content: " ↓"; }
   .slot.pause .name { color: var(--muted); font-weight: 400; font-size: 14px; }
   .slot.lunch .name { color: var(--accent); font-weight: 600; }
   .slot.section {
     grid-template-columns: 1fr;
-    background: var(--ink);
-    color: var(--bg);
+    background: var(--accent);
+    color: var(--accent-ink);
     padding: 9px 16px;
   }
   .slot.section .name {
-    color: var(--bg);
+    color: var(--accent-ink);
     text-transform: uppercase;
     letter-spacing: .12em;
     font-size: 12px;
@@ -172,8 +163,10 @@
   }
   .daytab {
     font: inherit;
-    font-size: 13px;
-    font-weight: 700;
+    font-family: var(--display);
+    font-size: 17px;
+    text-transform: uppercase;
+    font-weight: 600;
     letter-spacing: .02em;
     color: var(--muted);
     background: var(--surface);
@@ -189,6 +182,7 @@
     color: var(--accent-ink);
     background: var(--accent);
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
   }
   .day-panel[hidden] { display: none; }
   @media (max-width: 480px) {
@@ -197,10 +191,10 @@
   }
 
   section.band-card {
-    margin-top: 28px;
+    margin-top: 14px;
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
     box-shadow: var(--shadow);
     scroll-margin-top: 16px;
@@ -224,11 +218,17 @@
     transition: transform .2s ease;
   }
   section.band-card.open .band-head .chevron { transform: rotate(180deg); }
+  section.band-card.open { border-color: var(--accent); }
+  section.band-card.open .band-head { background: var(--accent-dim); }
   .band-head h3 {
     margin: 0;
-    font-size: 24px;
-    font-weight: 800;
-    letter-spacing: -.01em;
+    font-family: var(--display);
+    font-size: 30px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .02em;
+    color: var(--accent);
+    line-height: 1;
   }
   .band-head .band-time {
     font-variant-numeric: tabular-nums;
@@ -236,8 +236,8 @@
     font-size: 14px;
   }
   .band-head .chip {
-    background: var(--live-dim);
-    color: var(--live);
+    background: var(--accent);
+    color: var(--accent-ink);
     font-size: 12px;
     font-weight: 700;
     padding: 3px 10px;
@@ -250,9 +250,9 @@
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: .04em;
-    font-weight: 600;
-    color: var(--muted);
-    opacity: .8;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: .12em;
     margin: 0 0 8px;
     display: flex;
     align-items: center;
