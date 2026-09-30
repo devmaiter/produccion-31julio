@@ -1,0 +1,737 @@
+{
+ "evento": {
+  "id": "simon-bolivar-2026",
+  "nombre": "Parque Simón Bolívar · julio–agosto 2026",
+  "lugar": "Parque Simón Bolívar",
+  "ciudad": "Bogotá",
+  "desde": "2026-07-31",
+  "hasta": "2026-08-02"
+ },
+ "escenarios": [
+  {
+   "id": "principal",
+   "eventoId": "simon-bolivar-2026",
+   "nombre": "Tarima principal"
+  }
+ ],
+ "dias": [
+  {
+   "id": "viernes-31",
+   "eventoId": "simon-bolivar-2026",
+   "fecha": "2026-07-31",
+   "nombre": "Vie 31 jul",
+   "tipo": "show"
+  },
+  {
+   "id": "sabado-1",
+   "eventoId": "simon-bolivar-2026",
+   "fecha": "2026-08-01",
+   "nombre": "Sáb 1 ago",
+   "tipo": "show"
+  },
+  {
+   "id": "domingo-2",
+   "eventoId": "simon-bolivar-2026",
+   "fecha": "2026-08-02",
+   "nombre": "Dom 2 ago",
+   "tipo": "show"
+  }
+ ],
+ "artistas": [
+  {
+   "id": "proyecto-a",
+   "nombre": "Proyecto A"
+  },
+  {
+   "id": "one-4-all",
+   "nombre": "One 4 All"
+  },
+  {
+   "id": "vasija-de-barro",
+   "nombre": "Vasija de Barro"
+  },
+  {
+   "id": "rapha",
+   "nombre": "Rapha"
+  },
+  {
+   "id": "diana-paipa",
+   "nombre": "Diana Paipa"
+  },
+  {
+   "id": "calibre-50",
+   "nombre": "Calibre 50"
+  },
+  {
+   "id": "andy-caicedo",
+   "nombre": "Andy Caicedo"
+  },
+  {
+   "id": "john-onofre",
+   "nombre": "John Onofre"
+  },
+  {
+   "id": "banda-la-mb",
+   "nombre": "Banda La MB"
+  },
+  {
+   "id": "homenaje-a-jose-alfredo-jimenez",
+   "nombre": "Homenaje a José Alfredo Jiménez"
+  },
+  {
+   "id": "luister-la-voz",
+   "nombre": "Luister La Voz"
+  },
+  {
+   "id": "aviva-band",
+   "nombre": "Aviva Band"
+  },
+  {
+   "id": "cales-louima",
+   "nombre": "Cales Louima"
+  },
+  {
+   "id": "rescate",
+   "nombre": "Rescate"
+  },
+  {
+   "id": "miel-san-marcos",
+   "nombre": "Miel San Marcos"
+  },
+  {
+   "id": "alex-zurdo",
+   "nombre": "Alex Zurdo"
+  }
+ ],
+ "bloques": [
+  {
+   "id": "viernes-31-b0",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "artistaId": "proyecto-a",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "09:00",
+   "fin": "09:45"
+  },
+  {
+   "id": "viernes-31-b1",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "09:45",
+   "fin": "10:00"
+  },
+  {
+   "id": "viernes-31-b2",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "artistaId": "one-4-all",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "10:00",
+   "fin": "12:00"
+  },
+  {
+   "id": "viernes-31-b3",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "12:00",
+   "fin": "12:20"
+  },
+  {
+   "id": "viernes-31-b4",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "artistaId": "vasija-de-barro",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "12:20",
+   "fin": "13:35"
+  },
+  {
+   "id": "viernes-31-b5",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "13:35",
+   "fin": "13:45"
+  },
+  {
+   "id": "viernes-31-b6",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "titulo": "Almuerzo",
+   "tipo": "marca",
+   "inicio": "13:45",
+   "fin": "14:45"
+  },
+  {
+   "id": "viernes-31-b7",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "artistaId": "rapha",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:45",
+   "fin": "16:00"
+  },
+  {
+   "id": "viernes-31-b8",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "16:00",
+   "fin": "16:15"
+  },
+  {
+   "id": "viernes-31-b9",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "artistaId": "diana-paipa",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "16:15",
+   "fin": "17:30"
+  },
+  {
+   "id": "viernes-31-b10",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "17:30",
+   "fin": "17:45"
+  },
+  {
+   "id": "viernes-31-b11",
+   "diaId": "viernes-31",
+   "escenarioId": "principal",
+   "artistaId": "calibre-50",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "17:45",
+   "fin": "19:45"
+  },
+  {
+   "id": "sabado-1-b1",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "andy-caicedo",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "09:00",
+   "fin": "09:45"
+  },
+  {
+   "id": "sabado-1-b2",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "09:45",
+   "fin": "10:00"
+  },
+  {
+   "id": "sabado-1-b3",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "john-onofre",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "10:00",
+   "fin": "11:00"
+  },
+  {
+   "id": "sabado-1-b4",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "11:00",
+   "fin": "11:15"
+  },
+  {
+   "id": "sabado-1-b5",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "banda-la-mb",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "11:15",
+   "fin": "12:00"
+  },
+  {
+   "id": "sabado-1-b7",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "banda-la-mb",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:00",
+   "fin": "14:50"
+  },
+  {
+   "id": "sabado-1-b8",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "14:50",
+   "fin": "15:05"
+  },
+  {
+   "id": "sabado-1-b9",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "homenaje-a-jose-alfredo-jimenez",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:05",
+   "fin": "15:55"
+  },
+  {
+   "id": "sabado-1-b10",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "15:55",
+   "fin": "16:10"
+  },
+  {
+   "id": "sabado-1-b11",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "andy-caicedo",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "16:10",
+   "fin": "17:00"
+  },
+  {
+   "id": "sabado-1-b12",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "17:00",
+   "fin": "17:20"
+  },
+  {
+   "id": "sabado-1-b13",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "proyecto-a",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "17:20",
+   "fin": "18:10"
+  },
+  {
+   "id": "sabado-1-b14",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "18:10",
+   "fin": "18:25"
+  },
+  {
+   "id": "sabado-1-b15",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "luister-la-voz",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "18:25",
+   "fin": "19:15"
+  },
+  {
+   "id": "sabado-1-b16",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "19:15",
+   "fin": "19:30"
+  },
+  {
+   "id": "sabado-1-b17",
+   "diaId": "sabado-1",
+   "escenarioId": "principal",
+   "artistaId": "john-onofre",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "19:30",
+   "fin": "20:20"
+  },
+  {
+   "id": "domingo-2-b1",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "alex-zurdo",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "08:00",
+   "fin": "08:45"
+  },
+  {
+   "id": "domingo-2-b2",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "08:45",
+   "fin": "09:00"
+  },
+  {
+   "id": "domingo-2-b3",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "miel-san-marcos",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "09:00",
+   "fin": "09:45"
+  },
+  {
+   "id": "domingo-2-b4",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "09:45",
+   "fin": "10:00"
+  },
+  {
+   "id": "domingo-2-b5",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "rescate",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "10:00",
+   "fin": "10:45"
+  },
+  {
+   "id": "domingo-2-b6",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "10:45",
+   "fin": "11:00"
+  },
+  {
+   "id": "domingo-2-b7",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "cales-louima",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "11:00",
+   "fin": "11:45"
+  },
+  {
+   "id": "domingo-2-b9",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "aviva-band",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:00",
+   "fin": "14:25"
+  },
+  {
+   "id": "domingo-2-b10",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "14:25",
+   "fin": "14:30"
+  },
+  {
+   "id": "domingo-2-b11",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "one-4-all",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:30",
+   "fin": "14:55"
+  },
+  {
+   "id": "domingo-2-b12",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "14:55",
+   "fin": "15:10"
+  },
+  {
+   "id": "domingo-2-b13",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "diana-paipa",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:10",
+   "fin": "15:30"
+  },
+  {
+   "id": "domingo-2-b14",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "15:30",
+   "fin": "15:35"
+  },
+  {
+   "id": "domingo-2-b15",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "rapha",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:35",
+   "fin": "15:55"
+  },
+  {
+   "id": "domingo-2-b16",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "15:55",
+   "fin": "16:00"
+  },
+  {
+   "id": "domingo-2-b17",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "vasija-de-barro",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "16:00",
+   "fin": "16:20"
+  },
+  {
+   "id": "domingo-2-b18",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "16:20",
+   "fin": "16:30"
+  },
+  {
+   "id": "domingo-2-b19",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "cales-louima",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "16:30",
+   "fin": "17:15"
+  },
+  {
+   "id": "domingo-2-b20",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "17:15",
+   "fin": "17:30"
+  },
+  {
+   "id": "domingo-2-b21",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "rescate",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "17:30",
+   "fin": "18:30"
+  },
+  {
+   "id": "domingo-2-b22",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "18:30",
+   "fin": "18:45"
+  },
+  {
+   "id": "domingo-2-b23",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "miel-san-marcos",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "18:45",
+   "fin": "19:45"
+  },
+  {
+   "id": "domingo-2-b24",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "19:45",
+   "fin": "20:00"
+  },
+  {
+   "id": "domingo-2-b25",
+   "diaId": "domingo-2",
+   "escenarioId": "principal",
+   "artistaId": "alex-zurdo",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "20:00",
+   "fin": "21:00"
+  }
+ ],
+ "items": [
+  {
+   "id": "viernes-31-one-4-all-0",
+   "eventoId": "simon-bolivar-2026",
+   "diaId": "viernes-31",
+   "artistaId": "one-4-all",
+   "descripcion": "Batería Yamaha",
+   "cantidad": 1,
+   "categoria": "Batería",
+   "referencia": "Batería Yamaha",
+   "propietario": {
+    "tipo": "sin-definir"
+   },
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "viernes-31-one-4-all-1",
+   "eventoId": "simon-bolivar-2026",
+   "diaId": "viernes-31",
+   "artistaId": "one-4-all",
+   "descripcion": "Set de platillos: 1 ride, 2 crash, 1 splash y hi-hat",
+   "cantidad": 1,
+   "categoria": "Platillos",
+   "referencia": "Set de platillos: 1 ride, 2 crash, 1 splash y hi-hat",
+   "propietario": {
+    "tipo": "sin-definir"
+   },
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "viernes-31-one-4-all-2",
+   "eventoId": "simon-bolivar-2026",
+   "diaId": "viernes-31",
+   "artistaId": "one-4-all",
+   "descripcion": "4 bases de platillo (ride, 2 crash, splash)",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "4 bases de platillo",
+   "propietario": {
+    "tipo": "sin-definir"
+   },
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "viernes-31-one-4-all-3",
+   "eventoId": "simon-bolivar-2026",
+   "diaId": "viernes-31",
+   "artistaId": "one-4-all",
+   "descripcion": "Yamaha Montage 8",
+   "cantidad": 1,
+   "categoria": "Teclado",
+   "referencia": "Yamaha Motif XF8 / Montage 8",
+   "propietario": {
+    "tipo": "sin-definir"
+   },
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "viernes-31-one-4-all-4",
+   "eventoId": "simon-bolivar-2026",
+   "diaId": "viernes-31",
+   "artistaId": "one-4-all",
+   "descripcion": "2 bases de teclado",
+   "cantidad": 1,
+   "categoria": "Bases",
+   "referencia": "2 bases de teclado",
+   "propietario": {
+    "tipo": "sin-definir"
+   },
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "viernes-31-one-4-all-5",
+   "eventoId": "simon-bolivar-2026",
+   "diaId": "viernes-31",
+   "artistaId": "one-4-all",
+   "descripcion": "Amplificador de bajo",
+   "cantidad": 1,
+   "categoria": "Ampli bajo",
+   "referencia": "Amplificador de bajo",
+   "propietario": {
+    "tipo": "sin-definir"
+   },
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  },
+  {
+   "id": "viernes-31-one-4-all-6",
+   "eventoId": "simon-bolivar-2026",
+   "diaId": "viernes-31",
+   "artistaId": "one-4-all",
+   "descripcion": "Congas con base y timbal",
+   "cantidad": 1,
+   "categoria": "Percusión",
+   "referencia": "Congas con base y timbal",
+   "propietario": {
+    "tipo": "sin-definir"
+   },
+   "porConfirmar": false,
+   "chuleadoEnHoja": false
+  }
+ ],
+ "stagePlots": [
+  {
+   "artistaId": "one-4-all",
+   "eventoId": "simon-bolivar-2026",
+   "archivo": "stage-plots/simon-bolivar-2026/one-4-all.jpg",
+   "descripcion": "Stage plot de One 4 All: batería, bajo y percusión menor atrás; teclados y tres guitarras al centro; cuerdas (11) y vientos (5) adelante; 4 lead vocals y 11 micrófonos al frente. Todos con IEM."
+  },
+  {
+   "artistaId": "vasija-de-barro",
+   "eventoId": "simon-bolivar-2026",
+   "archivo": "stage-plots/simon-bolivar-2026/vasija-de-barro.jpg",
+   "descripcion": "Stage plot de Vasija de Barro: cantante al centro con guitarra electroacústica y dos cuñas; guitarrista eléctrico a la izquierda y teclista a la derecha; batería en drum riser al fondo; bajista con computador y talkback en riser derecho; sección de vientos (3) en riser izquierdo; sidefill PA en los extremos."
+  },
+  {
+   "artistaId": "rapha",
+   "eventoId": "simon-bolivar-2026",
+   "archivo": "stage-plots/simon-bolivar-2026/rapha.jpg",
+   "descripcion": "Stage plot de Rapha: batería (Kevin) al fondo al centro con laptop que envía secuencias por interfaz estéreo; guitarra (Migue) a la izquierda con talkback y salida estéreo; teclados (Darwin) con laptop de coros y salidas estéreo de key y gtr; bajo (Santi) a la derecha con salida mono; voz líder (Rapha) al centro y voz (Sofi) a la derecha; dos monitores de piso al frente. Canales: 1 voz Rapha, 2 voz Sofi, 3 batería, 4 bajo, 5 guitarra, 6 key/coro 2, 7 y 8 monitores de piso."
+  },
+  {
+   "artistaId": "andy-caicedo",
+   "eventoId": "simon-bolivar-2026",
+   "archivo": "stage-plots/simon-bolivar-2026/andy-caicedo.jpg",
+   "descripcion": "Stage plot de Andy Caicedo: al fondo un riser de 10 x 3 x 0.60 m con percusión, vientos y teclado (Mix 5 a Mix 9); dos risers laterales de 2 x 2 x 0.30 m con trompetas y trombones (Mix 10 a Mix 13); al frente monitores de piso Mix 2 y Mix 3 a los costados y Mix 1 al centro para la voz. 13 envíos de monitor en total."
+  }
+ ]
+}
