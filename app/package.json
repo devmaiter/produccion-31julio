@@ -10,9 +10,11 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "importar": "tsx scripts/importar-prototipos.ts"
+    "importar": "tsx scripts/importar-prototipos.ts",
+    "extraer": "tsx scripts/extraer.ts"
   },
   "devDependencies": {
+    "@types/mailparser": "^3.9.0",
     "@types/node": "^26.6.3",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
@@ -20,6 +22,8 @@
     "vitest": "^5.0.2"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.129.0",
+    "mailparser": "^3.9.31",
     "zod": "^4.6.5"
   }
 }

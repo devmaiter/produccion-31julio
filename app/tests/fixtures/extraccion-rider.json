@@ -1,0 +1,24 @@
+{
+ "evento": { "nombre": "Rock al Parque 2026", "lugar": "Parque Simón Bolívar", "ciudad": "Bogotá", "desde": "2026-11-07", "hasta": null },
+ "escenarios": ["Escenario Plaza"],
+ "dias": [
+  { "fecha": "2026-11-06", "nombre": "Viernes 6 · Pruebas", "tipo": "pruebas" },
+  { "fecha": "2026-11-07", "nombre": "Sábado 7", "tipo": "show" }
+ ],
+ "artistas": ["Los Petit Fellas", "Doctor Krápula"],
+ "bloques": [
+  { "fecha": "2026-11-06", "escenario": "Escenario Plaza", "artista": "Doctor Krápula", "titulo": "Soundcheck", "tipo": "soundcheck", "inicio": "9:00", "fin": "10:30" },
+  { "fecha": "2026-11-07", "escenario": "Plaza", "artista": "Los Petit Fellas", "titulo": "Show", "tipo": "show", "inicio": "16:00", "fin": "17:00" },
+  { "fecha": "2026-11-07", "escenario": "Escenario Plaza", "artista": "Doctor Krápula", "titulo": "Show", "tipo": "show", "inicio": "23:30", "fin": "00:45" },
+  { "fecha": "2026-11-07", "escenario": null, "artista": null, "titulo": "Puertas", "tipo": "marca", "inicio": "13:00", "fin": null },
+  { "fecha": "07/11", "escenario": null, "artista": "Doctor Krápula", "titulo": "LX", "tipo": "montaje", "inicio": "25:00", "fin": null }
+ ],
+ "items": [
+  { "artista": "Doctor Krápula", "fecha": null, "grupo": "Drums", "descripcion": "Snare stand", "cantidad": 2, "categoria": "Bases", "proveedor": "CN", "dudoso": false, "nota": null },
+  { "artista": "Doctor Krápula", "fecha": null, "grupo": "Drums", "descripcion": "Base de redoblante", "cantidad": 1, "categoria": "Bases", "proveedor": "OML", "dudoso": false, "nota": null },
+  { "artista": "Doctor Krápula", "fecha": null, "grupo": "Misc", "descripcion": "Stage fan", "cantidad": 2, "categoria": "Otro", "proveedor": null, "dudoso": true, "nota": "número a mano encima del impreso" },
+  { "artista": "Los Petit Fellas", "fecha": "2026-11-07", "grupo": "Keys", "descripcion": "Nord Stage 3", "cantidad": 1, "categoria": "Teclado", "proveedor": "BACKLINE COP", "dudoso": false, "nota": null },
+  { "artista": "Banda Fantasma", "fecha": null, "grupo": null, "descripcion": "Ampeg SVT Classic", "cantidad": 1, "categoria": "Ampli bajo", "proveedor": null, "dudoso": false, "nota": null }
+ ],
+ "avisos": ["El rider de Los Petit Fellas trae una página cortada."]
+}

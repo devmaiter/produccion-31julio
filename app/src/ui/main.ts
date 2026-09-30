@@ -9,7 +9,7 @@ import { EVENTOS } from "../datos/eventos";
 import { fichasDelDia, minutosShow } from "../datos/consultas";
 import { RepositorioLocal } from "../datos/repositorio";
 
-type Vista = "backline" | "totales" | "horario" | "lista";
+type Vista = "backline" | "totales" | "horario" | "lista" | "importar";
 
 const repo = new RepositorioLocal(window.localStorage);
 const $ = <T extends HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
@@ -30,7 +30,7 @@ async function elegirEvento(id: string) {
 }
 
 function render() {
-  $("#dias").innerHTML = vista === "totales" || vista === "lista" ? "" : paquete.dias
+  $("#dias").innerHTML = vista === "totales" || vista === "lista" || vista === "importar" ? "" : paquete.dias
     .map(d => `<button data-dia="${d.id}" aria-pressed="${d.id === diaId}">${esc(d.nombre)}</button>`).join("");
   document.querySelectorAll<HTMLButtonElement>("#vistas button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.vista === vista)));
   const a = avance(paquete.items, verif);
@@ -40,6 +40,7 @@ function render() {
   if (vista === "totales") c.innerHTML = vistaTotales();
   if (vista === "horario") c.innerHTML = vistaHorario();
   if (vista === "lista") c.innerHTML = vistaLista();
+  if (vista === "importar") c.innerHTML = vistaImportar();
 }
 
 function filaItem(it: ItemBackline): string {
@@ -106,6 +107,88 @@ function renderLista(texto: string) {
   $("#resultado").innerHTML = r.length ? `<table><thead><tr><th class="n">Cant.</th><th>Descripción</th><th>Categoría</th><th>Referencia</th></tr></thead><tbody>${r.map(l => `<tr><td class="n">${l.cantidad}</td><td>${esc(l.descripcion)}</td><td>${esc(l.categoria)}</td><td>${esc(referenciaDe(l.descripcion))}</td></tr>`).join("")}</tbody></table>` : "";
 }
 
+/* ---------- Importar: correo, PDF o foto → entidades ---------- */
+interface Conteo { nuevos: number; actualizados: number; iguales: number }
+interface RespuestaExtraer {
+  error?: string;
+  paquete: PaqueteEvento;
+  resumen: { evento: { id: string; nuevo: boolean }; avisos: string[]; itemsTocados: string[] } & Record<"escenarios" | "dias" | "artistas" | "bloques" | "items", Conteo>;
+}
+let pendiente: RespuestaExtraer | null = null;
+
+function vistaImportar(): string {
+  return `<p>Sube lo que llegó de producción: correos (.eml, con sus adjuntos), riders en PDF, fotos de las hojas de backline u horarios, o texto. Claude los lee y la app los convierte en días, artistas, horario y backline. Nada se guarda hasta que lo revises.</p>
+  <p><label>Destino <select id="imp-evento"><option value="">Evento nuevo (según los archivos)</option>${EVENTOS.map(e => `<option value="${e.evento.id}" ${e.evento.id === paquete.evento.id ? "selected" : ""}>${esc(e.evento.nombre)}</option>`).join("")}</select></label></p>
+  <p><input type="file" id="imp-archivos" multiple accept=".eml,.pdf,.jpg,.jpeg,.png,.webp,.gif,.txt,.csv,message/rfc822,application/pdf,image/*,text/plain"></p>
+  <p><button id="imp-extraer">Extraer</button> <span id="imp-estado"></span></p>
+  <div id="imp-resultado"></div>`;
+}
+
+const base64 = (f: File) => new Promise<string>((ok, mal) => {
+  const r = new FileReader();
+  r.onload = () => ok(String(r.result).replace(/^data:[^,]*,/, ""));
+  r.onerror = () => mal(r.error);
+  r.readAsDataURL(f);
+});
+
+async function importar() {
+  const archivos = [...($("#imp-archivos") as HTMLInputElement).files ?? []];
+  const estado = $("#imp-estado");
+  if (!archivos.length) { estado.textContent = "Elige al menos un archivo."; return; }
+  const eventoId = ($("#imp-evento") as HTMLSelectElement).value || undefined;
+  ($("#imp-extraer") as HTMLButtonElement).disabled = true;
+  estado.textContent = `Leyendo ${archivos.length} archivo(s)… puede tardar un par de minutos.`;
+  $("#imp-resultado").innerHTML = "";
+  try {
+    const cuerpo = { eventoId, archivos: await Promise.all(archivos.map(async f => ({ nombre: f.name, tipo: f.type, base64: await base64(f) }))) };
+    const res = await fetch("api/extraer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(cuerpo) });
+    if (res.status === 404) throw new Error("La extracción solo funciona con el servidor (npm run dev).");
+    const r = await res.json() as RespuestaExtraer;
+    if (!res.ok || r.error) throw new Error(r.error ?? `Error ${res.status}`);
+    pendiente = r;
+    estado.textContent = "";
+    $("#imp-resultado").innerHTML = resultadoImportar(r);
+  } catch (err) {
+    estado.textContent = err instanceof Error ? err.message : String(err);
+  } finally {
+    ($("#imp-extraer") as HTMLButtonElement).disabled = false;
+  }
+}
+
+function resultadoImportar(r: RespuestaExtraer): string {
+  const p = r.paquete, s = r.resumen;
+  const fila = (n: string, c: Conteo) => `<tr><td>${n}</td><td class="n">${c.nuevos}</td><td class="n">${c.actualizados}</td><td class="n">${c.iguales}</td></tr>`;
+  const nombre = new Map(p.artistas.map(a => [a.id, a.nombre]));
+  const dia = new Map(p.dias.map(d => [d.id, d.nombre]));
+  const tocados = new Set(s.itemsTocados);
+  const recientes = p.items.filter(i => tocados.has(i.id));
+  return `<h3>${s.evento.nuevo ? "Evento nuevo" : "Se sumará a"}: ${esc(p.evento.nombre)}</h3>
+  <div class="tabla-scroll"><table><thead><tr><th></th><th class="n">Nuevos</th><th class="n">Actualizados</th><th class="n">Ya estaban</th></tr></thead><tbody>
+  ${fila("Escenarios", s.escenarios)}${fila("Días", s.dias)}${fila("Artistas", s.artistas)}${fila("Horario", s.bloques)}${fila("Backline", s.items)}</tbody></table></div>
+  ${s.avisos.length ? `<h4>Para revisar</h4><ul>${s.avisos.map(a => `<li class="aviso">${esc(a)}</li>`).join("")}</ul>` : ""}
+  ${recientes.length ? `<h4>Backline extraído</h4><div class="tabla-scroll"><table><thead><tr><th>Artista</th><th>Día</th><th class="n">Cant.</th><th>Ítem</th><th>Categoría</th><th>Propietario</th></tr></thead><tbody>
+    ${recientes.map(i => `<tr><td>${esc(nombre.get(i.artistaId))}</td><td>${esc(dia.get(i.diaId))}</td><td class="n">${i.cantidad}</td><td>${esc(i.descripcion)}${i.porConfirmar ? ` <span class="aviso">confirmar</span>` : ""}</td><td>${esc(i.categoria)}</td><td>${esc(etiquetaPropietario(i.propietario))}</td></tr>`).join("")}
+  </tbody></table></div>` : ""}
+  <p><button id="imp-guardar">Guardar en ${esc(p.evento.nombre)}</button> <button id="imp-descartar">Descartar</button></p>`;
+}
+
+async function guardarImportacion() {
+  if (!pendiente) return;
+  const estado = $("#imp-estado");
+  try {
+    const res = await fetch("api/guardar", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ paquete: pendiente.paquete, nuevo: pendiente.resumen.evento.nuevo }) });
+    const r = await res.json() as { error?: string; id?: string };
+    if (!res.ok || r.error) throw new Error(r.error ?? `Error ${res.status}`);
+    // El servidor de desarrollo recarga la página con el evento nuevo o actualizado.
+    try { sessionStorage.setItem("backline:evento", r.id!); } catch { /* sin almacenamiento */ }
+    estado.textContent = "Guardado.";
+    pendiente = null;
+    $("#imp-resultado").innerHTML = "";
+  } catch (err) {
+    estado.textContent = err instanceof Error ? err.message : String(err);
+  }
+}
+
 async function registrar(fila: HTMLTableRowElement) {
   const itemId = fila.dataset.item!;
   const n = fila.querySelector<HTMLInputElement>("[data-contado]")!.value;
@@ -133,8 +216,17 @@ $("#contenido").addEventListener("change", e => {
   const fila = (e.target as HTMLElement).closest<HTMLTableRowElement>("tr[data-item]");
   if (fila) void registrar(fila);
 });
+$("#contenido").addEventListener("click", e => {
+  const id = (e.target as HTMLElement).id;
+  if (id === "imp-extraer") void importar();
+  if (id === "imp-guardar") void guardarImportacion();
+  if (id === "imp-descartar") { pendiente = null; $("#imp-resultado").innerHTML = ""; }
+});
 $("#contenido").addEventListener("input", e => {
   if ((e.target as HTMLElement).id === "pegado") renderLista((e.target as HTMLTextAreaElement).value);
 });
 
-void elegirEvento(EVENTOS[0]!.evento.id);
+let inicial = EVENTOS[0]!.evento.id;
+try { inicial = sessionStorage.getItem("backline:evento") ?? inicial; sessionStorage.removeItem("backline:evento"); } catch { /* sin almacenamiento */ }
+($("#evento") as HTMLSelectElement).value = inicial;
+void elegirEvento(inicial);

@@ -108,6 +108,8 @@ export const ItemBackline = z.object({
   porConfirmar: z.boolean().default(false),
   /** Ya venía chuleado a mano en la hoja impresa. */
   chuleadoEnHoja: z.boolean().default(false),
+  /** De qué archivo salió (correo, PDF, foto), para poder rastrearlo. */
+  origen: z.string().optional(),
 });
 export type ItemBackline = z.infer<typeof ItemBackline>;
 export type ItemBacklineEntrada = z.input<typeof ItemBackline>;
