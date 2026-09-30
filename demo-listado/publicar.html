@@ -1,0 +1,668 @@
+<title>Backline ESC 1 Cordillera</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil+Display:wght@700;800&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Concepto: el listado llega en papel (hoja de cálculo impresa) y el equipo lo
+   usa como road cases: cajas negras con canto de aluminio y cinta de color
+   (gaffer) que marca la categoría, igual que en bodega. Un solo look oscuro:
+   es el mundo de la tarima. */
+:root {
+  color-scheme: dark;
+  --bg: #0d0f13;
+  --bg-2: #14171d;
+  --caja: #1a1d24;
+  --caja-2: #22262e;
+  --metal: #aab1bc;
+  --fg: #eceae4;
+  --fg-2: #a3a8b1;
+  --fg-3: #6f7580;
+  --papel: #eef0f1;
+  --papel-tinta: #2b2f36;
+  --papel-linea: #d3d7dc;
+  --alerta: #ff5a4e;
+  --ok: #5fd68e;
+  /* cinta por categoría */
+  --t-bateria: #f2c230;
+  --t-platillos: #f59f3a;
+  --t-bajo: #3fc6e8;
+  --t-guitarra: #ff5c8a;
+  --t-teclados: #a58bff;
+  --t-percusion: #57d18a;
+  --t-bases: #d9dde3;
+  --t-dj: #6e8bff;
+  --t-escenario: #9aa3ad;
+  --t-energia: #7ee0c3;
+  --f-display: "Big Shoulders Stencil Display", "Arial Narrow", Impact, sans-serif;
+  --f-body: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --radio: 14px;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { background: var(--bg); }
+body { color: var(--fg); font: 15px/1.45 var(--f-body); padding-inline: 16px; padding-block: 0 48px; overflow-x: hidden; }
+
+/* ---------- fondo líquido: manchas lentas, solo transform ---------- */
+.fondo { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.mancha { position: absolute; width: 46vmax; height: 46vmax; border-radius: 50%; filter: blur(70px); opacity: .22; will-change: transform; transition: background-color 1.2s ease; }
+.mancha.m1 { background: var(--t-bateria); left: -12vmax; top: -14vmax; animation: flotar1 26s ease-in-out infinite alternate; }
+.mancha.m2 { background: var(--t-guitarra); right: -16vmax; top: 18vh; animation: flotar2 31s ease-in-out infinite alternate; }
+.mancha.m3 { background: var(--t-bajo); left: 20vw; bottom: -22vmax; animation: flotar3 29s ease-in-out infinite alternate; }
+body[data-paso="1"] .mancha { opacity: .08; }
+body[data-paso="2"] .mancha.m1, body[data-paso="2"] .mancha.m2 { background: var(--alerta); }
+@keyframes flotar1 { to { transform: translate(18vw, 12vh) scale(1.15); } }
+@keyframes flotar2 { to { transform: translate(-22vw, 20vh) scale(.9); } }
+@keyframes flotar3 { to { transform: translate(14vw, -18vh) scale(1.1); } }
+
+.envoltura { position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; }
+
+/* ---------- barra ---------- */
+.barra { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding-block: 12px; margin-inline: -16px; padding-inline: 16px; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid #ffffff10; }
+.marca { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+.marca b { font: 800 22px/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+.marca span { color: var(--fg-3); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pasos { position: relative; display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--bg-2); border: 1px solid #ffffff14; border-radius: 999px; padding: 4px; isolation: isolate; }
+.pasos button { position: relative; z-index: 1; appearance: none; border: 0; background: none; color: var(--fg-2); font: 600 13px/1 var(--f-body); padding: 9px 14px; border-radius: 999px; cursor: pointer; white-space: nowrap; transition: color .3s; }
+.pasos button[aria-pressed="true"] { color: #111; }
+.pasos button:focus-visible { outline: 2px solid var(--metal); outline-offset: 2px; }
+.pasos .gel { position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: var(--fg); }
+body[data-paso="2"] .pasos .gel { background: var(--alerta); }
+body[data-paso="3"] .pasos .gel { background: var(--t-bateria); }
+.pasos small { display: none; }
+
+/* ---------- titular por paso ---------- */
+.titular { display: grid; gap: 6px; padding-block: 28px 18px; max-width: 70ch; }
+body[data-paso="3"] .titular { padding-block: 18px 12px; }
+body[data-paso="3"] .titular h1 { font-size: clamp(28px, 4.2vw, 44px); }
+body[data-paso="3"] .titular p { display: none; }
+.titular h1 { margin: 0; font: 800 clamp(34px, 6.2vw, 64px)/.95 var(--f-display); letter-spacing: .01em; text-transform: uppercase; text-wrap: balance; }
+.titular h1 em { font-style: normal; color: var(--t-bateria); }
+body[data-paso="2"] .titular h1 em { color: var(--alerta); }
+.titular p { margin: 0; color: var(--fg-2); font-size: 16px; max-width: 62ch; }
+.cifras { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.cifra { font: 500 12px/1 var(--f-mono); color: var(--fg-2); border: 1px solid #ffffff1c; border-radius: 999px; padding: 7px 11px; }
+.cifra b { color: var(--fg); font-weight: 500; }
+.sig { justify-self: start; margin-top: 12px; appearance: none; border: 0; border-radius: 999px; padding: 12px 18px; font: 700 14px/1 var(--f-body); cursor: pointer; background: var(--fg); color: #111; }
+.sig:focus-visible { outline: 2px solid var(--metal); outline-offset: 3px; }
+body[data-paso="2"] .sig { background: var(--alerta); color: #fff; }
+body[data-paso="3"] .sig { display: none; }
+
+/* ---------- escena 3D ---------- */
+.escena { perspective: 1600px; perspective-origin: 50% 0; overflow-x: clip; }
+
+/* ---------- ANTES: la hoja ---------- */
+.hoja { position: relative; background: var(--papel); color: var(--papel-tinta); border-radius: 6px; box-shadow: 0 1px 0 #fff inset, 0 30px 60px -20px #000c, 0 10px 20px -10px #0009; transform-origin: 50% 0; transform: rotateX(10deg) scale(.95); transition: transform .9s cubic-bezier(.2,.8,.2,1), box-shadow .9s; overflow: hidden; }
+body[data-paso="2"] .hoja { transform: rotateX(0deg) scale(1); }
+.hoja-cab-doc { padding: 14px 14px 10px; font: 600 11px/1.35 var(--f-mono); letter-spacing: .02em; border-bottom: 2px solid var(--papel-tinta); text-transform: uppercase; }
+.hoja-scroll { overflow-x: auto; }
+.filas { min-width: 640px; }
+.it { font: 400 11.5px/1.25 var(--f-mono); }
+.hoja .it, .hoja .fila-cab { display: grid; grid-template-columns: 34px 92px minmax(0, 1fr) 44px minmax(90px, 190px) 64px; column-gap: 8px; padding: 3px 12px; border-bottom: 1px solid var(--papel-linea); align-items: center; }
+.hoja .fila-cab { font: 600 10.5px/1.2 var(--f-mono); background: #e2e5e8; position: sticky; top: 0; text-transform: uppercase; }
+.hoja .it:nth-child(even) { background: #0000000a; }
+.hoja .c-cant { text-align: right; font-variant-numeric: tabular-nums; }
+.hoja .limpio, .hoja .q, .hoja .dot, .hoja .band, .hoja .marca-ok, .hoja .extra { display: none; }
+.hoja .c-item { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hoja .c-falt { color: #0003; }
+/* paso 2: las trampas se iluminan */
+body[data-paso="2"] .hoja .it { opacity: .38; transition: opacity .4s; }
+body[data-paso="2"] .hoja .it.trampa { opacity: 1; background: #ff5a4e14; box-shadow: inset 3px 0 0 var(--alerta); }
+body[data-paso="2"] .hoja .it.trampa.grave { background: #ff5a4e2b; }
+.hoja .etq { display: none; }
+body[data-paso="2"] .hoja .it.trampa .etq { display: inline-block; grid-column: 3 / -1; justify-self: start; margin: 2px 0 1px; font: 600 10px/1.2 var(--f-body); letter-spacing: .04em; text-transform: uppercase; color: #fff; background: var(--alerta); padding: 3px 7px; border-radius: 3px; transform: rotate(-.6deg); }
+
+/* ---------- DESPUÉS: tablero ---------- */
+.tablero { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.lateral { display: grid; gap: 12px; min-width: 0; }
+.principal { display: grid; gap: 14px; min-width: 0; }
+@media (min-width: 980px) {
+  .tablero { grid-template-columns: 330px minmax(0, 1fr); gap: 22px; }
+  .lateral { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 78px); max-height: calc(100vh - 96px); overflow-y: auto; padding-right: 4px; scrollbar-width: thin; }
+}
+.tablero[hidden] { display: none !important; }
+.alerta-kit { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; background: linear-gradient(135deg, #ff5a4e22, #f2c23014); border: 1px solid #ff5a4e55; border-radius: var(--radio); padding: 16px; }
+.alerta-kit h2 { margin: 0; font: 800 clamp(22px, 2.6vw, 28px)/1 var(--f-display); text-transform: uppercase; letter-spacing: .01em; text-wrap: balance; }
+.alerta-kit p { margin: 0; color: var(--fg-2); max-width: 60ch; font-size: 13.5px; }
+.ecuacion { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.renglon { font: 500 11px/1.2 var(--f-mono); background: var(--papel); color: var(--papel-tinta); padding: 7px 9px; border-radius: 3px; max-width: 100%; }
+.flecha { font: 800 26px/1 var(--f-display); color: var(--alerta); }
+.piezas-mini { display: flex; flex-wrap: wrap; gap: 5px; }
+.piezas-mini span { font: 500 11px/1 var(--f-body); background: var(--caja-2); border: 1px solid #ffffff1a; border-left: 3px solid var(--t-bateria); padding: 6px 8px; border-radius: 4px; }
+
+.hallazgos { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+@media (max-width: 979px) {
+  .alerta-kit p { display: none; }
+  .hallazgo span { display: none; }
+  .hallazgo b { font-size: 24px; }
+  .hallazgos { grid-auto-flow: column; grid-auto-columns: minmax(180px, 56%); grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; scrollbar-width: none; }
+  .hallazgo { scroll-snap-align: start; }
+  .alerta-kit .piezas-mini { max-height: 64px; overflow: hidden; mask-image: linear-gradient(#000 60%, transparent); -webkit-mask-image: linear-gradient(#000 60%, transparent); }
+}
+.hallazgo { appearance: none; text-align: left; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; align-content: start; color: var(--fg); background: var(--bg-2); border: 1px solid #ffffff14; border-radius: 12px; padding: 12px; cursor: pointer; font: inherit; transition: transform .25s, border-color .25s, background .25s; }
+.hallazgo:hover { transform: translateY(-2px); border-color: #ffffff30; }
+.hallazgo:focus-visible { outline: 2px solid var(--metal); outline-offset: 2px; }
+.hallazgo[aria-pressed="true"] { border-color: var(--alerta); background: #ff5a4e1a; }
+.hallazgo b { grid-row: span 2; min-width: 1.4em; font: 800 30px/1 var(--f-display); color: var(--alerta); font-variant-numeric: tabular-nums; }
+.hallazgo strong { font-size: 13.5px; line-height: 1.25; }
+.hallazgo span { font-size: 12px; color: var(--fg-2); }
+.hallazgos-titulo { margin: 4px 0 0; font: 700 11px/1 var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--fg-3); }
+
+.totales { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+.total { flex: none; display: grid; gap: 2px; background: var(--caja); border: 1px solid #ffffff12; border-radius: 10px; padding: 10px 12px; min-width: 128px; }
+.total b { font: 800 26px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.total span { font-size: 11.5px; color: var(--fg-2); }
+.total i { font: 400 10.5px/1.2 var(--f-mono); color: var(--fg-3); font-style: normal; }
+
+.controles { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 62px); min-width: 0; z-index: 10; padding-block: 8px; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.buscar { flex: 1 1 220px; min-width: 0; display: flex; align-items: center; gap: 8px; background: var(--bg-2); border: 1px solid #ffffff1a; border-radius: 999px; padding: 0 14px; }
+.buscar input { flex: 1; min-width: 0; background: none; border: 0; color: var(--fg); font: 500 14px/1 var(--f-body); padding: 11px 0; outline: none; }
+.buscar:focus-within { border-color: var(--metal); }
+.agrupar { display: inline-flex; background: var(--bg-2); border: 1px solid #ffffff1a; border-radius: 999px; padding: 3px; }
+.agrupar button, .chip { appearance: none; border: 0; background: none; color: var(--fg-2); font: 600 12.5px/1 var(--f-body); padding: 8px 12px; border-radius: 999px; cursor: pointer; }
+.agrupar button[aria-pressed="true"] { background: var(--fg); color: #111; }
+.agrupar button:focus-visible, .chip:focus-visible { outline: 2px solid var(--metal); outline-offset: 2px; }
+.chips { display: flex; gap: 6px; overflow-x: auto; flex: 1 1 100%; scrollbar-width: none; padding-bottom: 2px; }
+.chip { flex: none; border: 1px solid #ffffff1a; }
+.chip[aria-pressed="true"] { background: var(--fg); color: #111; border-color: var(--fg); }
+
+.cajas { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 16px; align-items: start; transform-style: preserve-3d; }
+.caja { position: relative; display: grid; gap: 10px; padding: 14px; border-radius: var(--radio); transform-style: preserve-3d; transition: transform .45s cubic-bezier(.2,.8,.2,1); }
+.caja[hidden] { display: none !important; }
+.caja-fondo { position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: linear-gradient(180deg, var(--caja-2), var(--caja)); border: 1px solid #ffffff14; box-shadow: 0 0 0 1px #0008, inset 0 1px 0 #ffffff14, 0 24px 40px -22px #000; }
+.caja-fondo::before, .caja-fondo::after { content: ""; position: absolute; width: 18px; height: 18px; border: 2px solid var(--metal); opacity: .5; }
+.caja-fondo::before { top: 6px; left: 6px; border-right: 0; border-bottom: 0; border-radius: 6px 0 0 0; }
+.caja-fondo::after { right: 6px; bottom: 6px; border-left: 0; border-top: 0; border-radius: 0 0 6px 0; }
+.caja-cab { display: grid; gap: 6px; transform: translateZ(18px); }
+.caja-cab h3 { margin: 0; font: 800 26px/1 var(--f-display); text-transform: uppercase; letter-spacing: .02em; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.caja-cab h3 small { font: 500 12px/1 var(--f-mono); color: var(--fg-3); letter-spacing: 0; text-transform: none; white-space: nowrap; }
+.cintas { display: flex; flex-wrap: wrap; gap: 4px; }
+.cinta { font: 700 10px/1 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: #111; padding: 4px 7px 3px; border-radius: 2px; background: var(--cinta); transform: rotate(var(--giro, -1deg)); }
+.progreso { height: 4px; border-radius: 4px; background: #ffffff14; overflow: hidden; }
+.progreso i { display: block; height: 100%; width: 0; background: var(--ok); border-radius: inherit; transition: width .5s cubic-bezier(.2,.8,.2,1); }
+
+.kit { position: relative; border-radius: 10px; padding: 10px; background: #0000003a; border: 1px solid #ffffff12; transform: translateZ(10px); box-shadow: 0 6px 0 -3px #ffffff0c, 0 12px 0 -6px #ffffff08; }
+.kit-cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.kit-cab .aviso-kit { flex: none; font: 600 10.5px/1.2 var(--f-body); color: var(--t-bateria); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+.kit-piezas, .sueltos { display: grid; gap: 4px; }
+
+/* el mismo nodo .it, vestido de pieza */
+.tablero .it { position: relative; display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; column-gap: 8px; padding: 7px 9px; border-radius: 7px; background: var(--caja); border: 1px solid #ffffff10; font: 500 13px/1.25 var(--f-body); cursor: pointer; user-select: none; transition: background .2s, opacity .3s, border-color .2s; }
+.tablero .it:hover { border-color: #ffffff2c; }
+.tablero .it:focus-visible { outline: 2px solid var(--metal); outline-offset: 1px; }
+.tablero .c-esc, .tablero .c-cat, .tablero .c-obs, .tablero .c-falt, .tablero .raw, .tablero .c-cant, .tablero .etq { display: none; }
+.tablero .dot { width: 10px; height: 10px; border-radius: 2px; background: var(--cinta, var(--fg-3)); transform: rotate(-8deg); }
+.tablero .c-item { min-width: 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; }
+.tablero .band { font: 500 10.5px/1.2 var(--f-mono); color: var(--fg-3); }
+.tablero .q { font: 500 12px/1 var(--f-mono); color: var(--fg-2); font-variant-numeric: tabular-nums; }
+.tablero .extra { font: 600 10px/1.2 var(--f-body); text-transform: uppercase; letter-spacing: .05em; color: var(--t-platillos); }
+.tablero .it.es-cabeza { background: none; border: 0; padding: 0; font: 800 17px/1.1 var(--f-display); text-transform: uppercase; letter-spacing: .02em; grid-template-columns: 10px minmax(0, 1fr); }
+.tablero .it.es-cabeza .q { display: none; }
+.tablero .it.cargado { background: #5fd68e14; border-color: #5fd68e44; }
+.tablero .it.cargado .limpio { color: var(--fg-2); text-decoration: line-through; text-decoration-color: #5fd68e99; }
+.tablero .it.cargado::after { content: "✓"; position: absolute; right: -6px; top: -7px; width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; background: var(--ok); color: #111; font: 800 11px/1 var(--f-body); }
+.tablero.enfocado .it:not(.foco):not(.es-cabeza) { opacity: .22; }
+.tablero .it.foco { border-color: var(--alerta); box-shadow: 0 0 0 1px var(--alerta); }
+.tablero .it.foco .extra { color: var(--alerta); }
+.oculto { display: none !important; }
+
+.pie { margin-top: 32px; color: var(--fg-3); font-size: 12px; max-width: 70ch; }
+.pie kbd { font: 500 11px/1 var(--f-mono); border: 1px solid #ffffff2a; border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; color: var(--fg-2); }
+
+@media (max-width: 560px) {
+  .pasos button { padding: 9px 11px; }
+  .marca span { display: none; }
+  .controles { top: calc(env(safe-area-inset-top, 0px) + 106px); }
+  .hoja { transform: rotateX(6deg) scale(.93); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mancha { animation: none; }
+  .hoja, .caja, .progreso i { transition: none; }
+}
+</style>
+
+<div class="fondo" aria-hidden="true"><div class="mancha m1"></div><div class="mancha m2"></div><div class="mancha m3"></div></div>
+
+<div class="envoltura">
+  <header class="barra">
+    <div class="marca"><b>Backline</b><span>Escenario 1 · Cordillera 2024</span></div>
+    <nav class="pasos" aria-label="Pasos de la demo">
+      <span class="gel" aria-hidden="true"></span>
+      <button type="button" data-paso="1" aria-pressed="true">1 · Listado</button>
+      <button type="button" data-paso="2" aria-pressed="false">2 · Revisar</button>
+      <button type="button" data-paso="3" aria-pressed="false">3 · Organizado</button>
+    </nav>
+  </header>
+
+  <section class="titular" aria-live="polite">
+    <h1 id="t-h1">Así llega <em>el listado</em></h1>
+    <p id="t-p">El listado general de backline del Escenario 1: tres páginas de PDF, una fila por línea, todo en mayúsculas. Con esto se carga el camión.</p>
+    <div class="cifras" id="t-cifras"></div>
+    <button type="button" class="sig" id="siguiente">Buscar lo que se puede quedar →</button>
+  </section>
+
+  <main class="escena">
+    <section class="hoja" id="hoja" aria-label="Listado original">
+      <div class="hoja-cab-doc">Escenario 1 - Festival Cordillera 2024 - 12 montaje, 13 pruebas, 14 y 15 de septiembre show</div>
+      <div class="hoja-scroll">
+        <div class="filas" id="filas">
+          <div class="fila-cab"><span>Esc</span><span>Categoría</span><span>Ítem</span><span style="text-align:right">Cant</span><span>Observaciones</span><span>Faltantes</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tablero" id="tablero" hidden aria-label="Backline organizado">
+      <aside class="lateral">
+        <div class="alerta-kit">
+          <h2>Una fila decía batería. Era una batería completa.</h2>
+          <div class="ecuacion" aria-label="Una fila del listado equivale a una batería con todas sus piezas">
+            <span class="renglon">1 · DRUMS · TAMA STARCLASSIC · 1</span>
+            <span class="flecha" aria-hidden="true">=</span>
+            <div class="piezas-mini" id="piezas-mini"></div>
+          </div>
+          <p>Si en bodega se lee como un ítem, algo se queda, y si falta un bombo en tarima toca mandar otro carro. Aquí cada batería es una caja con sus piezas para chulear al cargar.</p>
+        </div>
+        <p class="hallazgos-titulo">Lo que encontró en el listado</p>
+        <div class="hallazgos" id="hallazgos" aria-label="Lo que la herramienta encontró"></div>
+      </aside>
+
+      <div class="principal">
+        <div class="totales" id="totales" aria-label="Lo que hay que tener"></div>
+        <div class="controles">
+          <label class="buscar"><span aria-hidden="true">⌕</span><input id="buscar" type="search" placeholder="Buscar: bombo, nord, molotov…" autocomplete="off" aria-label="Buscar equipo"></label>
+          <div class="agrupar" role="group" aria-label="Agrupar por">
+            <button type="button" data-vista="banda" aria-pressed="true">Por banda</button>
+            <button type="button" data-vista="cat" aria-pressed="false">Por categoría</button>
+          </div>
+          <div class="chips" id="chips" role="group" aria-label="Filtrar"></div>
+        </div>
+        <div class="cajas" id="cajas-banda"></div>
+        <div class="cajas" id="cajas-cat" hidden></div>
+      </div>
+    </section>
+  </main>
+
+  <p class="pie">Toca una pieza para marcarla como cargada; toca el nombre de una batería para cargarla completa. Usa <kbd>←</kbd> <kbd>→</kbd> para cambiar de paso. Datos del listado real del Escenario 1; algunas cantidades son aproximadas para la demostración.</p>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/Flip.min.js"></script>
+<script>
+const DATOS = {"items":[{"id":"r0","r":["1","DRUMS","TAMA STARCLASSIC","1",""],"n":"Tama Starclassic","q":1,"c":"Batería","h":"g0","e":["kit"]},{"id":"r1","r":["1","DRUMS","22\" KICK","1",""],"n":"22\" Kick","q":1,"c":"Batería","g":"g0"},{"id":"r2","r":["1","DRUMS","10\",12\",13\",16\"","4",""],"n":"Toms 10\",12\",13\",16\"","q":4,"c":"Batería","g":"g0"},{"id":"r3","r":["1","DRUMS","14\" X 5.5\" SNARE MAPLE TAMA STARCLASSIC","1",""],"n":"14\" × 5.5\" Snare Maple Tama Starclassic","q":1,"c":"Batería","g":"g0"},{"id":"r4","r":["1","DRUMS","14\" X 6.5\" SNARE MAPLE TAMA STARCLASSIC (SPARE)","1",""],"n":"14\" × 6.5\" Snare Maple Tama Starclassic (spare)","q":1,"c":"Batería","g":"g0"},{"id":"r5","r":["1","DRUMS","SNARE STAND","2",""],"n":"Snare Stand","q":2,"c":"Batería","g":"g0"},{"id":"r6","r":["1","DRUMS","HI-HAT STAND","1",""],"n":"Hi-hat Stand","q":1,"c":"Batería","g":"g0"},{"id":"r7","r":["1","DRUMS","BOOM CYMBAL STAND","5",""],"n":"Boom Cymbal Stand","q":5,"c":"Batería","g":"g0"},{"id":"r8","r":["1","DRUMS","SINGLE KICK PEDAL","1",""],"n":"Single Kick Pedal","q":1,"c":"Batería","g":"g0"},{"id":"r9","r":["1","DRUMS","DRUM THRONE","1",""],"n":"Drum Throne","q":1,"c":"Batería","g":"g0"},{"id":"r10","r":["1","DRUMS","DRUM CARPET","1",""],"n":"Drum Carpet","q":1,"c":"Batería","g":"g0"},{"id":"r11","r":["1","DRUMS","CYMBALS SABIAN AAX SET 1","1","PROVIDENCIA"],"n":"Set de platillos Sabian AAX","q":1,"c":"Platillos","b":["Providencia"],"h":"g1","e":["set"]},{"id":"r12","r":["1","DRUMS","20\" RIDE","1","PROVIDENCIA"],"n":"20\" Ride","q":1,"c":"Platillos","b":["Providencia"],"g":"g1"},{"id":"r13","r":["1","DRUMS","16\", 18\",19\" CRASH","3","PROVIDENCIA"],"n":"16\", 18\",19\" Crash","q":3,"c":"Platillos","b":["Providencia"],"g":"g1"},{"id":"r14","r":["1","DRUMS","14\" HI-HATS","1","PROVIDENCIA"],"n":"14\" Hi-hats","q":1,"c":"Platillos","b":["Providencia"],"g":"g1"},{"id":"r15","r":["1","DRUMS","10\" SPLASH","1","PROVIDENCIA"],"n":"10\" Splash","q":1,"c":"Platillos","b":["Providencia"],"g":"g1"},{"id":"r16","r":["1","DRUMS","18\" CHINA","1","PROVIDENCIA"],"n":"18\" China","q":1,"c":"Platillos","b":["Providencia"],"g":"g1"},{"id":"r17","r":["1","DRUMS","GRETSCH RENOWN","1",""],"n":"Gretsch Renown","q":1,"c":"Batería","b":["Maldita Vecindad"],"h":"g2","e":["kit"]},{"id":"r18","r":["1","DRUMS","22\" KICK","1",""],"n":"22\" Kick","q":1,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r19","r":["1","DRUMS","10\",12\",14\",16\" TOMS","4",""],"n":"10\",12\",14\",16\" Toms","q":4,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r20","r":["1","DRUMS","14\" X 5.5\" SNARE MAPLE BLACK PANTHER","1",""],"n":"14\" × 5.5\" Snare Maple Black Panther","q":1,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r21","r":["1","DRUMS","14\" X 5.5\" SNARE BRONCE GODIN","1",""],"n":"14\" × 5.5\" Snare Bronce Godin","q":1,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r22","r":["1","DRUMS","SNARE STAND","2",""],"n":"Snare Stand","q":2,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r23","r":["1","DRUMS","HI-HAT STAND","1",""],"n":"Hi-hat Stand","q":1,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r24","r":["1","DRUMS","BOOM CYMBAL STAND","4",""],"n":"Boom Cymbal Stand","q":4,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r25","r":["1","DRUMS","IRON COBRA SINGLE KICK PEDAL","1","LA MALDITA"],"n":"Iron Cobra Single Kick Pedal","q":1,"c":"Batería","b":["Maldita Vecindad"],"g":"g2","e":["banda"]},{"id":"r26","r":["1","DRUMS","DW 9000 TWIN PEDAL","1","LA MALDITA"],"n":"DW 9000 Twin Pedal","q":1,"c":"Batería","b":["Maldita Vecindad"],"g":"g2","e":["banda"]},{"id":"r27","r":["1","DRUMS","DRUM THRONE","1",""],"n":"Drum Throne","q":1,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r28","r":["1","DRUMS","DRUM CARPET","1",""],"n":"Drum Carpet","q":1,"c":"Batería","b":["Maldita Vecindad"],"g":"g2"},{"id":"r29","r":["1","DRUMS","CYMBALS SABIAN AA SET 5","1","VERGARABAT"],"n":"Set de platillos Sabian AA","q":1,"c":"Platillos","b":["Vergarabat"],"h":"g3","e":["set"]},{"id":"r30","r":["1","DRUMS","20\" RIDE","1","VERGARABAT"],"n":"20\" Ride","q":1,"c":"Platillos","b":["Vergarabat"],"g":"g3"},{"id":"r31","r":["1","DRUMS","16\", 18\",19\" CRASH","3","VERGARABAT"],"n":"16\", 18\",19\" Crash","q":3,"c":"Platillos","b":["Vergarabat"],"g":"g3"},{"id":"r32","r":["1","DRUMS","14\" HI-HATS","1","VERGARABAT"],"n":"14\" Hi-hats","q":1,"c":"Platillos","b":["Vergarabat"],"g":"g3"},{"id":"r33","r":["1","DRUMS","DW COLLECTOR´S SERIES SATIN","1",""],"n":"DW Collector's Series Satin","q":1,"c":"Batería","h":"g4","e":["kit","typo"]},{"id":"r34","r":["1","DRUMS","22\" KICK","1",""],"n":"22\" Kick","q":1,"c":"Batería","g":"g4"},{"id":"r35","r":["1","DRUMS","10\",12\",14\",16\" TOMS","4",""],"n":"10\",12\",14\",16\" Toms","q":4,"c":"Batería","g":"g4"},{"id":"r36","r":["1","DRUMS","14\" X 5.5\" SNARE MAPLE DW","1",""],"n":"14\" × 5.5\" Snare Maple DW","q":1,"c":"Batería","g":"g4"},{"id":"r37","r":["1","DRUMS","14\" X 5.5\" SNARE BLACK PANTHER BRONCE","1",""],"n":"14\" × 5.5\" Snare Black Panther Bronce","q":1,"c":"Batería","g":"g4"},{"id":"r38","r":["1","DRUMS","SNARE STAND","3",""],"n":"Snare Stand","q":3,"c":"Batería","g":"g4"},{"id":"r39","r":["1","DRUMS","HI-HAT STAND","1",""],"n":"Hi-hat Stand","q":1,"c":"Batería","g":"g4"},{"id":"r40","r":["1","DRUMS","BOOM CYMBAL STAND","10",""],"n":"Boom Cymbal Stand","q":10,"c":"Batería","g":"g4"},{"id":"r41","r":["1","DRUMS","SINGLE KICK PEDAL (SPARE)","1",""],"n":"Single Kick Pedal (spare)","q":1,"c":"Batería","g":"g4"},{"id":"r42","r":["1","DRUMS","IRON COBRA SINGLE KICK PEDAL","1",""],"n":"Iron Cobra Single Kick Pedal","q":1,"c":"Batería","g":"g4"},{"id":"r43","r":["1","DRUMS","DRUM THRONE","1",""],"n":"Drum Throne","q":1,"c":"Batería","g":"g4"},{"id":"r44","r":["1","DRUMS","DRUM CARPET","1",""],"n":"Drum Carpet","q":1,"c":"Batería","g":"g4"},{"id":"r45","r":["1","DRUMS","CYMBALS SABIAN HHX SET 3","1","VILMA PALMA/FONSECA"],"n":"Set de platillos Sabian HHX","q":1,"c":"Platillos","b":["Vilma Palma","Fonseca"],"h":"g5","e":["set","reparto"]},{"id":"r46","r":["1","DRUMS","20\" RIDE","1","VILMA PALMA/FONSECA"],"n":"20\" Ride","q":1,"c":"Platillos","b":["Vilma Palma","Fonseca"],"g":"g5","e":["reparto"]},{"id":"r47","r":["1","DRUMS","14\",16\",18\" CRASH","3","VILMA PALMA/FONSECA"],"n":"14\",16\",18\" Crash","q":3,"c":"Platillos","b":["Vilma Palma","Fonseca"],"g":"g5","e":["reparto"]},{"id":"r48","r":["1","DRUMS","8\" OR 10\",12\" SPLASH","2","VILMA PALMA/FONSECA"],"n":"8\" Or 10\",12\" Splash","q":2,"c":"Platillos","b":["Vilma Palma","Fonseca"],"g":"g5","e":["reparto"]},{"id":"r49","r":["1","DRUMS","14\" HI-HATS","1","VILMA PALMA/FONSECA"],"n":"14\" Hi-hats","q":1,"c":"Platillos","b":["Vilma Palma","Fonseca"],"g":"g5","e":["reparto"]},{"id":"r50","r":["1","DRUMS","18\" CHINA","1","VILMA PALMA/FONSECA"],"n":"18\" China","q":1,"c":"Platillos","b":["Vilma Palma","Fonseca"],"g":"g5","e":["reparto"]},{"id":"r51","r":["1","DRUMS","DW COLLECTOR´S SERIES BLACK","1",""],"n":"DW Collector's Series Black","q":1,"c":"Batería","h":"g6","e":["kit","typo"]},{"id":"r52","r":["1","DRUMS","22\" KICK","1",""],"n":"22\" Kick","q":1,"c":"Batería","g":"g6"},{"id":"r53","r":["1","DRUMS","10\",12\",14\",16\" TOMS","4",""],"n":"10\",12\",14\",16\" Toms","q":4,"c":"Batería","g":"g6"},{"id":"r54","r":["1","DRUMS","14\" X 5.5\" SNARE MAPLE OCDP","1",""],"n":"14\" × 5.5\" Snare Maple OCDP","q":1,"c":"Batería","g":"g6"},{"id":"r55","r":["1","DRUMS","13\" X 7\" SNARE MAPLE OCPD","1",""],"n":"13\" × 7\" Snare Maple OCDP","q":1,"c":"Batería","g":"g6","e":["typo"]},{"id":"r56","r":["1","DRUMS","SNARE STAND","2",""],"n":"Snare Stand","q":2,"c":"Batería","g":"g6"},{"id":"r57","r":["1","DRUMS","HI-HAT STAND","1",""],"n":"Hi-hat Stand","q":1,"c":"Batería","g":"g6"},{"id":"r58","r":["1","DRUMS","BOOM CYMBAL STAND","6",""],"n":"Boom Cymbal Stand","q":6,"c":"Batería","g":"g6"},{"id":"r59","r":["1","DRUMS","DW 5000 SINGLE KICK PEDAL","1",""],"n":"DW 5000 Single Kick Pedal","q":1,"c":"Batería","g":"g6"},{"id":"r60","r":["1","DRUMS","DW 5000 SINGLE KICK PEDAL (SPARE)","1",""],"n":"DW 5000 Single Kick Pedal (spare)","q":1,"c":"Batería","g":"g6"},{"id":"r61","r":["1","DRUMS","DRUM THRONE","1",""],"n":"Drum Throne","q":1,"c":"Batería","g":"g6"},{"id":"r62","r":["1","DRUMS","DRUM CARPET","1",""],"n":"Drum Carpet","q":1,"c":"Batería","g":"g6"},{"id":"r63","r":["1","DRUMS","CYMBALS PAISTE 2002 / MARIN","1","HOMBRES G"],"n":"Set de platillos Paiste 2002 / Marin","q":1,"c":"Platillos","b":["Hombres G"],"h":"g7","e":["set"]},{"id":"r64","r":["1","DRUMS","20\" RIDE","1","HOMBRES G"],"n":"20\" Ride","q":1,"c":"Platillos","b":["Hombres G"],"g":"g7"},{"id":"r65","r":["1","DRUMS","16\",18\" CRASH","3","HOMBRES G"],"n":"16\",18\" Crash","q":3,"c":"Platillos","b":["Hombres G"],"g":"g7","e":["cuadra"]},{"id":"r66","r":["1","DRUMS","14\" HI-HATS","1","HOMBRES G"],"n":"14\" Hi-hats","q":1,"c":"Platillos","b":["Hombres G"],"g":"g7"},{"id":"r67","r":["1","DRUMS","CYMBALS ZILDJIAN A CUSTOM (PENDIENTE)","1","LFC"],"n":"Set de platillos Zildjian A Custom","q":1,"c":"Platillos","b":["LFC"],"h":"g8","e":["set","pendiente"]},{"id":"r68","r":["1","DRUMS","20\" RIDE","1","LFC"],"n":"20\" Ride","q":1,"c":"Platillos","b":["LFC"],"g":"g8"},{"id":"r69","r":["1","DRUMS","18\",19\" CRASH","3","LFC"],"n":"18\",19\" Crash","q":3,"c":"Platillos","b":["LFC"],"g":"g8","e":["cuadra"]},{"id":"r70","r":["1","DRUMS","14\" HI-HATS","1","LFC"],"n":"14\" Hi-hats","q":1,"c":"Platillos","b":["LFC"],"g":"g8"},{"id":"r71","r":["1","DRUMS","8\",10\" SPLASH","1","LFC"],"n":"8\",10\" Splash","q":1,"c":"Platillos","b":["LFC"],"g":"g8","e":["cuadra"]},{"id":"r72","r":["1","DRUMS","18\" CHINA","1","LFC"],"n":"18\" China","q":1,"c":"Platillos","b":["LFC"],"g":"g8"},{"id":"r73","r":["1","DRUMS","16\" OR 17\" CHINA","1","LFC"],"n":"16\" Or 17\" China","q":1,"c":"Platillos","b":["LFC"],"g":"g8"},{"id":"r74","r":["1","DRUMS","LUDWIG CLASSIC MAPLE","1","MOLOTOV"],"n":"Ludwig Classic Maple","q":1,"c":"Batería","b":["Molotov"],"h":"g9","e":["kit"]},{"id":"r75","r":["1","DRUMS","24\" KICK","1","MOLOTOV"],"n":"24\" Kick","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r76","r":["1","DRUMS","13\" RACK TOM","1","MOLOTOV"],"n":"13\" Rack Tom","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r77","r":["1","DRUMS","16\" FLOOR TOM","1","MOLOTOV"],"n":"16\" Floor Tom","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r78","r":["1","DRUMS","18\" FLOOR TOM (TAMA STARCLASSIC)","1","MOLOTOV"],"n":"18\" Floor Tom (tama Starclassic)","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r79","r":["1","DRUMS","14\" X 6.5\" SNARE LUDWIG SUPRAPHONIC","1","MOLOTOV"],"n":"14\" × 6.5\" Snare Ludwig Supraphonic","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r80","r":["1","DRUMS","14\" X 5.5\" SNARE MAPLE LUDWIG JAZZ","1","MOLOTOV"],"n":"14\" × 5.5\" Snare Maple Ludwig Jazz","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r81","r":["1","DRUMS","SNARE STAND","3","MOLOTOV"],"n":"Snare Stand","q":3,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r82","r":["1","DRUMS","HI-HAT STAND","1","MOLOTOV"],"n":"Hi-hat Stand","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r83","r":["1","DRUMS","BOOM CYMBAL STAND","10","MOLOTOV"],"n":"Boom Cymbal Stand","q":10,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r84","r":["1","DRUMS","DW 9000 SINGLE KICK PEDAL","1","MOLOTOV"],"n":"DW 9000 Single Kick Pedal","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r85","r":["1","DRUMS","DRUM TRONE","1","MOLOTOV"],"n":"Drum Throne","q":1,"c":"Batería","b":["Molotov"],"g":"g9","e":["typo"]},{"id":"r86","r":["1","DRUMS","DRUM CARPET PERSIAN AZUL 3 X 2.5 MTS","1","MOLOTOV"],"n":"Drum Carpet Persian Azul 3 × 2.5 MTS","q":1,"c":"Batería","b":["Molotov"],"g":"g9"},{"id":"r87","r":["1","BASS","BASS","1",""],"z":1,"e":["titulo"]},{"id":"r88","r":["1","BASS","AGUILAR TH500","2",""],"n":"Aguilar TH500","q":2,"c":"Bajo"},{"id":"r89","r":["1","BASS","AGUILAR DB751 HEAD","1",""],"n":"Aguilar DB751 Head","q":1,"c":"Bajo"},{"id":"r90","r":["1","BASS","AMPEG SVT CLASSIC HEAD","3","2 LFC / 2 MALDITA (COMPARTEN SPARE)"],"n":"Ampeg SVT Classic Head","q":3,"c":"Bajo","b":["Maldita Vecindad","LFC"],"e":["banda","reparto"]},{"id":"r91","r":["1","BASS","AMPEG SVT 4 PRO","3","2 MOLOTOV"],"n":"Ampeg SVT 4 Pro","q":3,"c":"Bajo","b":["Molotov"]},{"id":"r92","r":["1","BASS","AGUILAR DB 410 CAB","1",""],"n":"Aguilar DB 410 CAB","q":1,"c":"Bajo"},{"id":"r93","r":["1","BASS","AGUILAR DB 810 CAB","1",""],"n":"Aguilar DB 810 CAB","q":1,"c":"Bajo"},{"id":"r94","r":["1","BASS","AMPEG SVT 810E CAB","6","4 MOLOTOV"],"n":"Ampeg SVT 810E CAB","q":6,"c":"Bajo","b":["Molotov"]},{"id":"r95","r":["1","GUITARS","GUITARS","1",""],"z":1,"e":["titulo"]},{"id":"r96","r":["1","GUITARS","FENDER TWIN REVERB","4",""],"n":"Fender Twin Reverb","q":4,"c":"Guitarra"},{"id":"r97","r":["1","GUITARS","FENDER HOT ROD DELUXE 112","2",""],"n":"Fender Hot Rod Deluxe 112","q":2,"c":"Guitarra"},{"id":"r98","r":["1","GUITARS","FENDER HOT ROD DEVILLE","5",""],"n":"Fender Hot Rod Deville","q":5,"c":"Guitarra"},{"id":"r99","r":["1","GUITARS","ROLAND JAZZ CHORUS 120","1",""],"n":"Roland Jazz Chorus 120","q":1,"c":"Guitarra"},{"id":"r100","r":["1","GUITARS","MARSHALL JCM 2000 DSL","2","MALDITA VECINDAD"],"n":"Marshall JCM 2000 DSL","q":2,"c":"Guitarra","b":["Maldita Vecindad"],"e":["banda"]},{"id":"r101","r":["1","GUITARS","MARSHALL JCM 900","2","MALDITA VECINDAD"],"n":"Marshall JCM 900","q":2,"c":"Guitarra","b":["Maldita Vecindad"],"e":["banda"]},{"id":"r102","r":["1","GUITARS","MARSHALL 1960A 412 CAB","3","1 MOLOTOV / 2 MALDITA"],"n":"Marshall 1960A 412 CAB","q":3,"c":"Guitarra","b":["Molotov","Maldita Vecindad"],"e":["banda","reparto"]},{"id":"r103","r":["1","GUITARS","MARSHALL 1960B 412 CAB","2","1 MOLOTOV / 1 MALDITA"],"n":"Marshall 1960B 412 CAB","q":2,"c":"Guitarra","b":["Molotov","Maldita Vecindad"],"e":["banda","reparto"]},{"id":"r104","r":["1","KEYBOARDS","KEYBOARDS","1",""],"z":1,"e":["titulo"]},{"id":"r105","r":["1","KEYBOARDS","NORD STAGE 4 HA 88 W/SUSTAIN PEDAL","1","MALDITA"],"n":"Nord Stage 4 HA 88 con sustain Pedal","q":1,"c":"Teclados","b":["Maldita Vecindad"],"e":["banda"]},{"id":"r106","r":["1","KEYBOARDS","NORD STAGE 3 HA 88 W/SUSTAIN PEDAL","1","FONSECA"],"n":"Nord Stage 3 HA 88 con sustain Pedal","q":1,"c":"Teclados","b":["Fonseca"]},{"id":"r107","r":["1","KEYBOARDS","NORD LEAD 4 W/SUSTAIN PEDAL","1","FONSECA"],"n":"Nord Lead 4 con sustain Pedal","q":1,"c":"Teclados","b":["Fonseca"]},{"id":"r108","r":["1","KEYBOARDS","KORG KRONOS 2 88 W/SUSTAIN PEDAL","1","PROVIDENCIA"],"n":"Korg Kronos 2 88 con sustain Pedal","q":1,"c":"Teclados","b":["Providencia"]},{"id":"r109","r":["1","KEYBOARDS","YAMAHA MONTAGE 8 W/SUSTAIN PEDAL","1","JUAN LUIS GUERRA"],"n":"Yamaha Montage 8 con sustain Pedal","q":1,"c":"Teclados","b":["Juan Luis Guerra"]},{"id":"r110","r":["1","KEYBOARDS","YAMAHA MONTAGE M7 W/SUSTAIN PEDAL","1","JUAN LUIS GUERRA"],"n":"Yamaha Montage M7 con sustain Pedal","q":1,"c":"Teclados","b":["Juan Luis Guerra"]},{"id":"r111","r":["1","KEYBOARDS","YAMAHA MONTAGE 6 W/SUSTAIN PEDAL","1","JUAN LUIS GUERRA"],"n":"Yamaha Montage 6 con sustain Pedal","q":1,"c":"Teclados","b":["Juan Luis Guerra"]},{"id":"r112","r":["1","KEYBOARDS","YAMAHA MOTIF XF8 W/SUSTAIN PEDAL","2","1 PROVIDENCIA / 1 HOMBRES G"],"n":"Yamaha Motif XF8 con sustain Pedal","q":2,"c":"Teclados","b":["Providencia","Hombres G"],"e":["reparto"]},{"id":"r113","r":["1","KEYBOARDS","YAMAHA MOTIF XF7 W/SUSTAIN PEDAL","1","JUAN LUIS GUERRA"],"n":"Yamaha Motif XF7 con sustain Pedal","q":1,"c":"Teclados","b":["Juan Luis Guerra"]},{"id":"r114","r":["1","KEYBOARDS","YAMAHA MOTIF XF6 W/SUSTAIAN PEDAL","2","1 VILMA PALMA / 1 HOMBRES G"],"n":"Yamaha Motif XF6 con sustain Pedal","q":2,"c":"Teclados","b":["Vilma Palma","Hombres G"],"e":["typo","reparto"]},{"id":"r115","r":["1","KEYBOARDS","ROLAND FANTOM G8 W/SUSTAIN PEDAL","1","VILMA PALMA"],"n":"Roland Fantom G8 con sustain Pedal","q":1,"c":"Teclados","b":["Vilma Palma"]},{"id":"r116","r":["1","KEYBOARDS","YAMAHA FC7 EXPRESSION PEDAL","1",""],"n":"Yamaha FC7 Expression Pedal","q":1,"c":"Teclados"},{"id":"r117","r":["1","KEYBOARDS","HERCULES KEYBOARD STAND KS120B","7",""],"n":"Hercules Keyboard Stand KS120B","q":7,"c":"Bases y soportes"},{"id":"r118","r":["1","KEYBOARDS","HERCULES KEYBOARD STAND KS210B","4",""],"n":"Hercules Keyboard Stand KS210B","q":4,"c":"Bases y soportes"},{"id":"r119","r":["1","PERCUSSION","PERCUSSION","",""],"z":1,"e":["titulo"]},{"id":"r120","r":["1","PERCUSSION","LP GALAXY GIOVANNI CONGAS (CONGA, TUMBA & QUINTO) + STAND","1",""],"n":"LP Galaxy Giovanni Congas (conga, Tumba & Quinto) + Stand","q":1,"c":"Percusión"},{"id":"r121","r":["1","PERCUSSION","LP GALAXY GIOVANNI CONGAS (CONGA, TUMBA & QUINTO)","1",""],"n":"LP Galaxy Giovanni Congas (conga, Tumba & Quinto)","q":1,"c":"Percusión"},{"id":"r122","r":["1","PERCUSSION","LP 636 CRADLE CONGA STAND","4",""],"n":"LP 636 Cradle Conga Stand","q":4,"c":"Percusión"},{"id":"r123","r":["1","PERCUSSION","LP CONGAS CLASSIC (CONGA, TUMBA) + STAND","1",""],"n":"LP Congas Classic (conga, Tumba) + Stand","q":1,"c":"Percusión"},{"id":"r124","r":["1","PERCUSSION","LP TIMBAL 14\" HI + CENCERRO, CHACHA BELL & RED JAMBLOCK","1",""],"n":"LP Timbal 14\" Hi + Cencerro, Chacha Bell & Red Jamblock","q":1,"c":"Percusión"},{"id":"r125","r":["1","PERCUSSION","LP TIMBALES (14\"-15\") + CENCERRO, CHACHA BELL & RED JAMBLOCK","1",""],"n":"LP Timbales (14\"-15\") + Cencerro, Chacha Bell & Red Jamblock","q":1,"c":"Percusión"},{"id":"r126","r":["1","PERCUSSION","LP TIMBALES (14\"-15\") + CENCERRO, CHACHA BELL & RED JAMBLOCK","1",""],"n":"LP Timbales (14\"-15\") + Cencerro, Chacha Bell & Red Jamblock","q":1,"c":"Percusión"},{"id":"r127","r":["1","PERCUSSION","LP TIMBALES (14\"-15\") + CENCERRO, CHACHA BELL & RED JAMBLOCK","1",""],"n":"LP Timbales (14\"-15\") + Cencerro, Chacha Bell & Red Jamblock","q":1,"c":"Percusión"},{"id":"r128","r":["1","PERCUSSION","LP DJEMBE CLASSIC + STAND GPDS","2",""],"n":"LP Djembe Classic + Stand GPDS","q":2,"c":"Percusión"},{"id":"r129","r":["1","PERCUSSION","LP 1432 CAJON PERUANO","1","FONSECA"],"n":"LP 1432 Cajon Peruano","q":1,"c":"Percusión","b":["Fonseca"]},{"id":"r130","r":["1","PERCUSSION","LP GALAXY BONGO + STAND","1",""],"n":"LP Galaxy Bongo + Stand","q":1,"c":"Percusión"},{"id":"r131","r":["1","PERCUSSION","LP BONGO","2","JUAN LUIS GUERRA"],"n":"LP Bongo","q":2,"c":"Percusión","b":["Juan Luis Guerra"]},{"id":"r132","r":["1","PERCUSSION","LP BONGO + STAND","2",""],"n":"LP Bongo + Stand","q":2,"c":"Percusión"},{"id":"r133","r":["1","PERCUSSION","LP SET OF TOYS","1",""],"n":"LP Set Of Toys","q":1,"c":"Percusión"},{"id":"r134","r":["1","PERCUSSION","LP CYCLOPS TAMBOURINE MOUNT","1",""],"n":"LP Cyclops Tambourine Mount","q":1,"c":"Percusión"},{"id":"r135","r":["1","PERCUSSION","GAJATE + COWBELL SALSA CHACHA","1","LFC"],"n":"Gajate + Cowbell Salsa Chacha","q":1,"c":"Percusión","b":["LFC"]},{"id":"r136","r":["1","PERCUSSION","SURDO MEINL 20\" + LEGS","1","LFC"],"n":"Surdo Meinl 20\" + Legs","q":1,"c":"Percusión","b":["LFC"]},{"id":"r137","r":["1","PERCUSSION","16\" FLOOR TOM W/LEGS (OCDP)","1","VERGARABAT"],"n":"16\" Floor Tom con legs (OCDP)","q":1,"c":"Percusión","b":["Vergarabat"]},{"id":"r138","r":["1","PERCUSSION","14\" CRASH","2","1 FONSECA / MALDITA"],"n":"14\" Crash","q":2,"c":"Platillos","b":["Fonseca","Maldita Vecindad"],"e":["banda","reparto","categoria"]},{"id":"r139","r":["1","PERCUSSION","15\" CRASH","1","FONSECA"],"n":"15\" Crash","q":1,"c":"Platillos","b":["Fonseca"],"e":["categoria"]},{"id":"r140","r":["1","PERCUSSION","16\" CRASH","3","1 FONSECA / 1 MOLOTOV / 1 MALDITA"],"n":"16\" Crash","q":3,"c":"Platillos","b":["Molotov","Fonseca","Maldita Vecindad"],"e":["banda","reparto","categoria"]},{"id":"r141","r":["1","PERCUSSION","18\" CRASH","2","1 FONSECA / 1 MOLOTOV"],"n":"18\" Crash","q":2,"c":"Platillos","b":["Molotov","Fonseca"],"e":["reparto","categoria"]},{"id":"r142","r":["1","PERCUSSION","18\" CHINA","1","FONSECA"],"n":"18\" China","q":1,"c":"Platillos","b":["Fonseca"],"e":["categoria"]},{"id":"r143","r":["1","PERCUSSION","TAMA SINGLE KICK PEDAL","1","LFC"],"n":"Tama Single Kick Pedal","q":1,"c":"Batería","b":["LFC"],"e":["categoria"]},{"id":"r144","r":["1","PERCUSSION","DW 7000 SINGLE KICK PEDAL","1","JUAN LUIS GUERRA"],"n":"DW 7000 Single Kick Pedal","q":1,"c":"Batería","b":["Juan Luis Guerra"],"e":["categoria"]},{"id":"r145","r":["1","PERCUSSION","SINGLE KICK PEDAL GIBRALTAR","1","JUAN LUIS GUERRA"],"n":"Single Kick Pedal Gibraltar","q":1,"c":"Batería","b":["Juan Luis Guerra"],"e":["categoria"]},{"id":"r146","r":["1","PERCUSSION","14\" X 4.5\" SNARE PICOLO STEEL MAPEX","1",""],"n":"14\" × 4.5\" Snare Picolo Steel Mapex","q":1,"c":"Batería","e":["categoria"]},{"id":"r147","r":["1","PERCUSSION","SNARE STAND","2","LFC"],"n":"Snare Stand","q":2,"c":"Batería","b":["LFC"],"e":["categoria"]},{"id":"r148","r":["1","PERCUSSION","TALL SNARE STAND","2",""],"n":"Tall Snare Stand","q":2,"c":"Batería","e":["categoria"]},{"id":"r149","r":["1","PERCUSSION","BOOM CYMBAL STAND","12",""],"n":"Boom Cymbal Stand","q":12,"c":"Batería","e":["categoria"]},{"id":"r150","r":["1","PERCUSSION","DRUM THRONE","3","LFC"],"n":"Drum Throne","q":3,"c":"Batería","b":["LFC"],"e":["categoria"]},{"id":"r151","r":["1","PERCUSSION","LP 760A PERCUSSION TABLE","4",""],"n":"LP 760A Percussion Table","q":4,"c":"Percusión"},{"id":"r152","r":["1","PERCUSSION","LP ASPIRE 561 PERCUSSION TABLE","1","LFC"],"n":"LP Aspire 561 Percussion Table","q":1,"c":"Percusión","b":["LFC"]},{"id":"r153","r":["1","PERCUSSION","MAGICIAN PERCUSSION TABLE","6",""],"n":"Magician Percussion Table","q":6,"c":"Percusión"},{"id":"r154","r":["1","OTROS","OTROS","",""],"z":1,"e":["titulo"]},{"id":"r155","r":["1","OTROS","OTROS","1",""],"z":1,"e":["titulo"]},{"id":"r156","r":["1","OTROS","ROLAND SPD-SX","1",""],"n":"Roland SPD-SX","q":1,"c":"Batería"},{"id":"r157","r":["1","OTROS","ROAD RUNNER GUITAR RACK 7 SPACES (MOLOTOV)","2",""],"n":"Road Runner Guitar Rack 7 Spaces","q":2,"c":"Bases y soportes","b":["Molotov"]},{"id":"r158","r":["1","OTROS","GUITAR BOAT 6 SPACES","4",""],"n":"Guitar Boat 6 Spaces","q":4,"c":"Bases y soportes"},{"id":"r159","r":["1","OTROS","HECULES GUITAR STAND","16",""],"n":"Hercules Guitar Stand","q":16,"c":"Bases y soportes","e":["typo"]},{"id":"r160","r":["1","OTROS","HERCULES PIANO BENCH","1",""],"n":"Hercules Piano Bench","q":1,"c":"Bases y soportes"},{"id":"r161","r":["1","OTROS","PLEXIGLASS 5 SHIELDS","1",""],"n":"Plexiglass 5 Shields","q":1,"c":"Escenario"},{"id":"r162","r":["1","OTROS","TAKAMEINE G SERIES ELECTROACOUSTIC GUITAR","1",""],"n":"Takamine G Series Electroacoustic Guitar","q":1,"c":"Guitarra","e":["typo"]},{"id":"r163","r":["1","OTROS","FENDER JAZZ BASS 4 ST","1",""],"n":"Fender Jazz Bass 4 ST","q":1,"c":"Bajo"},{"id":"r164","r":["1","OTROS","FENDER JAZZ BASS 5 ST","1",""],"n":"Fender Jazz Bass 5 ST","q":1,"c":"Bajo"},{"id":"r165","r":["1","OTROS","FENDER TELECASTER","1",""],"n":"Fender Telecaster","q":1,"c":"Guitarra"},{"id":"r166","r":["1","OTROS","FENDER STRATOCASTER","1",""],"n":"Fender Stratocaster","q":1,"c":"Guitarra"},{"id":"r167","r":["1","OTROS","TAYLOR 412CE ELECTROACOUSTIC GUITAR","1",""],"n":"Taylor 412CE Electroacoustic Guitar","q":1,"c":"Guitarra"},{"id":"r168","r":["1","OTROS","TAYLOR 414CE ELECTROACOUSTIC GUITAR","1",""],"n":"Taylor 414CE Electroacoustic Guitar","q":1,"c":"Guitarra"},{"id":"r169","r":["1","OTROS","INSTRUMENT CABLE 3 MTS","10",""],"n":"Instrument Cable 3 MTS","q":10,"c":"Cables y energía"},{"id":"r170","r":["1","OTROS","INSTRUMENT CABLE 6 MTS","8",""],"n":"Instrument Cable 6 MTS","q":8,"c":"Cables y energía"},{"id":"r171","r":["1","OTROS","SPEAKON - SPEAKON - SPEAKER CABLE","2","MOLOTOV"],"n":"Speakon - Speakon - Speaker Cable","q":2,"c":"Cables y energía","b":["Molotov"]},{"id":"r172","r":["1","OTROS","PORTER & DAVIES BC2","1",""],"n":"Porter & Davies Bc2","q":1,"c":"Batería"},{"id":"r173","r":["1","OTROS","DRUM TRHONE","1",""],"n":"Drum Throne","q":1,"c":"Batería","e":["typo"]},{"id":"r174","r":["1","OTROS","BAR STOOL","10","5 SABADO / 10 DOMINGO"],"n":"Bar Stool","q":10,"c":"Bases y soportes","e":["dia"]},{"id":"r175","r":["1","OTROS","RED PERSIAN CARPET 3 X 3 MTS","2","MOLOTOV"],"n":"Red Persian Carpet 3 × 3 MTS","q":2,"c":"Escenario","b":["Molotov"]},{"id":"r176","r":["1","OTROS","MUSIC STAND","14","FONSECA"],"n":"Music Stand","q":14,"c":"Bases y soportes","b":["Fonseca"]},{"id":"r177","r":["1","OTROS","SILLA TIPO AUDITORIO NEGRA SIN BRAZOS (FONSECA)","14","FONSECA"],"n":"Silla Tipo Auditorio Negra Sin Brazos","q":14,"c":"Bases y soportes","b":["Fonseca"]},{"id":"r178","r":["1","OTROS","TROMBONE STAND","1",""],"n":"Trombone Stand","q":1,"c":"Bases y soportes"},{"id":"r179","r":["1","OTROS","TRUMPET STAND","2",""],"n":"Trumpet Stand","q":2,"c":"Bases y soportes"},{"id":"r180","r":["1","OTROS","UPS 1000 W (FONSECA)","1","FONSECA"],"n":"UPS 1000 W","q":1,"c":"Cables y energía","b":["Fonseca"]},{"id":"r181","r":["1","OTROS","SAND BAGS (FONSECA)","6","FONSECA"],"n":"Sand Bags","q":6,"c":"Escenario","b":["Fonseca"]},{"id":"r182","r":["1","OTROS","FOLDING TABLE 1.80 X 70 X 70 CM (FONSECA)","2","FONSECA"],"n":"Folding Table 1.80 × 70 × 70 CM","q":2,"c":"Escenario","b":["Fonseca"]},{"id":"r183","r":["1","OTROS","16\" STAGE FAN","5",""],"n":"16\" Stage Fan","q":5,"c":"Escenario"},{"id":"r184","r":["1","OTROS","PIONEER DJM 900 NXS2 (CHANGE OVER)","1",""],"n":"Pioneer DJM 900 NXS2","q":1,"c":"DJ"},{"id":"r185","r":["1","OTROS","PIONEER CDJ 3000 (CHANGE OVER)","2",""],"n":"Pioneer CDJ 3000","q":2,"c":"DJ"},{"id":"r186","r":["1","OTROS","PROLYTE STAGE DEX 2 X 1 X 1 (CHANGE OVER)","1",""],"n":"Prolyte Stage Dex 2 × 1 × 1","q":1,"c":"DJ"},{"id":"r187","r":["1","OTROS","SET DE PARCHES NUEVOS REMO O EVANS (22\",10\",12\",14\",16\")","4",""],"n":"Set De Parches Nuevos Remo O Evans (22\",10\",12\",14\",16\")","q":4,"c":"Batería"},{"id":"r188","r":["1","OTROS","PARCHE DE REDOBLANTE NUEVO 14\" REMO O EVANS","4",""],"n":"Parche De Redoblante Nuevo 14\" Remo O Evans","q":4,"c":"Batería"},{"id":"r189","r":["1","OTROS","ELEVADOR 110V TO 220V","3",""],"n":"Elevador 110V To 220V","q":3,"c":"Cables y energía"},{"id":"r190","r":["1","OTROS","CARPA DE CARRO GRIS","2",""],"n":"Carpa De Carro Gris","q":2,"c":"Escenario"},{"id":"r191","r":["1","OTROS","PLASTICOS","4",""],"n":"Plasticos","q":4,"c":"Escenario"}],"grupos":[{"id":"g0","t":"kit","cab":"r0","p":["r1","r2","r3","r4","r5","r6","r7","r8","r9","r10"],"b":[]},{"id":"g1","t":"set","cab":"r11","p":["r12","r13","r14","r15","r16"],"b":["Providencia"]},{"id":"g2","t":"kit","cab":"r17","p":["r18","r19","r20","r21","r22","r23","r24","r25","r26","r27","r28"],"b":["Maldita Vecindad"]},{"id":"g3","t":"set","cab":"r29","p":["r30","r31","r32"],"b":["Vergarabat"]},{"id":"g4","t":"kit","cab":"r33","p":["r34","r35","r36","r37","r38","r39","r40","r41","r42","r43","r44"],"b":[]},{"id":"g5","t":"set","cab":"r45","p":["r46","r47","r48","r49","r50"],"b":["Vilma Palma","Fonseca"]},{"id":"g6","t":"kit","cab":"r51","p":["r52","r53","r54","r55","r56","r57","r58","r59","r60","r61","r62"],"b":[]},{"id":"g7","t":"set","cab":"r63","p":["r64","r65","r66"],"b":["Hombres G"]},{"id":"g8","t":"set","cab":"r67","p":["r68","r69","r70","r71","r72","r73"],"b":["LFC"]},{"id":"g9","t":"kit","cab":"r74","p":["r75","r76","r77","r78","r79","r80","r81","r82","r83","r84","r85","r86"],"b":["Molotov"]}]};
+
+const CATS = {
+  "Batería": "--t-bateria", "Platillos": "--t-platillos", "Bajo": "--t-bajo", "Guitarra": "--t-guitarra", "Teclados": "--t-teclados",
+  "Percusión": "--t-percusion", "Bases y soportes": "--t-bases", "DJ": "--t-dj", "Escenario": "--t-escenario", "Cables y energía": "--t-energia",
+};
+const ORDEN_BANDAS = ["Molotov", "Maldita Vecindad", "LFC", "Fonseca", "Juan Luis Guerra", "Providencia", "Vilma Palma", "Hombres G", "Vergarabat", "Compartido entre bandas", "Equipo de casa"];
+const HALLAZGOS = {
+  kit: ["Baterías completas escritas como una fila", "El nombre de la batería contaba como 1 ítem y sus piezas iban sueltas debajo."],
+  set: ["Sets de platillos escritos como una fila", "Igual que las baterías: el set y sus platillos, sin relación."],
+  titulo: ["Filas que no son equipo", "“BASS · BASS · 1”, “OTROS · OTROS · 1”: títulos contados como equipo."],
+  categoria: ["Piezas en la categoría equivocada", "Platillos, pedales y bases de batería metidos en Percusión."],
+  reparto: ["Ítems repartidos en una nota", "“2 LFC / 2 MALDITA (comparten spare)”: el reparto solo estaba en el texto."],
+  banda: ["Una banda escrita de 4 formas", "MALDITA, LA MALDITA, MALDITA VECINDAD, (MALDITA)."],
+  typo: ["Nombres mal escritos", "DRUM TRONE, TRHONE, SUSTAIAN, HECULES…"],
+  cuadra: ["Cantidades que no cuadran", "“16”, 18” CRASH · 3”: dos medidas y tres platillos."],
+  pendiente: ["Pendientes escondidos", "“(PENDIENTE)” dentro del nombre del set, sin estado."],
+  dia: ["Reparto por día en una nota", "“5 SÁBADO / 10 DOMINGO”: un solo número no dice cuántos llevar."],
+};
+const GRAVES = new Set(["kit", "set", "titulo", "cuadra"]);
+const ETIQUETAS = { kit: "batería completa → piezas sueltas abajo", set: "set completo → platillos sueltos abajo", titulo: "no es equipo", categoria: "categoría equivocada", reparto: "reparto escondido en la nota", banda: "banda con otro nombre", typo: "mal escrito", cuadra: "la cantidad no cuadra", pendiente: "pendiente escondido", dia: "reparto por día" };
+
+gsap.registerPlugin(Flip);
+const reducir = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const D = reducir ? 0 : 1;
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+const items = DATOS.items;
+const porId = new Map(items.map(x => [x.id, x]));
+const grupos = new Map(DATOS.grupos.map(g => [g.id, g]));
+const nodo = new Map();
+
+/* ---------- las filas: un nodo por ítem, que viaja entre la hoja y las cajas ---------- */
+const filas = $("#filas");
+for (const x of items) {
+  const [e, c, it, q, o] = x.r;
+  const el = document.createElement("div");
+  el.className = "it";
+  el.dataset.id = x.id;
+  const problemas = x.e || [];
+  if (problemas.length) el.classList.add("trampa");
+  if (problemas.some(p => GRAVES.has(p))) el.classList.add("grave");
+  if (x.h) el.classList.add("es-cabeza");
+  if (x.c) el.style.setProperty("--cinta", `var(${CATS[x.c]})`);
+  const g = x.h ? grupos.get(x.h) : null;
+  const extra = g ? `${g.p.length} piezas` : problemas.includes("cuadra") ? "revisar cantidad" : problemas.includes("pendiente") ? "pendiente" : "";
+  el.innerHTML = `<span class="c-esc">${esc(e)}</span><span class="c-cat">${esc(c)}</span>`
+    + `<span class="dot"></span><span class="c-item"><span class="raw">${esc(it)}</span><span class="limpio">${esc(x.n || it)}</span><span class="band"></span>${extra ? `<span class="extra">${esc(extra)}</span>` : ""}</span>`
+    + `<span class="c-cant">${esc(q)}</span><span class="q">${x.h ? "" : "×" + esc(x.q ?? q)}</span><span class="c-obs">${esc(o)}</span><span class="c-falt"></span>`
+    + (problemas.length ? `<span class="etq">${esc(problemas.map(p => ETIQUETAS[p]).join(" · "))}</span>` : "");
+  filas.append(el);
+  nodo.set(x.id, el);
+}
+
+/* ---------- a qué caja va cada cosa ---------- */
+function cajaBanda(x) {
+  const b = x.g ? grupos.get(x.g).b : x.h ? grupos.get(x.h).b : x.b || [];
+  if (b.length > 1) return "Compartido entre bandas";
+  return b[0] || "Equipo de casa";
+}
+const utiles = items.filter(x => !x.z);
+
+function crearCajas(contenedor, claves, clave) {
+  const cajas = new Map();
+  for (const k of claves) {
+    const art = document.createElement("article");
+    art.className = "caja";
+    art.innerHTML = `<div class="caja-fondo"></div><header class="caja-cab"><h3><span>${esc(k)}</span><small></small></h3><div class="cintas"></div><div class="progreso"><i></i></div></header><div class="kits"></div><div class="sueltos"></div>`;
+    contenedor.append(art);
+    cajas.set(k, { el: art, kits: new Map() });
+  }
+  for (const x of utiles) {
+    const caja = cajas.get(clave(x));
+    if (!caja) continue;
+    const gid = x.h || x.g;
+    if (gid) {
+      let kit = caja.kits.get(gid);
+      if (!kit) {
+        const g = grupos.get(gid);
+        const k = document.createElement("div");
+        k.className = "kit";
+        k.innerHTML = `<div class="kit-cab"><div class="slot-cab"></div><span class="aviso-kit">${g.t === "kit" ? "batería completa" : "set completo"}</span></div><div class="kit-piezas"></div>`;
+        caja.el.querySelector(".kits").append(k);
+        kit = { el: k, cab: k.querySelector(".slot-cab"), piezas: k.querySelector(".kit-piezas") };
+        caja.kits.set(gid, kit);
+      }
+    }
+  }
+  const destino = new Map();
+  for (const x of utiles) {
+    const caja = cajas.get(clave(x));
+    if (!caja) continue;
+    if (x.h) destino.set(x.id, caja.kits.get(x.h).cab);
+    else if (x.g) destino.set(x.id, caja.kits.get(x.g).piezas);
+    else destino.set(x.id, caja.el.querySelector(".sueltos"));
+  }
+  return { cajas, destino };
+}
+const clavesBanda = ORDEN_BANDAS.filter(b => utiles.some(x => cajaBanda(x) === b));
+const clavesCat = Object.keys(CATS).filter(c => utiles.some(x => x.c === c));
+const VISTAS = {
+  banda: { cont: $("#cajas-banda"), ...crearCajas($("#cajas-banda"), clavesBanda, cajaBanda) },
+  cat: { cont: $("#cajas-cat"), ...crearCajas($("#cajas-cat"), clavesCat, x => (x.g || x.h) ? (grupos.get(x.g || x.h).t === "set" ? "Platillos" : "Batería") : x.c) },
+};
+// Dentro de cada caja: primero las baterías y sets, luego lo suelto ordenado por categoría.
+const ordenCat = Object.keys(CATS);
+const ordenar = arr => arr.sort((a, b) => ordenCat.indexOf(porId[a]?.c) - ordenCat.indexOf(porId[b]?.c));
+
+/* ---------- estado ---------- */
+let paso = 1, vista = "banda", filtro = "todo", busqueda = "", hallazgoActivo = null;
+const cargados = new Set();
+
+function colocar() {
+  const v = VISTAS[vista];
+  const porDestino = new Map();
+  for (const x of utiles) {
+    const d = v.destino.get(x.id);
+    if (!porDestino.has(d)) porDestino.set(d, []);
+    porDestino.get(d).push(x.id);
+  }
+  for (const [d, ids] of porDestino) {
+    if (d.classList.contains("sueltos")) ids.sort((a, b) => ordenCat.indexOf(porId.get(a).c) - ordenCat.indexOf(porId.get(b).c));
+    for (const id of ids) d.append(nodo.get(id));
+  }
+  for (const x of items) if (x.z) nodo.get(x.id).classList.add("oculto");
+  VISTAS.banda.cont.hidden = vista !== "banda";
+  VISTAS.cat.cont.hidden = vista !== "cat";
+}
+function devolver() {
+  for (const x of items) { const el = nodo.get(x.id); el.classList.remove("oculto", "foco"); filas.append(el); }
+}
+
+function coincide(x) {
+  const texto = `${x.n || ""} ${x.r[2]} ${x.r[4]} ${x.c || ""} ${(x.b || []).join(" ")} ${cajaBanda(x)}`.toLowerCase();
+  const q = busqueda.trim().toLowerCase();
+  if (q && !q.split(/\s+/).every(p => texto.includes(p))) return false;
+  if (filtro === "todo") return true;
+  return vista === "banda" ? cajaBanda(x) === filtro : (x.c === filtro || ((x.g || x.h) && filtro === (grupos.get(x.g || x.h).t === "set" ? "Platillos" : "Batería")));
+}
+
+function refrescarCajas() {
+  const v = VISTAS[vista];
+  for (const [k, caja] of v.cajas) {
+    const ids = utiles.filter(x => (vista === "banda" ? cajaBanda(x) : (x.g || x.h) ? (grupos.get(x.g || x.h).t === "set" ? "Platillos" : "Batería") : x.c) === k);
+    const visibles = ids.filter(x => !nodo.get(x.id).classList.contains("oculto"));
+    caja.el.hidden = visibles.length === 0;
+    const piezas = ids.filter(x => !x.h);
+    const listas = piezas.filter(x => cargados.has(x.id)).length;
+    caja.el.querySelector("small").textContent = `${listas}/${piezas.length} cargado`;
+    caja.el.querySelector(".progreso i").style.width = `${piezas.length ? (listas / piezas.length) * 100 : 0}%`;
+    const conteo = {};
+    for (const x of piezas) conteo[x.c] = (conteo[x.c] || 0) + 1;
+    caja.el.querySelector(".cintas").innerHTML = Object.entries(conteo).sort((a, b) => ordenCat.indexOf(a[0]) - ordenCat.indexOf(b[0]))
+      .map(([c, n], i) => `<span class="cinta" style="--cinta:var(${CATS[c]});--giro:${(i % 2 ? 1 : -1) * (0.6 + (i % 3) * 0.4)}deg">${esc(c)} ${n}</span>`).join("");
+    for (const kit of caja.kits.values()) kit.el.hidden = !kit.el.querySelector(".it:not(.oculto)");
+  }
+  for (const x of utiles) {
+    const b = nodo.get(x.id).querySelector(".band");
+    b.textContent = vista === "cat" ? cajaBanda(x) : (x.b || []).length > 1 ? x.b.join(" / ") : "";
+  }
+}
+
+function aplicarFiltros() {
+  for (const x of utiles) nodo.get(x.id).classList.toggle("oculto", !coincide(x));
+  // una batería se ve si se ve alguna de sus piezas
+  for (const g of grupos.values()) {
+    const alguna = g.p.some(id => !nodo.get(id).classList.contains("oculto")) || !nodo.get(g.cab).classList.contains("oculto");
+    nodo.get(g.cab).classList.toggle("oculto", !alguna);
+    if (alguna && busqueda && g.p.every(id => nodo.get(id).classList.contains("oculto"))) g.p.forEach(id => nodo.get(id).classList.remove("oculto"));
+  }
+  refrescarCajas();
+}
+
+/* ---------- animación: el mismo nodo vuela de la hoja a su caja ---------- */
+function flip(cambio, opciones = {}) {
+  const objetivos = [...document.querySelectorAll(".it, .caja, .kit")];
+  const estado = Flip.getState(objetivos, { props: "opacity" });
+  cambio();
+  return Flip.from(estado, {
+    duration: 0.9 * D, ease: "power3.inOut", absolute: true, nested: true, prune: true,
+    stagger: { amount: 0.45 * D, from: "start" },
+    onEnter: els => gsap.fromTo(els, { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.5 * D, ease: "back.out(2)", clearProps: "opacity,scale,transform" }),
+    // al salir se funden; luego se limpian para que vuelvan nítidos si reaparecen
+    onLeave: els => gsap.to(els, { opacity: 0, scale: 0.6, filter: "blur(4px)", duration: 0.45 * D, ease: "power2.in", onComplete: () => gsap.set(els, { clearProps: "opacity,scale,filter,transform" }) }),
+    ...opciones,
+  });
+}
+
+function gelCajas(cont) {
+  // las cajas aparecen como gel: nacen redondeadas y se asientan con rebote
+  const fondos = cont.querySelectorAll(".caja:not([hidden]) .caja-fondo");
+  gsap.fromTo(fondos, { opacity: 0, scale: 0.9, borderRadius: "48% 52% 44% 56% / 55% 45% 55% 45%" },
+    { opacity: 1, scale: 1, borderRadius: 14, duration: 1.1 * D, ease: "elastic.out(1, 0.55)", stagger: 0.05 * D, delay: 0.25 * D, clearProps: "borderRadius,transform" });
+  gsap.fromTo(cont.querySelectorAll(".caja:not([hidden]) .caja-cab"), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5 * D, stagger: 0.05 * D, delay: 0.5 * D, clearProps: "transform" });
+}
+
+const TEXTOS = {
+  1: { h: "Así llega <em>el listado</em>", p: "El listado general de backline del Escenario 1: tres páginas de PDF, una fila por línea, todo en mayúsculas. Con esto se carga el camión.", b: "Buscar lo que se puede quedar →" },
+  2: { h: "Aquí se esconden <em>los olvidos</em>", p: "La herramienta lee el mismo listado y marca lo que en bodega se lee mal: baterías completas que parecen un ítem, títulos contados como equipo, repartos escritos en una nota.", b: "Organizar para cargar →" },
+  3: { h: "Así lo usa <em>el equipo</em>", p: "Las mismas filas, en cajas por banda. Cada batería con sus piezas, los errores corregidos y lo que hay que tener sumado.", b: "" },
+};
+function cifras() {
+  const cont = {};
+  for (const x of items) for (const e of x.e || []) cont[e] = (cont[e] || 0) + 1;
+  const trampas = items.filter(x => (x.e || []).length).length;
+  const piezasKit = DATOS.grupos.reduce((n, g) => n + g.p.length, 0);
+  return {
+    1: [`<b>${items.length}</b> filas`, `<b>6</b> columnas`, `columna Escenario: <b>“1”</b> en todas`, `Faltantes: <b>vacía</b>`],
+    2: [`<b>${trampas}</b> filas con problemas`, `<b>${DATOS.grupos.length}</b> baterías y sets escritos como una fila`, `<b>${piezasKit}</b> piezas sueltas debajo`, `<b>${cont.titulo}</b> filas que no son equipo`],
+    3: [`<b>${clavesBanda.length}</b> cajas por banda`, `<b>${items.length - items.filter(x => x.z).length}</b> piezas`, `<b>0</b> filas de título`, `<b>${trampas}</b> problemas corregidos`],
+  };
+}
+const CIFRAS = cifras();
+
+function irA(n, animar = true) {
+  n = Math.max(1, Math.min(3, n));
+  if (n === paso && animar) return;
+  const antes = paso;
+  paso = n;
+  document.body.dataset.paso = String(n);
+  const t = TEXTOS[n];
+  $("#t-h1").innerHTML = t.h;
+  $("#t-p").textContent = t.p;
+  $("#siguiente").textContent = t.b;
+  $("#t-cifras").innerHTML = CIFRAS[n].map(c => `<span class="cifra">${c}</span>`).join("");
+  document.querySelectorAll(".pasos button").forEach(b => b.setAttribute("aria-pressed", String(+b.dataset.paso === n)));
+  moverGel(animar);
+  if (animar && !reducir) gsap.fromTo(".titular > *", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.06, ease: "power3.out" });
+
+  if (n === 3 && antes !== 3) {
+    flip(() => {
+      $("#hoja").hidden = true;
+      $("#tablero").hidden = false;
+      colocar();
+      aplicarFiltros();
+    });
+    gelCajas(VISTAS[vista].cont);
+    if (!reducir) gsap.fromTo(".alerta-kit, .hallazgos-titulo, .hallazgo, .total", { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.6, stagger: 0.035, ease: "power3.out", delay: 0.55, clearProps: "transform" });
+  } else if (n !== 3 && antes === 3) {
+    flip(() => {
+      $("#tablero").hidden = true;
+      $("#hoja").hidden = false;
+      $("#tablero").classList.remove("enfocado");
+      devolver();
+    }, { stagger: { amount: 0.3 * D, from: "start" } });
+  }
+  if (n === 2 && animar && !reducir) {
+    const trampas = [...document.querySelectorAll("#filas .it.trampa")].slice(0, 60);
+    gsap.fromTo(trampas, { x: -6 }, { x: 0, duration: 0.6, ease: "elastic.out(1.2, 0.4)", stagger: 0.012 });
+  }
+  if (animar) window.scrollTo({ top: 0, behavior: reducir ? "auto" : "smooth" });
+}
+
+function moverGel(animar) {
+  const b = document.querySelector(`.pasos button[data-paso="${paso}"]`);
+  const gel = $(".pasos .gel");
+  const x = b.offsetLeft, w = b.offsetWidth;
+  if (!animar || reducir) { gsap.set(gel, { x, width: w }); return; }
+  // se estira como gel hacia el nuevo botón y se asienta con rebote
+  const actual = gsap.getProperty(gel, "x"), ancho = gsap.getProperty(gel, "width");
+  const izq = Math.min(actual, x), der = Math.max(actual + ancho, x + w);
+  gsap.timeline()
+    .to(gel, { x: izq, width: der - izq, scaleY: 0.82, duration: 0.22, ease: "power2.in" })
+    .to(gel, { x, width: w, scaleY: 1, duration: 0.7, ease: "elastic.out(1, 0.5)" });
+}
+
+/* ---------- tablero: hallazgos, totales, filtros ---------- */
+(function tablero() {
+  const cont = {};
+  for (const x of items) for (const e of x.e || []) cont[e] = (cont[e] || 0) + 1;
+  $("#hallazgos").innerHTML = Object.entries(HALLAZGOS).filter(([k]) => cont[k])
+    .map(([k, [t, d]]) => `<button type="button" class="hallazgo" data-h="${k}" aria-pressed="false"><b>${k === "banda" ? 4 : cont[k]}</b><strong>${esc(t)}</strong><span>${esc(d)}</span></button>`).join("");
+
+  const tama = grupos.get(porId.get(items.find(x => x.h && /TAMA/.test(x.r[2])).id).h);
+  $("#piezas-mini").innerHTML = tama.p.map(id => `<span>${esc(porId.get(id).n)}</span>`).join("");
+
+  const REFS = [["Boom cymbal stand", /BOOM CYMBAL/], ["Snare stand", /SNARE STAND/], ["Drum throne", /DRUM T[RH]+[RH]?ONE|DRUM THRONE|DRUM TRONE/], ["Pedal de bombo", /KICK PEDAL|TWIN PEDAL/], ["Hi-hat stand", /HI-HAT STAND/], ["Guitar stand", /GUITAR STAND/], ["Keyboard stand", /KEYBOARD STAND/]];
+  $("#totales").innerHTML = REFS.map(([n, re]) => {
+    const fs = items.filter(x => !x.z && re.test(x.r[2]));
+    const total = fs.reduce((s, x) => s + (x.q || 0), 0);
+    return `<div class="total"><b>${total}</b><span>${esc(n)}</span><i>sumado de ${fs.length} filas</i></div>`;
+  }).join("");
+
+  pintarChips();
+})();
+
+function pintarChips() {
+  const claves = vista === "banda" ? clavesBanda : clavesCat;
+  $("#chips").innerHTML = [`<button type="button" class="chip" data-f="todo" aria-pressed="${filtro === "todo"}">Todo</button>`]
+    .concat(claves.map(k => `<button type="button" class="chip" data-f="${esc(k)}" aria-pressed="${filtro === k}">${esc(k)}</button>`)).join("");
+}
+
+function enfocar(h) {
+  hallazgoActivo = hallazgoActivo === h ? null : h;
+  document.querySelectorAll(".hallazgo").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.h === hallazgoActivo)));
+  $("#tablero").classList.toggle("enfocado", !!hallazgoActivo);
+  let primero = null;
+  for (const x of items) {
+    const el = nodo.get(x.id);
+    const si = !!hallazgoActivo && (x.e || []).includes(hallazgoActivo);
+    el.classList.toggle("foco", si);
+    if (si && !primero && !el.classList.contains("oculto") && el.offsetParent) primero = el;
+  }
+  if (hallazgoActivo === "titulo") {
+    // las filas de título no llegan al tablero: se muestra que se descartaron
+    const e = document.querySelector(`.hallazgo[data-h="titulo"] span`);
+    e.textContent = "Se descartaron al organizar: no son equipo.";
+  }
+  if (primero) primero.scrollIntoView({ behavior: reducir ? "auto" : "smooth", block: "center" });
+}
+
+$("#hallazgos").addEventListener("click", e => { const b = e.target.closest(".hallazgo"); if (b) enfocar(b.dataset.h); });
+$("#chips").addEventListener("click", e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  filtro = b.dataset.f;
+  pintarChips();
+  flip(aplicarFiltros, { duration: 0.55 * D, stagger: { amount: 0.15 * D } });
+});
+document.querySelector(".agrupar").addEventListener("click", e => {
+  const b = e.target.closest("button[data-vista]"); if (!b || b.dataset.vista === vista) return;
+  vista = b.dataset.vista;
+  filtro = "todo";
+  document.querySelectorAll(".agrupar button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  pintarChips();
+  flip(() => { colocar(); aplicarFiltros(); }, { duration: 0.85 * D });
+  gelCajas(VISTAS[vista].cont);
+});
+let tBuscar;
+$("#buscar").addEventListener("input", e => {
+  clearTimeout(tBuscar);
+  tBuscar = setTimeout(() => { busqueda = e.target.value; flip(aplicarFiltros, { duration: 0.4 * D, stagger: 0 }); }, 140);
+});
+
+/* ---------- chulear al cargar ---------- */
+$("#tablero").addEventListener("click", e => {
+  const el = e.target.closest(".it"); if (!el || paso !== 3) return;
+  const x = porId.get(el.dataset.id);
+  const ids = x.h ? grupos.get(x.h).p : [x.id];
+  const marcar = x.h ? !ids.every(id => cargados.has(id)) : !cargados.has(x.id);
+  for (const id of ids) { marcar ? cargados.add(id) : cargados.delete(id); nodo.get(id).classList.toggle("cargado", marcar); }
+  if (x.h) nodo.get(x.id).classList.toggle("cargado", marcar);
+  if (!reducir) gsap.fromTo(ids.map(id => nodo.get(id)), { scale: 0.94 }, { scale: 1, duration: 0.5, ease: "elastic.out(1.2, 0.45)", stagger: 0.02 });
+  refrescarCajas();
+});
+for (const el of nodo.values()) { el.tabIndex = -1; }
+$("#tablero").addEventListener("keydown", e => {
+  if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("it")) { e.preventDefault(); e.target.click(); }
+});
+
+/* ---------- profundidad: las cajas se inclinan con el puntero (solo con mouse) ---------- */
+if (matchMedia("(pointer: fine)").matches && !reducir) {
+  document.addEventListener("pointermove", e => {
+    const c = e.target.closest?.(".caja");
+    document.querySelectorAll(".caja.inclinada").forEach(x => { if (x !== c) { x.classList.remove("inclinada"); x.style.transform = ""; } });
+    if (!c) return;
+    const r = c.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+    c.classList.add("inclinada");
+    c.style.transform = `rotateX(${(-py * 5).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg) translateZ(6px)`;
+  }, { passive: true });
+}
+
+/* ---------- navegación ---------- */
+document.querySelector(".pasos").addEventListener("click", e => { const b = e.target.closest("button[data-paso]"); if (b) irA(+b.dataset.paso); });
+$("#siguiente").addEventListener("click", () => irA(paso + 1));
+document.addEventListener("keydown", e => {
+  if (e.target.matches("input, textarea")) return;
+  if (e.key === "ArrowRight") irA(paso + 1);
+  if (e.key === "ArrowLeft") irA(paso - 1);
+});
+window.addEventListener("resize", () => moverGel(false));
+document.fonts?.ready.then(() => moverGel(false));
+
+document.body.dataset.paso = "1";
+irA(1, false);
+paso = 1;
+</script>
