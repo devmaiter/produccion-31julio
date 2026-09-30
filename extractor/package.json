@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --port 5180",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:cordillera": "vite build -c vite.lib.config.ts && node scripts/empaquetar-cordillera.mjs"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
