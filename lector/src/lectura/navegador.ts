@@ -10,7 +10,12 @@ export interface RutasNavegador {
   pdfWorker: string;
   /** Carpeta servida con `worker.min.js`, `core/` y `lang/` (lo que genera `npm run preparar`). */
   ocr: string;
+  /** URL por idioma cuando `lang/*.traineddata.gz` no se puede servir con ese nombre. */
+  idiomas?: Record<string, string>;
 }
+
+/** La página puede fijar `window.BACKLINE_IDIOMAS = { spa: "…", eng: "…" }` sin recompilar. */
+const idiomasGlobales = (): Record<string, string> | undefined => (globalThis as { BACKLINE_IDIOMAS?: Record<string, string> }).BACKLINE_IDIOMAS;
 
 interface PaginaRenderizable extends PaginaPdf {
   getViewport(o: { scale: number }): { width: number; height: number };
@@ -32,6 +37,7 @@ export function lectoresNavegador(rutas: RutasNavegador): Lectores {
       langPath: base(`${dirOcr}/lang`),
       workerPath: base(`${dirOcr}/worker.min.js`),
       corePath: base(`${dirOcr}/core`),
+      idiomas: rutas.idiomas ?? idiomasGlobales(),
     }).catch(err => { ocr = null; throw err; })),
     async ampliarImagen(bytes, extension, factor) {
       const img = await createImageBitmap(new Blob([bytes as BlobPart], { type: extension === "png" ? "image/png" : "image/jpeg" }));

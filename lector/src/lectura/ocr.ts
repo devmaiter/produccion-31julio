@@ -29,6 +29,9 @@ export interface Ocr {
 export interface OpcionesOcr {
   /** Carpeta con spa.traineddata.gz y eng.traineddata.gz. */
   langPath: string;
+  /** Si el servidor no puede servir .traineddata.gz (p. ej. un artefacto), URL por idioma con
+   *  cualquier extensión; se descargan aquí y se le pasan a Tesseract como datos. */
+  idiomas?: Record<string, string>;
   workerPath?: string;
   corePath?: string;
   cachePath?: string;
@@ -39,7 +42,14 @@ interface BloqueTesseract { paragraphs: Array<{ lines: LineaTesseract[] }> }
 
 export async function crearOcr(op: OpcionesOcr): Promise<Ocr> {
   const { createWorker, PSM } = await import("tesseract.js");
-  const worker = await createWorker(["spa", "eng"], 1, {
+  const idiomas = op.idiomas
+    ? await Promise.all(["spa", "eng"].map(async code => {
+      const r = await fetch(op.idiomas![code] ?? `${op.langPath.replace(/\/+$/, "")}/${code}.traineddata.gz`);
+      if (!r.ok) throw new Error(`No se pudo descargar el idioma ${code} del OCR (${r.status})`);
+      return { code, data: new Uint8Array(await r.arrayBuffer()) };
+    }))
+    : ["spa", "eng"];
+  const worker = await createWorker(idiomas as Parameters<typeof createWorker>[0], 1, {
     langPath: op.langPath,
     ...(op.workerPath ? { workerPath: op.workerPath } : {}),
     ...(op.corePath ? { corePath: op.corePath } : {}),

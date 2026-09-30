@@ -70,7 +70,7 @@ for (const b of document.querySelectorAll<HTMLButtonElement>("[data-muestra]")) 
     const ruta = b.dataset.muestra!;
     const r = await fetch(ruta);
     if (!r.ok) { avisar(`No encontré la muestra ${ruta}.`); return; }
-    const nombre = ruta.split("/").pop()!;
+    const nombre = b.dataset.nombre ?? ruta.split("/").pop()!;
     await leerArchivos([new File([await r.blob()], nombre)]);
   });
 }
