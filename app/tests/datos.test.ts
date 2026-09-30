@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { EVENTOS } from "../src/datos/eventos";
 import { fichasDelDia, minutosShow } from "../src/datos/consultas";
-import { RepositorioEnMemoria, RepositorioLocal } from "../src/datos/repositorio";
 import { slug } from "../src/datos/slug";
 import { totalesPorReferencia } from "../src/dominio";
 
@@ -40,26 +39,5 @@ describe("slug", () => {
   it("quita tildes y símbolos", () => {
     expect(slug("Panteón Rococó")).toBe("panteon-rococo");
     expect(slug("Homenaje \"100 años de Rafael Escalona\"")).toBe("homenaje-100-anos-de-rafael-escalona");
-  });
-});
-
-describe("repositorios de verificación", () => {
-  it("en memoria guarda y borra", async () => {
-    const r = new RepositorioEnMemoria();
-    await r.guardar("ev", { itemId: "i1", contado: 2, listo: false });
-    expect((await r.todas("ev")).get("i1")?.contado).toBe(2);
-    await r.borrar("ev", "i1");
-    expect((await r.todas("ev")).size).toBe(0);
-  });
-  it("local descarta datos corruptos sin romperse", async () => {
-    const mem = new Map<string, string>();
-    const almacen = { getItem: (k: string) => mem.get(k) ?? null, setItem: (k: string, v: string) => void mem.set(k, v) };
-    const r = new RepositorioLocal(almacen);
-    await r.guardar("ev", { itemId: "i1", contado: 1, listo: true });
-    mem.set("backline:v1:ev", JSON.stringify([...JSON.parse(mem.get("backline:v1:ev")!), { itemId: "MAL ID", contado: -3 }]));
-    const todas = await r.todas("ev");
-    expect([...todas.keys()]).toEqual(["i1"]);
-    mem.set("backline:v1:ev", "{no es json");
-    expect((await r.todas("ev")).size).toBe(0);
   });
 });

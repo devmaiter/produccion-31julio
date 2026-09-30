@@ -23,6 +23,7 @@
     "src",
     "scripts",
     "tests",
+    "servidor",
     "vite.config.ts"
   ]
 }

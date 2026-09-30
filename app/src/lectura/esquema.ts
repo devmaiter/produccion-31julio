@@ -1,9 +1,9 @@
-/* Lo que Claude devuelve al leer un correo, PDF o foto.
+/* Formato intermedio entre la lectura y el modelo de datos.
  *
- * Es deliberadamente "plano" y por NOMBRES (no ids): el modelo solo transcribe
- * lo que ve. Convertirlo en entidades (ids, referencias, propietario,
- * validación cruzada, fusión con lo que ya existe) lo hace código
- * determinista en integrar.ts, que sí se puede probar sin llamar a la API.
+ * Es deliberadamente "plano" y por NOMBRES (no ids): así lo produce el
+ * intérprete de texto (interpretar.ts) y así se revisa y corrige en pantalla
+ * antes de guardar. Convertirlo en entidades (ids, referencias, propietario,
+ * fusión con lo que ya existe) lo hace integrar.ts.
  */
 import { z } from "zod";
 import { CATEGORIAS, TIPOS_BLOQUE } from "../dominio/entidades";
