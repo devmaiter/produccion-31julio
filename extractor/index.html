@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Extractor de backline</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./src/estilos.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div>
+      <h1>Extractor de backline</h1>
+      <p class="sub">Suelta el correo, el PDF, la foto del rider o el desglose de producción. Todo se lee aquí, en el dispositivo, sin internet.</p>
+    </div>
+    <label class="campo">Evento
+      <select id="evento"><option value="">Sin evento (solo leer)</option></select>
+    </label>
+  </header>
+
+  <section class="entrada">
+    <div id="zona" class="zona" tabindex="0">
+      <input id="archivos" type="file" multiple accept=".eml,.pdf,.png,.jpg,.jpeg,.webp,.txt,.xlsx,message/rfc822,application/pdf,image/*,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+      <p><strong>Suelta aquí los documentos</strong> o <button id="elegir" type="button" class="enlace">elígelos</button></p>
+      <p class="mini">.eml con adjuntos · PDF · fotos (OCR) · .txt · desglose .xlsx</p>
+    </div>
+    <div class="muestras">
+      <span>Probar con:</span>
+      <button type="button" class="chip" data-muestra="muestras/desglose-cordillera-2026.xlsx" data-evento="cordillera-2026">Desglose Cordillera 2026</button>
+      <button type="button" class="chip" data-muestra="muestras/hoja-backline.pdf">Hoja de backline (PDF)</button>
+      <button type="button" class="chip" data-muestra="muestras/foto-hoja.jpg">Foto de una hoja (OCR)</button>
+      <button type="button" class="chip" id="pegar">Pegar texto</button>
+    </div>
+    <div id="pegado" class="pegado" hidden>
+      <textarea id="texto" rows="6" placeholder="Pega aquí el correo o el rider…"></textarea>
+      <div class="fila"><label>Artista <input id="texto-artista" placeholder="opcional"></label><button id="leer-texto" type="button">Leer</button></div>
+    </div>
+  </section>
+
+  <section id="progreso" class="progreso" hidden></section>
+
+  <section id="resumen" class="resumen" hidden>
+    <div class="contadores" id="contadores"></div>
+    <div class="acciones">
+      <input id="buscar" type="search" placeholder="Buscar en el listado…">
+      <select id="filtro-artista"><option value="">Todos los artistas</option></select>
+      <label class="check"><input id="solo-dudosos" type="checkbox"> Solo lo dudoso</label>
+      <button id="descargar" type="button">Descargar JSON</button>
+      <button id="integrar" type="button" class="primario">Integrar al evento</button>
+      <button id="limpiar" type="button" class="enlace">Empezar de nuevo</button>
+    </div>
+    <nav class="pestanas" id="pestanas">
+      <button data-pestana="backline" class="activa">Backline</button>
+      <button data-pestana="tarima">Tarima</button>
+      <button data-pestana="canales">Canales</button>
+      <button data-pestana="horario">Horario</button>
+      <button data-pestana="requisitos">Requisitos</button>
+      <button data-pestana="avisos">Avisos</button>
+    </nav>
+    <div id="contenido" class="contenido"></div>
+  </section>
+
+  <footer class="pie">Lector sin IA ni servicios pagos: reglas, pdfjs, Tesseract (OCR) y exceljs corriendo en el navegador. Lo que no se entiende queda en avisos; lo que se lee con duda se marca.</footer>
+  <script type="module" src="./src/main.ts"></script>
+</body>
+</html>

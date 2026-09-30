@@ -11,3 +11,4 @@ export * from "./nombres";
 export * from "./xlsx";
 export * from "./plano";
 export * from "./desglose";
+export * from "./unir";

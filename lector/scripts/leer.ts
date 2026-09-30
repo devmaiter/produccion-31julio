@@ -17,7 +17,7 @@ import { basename, join } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
 import { parseArgs } from "node:util";
 import { DIR_DATA, cargarEvento } from "../src/datos/eventos";
-import { Extraccion, integrar, interpretar, leerArchivo, leerDesglose, type Documento, type ImagenPlano } from "../src/lectura";
+import { Extraccion, integrar, interpretar, leerArchivo, leerDesglose, unirExtracciones, type Documento, type ImagenPlano } from "../src/lectura";
 import { dirname, join as unir } from "node:path";
 import { mkdirSync } from "node:fs";
 import { lectoresNode } from "../src/lectura/node/lectores";
@@ -58,6 +58,7 @@ async function main() {
   }
 
   if (docs.length) parciales.push(interpretar(docs, { base, artista: op.artista, fecha: op.fecha }));
+  if (!parciales.length) throw new Error("No se leyó nada.");
   const extraccion = unirExtracciones(parciales);
   for (const a of extraccion.avisos) console.error(`aviso: ${a}`);
 
@@ -81,18 +82,6 @@ async function main() {
   }
 }
 
-function unirExtracciones(lista: Extraccion[]): Extraccion {
-  const [primera, ...resto] = lista;
-  if (!primera) throw new Error("No se leyó nada.");
-  const out: Extraccion = { ...primera, escenarios: [...primera.escenarios], dias: [...primera.dias], artistas: [...primera.artistas], bloques: [...primera.bloques], items: [...primera.items], avisos: [...primera.avisos], zonas: [...primera.zonas], puestos: [...primera.puestos], canales: [...primera.canales], requisitos: [...primera.requisitos], planos: [...primera.planos] };
-  for (const e of resto) {
-    out.evento ??= e.evento;
-    for (const k of ["escenarios", "artistas"] as const) for (const x of e[k]) if (!out[k].includes(x)) out[k].push(x);
-    for (const d of e.dias) if (!out.dias.some(x => x.fecha === d.fecha)) out.dias.push(d);
-    for (const k of ["bloques", "items", "avisos", "zonas", "puestos", "canales", "requisitos", "planos"] as const) (out[k] as unknown[]).push(...e[k]);
-  }
-  return out;
-}
 
 main().catch(err => {
   console.error(err instanceof Error ? err.message : String(err));
