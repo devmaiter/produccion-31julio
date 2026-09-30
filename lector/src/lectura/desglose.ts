@@ -17,6 +17,7 @@ import type { Lectores } from "./leer";
 import { buscarMedidas } from "./medidas";
 import { clave, emparejar } from "./nombres";
 import { leerPlano, musicosDesdeCanales } from "./plano";
+import { leerTablas } from "./tabla";
 import { leerLibro, type Hoja } from "./xlsx";
 
 export interface ImagenPlano {
@@ -168,6 +169,16 @@ export async function leerDesglose(bytes: Uint8Array, nombreArchivo: string, ctx
         ext.avisos.push(`${a}: no se pudo leer el plano con OCR (${err instanceof Error ? err.message : String(err)}); queda guardado para marcarlo a mano.`);
       }
     }
+  }
+
+  /* ---- Cualquier otra hoja con tablas "Cant | descripción" -------------- */
+  const conocida = (h: Hoja) => numeroDia(h) !== null && /backline|riser|tarima|power|energ|crew|io\s*list|input\s*list|patch|stage\s*plots?|planos?/i.test(h.nombre) || /^backline\s+[a-z]{2,4}$/i.test(h.nombre);
+  const tablas = leerTablas(libro, { artista: ctx.artista, fecha: ctx.fecha, anio: ctx.anio ?? (base ? Number(base.evento.desde?.slice(0, 4)) : undefined), emparejar: artista, omitir: conocida });
+  for (const k of ["items", "requisitos", "avisos"] as const) (ext[k] as unknown[]).push(...tablas[k]);
+  for (const e of tablas.escenarios) if (!ext.escenarios.includes(e)) ext.escenarios.push(e);
+  for (const d of tablas.dias) if (!ext.dias.some(x => x.fecha === d.fecha)) ext.dias.push(d);
+  if (!ext.items.length && !ext.zonas.length && !ext.canales.length && !ext.planos.length) {
+    ext.avisos.push(`${nombreArchivo}: no encontré hojas del desglose ni tablas con una columna de cantidad. Hojas: ${libro.hojas.map(h => h.nombre).join(", ")}.`);
   }
 
   /* ---- Cruces entre fuentes --------------------------------------------- */

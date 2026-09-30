@@ -45,6 +45,7 @@ El desglose de producción trae, por banda y por día, varias fuentes que hablan
 | `IO List Day n` | Un bloque de columnas por banda: canal, instrumento, micrófono, base, ubicación o snake ("1 - RACK" separa canal y rack); después del bloque `OUTPUT`, las salidas | `Canal` |
 | `Stage Plots Day n` | La imagen se guarda en `data/stage-plots/<evento>/<artista>.png`; el OCR (imagen ampliada 3×) propone puestos ("BASS", "OMAR" si el IO List dice "BASS OMAR"), zonas ("AMP RISER", "GUITAR WORLD"), tomas ("110V") y monitores ("MIX 3") con su posición 0–1. Todo queda `dudoso`: la posición se confirma a mano en el plano | `Puesto`, `Zona` (tipo `area`) |
 | `Power`, `Crew`, `BACKLINE <iniciales>` | Texto tal cual, y el backline en filas Qty / ítem | `Requisito`, `ItemBackline` |
+| Cualquier otra hoja con `Cant | descripción` | Tablas de backline como el inventario de OML: bloques `Cant | Requerimiento | Cant | Propuesta` por banda (la banda, la fecha y el escenario se leen encima del encabezado); los ítems salen de la propuesta y el rider queda como requisito. Una hoja plana (`CANTIDAD | ítem | DIAS | VALOR`) entra con las columnas extra como nota | `ItemBackline`, `Requisito` |
 
 Cruces que producen avisos: riser dibujado en el plano con medidas distintas a la hoja (Kany García: 12.2 m vs 14.44 m), canales ubicados en un riser que no existe en la hoja ni en el plano, más mesas de percusión pedidas que percusionistas dibujados, tomas de corriente que no quedan junto a ningún puesto.
 
