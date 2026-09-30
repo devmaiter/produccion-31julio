@@ -42,14 +42,18 @@ interface BloqueTesseract { paragraphs: Array<{ lines: LineaTesseract[] }> }
 
 export async function crearOcr(op: OpcionesOcr): Promise<Ocr> {
   const { createWorker, PSM } = await import("tesseract.js");
-  const idiomas = op.idiomas
-    ? await Promise.all(["spa", "eng"].map(async code => {
-      const r = await fetch(op.idiomas![code] ?? `${op.langPath.replace(/\/+$/, "")}/${code}.traineddata.gz`);
+  if (op.idiomas) {
+    // Tesseract mira primero su caché (IndexedDB, idb-keyval) antes de descargar
+    // `${langPath}/${idioma}.traineddata.gz`: se deja ahí lo descargado desde las URL dadas.
+    await Promise.all(["spa", "eng"].map(async code => {
+      const url = op.idiomas![code];
+      if (!url) return;
+      const r = await fetch(url);
       if (!r.ok) throw new Error(`No se pudo descargar el idioma ${code} del OCR (${r.status})`);
-      return { code, data: new Uint8Array(await r.arrayBuffer()) };
-    }))
-    : ["spa", "eng"];
-  const worker = await createWorker(idiomas as Parameters<typeof createWorker>[0], 1, {
+      await guardarEnCacheTesseract(`${op.cachePath ?? "."}/${code}.traineddata`, new Uint8Array(await r.arrayBuffer()));
+    }));
+  }
+  const worker = await createWorker(["spa", "eng"], 1, {
     langPath: op.langPath,
     ...(op.workerPath ? { workerPath: op.workerPath } : {}),
     ...(op.corePath ? { corePath: op.corePath } : {}),
@@ -81,4 +85,22 @@ export async function crearOcr(op: OpcionesOcr): Promise<Ocr> {
     },
     terminar: () => worker.terminate().then(() => undefined),
   };
+}
+
+
+/** Misma base y almacén que usa idb-keyval (la caché de tesseract.js en el navegador). */
+function guardarEnCacheTesseract(clave: string, datos: Uint8Array): Promise<void> {
+  return new Promise((ok, mal) => {
+    const req = indexedDB.open("keyval-store");
+    req.onupgradeneeded = () => req.result.createObjectStore("keyval");
+    req.onerror = () => mal(req.error ?? new Error("IndexedDB no disponible"));
+    req.onsuccess = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains("keyval")) { db.close(); mal(new Error("la caché del OCR no tiene el almacén keyval")); return; }
+      const tx = db.transaction("keyval", "readwrite");
+      tx.objectStore("keyval").put(datos, clave);
+      tx.oncomplete = () => { db.close(); ok(); };
+      tx.onerror = () => { db.close(); mal(tx.error ?? new Error("no se pudo guardar el idioma en la caché")); };
+    };
+  });
 }
