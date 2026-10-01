@@ -10,6 +10,7 @@ La raíz es la Home (`index.html`) con un enlace a cada demo:
 | `extractor/` | Extractor de backline (build de Vite) | rama `extractor` |
 | `demo-listado/` | Del listado al backline organizado | rama `demo` |
 | `produccion-31-julio/` | Hoja de producción del 31 de julio | aquí mismo (antes estaba en la raíz) |
+| `lab-reels/` | Lab: el backline en reels, una categoría por pantalla | aquí mismo |
 
 Para renovar los demos desde sus ramas: `./construir-sitio.sh`, commit y push a
 `main`; Pages lo publica solo en uno o dos minutos. Para probar local:

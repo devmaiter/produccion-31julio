@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:,">
+<title>Backline en reels</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Lab: el backline de ESC 2 como reels. Arriba/abajo cambia de categoría (Batería, Platillos…),
+   izquierda/derecha pasa de la portada al resumen y a cada banda. Todo es CSS scroll-snap nativo. */
+:root{
+  --bg:#000; --surface:#121212; --surface2:#1a1a1a; --line:#333;
+  --ink:#fff; --ink2:#d6d6d6; --ink3:#9a9a9a;
+  --accent:#ff6a1f; --accent-ink:#000; --ok:#3fbf77; --warn:#ffa83a;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden}
+body{font-family:var(--body);font-size:15px;line-height:1.4;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+
+/* Feed vertical: un reel por pantalla */
+#feed{height:100dvh;overflow-y:auto;scroll-snap-type:y mandatory;overscroll-behavior:contain;scrollbar-width:none;max-width:520px;margin:0 auto;position:relative}
+#feed::-webkit-scrollbar{display:none}
+.reel{height:100dvh;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden;background:radial-gradient(120% 70% at 50% 0%,hsl(var(--h) 90% 22%) 0%,#000 65%)}
+
+/* Carrusel horizontal dentro del reel */
+.slides{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none}
+.slides::-webkit-scrollbar{display:none}
+.slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;padding:calc(env(safe-area-inset-top) + 64px) 76px calc(env(safe-area-inset-bottom) + 34px) 18px;display:flex;flex-direction:column;overflow:hidden}
+
+/* Barra de progreso tipo historias */
+.prog{position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;display:flex;gap:4px;pointer-events:none}
+.prog i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}
+.prog i.on{background:var(--ink)}
+.cab{position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + 22px);left:16px;right:16px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);pointer-events:none}
+.cab b{font-family:var(--display);font-size:18px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
+.cab .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink3)}
+
+/* Portada */
+.portada{justify-content:flex-end}
+.emoji{font-size:clamp(90px,30vw,150px);line-height:1;margin-bottom:auto;margin-top:8vh;filter:drop-shadow(0 10px 30px rgba(0,0,0,.6));transform:scale(.6);opacity:0;transition:transform .5s cubic-bezier(.2,1.4,.4,1),opacity .4s}
+.reel.visto .emoji{transform:none;opacity:1}
+.portada h2{font-family:var(--display);font-weight:700;font-size:clamp(44px,13vw,76px);line-height:.9;letter-spacing:.01em;text-transform:uppercase;margin:0;color:var(--accent);text-wrap:balance;overflow-wrap:anywhere}
+.big{display:flex;align-items:baseline;gap:10px;margin:10px 0 2px}
+.big strong{font-family:var(--display);font-size:clamp(80px,26vw,128px);line-height:.85;font-variant-numeric:tabular-nums}
+.big span{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);line-height:1}
+.dias{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+.chip{font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.1);color:var(--ink);white-space:nowrap}
+.chip.ac{background:var(--accent);color:var(--accent-ink)}
+.chip.warn{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+.chip.ter{background:transparent;border:1px solid var(--ink3);color:var(--ink2)}
+.pista{margin-top:18px;font-size:14px;color:var(--ink2);display:flex;align-items:center;gap:8px}
+.pista .flecha{display:inline-block;animation:empuja 1.4s ease-in-out infinite}
+@keyframes empuja{50%{transform:translateX(8px)}}
+
+/* Listas */
+h3{font-family:var(--display);font-size:34px;font-weight:700;line-height:1;text-transform:uppercase;letter-spacing:.02em;margin:0 0 4px;text-wrap:balance}
+.sub{color:var(--ink2);font-size:14px;margin:0 0 14px}
+ul.lista{list-style:none;margin:0;padding:0;overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;mask-image:linear-gradient(#000 88%,transparent)}
+ul.lista li{display:flex;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+ul.lista .q{font-family:var(--display);font-size:28px;font-weight:700;color:var(--accent);min-width:2.2ch;text-align:right;line-height:1;font-variant-numeric:tabular-nums}
+ul.lista .t{min-width:0;flex:1}
+ul.lista .t small{display:block;color:var(--ink3);font-size:12px;margin-top:2px}
+ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inline-block}
+.barra{height:4px;border-radius:2px;background:var(--accent);opacity:.35;margin-top:6px}
+
+/* Slide de banda con el stage plot de fondo */
+.banda .fondo{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(16px) brightness(.22) saturate(.6);transform:scale(1.15);z-index:-1}
+.banda{isolation:isolate}
+.banda .plot{display:block;width:100%;max-height:26vh;object-fit:contain;border-radius:10px;background:#fff;margin:0 0 12px;cursor:zoom-in}
+.hora{font-family:var(--display);font-size:20px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+
+/* Riel de acciones a la derecha, como en los reels */
+.riel{position:absolute;z-index:4;right:10px;bottom:calc(env(safe-area-inset-bottom) + 90px);display:flex;flex-direction:column;gap:18px;align-items:center}
+.riel button{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--ink);text-shadow:0 1px 3px rgba(0,0,0,.8)}
+.riel .ic{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:rgba(255,255,255,.12);backdrop-filter:blur(6px);transition:transform .15s,background .15s}
+.riel button:active .ic{transform:scale(.88)}
+.riel .listo[aria-pressed="true"] .ic{background:var(--ok);color:#000}
+.corazon{position:absolute;z-index:5;left:50%;top:45%;font-size:110px;pointer-events:none;transform:translate(-50%,-50%) scale(0);opacity:0}
+.corazon.go{animation:pop .8s ease-out}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}20%{transform:translate(-50%,-50%) scale(1.15);opacity:1}60%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-60%) scale(1);opacity:0}}
+
+/* Pista de deslizar hacia arriba en el primer reel */
+.arriba{position:absolute;z-index:4;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 8px);text-align:center;font-size:13px;color:var(--ink2);animation:sube 1.6s ease-in-out infinite;pointer-events:none}
+@keyframes sube{50%{transform:translateY(-8px);opacity:.6}}
+
+/* Índice y visor */
+.hoja{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.hoja .panel{width:100%;max-width:520px;max-height:80dvh;overflow:auto;background:var(--surface);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 16px)}
+.hoja h4{font-family:var(--display);font-size:24px;text-transform:uppercase;margin:0 0 8px;color:var(--accent)}
+.hoja .fila{display:flex;align-items:center;gap:12px;width:100%;padding:12px 4px;border-bottom:1px solid var(--line);text-align:left}
+.hoja .fila .e{font-size:24px}
+.hoja .fila .x{margin-left:auto;color:var(--ink3);font-variant-numeric:tabular-nums}
+.hoja .fila .ok{color:var(--ok);font-weight:700}
+.visor{position:fixed;inset:0;z-index:11;background:#000;display:grid;place-items:center;padding:16px}
+.visor img{max-width:100%;max-height:100%;background:#fff;border-radius:8px}
+.aviso{position:fixed;z-index:12;left:50%;bottom:30px;transform:translateX(-50%);background:var(--ink);color:#000;padding:8px 14px;border-radius:999px;font-size:14px;font-weight:600}
+.cargando{height:100dvh;display:grid;place-items:center;color:var(--ink3);text-align:center;padding:16px}
+@media (min-width:700px){
+  body{background:radial-gradient(circle at 50% 30%,#1a0d05,#000 60%)}
+  #feed{border-left:1px solid var(--line);border-right:1px solid var(--line)}
+  .teclas{position:fixed;left:24px;bottom:24px;max-width:230px;font-size:13px;color:var(--ink3)}
+  .teclas kbd{font-family:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--ink2)}
+}
+@media (max-width:699px){.teclas{display:none}}
+@media (prefers-reduced-motion:reduce){.emoji,.pista .flecha,.arriba,.corazon.go{animation:none;transition:none}.emoji{transform:none;opacity:1}}
+</style>
+</head>
+<body>
+<main id="feed" aria-label="Backline por categoría"><div class="cargando">Cargando el backline de Cordillera 2026…</div></main>
+<div class="teclas"><b>Lab reels.</b> En el celular se desliza. Aquí: <kbd>↑</kbd><kbd>↓</kbd> categoría, <kbd>←</kbd><kbd>→</kbd> banda, doble clic marca listo.</div>
+<div class="hoja" id="indice" hidden><div class="panel" role="dialog" aria-label="Índice"><h4>Categorías</h4><div id="filas"></div></div></div>
+<div class="visor" id="visor" hidden><img alt=""></div>
+
+<script>
+const DATOS = "../extractor/data/cordillera-2026.json";
+const BASE_IMG = "../extractor/data/";
+const ORDEN = ["Batería","Platillos","Percusión","Teclado","Ampli bajo","Ampli guitarra","Guitarra","Bajo","Bases","Escenario","Cables y energía","DJ"];
+const EMOJI = {"Batería":"🥁","Platillos":"🔔","Percusión":"🪘","Teclado":"🎹","Ampli bajo":"🔊","Ampli guitarra":"📢","Guitarra":"🎸","Bajo":"🎸","Bases":"🎙️","Escenario":"🏗️","Cables y energía":"🔌","DJ":"🎧"};
+const HUE = {"Batería":20,"Platillos":45,"Percusión":5,"Teclado":265,"Ampli bajo":200,"Ampli guitarra":340,"Guitarra":30,"Bajo":180,"Bases":220,"Escenario":120,"Cables y energía":55,"DJ":290};
+const CLAVE = "lab-reels:listos";
+
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-");
+let listos = new Set();
+try { listos = new Set(JSON.parse(localStorage.getItem(CLAVE) || "[]")); } catch {}
+const guardar = () => { try { localStorage.setItem(CLAVE, JSON.stringify([...listos])); } catch {} };
+
+function aviso(t){
+  const a = document.createElement("div"); a.className = "aviso"; a.textContent = t;
+  document.body.append(a); setTimeout(() => a.remove(), 1600);
+}
+
+/* Agrupa los ítems por categoría: totales por día (se suman), "a tener" = máximo entre días,
+   resumen por referencia y una ficha por banda. */
+function armar(d){
+  const art = Object.fromEntries(d.artistas.map(a => [a.id, a.nombre]));
+  const dia = Object.fromEntries(d.dias.map(x => [x.id, x.nombre]));
+  const show = {}; for (const b of d.bloques) if (b.tipo === "show" && b.artistaId) show[b.diaId + "|" + b.artistaId] = b;
+  const plot = {}; for (const p of d.stagePlots) plot[p.artistaId] = BASE_IMG + p.archivo;
+  const diasShow = d.dias.filter(x => x.tipo === "show").map(x => x.id);
+  const cats = new Map();
+  for (const it of d.items) {
+    if (!cats.has(it.categoria)) cats.set(it.categoria, []);
+    cats.get(it.categoria).push(it);
+  }
+  const nombres = [...cats.keys()].sort((a,b) => (ORDEN.indexOf(a)+99*(ORDEN.indexOf(a)<0)) - (ORDEN.indexOf(b)+99*(ORDEN.indexOf(b)<0)));
+  return nombres.map(cat => {
+    const items = cats.get(cat);
+    const porDia = Object.fromEntries(diasShow.map(id => [id, 0]));
+    const refs = new Map();
+    const bandas = new Map();
+    for (const it of items) {
+      porDia[it.diaId] = (porDia[it.diaId] || 0) + it.cantidad;
+      const r = refs.get(it.referencia) || {ref: it.referencia, dias:{}};
+      r.dias[it.diaId] = (r.dias[it.diaId] || 0) + it.cantidad;
+      refs.set(it.referencia, r);
+      const k = it.diaId + "|" + it.artistaId;
+      if (!bandas.has(k)) bandas.set(k, {nombre: art[it.artistaId] || it.artistaId, dia: dia[it.diaId], show: show[k], plot: plot[it.artistaId], items: []});
+      bandas.get(k).items.push(it);
+    }
+    const resumen = [...refs.values()].map(r => ({ref: r.ref, q: Math.max(...Object.values(r.dias))})).sort((a,b) => b.q - a.q || a.ref.localeCompare(b.ref));
+    const orden = [...bandas.values()].sort((a,b) => (a.dia + (a.show?.inicio || "")).localeCompare(b.dia + (b.show?.inicio || "")));
+    return {cat, id: slug(cat), porDia, aTener: resumen.reduce((s,r) => s + r.q, 0), resumen, bandas: orden, dudosos: items.filter(i => i.porConfirmar).length};
+  });
+}
+
+function htmlReel(c, i, total, primero){
+  const n = 2 + c.bandas.length;
+  const dias = Object.entries(c.porDia).map(([id,q]) => `<span class="chip">${id.includes("sab") ? "Sáb" : "Dom"} ${q}</span>`).join("");
+  const max = c.resumen[0]?.q || 1;
+  const resumen = c.resumen.map(r => `<li><span class="q">${r.q}</span><span class="t">${esc(r.ref)}<div class="barra" style="width:${Math.max(8, 100*r.q/max)}%"></div></span></li>`).join("");
+  const bandas = c.bandas.map(b => `
+    <section class="slide banda">
+      ${b.plot ? `<div class="fondo" style="background-image:url('${esc(b.plot)}')"></div>` : ""}
+      <h3>${esc(b.nombre)}</h3>
+      <p class="sub"><span class="hora">${esc(b.dia)}${b.show ? " · " + esc(b.show.inicio) : ""}</span> · ${b.items.reduce((s,x)=>s+x.cantidad,0)} piezas</p>
+      ${b.plot ? `<img class="plot" src="${esc(b.plot)}" alt="Stage plot de ${esc(b.nombre)}" loading="lazy">` : ""}
+      <ul class="lista">${b.items.map(x => `<li><span class="q">${x.cantidad}</span><span class="t">${esc(x.referencia)}
+        ${x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
+        ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
+        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span></li>`).join("")}</ul>
+    </section>`).join("");
+  return `
+  <article class="reel" id="${c.id}" style="--h:${HUE[c.cat] ?? 20}" data-n="${n}" aria-label="${esc(c.cat)}">
+    <div class="prog">${"<i></i>".repeat(n)}</div>
+    <div class="cab"><b>${esc(c.cat)}</b><span class="n">${i+1}/${total}</span></div>
+    <div class="slides">
+      <section class="slide portada">
+        <div class="emoji" aria-hidden="true">${EMOJI[c.cat] || "📦"}</div>
+        <h2>${esc(c.cat)}</h2>
+        <div class="big"><strong data-to="${c.aTener}">${c.aTener}</strong><span>piezas<br>a tener</span></div>
+        <div class="dias">${dias}<span class="chip ac">${c.bandas.length} ${c.bandas.length === 1 ? "banda" : "bandas"}</span>${c.dudosos ? `<span class="chip warn">${c.dudosos} por confirmar</span>` : ""}</div>
+        <p class="pista">Desliza para ver banda por banda <span class="flecha">→</span></p>
+      </section>
+      <section class="slide">
+        <h3>Qué hay que tener</h3>
+        <p class="sub">Por referencia. Se suma dentro del día y se toma el máximo entre sábado y domingo.</p>
+        <ul class="lista">${resumen}</ul>
+      </section>
+      ${bandas}
+    </div>
+    <div class="riel">
+      <button class="listo" aria-pressed="${listos.has(c.id)}"><span class="ic">✓</span><span>Listo</span></button>
+      <button class="compartir"><span class="ic">↗</span><span>Enviar</span></button>
+      <button class="ver-indice"><span class="ic">☰</span><span>Índice</span></button>
+    </div>
+    <div class="corazon" aria-hidden="true">✅</div>
+    ${primero ? `<div class="arriba">Desliza ↑ para la siguiente categoría</div>` : ""}
+  </article>`;
+}
+
+function contar(el){
+  const to = +el.dataset.to; if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const t0 = performance.now();
+  const paso = t => { const k = Math.min(1, (t - t0) / 700); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(paso); };
+  requestAnimationFrame(paso);
+}
+
+function iniciar(cats){
+  const feed = document.getElementById("feed");
+  feed.innerHTML = cats.map((c,i) => htmlReel(c, i, cats.length, i === 0)).join("");
+  const reels = [...feed.querySelectorAll(".reel")];
+  let actual = reels[0];
+
+  // Reel visible: anima la portada y deja el hash para compartir o volver.
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const r = e.target; actual = r;
+    if (!r.classList.contains("visto")) { r.classList.add("visto"); contar(r.querySelector(".big strong")); }
+    history.replaceState(null, "", "#" + r.id);
+  }), {root: feed, threshold: .6});
+  reels.forEach(r => io.observe(r));
+  // La pista "desliza ↑" sobra en cuanto la persona ya deslizó una vez.
+  feed.addEventListener("scroll", () => feed.querySelector(".arriba")?.remove(), {once: true, passive: true});
+
+  // Progreso horizontal (las rayitas de arriba).
+  for (const r of reels) {
+    const s = r.querySelector(".slides"), marcas = r.querySelectorAll(".prog i");
+    const pintar = () => { const k = Math.round(s.scrollLeft / s.clientWidth); marcas.forEach((m,j) => m.classList.toggle("on", j <= k)); };
+    s.addEventListener("scroll", pintar, {passive: true}); pintar();
+  }
+
+  const marcar = (r, forzar) => {
+    const b = r.querySelector(".listo"), on = forzar ?? !listos.has(r.id);
+    on ? listos.add(r.id) : listos.delete(r.id); guardar();
+    b.setAttribute("aria-pressed", on);
+    if (on) { const c = r.querySelector(".corazon"); c.classList.remove("go"); void c.offsetWidth; c.classList.add("go"); }
+  };
+
+  feed.addEventListener("click", async e => {
+    const r = e.target.closest(".reel");
+    if (e.target.closest(".listo")) return marcar(r);
+    if (e.target.closest(".compartir")) {
+      const url = location.href.split("#")[0] + "#" + r.id, titulo = "Backline · " + r.getAttribute("aria-label");
+      try { if (navigator.share) await navigator.share({title: titulo, url}); else { await navigator.clipboard.writeText(url); aviso("Enlace copiado"); } } catch {}
+      return;
+    }
+    if (e.target.closest(".ver-indice")) return abrirIndice();
+    const img = e.target.closest(".plot");
+    if (img) { const v = document.getElementById("visor"); v.querySelector("img").src = img.src; v.hidden = false; }
+  });
+  // Doble toque en cualquier parte = listo, igual que el "me gusta".
+  feed.addEventListener("dblclick", e => { if (!e.target.closest(".riel")) marcar(e.target.closest(".reel"), true); });
+  document.getElementById("visor").addEventListener("click", e => e.currentTarget.hidden = true);
+
+  const indice = document.getElementById("indice");
+  function abrirIndice(){
+    document.getElementById("filas").innerHTML = cats.map(c => `<button class="fila" data-id="${c.id}"><span class="e">${EMOJI[c.cat] || "📦"}</span><span>${esc(c.cat)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${c.aTener}</span></button>`).join("");
+    indice.hidden = false;
+  }
+  indice.addEventListener("click", e => {
+    const f = e.target.closest(".fila");
+    indice.hidden = true;
+    if (f) document.getElementById(f.dataset.id).scrollIntoView({behavior: "smooth"});
+  });
+
+  addEventListener("keydown", e => {
+    if (!indice.hidden || !document.getElementById("visor").hidden) { if (e.key === "Escape") indice.hidden = document.getElementById("visor").hidden = true; return; }
+    const i = reels.indexOf(actual), s = actual.querySelector(".slides");
+    const ir = {ArrowDown: () => reels[i+1]?.scrollIntoView({behavior:"smooth"}), ArrowUp: () => reels[i-1]?.scrollIntoView({behavior:"smooth"}),
+                ArrowRight: () => s.scrollBy({left: s.clientWidth, behavior:"smooth"}), ArrowLeft: () => s.scrollBy({left: -s.clientWidth, behavior:"smooth"})}[e.key];
+    if (ir) { e.preventDefault(); ir(); }
+  });
+
+  const inicio = location.hash && document.getElementById(location.hash.slice(1));
+  if (inicio) inicio.scrollIntoView();
+}
+
+fetch(DATOS).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(d => iniciar(armar(d)))
+  .catch(() => { document.getElementById("feed").innerHTML = `<div class="cargando">No se pudo leer ${esc(DATOS)}.<br>Sirve la carpeta con <code>python3 -m http.server</code> desde la raíz del repo.</div>`; });
+</script>
+</body>
+</html>
