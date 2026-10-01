@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="data:,">
 <title>Backline en reels</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Quicksand:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Lab: el backline de ESC 2 como reels. Arriba/abajo cambia de categoría (Batería, Platillos…),
    izquierda/derecha pasa de la portada al resumen y a cada banda. Todo es CSS scroll-snap nativo. */
@@ -187,11 +187,16 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 /* ── Primera vez: logo con glitch y la mano que enseña a deslizar, como al abrir TikTok ── */
 .splash{position:fixed;inset:0;z-index:30;background:#000;display:grid;place-items:center;transition:opacity .45s}
 .splash.fuera{opacity:0;pointer-events:none}
-.logo{position:relative;font-family:var(--display);font-weight:700;font-size:clamp(54px,17vw,110px);line-height:.85;text-transform:uppercase;letter-spacing:.01em;color:#fff;text-align:center;animation:entra .7s cubic-bezier(.2,1.5,.4,1) both}
-.logo::before,.logo::after{content:attr(data-t);position:absolute;inset:0;white-space:pre-line}
-.logo::before{color:#25f4ee;transform:translate(-4px,-2px);mix-blend-mode:screen;animation:glitch 1.1s steps(2) infinite}
-.logo::after{color:var(--accent);transform:translate(4px,2px);mix-blend-mode:screen;animation:glitch 1.1s steps(2) infinite reverse}
-.logo small{display:block;font-family:var(--body);font-size:13px;font-weight:600;letter-spacing:.3em;color:var(--ink3);margin-top:14px}
+/* Logo de Circuito Naranja: "circuit" + la "o" como conector XLR, y "Naranja" espaciado. Tres copias: blanca encima y cian/naranja corridas con cortes, como el glitch de TikTok. */
+.logo{position:relative;color:#fff;animation:entra .7s cubic-bezier(.2,1.5,.4,1) both}
+.logo .capa{display:flex;flex-direction:column;align-items:center}
+.logo .capa+.capa{position:absolute;inset:0;mix-blend-mode:screen}
+.logo .cian{color:#25f4ee;transform:translate(-4px,-2px);animation:glitch 1.1s steps(2) infinite}
+.logo .nar{color:var(--accent);transform:translate(4px,2px);animation:glitch 1.1s steps(2) infinite reverse}
+.logo .marca{display:flex;align-items:center;font-family:"Quicksand","Comfortaa",var(--body);font-weight:500;font-size:clamp(58px,18vw,120px);line-height:1;letter-spacing:-.01em}
+.logo svg{width:.86em;height:.86em;margin-left:.04em;flex:none}
+.logo .naranja{font-family:"Quicksand",var(--body);font-size:clamp(14px,4vw,22px);letter-spacing:.9em;margin:10px 0 0 .9em}
+.logo small{display:block;font-family:var(--body);font-size:12px;font-weight:600;letter-spacing:.3em;color:var(--ink3);margin-top:26px;text-align:center}
 @keyframes entra{from{transform:scale(.3);opacity:0}}
 @keyframes glitch{0%{clip-path:inset(0 0 60% 0)}25%{clip-path:inset(40% 0 20% 0)}50%{clip-path:inset(70% 0 0 0)}75%{clip-path:inset(10% 0 70% 0)}100%{clip-path:inset(0 0 60% 0)}}
 .guia{position:fixed;inset:0;z-index:25;background:rgba(0,0,0,.62);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:24px;animation:aparece .35s ease-out both}
@@ -215,7 +220,7 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 </style>
 </head>
 <body>
-<main id="feed" aria-label="Backline por categoría"><div class="cargando">Cargando…</div></main>
+<main id="feed" aria-label="Backline por categoría"></main>
 <div class="teclas"><b>Lab reels.</b> En el celular se desliza. Aquí: <kbd>↑</kbd><kbd>↓</kbd> categoría, <kbd>←</kbd><kbd>→</kbd> banda, doble clic marca listo. Arriba de todo: ＋ subir un documento.</div>
 <nav class="lado" id="lado" aria-label="Categorías"></nav>
 <div class="flechas-v"><button id="sube" aria-label="Categoría anterior">↑</button><button id="baja" aria-label="Categoría siguiente">↓</button></div>
@@ -223,7 +228,6 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 <div class="visor" id="visor" hidden><img alt=""></div>
 
 <script>
-const DATOS = "../extractor/data/cordillera-2026.json";
 const BASE_IMG = "../extractor/data/";
 const LECTOR = new URL("../cordillera/lector/", location.href).href;   // el mismo lector de "Subir documento"
 const MUESTRA = "../extractor/muestras/hoja-backline.pdf";
@@ -243,16 +247,14 @@ function aviso(t){
   document.body.append(a); setTimeout(() => a.remove(), 1800);
 }
 
-/* ── Fuentes: el documento que subió la persona (guardado en el dispositivo) o el ejemplo de Cordillera ── */
-let ejemplo = null;                          // JSON de Cordillera, se pide una vez
+/* ── El documento que subió la persona, guardado en el dispositivo. Sin documento solo está el reel de subir. ── */
 let doc = leer("lab-reels:doc", null);        // {nombre, archivos, cuando, datos}
-let fuente = doc ? "doc" : "ejemplo";
 let listos = new Set();
-const claveListos = () => "lab-reels:listos:" + fuente;
-const cargarListos = () => { listos = new Set(leer(claveListos(), [])); };
-const guardarListos = () => escribir(claveListos(), [...listos]);
-const datos = () => fuente === "doc" ? doc.datos : ejemplo;
-const titulo = () => fuente === "doc" ? "Mi documento · " + doc.nombre : "Cordillera 2026 · Escenario 2";
+const cargarListos = () => { listos = new Set(leer("lab-reels:listos:doc", [])); };
+const guardarListos = () => escribir("lab-reels:listos:doc", [...listos]);
+const VACIO = {artistas: [], dias: [], bloques: [], stagePlots: [], items: []};
+const datos = () => doc?.datos || VACIO;
+const titulo = () => doc ? doc.nombre : "Sube un documento para empezar";
 
 /* Agrupa los ítems por categoría: totales por día (se suman), "a tener" = máximo entre días,
    resumen por referencia y una ficha por banda. */
@@ -312,14 +314,19 @@ const subida = {estado: "inicio", archivos: [], resultado: null, error: ""};
 function htmlSubir(){
   const s = subida;
   const flotan = QUIETO ? "" : `<div class="flotan" aria-hidden="true">${["📄","🧾","📸","📊","✉️","📄","🎸","🥁"].map((e,i) => `<span style="left:${8 + i*11.5}%;animation-delay:${(i*0.75).toFixed(2)}s">${e}</span>`).join("")}</div>`;
-  const fuenteSel = (doc ? `<button data-fuente="doc" aria-pressed="${fuente === "doc"}">Mi documento</button>` : "") +
-    `<button data-fuente="ejemplo" aria-pressed="${fuente === "ejemplo"}">Ejemplo Cordillera</button>`;
+  const pie = doc && s.estado !== "leyendo" ? `<div class="fuente">Tu documento: <b>${esc(doc.nombre)}</b> · ${doc.datos.items.length} ítems <button data-acc="borrar">Borrar</button></div>` : "";
   const lista = s.archivos.length ? `<ul class="archivos">${s.archivos.map(a => `<li class="${a.clase}"><span>${esc(a.nombre)}</span><span>${esc(a.estado)}</span></li>`).join("")}</ul>` : "";
   let cuerpo;
   if (s.estado === "leyendo") cuerpo = `
       <div class="hojita" aria-hidden="true">${"<i></i>".repeat(9)}</div>
       <h2>Leyendo<em>…</em></h2>
-      <p class="sub">Todo pasa en este dispositivo. Una foto tarda más porque hay que reconocer las letras.</p>${lista}`;
+      <p class="sub" id="lento">Todo pasa en este dispositivo. Una foto tarda más porque hay que reconocer las letras.</p>${lista}`;
+  else if (s.estado === "error") cuerpo = `
+      <div class="encontre" aria-hidden="true"><strong>⚠</strong></div>
+      <h2>${esc(s.error.titulo)}</h2>
+      <p class="sub">${esc(s.error.texto)}</p>
+      ${s.error.avisos?.length ? `<ul class="archivos">${s.error.avisos.slice(0, 6).map(a => `<li><span>${esc(a)}</span></li>`).join("")}</ul>` : ""}
+      <div class="botones"><button class="btn" data-acc="elegir">Probar con otro archivo</button><button class="btn sec" data-acc="muestra">Probar con un ejemplo</button></div>${lista}`;
   else if (s.estado === "listo") {
     const r = s.resultado;
     cuerpo = `
@@ -330,14 +337,14 @@ function htmlSubir(){
   } else cuerpo = `
       <button class="orbe" data-acc="elegir" aria-label="Elegir un documento"><span class="anillo"></span><span class="nucleo">+</span></button>
       <h2>Sube un <em>documento</em></h2>
-      <p class="sub">${s.error ? esc(s.error) : "Rider en PDF, foto de la hoja, Excel del desglose o el correo. Sale un reel por cada categoría. Se lee en tu dispositivo, sin internet."}</p>
+      <p class="sub">Rider en PDF, foto de la hoja, Excel del desglose o el correo. Sale un reel por cada categoría. Se lee en tu dispositivo, sin internet.</p>
       <div class="botones"><button class="btn" data-acc="elegir">Elegir archivo</button><button class="btn sec" data-acc="foto">Tomar foto</button><button class="btn sec" data-acc="muestra">Probar con un ejemplo</button></div>${lista}`;
   return `
   <article class="reel subir" id="subir" data-n="1" aria-label="Subir documento">
     ${flotan}
     <div class="slides"><section class="slide">
       ${cuerpo}
-      <div class="fuente">Viendo: ${fuenteSel}</div>
+      ${pie}
     </section></div>
     <input type="file" id="archivo" hidden multiple accept=".pdf,.xlsx,.xls,.csv,.txt,.eml,image/*">
     <input type="file" id="camara" hidden accept="image/*" capture="environment">
@@ -486,10 +493,9 @@ feed.addEventListener("click", async e => {
   if (acc === "elegir") return document.getElementById("archivo").click();
   if (acc === "foto") return document.getElementById("camara").click();
   if (acc === "muestra") return probarMuestra();
-  if (acc === "otro") { subida.estado = "inicio"; subida.archivos = []; subida.error = ""; return pintarSubir(); }
+  if (acc === "otro") { subida.estado = "inicio"; subida.archivos = []; return pintarSubir(); }
+  if (acc === "borrar") { doc = null; escribir("lab-reels:doc", null); escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; return pintar("subir"); }
   if (acc === "ver") return reels[1]?.scrollIntoView({behavior: "smooth"});
-  const f = e.target.closest("[data-fuente]");
-  if (f && f.dataset.fuente !== fuente) { fuente = f.dataset.fuente; return pintar("subir"); }
   if (e.target.closest(".listo")) return marcar(r);
   if (e.target.closest(".ir-subir")) return reels[0].scrollIntoView({behavior: "smooth"});
   if (e.target.closest(".compartir")) {
@@ -551,13 +557,27 @@ function cargarLector(){
   });
 }
 
+function fallo(titulo, texto, avisos){
+  subida.estado = "error"; subida.error = {titulo, texto, avisos};
+  pintarSubir();
+  reels[0]?.scrollIntoView();
+}
+
 async function subirArchivos(archivos){
   if (!archivos.length) return;
-  subida.estado = "leyendo"; subida.error = "";
+  subida.estado = "leyendo";
   subida.archivos = archivos.map(f => ({nombre: f.name, estado: "en cola", clase: ""}));
   pintarSubir();
+  reels[0]?.scrollIntoView();
+  const lento = setTimeout(() => { const el = document.getElementById("lento"); if (el) el.textContent = "Sigue leyendo. Un PDF escaneado o una foto puede tardar hasta un minuto en el celular."; }, 12000);
+  try { await leerYArmar(archivos); }
+  catch (err) { fallo("No se pudo leer", (err && err.message) || "Algo falló leyendo el archivo. Prueba otra vez o con otro archivo."); }
+  finally { clearTimeout(lento); }
+}
+
+async function leerYArmar(archivos){
   let r;
-  try {
+  {
     const L = await cargarLector();
     r = await L.leerTodo(archivos, {rutas: {pdfWorker: LECTOR + "pdf.worker.min.mjs", ocr: LECTOR + "ocr/"}, base: null,
       alProgreso: (nombre, estado) => {
@@ -566,21 +586,19 @@ async function subirArchivos(archivos){
         const li = [...document.querySelectorAll("#subir .archivos li")].find(li => li.firstElementChild.textContent === nombre);
         if (li) { li.className = a.clase; li.lastElementChild.textContent = estado; }
       }});
-  } catch (err) {
-    subida.estado = "inicio"; subida.error = err.message || "No se pudo leer el documento."; pintarSubir(); return;
   }
   const ext = r.extraccion;
   if (!ext.items.length) {
-    subida.estado = "inicio";
-    subida.error = "No encontré backline en lo que subiste. Si es una foto, prueba con una más nítida y más cerca de la hoja.";
-    pintarSubir(); return;
+    const errores = subida.archivos.filter(a => a.clase === "err").map(a => a.nombre + ": " + a.estado);
+    return fallo(errores.length ? "No se pudo leer" : "No encontré backline",
+      errores.length ? "El lector no pudo abrir el archivo." : "Leí el documento pero no vi una lista de equipos (cantidad y descripción). Si es una foto, que sea nítida y de cerca; si es un PDF escaneado, prueba con una foto de la hoja.",
+      [...errores, ...ext.avisos]);
   }
   const d = aDatos(ext);
   const nombre = archivos.length === 1 ? archivos[0].name.replace(/\.[^.]+$/, "") : archivos.length + " archivos";
   doc = {nombre, archivos: archivos.map(f => f.name), cuando: new Date().toISOString(), datos: d};
   escribir("lab-reels:doc", doc);
   escribir("lab-reels:listos:doc", null);
-  fuente = "doc";
   const categorias = [...new Set(d.items.map(i => i.categoria))];
   subida.estado = "listo";
   subida.resultado = {items: d.items.length, bandas: d.artistas.length, cats: categorias.length, dudosos: d.items.filter(i => i.porConfirmar).length, avisos: ext.avisos.length};
@@ -624,7 +642,7 @@ function guia(clave, tipo, texto, sub){
 }
 function guiaAlLlegar(r){
   if (document.querySelector(".splash:not(.fuera)")) return;
-  if (r.id === "subir") guia("arriba", "arriba-g", PC ? "Baja para ver cada categoría" : "Desliza hacia arriba", PC ? "Con la rueda del mouse, ↓ o los botones de la derecha" : "Cada pantalla es una categoría: Batería, Platillos, Bases…");
+  if (r.id === "subir") cats.length && guia("arriba", "arriba-g", PC ? "Baja para ver cada categoría" : "Desliza hacia arriba", PC ? "Con la rueda del mouse, ↓ o los botones de la derecha" : "Cada pantalla es una categoría: Batería, Platillos, Bases…");
   else if (!vistos.has("lado")) setTimeout(() => actual === r && guia("lado", "lado-g", PC ? "Pasa con ›" : "Desliza a la izquierda", "Ahí está lo que hay que tener y cada banda con su plano"), 1400);
   else setTimeout(() => actual === r && guia("toque", "toque-g", "Doble toque = listo", "Marca la categoría cuando esté revisada"), 1400);
 }
@@ -633,23 +651,18 @@ function splash(){
     if (vistos.has("splash")) return ok();
     vistos.add("splash"); escribir("lab-reels:guias", [...vistos]);
     const s = document.createElement("div"); s.className = "splash";
-    s.innerHTML = `<div class="logo" data-t="Back&#10;line">Back<br>line<small>EN REELS</small></div>`;
+    const xlr = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="currentColor" stroke-width="8"/><rect x="44" y="3" width="12" height="9" rx="2" fill="currentColor"/><circle cx="31" cy="46" r="8" fill="currentColor"/><circle cx="69" cy="46" r="8" fill="currentColor"/><circle cx="50" cy="69" r="8" fill="currentColor"/></svg>`;
+    const capa = c => `<div class="capa ${c}"${c ? ' aria-hidden="true"' : ""}><div class="marca">circuit${xlr}</div><div class="naranja">Naranja</div></div>`;
+    s.innerHTML = `<div class="logo" role="img" aria-label="Circuito Naranja">${capa("")}${QUIETO ? "" : capa("cian") + capa("nar")}<small>BACKLINE EN REELS</small></div>`;
     document.body.append(s);
     setTimeout(() => { s.classList.add("fuera"); ok(); setTimeout(() => s.remove(), 500); }, QUIETO ? 600 : 1900);
   });
 }
 
-/* ── Arranque: el ejemplo de Cordillera se pide siempre (es la otra fuente) ── */
-const arranque = splash();
-fetch(DATOS).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .then(async d => {
-    ejemplo = d;
-    if (location.hash === "#intro") history.replaceState(null, "", location.pathname);
-    pintar(location.hash.slice(1));
-    await arranque;
-    if (actual) guiaAlLlegar(actual);
-  })
-  .catch(() => { feed.innerHTML = `<div class="cargando">No se pudo leer ${esc(DATOS)}.<br>Sirve la carpeta con <code>python3 -m http.server</code> desde la raíz del repo.</div>`; });
+/* ── Arranque ── */
+splash().then(() => { if (actual) guiaAlLlegar(actual); });
+if (location.hash === "#intro") history.replaceState(null, "", location.pathname);
+pintar(location.hash.slice(1));
 </script>
 </body>
 </html>

@@ -4,8 +4,8 @@ Prueba de qué tan difícil es mostrar el backline como reels: una pantalla por
 categoría (Batería, Platillos, Percusión…) que se cambia deslizando hacia arriba,
 y dentro de cada una se desliza a los lados de la portada al resumen y a cada banda.
 
-Usa los datos reales de Cordillera 2026, ESC 2 (`../extractor/data/cordillera-2026.json`)
-y los stage plots de cada banda. Un solo archivo, sin librerías.
+Los reels salen del documento que se sube. Un solo archivo, sin librerías aparte del
+lector y el Three.js de los otros demos.
 
 ### Subir un documento
 
@@ -14,14 +14,17 @@ desglose o el correo. Lo lee el mismo lector de la lista de Cordillera
 (`../cordillera/lector/`), en el dispositivo y sin internet, y con eso arma reels
 nuevos: uno por cada categoría que encontró, con sus bandas y días.
 
+- Sin documento solo está el reel de subir: no se muestra ningún evento de ejemplo.
 - Lo leído se guarda en el dispositivo y sigue ahí al volver a abrir el link.
-- Abajo del reel se cambia entre **Mi documento** y **Ejemplo Cordillera**.
+  **Borrar** lo quita.
+- Si el archivo no se puede abrir o no trae una lista de equipos, el reel lo dice en
+  grande con lo que el lector no entendió. Si tarda más de 12 s avisa que sigue leyendo.
 - **Probar con un ejemplo** lee `extractor/muestras/hoja-backline.pdf`.
 - Cada categoría tiene **＋ Subir** en el riel para volver arriba.
 
 ### La primera vez
 
-Como al abrir TikTok: el logo entra con glitch y luego una mano enseña cada gesto
+Como al abrir TikTok: el logo de Circuito Naranja entra con glitch y luego una mano enseña cada gesto
 una sola vez (deslizar arriba, deslizar a la izquierda, doble toque). Para verlo de
 nuevo: `lab-reels/#intro`.
 
