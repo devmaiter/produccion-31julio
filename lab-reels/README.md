@@ -67,7 +67,6 @@ El resto (agrupar por categoría, contar, el riel, las rayitas) son unas 200 lí
 Lo que falta para llevarlo a la app de verdad:
 
 - Marcar listo por ítem y no solo por categoría, y sincronizarlo como la lista de chequeo.
-- Elegir escenario y evento (hoy está fijo en Cordillera 2026, ESC 2).
 - Probarlo en iPhone y Android reales: el carrusel horizontal dentro del vertical
   funciona en Chrome móvil emulado, pero los gestos finos se juzgan en la mano.
 
