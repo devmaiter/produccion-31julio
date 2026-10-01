@@ -228,6 +228,11 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 <div class="visor" id="visor" hidden><img alt=""></div>
 
 <script>
+/* El lector de PDF usa Map.getOrInsert(Computed), que solo traen los navegadores más nuevos. */
+for (const C of [Map, WeakMap]) {
+  if (!C.prototype.getOrInsertComputed) C.prototype.getOrInsertComputed = function(k, f){ if (!this.has(k)) this.set(k, f(k)); return this.get(k); };
+  if (!C.prototype.getOrInsert) C.prototype.getOrInsert = function(k, v){ if (!this.has(k)) this.set(k, v); return this.get(k); };
+}
 const BASE_IMG = "../extractor/data/";
 const LECTOR = new URL("../cordillera/lector/", location.href).href;   // el mismo lector de "Subir documento"
 const MUESTRA = "../extractor/muestras/hoja-backline.pdf";
@@ -399,7 +404,7 @@ function htmlReel(c, i, total){
 }
 
 function contar(el){
-  if (!el) return;
+  if (!el || !el.dataset.to) return;
   const to = +el.dataset.to; if (QUIETO) return;
   const t0 = performance.now();
   const paso = t => { const k = Math.min(1, (t - t0) / 700); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(paso); };
