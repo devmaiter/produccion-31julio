@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:,">
+<title>Reconocimiento 3D</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Reconocimiento de equipo: la cámara mira un equipo de backline, MobileNet dice qué es
+   y el equipo aparece como holograma 3D sobre la imagen. Negro y naranja como la Home;
+   el holograma es cian (o naranja, se cambia abajo). */
+:root{
+  --bg:#000; --surface:#121212; --surface2:#1a1a1a; --line:#333; --line2:#242424;
+  --ink:#fff; --ink2:#d6d6d6; --ink3:#9a9a9a;
+  --accent:#ff6a1f; --accent-ink:#000; --accent-soft:#3a1e0c;
+  --holo:#35e0ff; --ok:#3fbf77; --warn:#ffa83a;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:15px;line-height:1.45;padding:0 16px 48px}
+.wrap{max-width:1180px;margin:0 auto}
+header.top{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;padding:18px 0 14px;border-bottom:1px solid var(--line)}
+header.top a.volver{color:var(--ink3);text-decoration:none;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+header.top a.volver:hover{color:var(--accent)}
+h1{font-family:var(--display);font-weight:700;font-size:38px;line-height:1;letter-spacing:.02em;text-transform:uppercase;margin:0;color:var(--accent)}
+h1 small{display:block;font-family:var(--body);font-size:12px;font-weight:500;letter-spacing:.12em;color:var(--ink3);margin-bottom:6px}
+.layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-top:16px}
+@media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}}
+
+/* Escenario: video/foto de fondo, holograma encima y el HUD. */
+.escenario{position:relative;border-radius:14px;overflow:hidden;background:#02070a;border:1px solid var(--line2);height:min(72vh,680px);min-height:420px;touch-action:none}
+@media (max-width:860px){.escenario{height:68vh;min-height:380px}}
+.escenario canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;inset:0;pointer-events:none;font-family:var(--mono);color:var(--holo);text-shadow:0 0 8px rgba(53,224,255,.6)}
+.hud .esq{position:absolute;width:28px;height:28px;border:2px solid currentColor;opacity:.7}
+.hud .esq.a{top:14px;left:14px;border-right:0;border-bottom:0}
+.hud .esq.b{top:14px;right:14px;border-left:0;border-bottom:0}
+.hud .esq.c{bottom:84px;left:14px;border-right:0;border-top:0}
+.hud .esq.d{bottom:84px;right:14px;border-left:0;border-top:0}
+.hud .etiqueta{position:absolute;top:22px;left:26px;right:26px;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.hud .etiqueta b{display:block;font-family:var(--display);font-size:30px;line-height:1.05;letter-spacing:.04em;font-weight:700;margin-top:4px;color:#e9fdff}
+.hud .etiqueta span.conf{display:inline-block;margin-top:4px;padding:1px 8px;border:1px solid currentColor;border-radius:999px}
+.hud .estado{position:absolute;top:22px;right:26px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-align:right}
+.hud .barrido{position:absolute;left:0;right:0;top:0;height:2px;background:var(--holo);box-shadow:0 0 18px 4px rgba(53,224,255,.7);opacity:0}
+.escenario.escaneando .barrido{animation:barrido 1.1s ease-in-out infinite;opacity:1}
+@keyframes barrido{0%{top:10%}50%{top:82%}100%{top:10%}}
+.mira{position:absolute;left:50%;top:44%;width:min(56%,300px);aspect-ratio:1;transform:translate(-50%,-50%);border:1px dashed rgba(53,224,255,.45);border-radius:8px;opacity:0;transition:opacity .2s}
+.escenario.con-camara .mira{opacity:1}
+.escenario.con-camara.mostrando .mira{opacity:0}
+.botonera{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:8px;justify-content:center}
+@media (max-width:480px){.botonera .btn{font-size:16px;letter-spacing:.02em;padding:9px 8px;flex:1 1 0;min-width:0}}
+.btn{font-family:var(--display);font-size:18px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:10px;padding:10px 16px;border:1px solid var(--accent);background:rgba(0,0,0,.6);color:var(--accent);cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.btn.pri{background:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.aviso{position:absolute;left:50%;bottom:70px;transform:translateX(-50%);max-width:calc(100% - 32px);background:rgba(0,0,0,.75);border:1px solid var(--line);border-radius:8px;padding:6px 12px;font-size:13px;color:var(--ink2);text-align:center}
+
+/* Panel lateral */
+.panel{display:flex;flex-direction:column;gap:14px;min-width:0}
+.caja{background:var(--surface);border:1px solid var(--line2);border-radius:14px;padding:14px 16px}
+.caja h2{font-family:var(--display);font-size:16px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:600 13px var(--body);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);color:var(--ink2);cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.chip:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.ficha h3{font-family:var(--display);font-size:28px;line-height:1;font-weight:700;text-transform:uppercase;letter-spacing:.02em;margin:0 0 4px;color:var(--accent)}
+.ficha .tipo{color:var(--ink3);font-size:13px;margin:0 0 10px}
+.ficha dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0 0 10px;font-size:14px}
+.ficha dt{color:var(--ink3)}
+.ficha dd{margin:0;color:var(--ink2)}
+.ficha ul{margin:0;padding-left:20px;color:var(--ink2);font-size:14px}
+.ficha li+li{margin-top:3px}
+.vio{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.vio li{display:grid;grid-template-columns:minmax(0,1fr) 46px;gap:8px;align-items:center}
+.vio .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+.vio .n em{font-style:normal;color:var(--accent);font-weight:600}
+.vio .barra{grid-column:1/-1;height:4px;border-radius:2px;background:var(--line2);overflow:hidden}
+.vio .barra i{display:block;height:100%;background:var(--ink3)}
+.vio li.eq .barra i{background:var(--accent)}
+.vio .p{text-align:right;font-family:var(--mono);color:var(--ink3)}
+.vacio{color:var(--ink3);font-size:13px;margin:0}
+.ajustes{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;font-size:14px;color:var(--ink2)}
+.ajustes label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.nota{font-size:12px;color:var(--ink3);margin:14px 0 0;max-width:80ch}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1><small>Backline · demo</small>Reconocimiento de equipo en 3D</h1>
+  <a class="volver" href="../index.html">← Demos</a>
+</header>
+
+<div class="layout">
+  <section class="escenario" id="escenario" aria-label="Holograma del equipo">
+    <canvas id="lienzo"></canvas>
+    <div class="hud" aria-live="polite">
+      <div class="esq a"></div><div class="esq b"></div><div class="esq c"></div><div class="esq d"></div>
+      <div class="mira"></div>
+      <div class="barrido"></div>
+      <div class="etiqueta"><span id="hudTitulo">Holograma</span><b id="hudNombre">—</b><span class="conf" id="hudConf" hidden></span></div>
+      <div class="estado" id="hudEstado">● Sin cámara</div>
+    </div>
+    <div class="aviso" id="aviso" hidden></div>
+    <div class="botonera">
+      <button class="btn" id="btnCamara" type="button">Cámara</button>
+      <button class="btn pri" id="btnEscanear" type="button" disabled>Escanear</button>
+      <button class="btn" id="btnFoto" type="button">Foto</button>
+      <input type="file" id="archivo" accept="image/*" hidden>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <div class="caja">
+      <h2>Catálogo · toca uno para verlo</h2>
+      <div class="chips" id="catalogo"></div>
+    </div>
+    <div class="caja ficha" id="ficha"></div>
+    <div class="caja">
+      <h2>Lo que vio la cámara</h2>
+      <ul class="vio" id="vio"></ul>
+      <p class="vacio" id="vioVacio">Enciende la cámara y apunta a un amplificador, una batería, un teclado, una guitarra, un micrófono o un monitor. También sirve una foto.</p>
+    </div>
+    <div class="caja">
+      <h2>Holograma</h2>
+      <div class="ajustes">
+        <label><input type="radio" name="color" value="cian" checked> Cian</label>
+        <label><input type="radio" name="color" value="naranja"> Naranja</label>
+        <label><input type="checkbox" id="girar" checked> Girar solo</label>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<p class="nota">El reconocimiento corre en el dispositivo con MobileNet (ImageNet), sin servicios pagos ni enviar la imagen a ningún lado. MobileNet conoce guitarras, tambores, pianos, micrófonos y parlantes, no marcas ni modelos: por eso un parlante puede ser amplificador, gabinete de bajo o monitor, y la ficha lo dice. Arrastra el holograma para girarlo y pellizca o usa la rueda para acercarlo.</p>
+</div>
+
+<script src="vendor/tf.min.js"></script>
+<script type="module">
+import * as THREE from "./vendor/three.js";
+import { OrbitControls, EffectComposer, RenderPass, UnrealBloomPass, OutputPass, RoundedBoxGeometry } from "./vendor/three.js";
+import CLASES from "./vendor/imagenet.js";
+
+const $ = (id) => document.getElementById(id);
+const COLORES = { cian: 0x35e0ff, naranja: 0xff7a2e };
+
+/* ───────── Catálogo: ficha de cada equipo y cómo se construye en 3D ───────── */
+const EQUIPOS = {
+  amp: {
+    nombre: "Amplificador de guitarra", tipo: "Combo 2×12 a tubos o transistores",
+    ejemplos: "Fender Twin Reverb, Roland JC-120, Vox AC30",
+    energia: "110 V (revisar si viene a 220 V)", canal: "Micrófono al parlante (SM57) o DI de línea",
+    revisar: ["Fusible y cable de poder", "Pedal de canal y reverb", "Que no zumbe con la guitarra conectada", "Parlantes sin rotos ni vibración"],
+  },
+  bajo: {
+    nombre: "Cabezal y gabinete de bajo", tipo: "Cabezal sobre gabinete 8×10",
+    ejemplos: "Ampeg SVT-CL + SVT-810E, Ampeg SVT-4 Pro",
+    energia: "110 V, cabezal pesado: dos personas", canal: "DI del cabezal y micrófono al gabinete",
+    revisar: ["Cable de parlante (speakON), no de instrumento", "Impedancia del gabinete y del cabezal", "Ruedas y manijas", "Tubos calientes antes de tocar"],
+  },
+  bateria: {
+    nombre: "Batería", tipo: "Bombo, redoblante, toms, hi-hat y platillos",
+    ejemplos: "Bombo 22\", toms 12\" y 16\", redoblante 14\"",
+    energia: "No lleva", canal: "8 a 12 canales de micrófono",
+    revisar: ["Tapete y silla", "Bases de platillo tipo boom", "Pedal de bombo y clutch del hi-hat", "Parches y llave de afinar"],
+  },
+  teclado: {
+    nombre: "Teclado con base", tipo: "Teclado de escenario de 88 teclas",
+    ejemplos: "Nord Stage, Yamaha CP88, Roland RD",
+    energia: "110 V con regulador", canal: "2 DI (estéreo)",
+    revisar: ["Pedal de sustain", "Base tipo X o Z firme", "Fuente de poder original", "Salidas L/R"],
+  },
+  guitarra: {
+    nombre: "Guitarra en su base", tipo: "Guitarra eléctrica o acústica",
+    ejemplos: "Normalmente la trae la banda",
+    energia: "No lleva", canal: "Al amplificador o DI si es acústica",
+    revisar: ["Base o guitarrero", "Cable de instrumento de repuesto", "Afinador", "Correa con seguros"],
+  },
+  mic: {
+    nombre: "Micrófono con base boom", tipo: "Micrófono dinámico de voz o instrumento",
+    ejemplos: "Shure SM58, Shure SM57, Beta 52",
+    energia: "No lleva (los de condensador piden phantom)", canal: "1 canal",
+    revisar: ["Clip o pinza", "Base boom que no se caiga", "Cable XLR probado", "Pantalla anti-pop si es voz"],
+  },
+  monitor: {
+    nombre: "Monitor de piso", tipo: "Cuña con woofer de 12\" y driver",
+    ejemplos: "Cuña activa o pasiva del proveedor de sonido",
+    energia: "110 V si es activa", canal: "Una mezcla de monitores",
+    revisar: ["Número de mezcla marcado", "Cable de señal y de poder", "Ángulo hacia el músico", "Que no acople con la voz"],
+  },
+};
+
+/* Clases de ImageNet que delatan cada equipo, con su peso. Un parlante se reparte
+   entre amplificador, gabinete y monitor porque MobileNet no los distingue. */
+const MAPA = {
+  "electric guitar": { guitarra: 1 }, "acoustic guitar": { guitarra: 1 }, "banjo": { guitarra: .8 },
+  "drum": { bateria: 1 }, "drumstick": { bateria: .8 }, "gong": { bateria: .7 }, "chime": { bateria: .5 }, "steel drum": { bateria: .8 },
+  "grand piano": { teclado: 1 }, "upright": { teclado: 1 }, "organ": { teclado: .8 },
+  "computer keyboard": { teclado: .6 }, "typewriter keyboard": { teclado: .5 }, "space bar": { teclado: .4 },
+  "microphone": { mic: 1 }, "tripod": { mic: .35 },
+  "loudspeaker": { amp: .5, bajo: .25, monitor: .25 }, "radio": { amp: .5 }, "tape player": { amp: .4 },
+  "cassette player": { amp: .3 }, "CD player": { amp: .3 }, "home theater": { monitor: .3, amp: .2 },
+};
+const corto = (c) => c.split(",")[0];
+const INDICES = CLASES.map((c, i) => [corto(c), i]).filter(([n]) => MAPA[n]);
+
+/* ───────── Escena ───────── */
+const escenario = $("escenario");
+const renderer = new THREE.WebGLRenderer({ canvas: $("lienzo"), antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 1, 0.05, 50);
+camera.position.set(0, 1.7, 5.2);
+const controles = new OrbitControls(camera, renderer.domElement);
+controles.target.set(0, 1.05, 0);
+controles.enablePan = false; controles.enableDamping = true;
+controles.minDistance = 2.4; controles.maxDistance = 9;
+controles.maxPolarAngle = Math.PI * 0.62;
+controles.autoRotate = true; controles.autoRotateSpeed = 1.4;
+
+/* Fondo: la cámara o la foto, oscurecidas para que el holograma brille encima. */
+const fondoU = { tFondo: { value: null }, uHay: { value: 0 }, uEscala: { value: new THREE.Vector2(1, 1) }, uTiempo: { value: 0 } };
+const fondoScene = new THREE.Scene();
+const fondoCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+fondoScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({
+  uniforms: fondoU, depthWrite: false, depthTest: false,
+  vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.,1.); }`,
+  fragmentShader: `
+    uniform sampler2D tFondo; uniform float uHay, uTiempo; uniform vec2 uEscala; varying vec2 vUv;
+    void main(){
+      vec2 c = vUv - .5;
+      float vig = smoothstep(1.1, .2, length(c));
+      vec3 base = mix(vec3(.004,.012,.02), vec3(.02,.05,.07), vig);
+      if (uHay > .5) {
+        vec3 v = texture2D(tFondo, c * uEscala + .5).rgb;
+        float l = dot(v, vec3(.299,.587,.114));
+        v = mix(v, vec3(l) * vec3(.75,.95,1.), .35) * .42 * (.75 + .25 * vig);
+        v *= .94 + .06 * sin(vUv.y * 900. - uTiempo * 8.);
+        base = v;
+      }
+      gl_FragColor = vec4(base, 1.);
+    }`,
+})));
+
+/* Material del holograma: borde brillante (fresnel), líneas de barrido, una banda que sube
+   y el corte "uRevela" que lo va dibujando de abajo hacia arriba al reconocerlo. */
+const holoU = { uColor: { value: new THREE.Color(COLORES.cian) }, uTiempo: { value: 0 }, uRevela: { value: 10 }, uParpadeo: { value: 1 } };
+const vertHolo = `
+  varying vec3 vN; varying vec3 vV; varying vec3 vW;
+  void main(){
+    vec4 w = modelMatrix * vec4(position, 1.); vW = w.xyz;
+    vec4 mv = viewMatrix * w; vV = -mv.xyz;
+    vN = normalize(normalMatrix * normal);
+    gl_Position = projectionMatrix * mv;
+  }`;
+const fragComun = `
+  uniform vec3 uColor; uniform float uTiempo, uRevela, uParpadeo; varying vec3 vW;
+  float banda(){ float y = fract(uTiempo * .22) * 3.4 - .4; return exp(-pow((vW.y - y) * 7., 2.)); }
+  float frente(){ return smoothstep(.07, 0., uRevela - vW.y); }`;
+const matHolo = new THREE.ShaderMaterial({
+  uniforms: holoU, vertexShader: vertHolo, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+  fragmentShader: fragComun + `
+    varying vec3 vN; varying vec3 vV;
+    void main(){
+      if (vW.y > uRevela) discard;
+      float f = pow(1. - abs(dot(normalize(vN), normalize(vV))), 2.2);
+      float lin = smoothstep(.55, 1., sin(vW.y * 140. - uTiempo * 5.)) * .22;
+      float a = (.05 + f * .6 + lin + banda() * .3 + frente() * .9) * uParpadeo;
+      gl_FragColor = vec4(uColor * (.55 + f * 1.2 + frente() * 2.), a);
+    }`,
+});
+const matLinea = new THREE.ShaderMaterial({
+  uniforms: holoU, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  vertexShader: `varying vec3 vW; void main(){ vec4 w = modelMatrix * vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`,
+  fragmentShader: fragComun + `
+    void main(){
+      if (vW.y > uRevela) discard;
+      gl_FragColor = vec4(uColor * (1.3 + banda() + frente() * 2.), (.75 + banda() * .25) * uParpadeo);
+    }`,
+});
+
+/* Proyector: base, aros, haz de luz y partículas que suben. */
+const conColor = []; // materiales básicos que siguen el color elegido
+function basico(op) { const m = new THREE.MeshBasicMaterial({ color: COLORES.cian, transparent: true, opacity: op, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }); conColor.push(m); return m; }
+const proyector = new THREE.Group(); scene.add(proyector);
+const plano = (g) => { g.rotateX(-Math.PI / 2); return g; };
+proyector.add(new THREE.Mesh(plano(new THREE.RingGeometry(1.12, 1.18, 96)), basico(.9)));
+proyector.add(new THREE.Mesh(plano(new THREE.RingGeometry(.92, .94, 96)), basico(.5)));
+const aroGira = new THREE.Group(); proyector.add(aroGira);
+for (let i = 0; i < 12; i++) aroGira.add(new THREE.Mesh(plano(new THREE.RingGeometry(1.24, 1.3, 12, 1, i * Math.PI / 6, Math.PI / 9)), basico(.8)));
+proyector.add(new THREE.Mesh(plano(new THREE.CircleGeometry(1.12, 64)), basico(.06)));
+const hazU = { uColor: holoU.uColor, uTiempo: holoU.uTiempo };
+const haz = new THREE.Mesh(new THREE.CylinderGeometry(1.35, 1.12, 3, 64, 1, true), new THREE.ShaderMaterial({
+  uniforms: hazU, transparent: true, depthWrite: false, side: THREE.DoubleSide, blending: THREE.AdditiveBlending,
+  vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); }`,
+  fragmentShader: `uniform vec3 uColor; uniform float uTiempo; varying vec2 vUv;
+    void main(){ float r = .5 + .5 * sin(vUv.x * 120. + uTiempo * 1.5); float a = pow(1. - vUv.y, 2.5) * (.06 + .05 * r); gl_FragColor = vec4(uColor, a); }`,
+}));
+haz.position.y = 1.5; proyector.add(haz);
+const NP = 160, posP = new Float32Array(NP * 3), velP = new Float32Array(NP);
+for (let i = 0; i < NP; i++) { const r = Math.sqrt(Math.random()) * 1.1, a = Math.random() * 6.283; posP.set([Math.cos(a) * r, Math.random() * 2.8, Math.sin(a) * r], i * 3); velP[i] = .15 + Math.random() * .35; }
+const geoP = new THREE.BufferGeometry(); geoP.setAttribute("position", new THREE.BufferAttribute(posP, 3));
+const matP = new THREE.PointsMaterial({ color: COLORES.cian, size: .028, transparent: true, opacity: .8, blending: THREE.AdditiveBlending, depthWrite: false }); conColor.push(matP);
+proyector.add(new THREE.Points(geoP, matP));
+const plataforma = new THREE.Mesh(plano(new THREE.PlaneGeometry(2.8, .06)), basico(1)); // línea del corte mientras se dibuja
+plataforma.visible = false; scene.add(plataforma);
+
+/* ───────── Piezas para construir los equipos ───────── */
+const ARRIBA = new THREE.Vector3(0, 1, 0);
+function pieza(g, geo, x, y, z, rx = 0, ry = 0, rz = 0, umbral = 28) {
+  const m = new THREE.Mesh(geo, matHolo);
+  m.position.set(x, y, z); m.rotation.set(rx, ry, rz);
+  m.add(new THREE.LineSegments(new THREE.EdgesGeometry(geo, umbral), matLinea));
+  g.add(m); return m;
+}
+const caja = (w, h, d, r = .015) => new RoundedBoxGeometry(w, h, d, 2, r);
+const cil = (rt, rb, h, s = 32) => new THREE.CylinderGeometry(rt, rb, h, s);
+const aro = (r, t = .008) => new THREE.TorusGeometry(r, t, 6, 48);
+function barra(g, a, b, r = .012) {
+  const A = new THREE.Vector3(...a), B = new THREE.Vector3(...b), d = B.clone().sub(A);
+  const m = pieza(g, cil(r, r, d.length(), 8), 0, 0, 0, 0, 0, 0, 70);
+  m.position.copy(A).add(B).multiplyScalar(.5);
+  m.quaternion.setFromUnitVectors(ARRIBA, d.normalize());
+  return m;
+}
+function perillas(g, n, x0, paso, y, z, r = .014) { for (let i = 0; i < n; i++) pieza(g, cil(r, r, .02, 16), x0 + i * paso, y, z, Math.PI / 2); }
+function cono(g, r, x, y, z, rx = 0) { // parlante visto de frente: aro, cono y tapa
+  const p = new THREE.Group(); p.position.set(x, y, z); p.rotation.x = rx; g.add(p);
+  pieza(p, aro(r), 0, 0, 0);
+  pieza(p, new THREE.CylinderGeometry(r * .3, r * .95, r * .35, 32, 1, true), 0, 0, -r * .17, -Math.PI / 2);
+  pieza(p, new THREE.SphereGeometry(r * .28, 16, 8, 0, 6.283, 0, 1.2), 0, 0, -r * .2, Math.PI / 2);
+  return p;
+}
+function extruir(puntos, prof, bisel = 0) {
+  const s = new THREE.Shape(puntos.map(([x, y]) => new THREE.Vector2(x, y)));
+  return new THREE.ExtrudeGeometry(s, { depth: prof, bevelEnabled: bisel > 0, bevelSize: bisel, bevelThickness: bisel, bevelSegments: 2, curveSegments: 24 });
+}
+
+const CONSTRUIR = {
+  amp(g) {
+    pieza(g, caja(.72, .56, .28, .03), 0, .28, 0);
+    pieza(g, caja(.64, .36, .012, .004), 0, .22, .14);
+    cono(g, .12, -.16, .22, .15); cono(g, .12, .16, .22, .15);
+    pieza(g, caja(.64, .09, .012, .004), 0, .46, .14);
+    perillas(g, 9, -.26, .065, .46, .155);
+    pieza(g, caja(.2, .025, .05, .01), 0, .575, 0);
+    for (const x of [-.3, .3]) for (const z of [-.1, .1]) pieza(g, cil(.025, .025, .02, 12), x, -.01, z);
+  },
+  bajo(g) {
+    pieza(g, caja(.62, 1.22, .42, .03), 0, .65, 0);
+    for (let f = 0; f < 4; f++) for (const x of [-.145, .145]) cono(g, .115, x, .24 + f * .27, .215);
+    pieza(g, caja(.62, .22, .34, .02), 0, 1.38, -.02);
+    pieza(g, caja(.56, .11, .01, .004), 0, 1.38, .155);
+    perillas(g, 10, -.24, .053, 1.38, .165, .012);
+    for (const x of [-.24, .24]) for (const z of [-.15, .15]) pieza(g, new THREE.SphereGeometry(.035, 12, 8), x, .035, z);
+  },
+  bateria(g) {
+    pieza(g, cil(.29, .29, .42), 0, .3, 0, Math.PI / 2);
+    pieza(g, aro(.29, .012), 0, .3, .21); pieza(g, aro(.29, .012), 0, .3, -.21);
+    pieza(g, aro(.08, .006), 0, .3, .215);
+    barra(g, [-.18, .05, .3], [-.24, 0, .38]); barra(g, [.18, .05, .3], [.24, 0, .38]);
+    pieza(g, cil(.15, .15, .2), -.17, .78, .04, .35); pieza(g, cil(.16, .16, .22), .18, .78, .04, .35);
+    barra(g, [0, .58, 0], [-.12, .72, .02]); barra(g, [0, .58, 0], [.12, .72, .02]);
+    pieza(g, cil(.18, .18, .14), -.46, .66, .32, .12);
+    for (const a of [0, 2.1, 4.2]) barra(g, [-.46, .58, .32], [-.46 + Math.cos(a) * .2, 0, .32 + Math.sin(a) * .2]);
+    pieza(g, cil(.22, .22, .42), .5, .46, .34);
+    for (const a of [.8, 2.4, 4.2]) barra(g, [.5 + Math.cos(a) * .24, .35, .34 + Math.sin(a) * .24], [.5 + Math.cos(a) * .3, 0, .34 + Math.sin(a) * .3]);
+    pieza(g, cil(.18, .18, .012), -.78, .96, .2); pieza(g, cil(.18, .18, .012), -.78, .99, .2);
+    barra(g, [-.78, 0, .2], [-.78, .96, .2]);
+    for (const a of [0, 2.1, 4.2]) barra(g, [-.78, .3, .2], [-.78 + Math.cos(a) * .2, 0, .2 + Math.sin(a) * .2]);
+    pieza(g, cil(.012, .24, .03), -.48, 1.42, -.18, .35, 0, .2);
+    barra(g, [-.48, 0, -.4], [-.48, 1.12, -.25]); barra(g, [-.48, 1.12, -.25], [-.48, 1.4, -.18]);
+    pieza(g, cil(.012, .28, .03), .62, 1.2, -.12, .3, 0, -.25);
+    barra(g, [.7, 0, -.35], [.68, .95, -.2]); barra(g, [.68, .95, -.2], [.62, 1.18, -.12]);
+    pieza(g, cil(.19, .19, .08), 0, .55, .82);
+    barra(g, [0, .51, .82], [0, .12, .82]);
+    for (const a of [0, 2.1, 4.2]) barra(g, [0, .12, .82], [Math.cos(a) * .25, 0, .82 + Math.sin(a) * .25]);
+  },
+  teclado(g) {
+    pieza(g, caja(1.34, .11, .34, .02), 0, .84, 0);
+    pieza(g, caja(1.22, .025, .16, .004), 0, .9, .07);
+    const lineas = [];
+    for (let i = 1; i < 52; i++) { const x = -.61 + i * 1.22 / 52; lineas.push(x, .913, -.01, x, .913, .15); }
+    const geoL = new THREE.BufferGeometry(); geoL.setAttribute("position", new THREE.Float32BufferAttribute(lineas, 3));
+    g.add(new THREE.LineSegments(geoL, matLinea));
+    const negra = new THREE.BoxGeometry(.012, .018, .09);
+    for (let i = 0; i < 51; i++) if ([0, 2, 3, 5, 6].includes((i + 5) % 7)) pieza(g, negra, -.61 + (i + 1) * 1.22 / 52, .925, .03);
+    pieza(g, caja(1.2, .06, .012, .004), 0, .86, -.155);
+    perillas(g, 12, -.55, .04, .87, .17, .009);
+    for (const x of [-.45, .45]) { barra(g, [x, 0, .17], [x, .78, -.15], .016); barra(g, [x, 0, -.17], [x, .78, .15], .016); barra(g, [x, .78, -.17], [x, .78, .17]); }
+    barra(g, [-.45, .39, 0], [.45, .39, 0], .016);
+    pieza(g, caja(.1, .02, .16, .008), .3, .01, .45);
+  },
+  guitarra(g) {
+    const cuerpo = new THREE.Shape();
+    cuerpo.moveTo(0, -.24);
+    cuerpo.bezierCurveTo(.22, -.24, .22, -.05, .13, 0);
+    cuerpo.bezierCurveTo(.1, .04, .14, .13, .16, .21);
+    cuerpo.bezierCurveTo(.11, .25, .06, .12, .03, .11);
+    cuerpo.lineTo(-.03, .11);
+    cuerpo.bezierCurveTo(-.08, .13, -.1, .3, -.16, .27);
+    cuerpo.bezierCurveTo(-.21, .22, -.12, .06, -.14, 0);
+    cuerpo.bezierCurveTo(-.22, -.06, -.2, -.24, 0, -.24);
+    const geoC = new THREE.ExtrudeGeometry(cuerpo, { depth: .045, bevelEnabled: true, bevelSize: .008, bevelThickness: .008, bevelSegments: 2, curveSegments: 28 });
+    geoC.translate(0, 0, -.0225);
+    const gt = new THREE.Group(); gt.position.set(0, .36, 0); gt.rotation.x = -.22; g.add(gt);
+    pieza(gt, geoC, 0, 0, 0, 0, 0, 0, 40);
+    pieza(gt, caja(.052, .62, .025, .006), 0, .42, .01);
+    pieza(gt, caja(.085, .19, .016, .008), .008, .82, .005, 0, 0, -.05);
+    for (const y of [-.08, .02, .1]) pieza(gt, caja(.075, .02, .008, .003), 0, y, .033);
+    pieza(gt, caja(.09, .018, .01, .003), 0, -.15, .033);
+    perillas(gt, 3, .07, .035, -.12, .035, .01);
+    for (let i = 0; i < 6; i++) { const x = -.0125 + i * .005; const l = []; l.push(x, -.15, .042, x * 1.6, .74, .028); const geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.Float32BufferAttribute(l, 3)); gt.add(new THREE.LineSegments(geo, matLinea)); }
+    barra(g, [-.18, 0, .18], [-.04, .7, -.06]); barra(g, [.18, 0, .18], [.04, .7, -.06]); barra(g, [0, 0, -.25], [0, .7, -.08]);
+    barra(g, [-.18, .14, .13], [.18, .14, .13]);
+  },
+  mic(g) {
+    for (const a of [0, 2.094, 4.189]) barra(g, [0, .42, 0], [Math.cos(a) * .36, 0, Math.sin(a) * .36], .014);
+    barra(g, [0, .42, 0], [0, 1.22, 0], .014);
+    pieza(g, cil(.028, .028, .06, 16), 0, 1.22, 0, 0, 0, Math.PI / 2);
+    barra(g, [-.36, 1.04, 0], [.46, 1.48, 0], .011);
+    pieza(g, cil(.045, .045, .08, 16), -.36, 1.04, 0, 0, 0, 1.07);
+    const m = new THREE.Group(); m.position.set(.5, 1.5, 0); m.rotation.z = -1.07 - .5; g.add(m);
+    pieza(m, cil(.024, .017, .14, 20), 0, 0, 0);
+    pieza(m, new THREE.SphereGeometry(.034, 20, 12), 0, .095, 0);
+    pieza(m, aro(.026, .004), 0, .07, 0, Math.PI / 2);
+  },
+  monitor(g) {
+    const geo = extruir([[.3, 0], [-.22, 0], [-.22, .4], [.3, .1]], .58, .012);
+    geo.rotateY(-Math.PI / 2); geo.translate(.29, 0, 0);
+    pieza(g, geo, 0, 0, 0, 0, 0, 0, 30);
+    const n = new THREE.Vector3(0, .52, .3).normalize();
+    const cara = new THREE.Group(); cara.position.set(0, .25, .04).addScaledVector(n, .015);
+    cara.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), n); g.add(cara);
+    cono(cara, .14, -.09, 0, 0);
+    pieza(cara, caja(.16, .08, .012, .004), .19, 0, 0);
+    pieza(cara, caja(.5, .02, .01, .004), 0, -.2, 0);
+  },
+};
+
+/* ───────── Mostrar un equipo como holograma ───────── */
+const giro = new THREE.Group(); scene.add(giro);
+let actual = null, revelado = { desde: 0, hasta: 0, t0: -1 };
+function mostrar(id, { conf = null, fuente = "catalogo" } = {}) {
+  giro.traverse((o) => { if (o.geometry && o !== giro) o.geometry.dispose(); });
+  giro.clear();
+  const g = new THREE.Group(); CONSTRUIR[id](g);
+  const caja3 = new THREE.Box3().setFromObject(g), tam = caja3.getSize(new THREE.Vector3());
+  const s = Math.min(2.1 / tam.y, 2.0 / Math.max(tam.x, tam.z));
+  g.scale.setScalar(s);
+  const centro = caja3.getCenter(new THREE.Vector3());
+  g.position.set(-centro.x * s, -caja3.min.y * s + .02, -centro.z * s);
+  giro.add(g);
+  const alto = tam.y * s + .02;
+  revelado = { desde: -.05, hasta: alto + .1, t0: performance.now() };
+  holoU.uRevela.value = -.05;
+  controles.target.set(0, Math.max(.7, alto * .5), 0);
+  actual = id;
+  pintarFicha(id, conf, fuente);
+  for (const b of document.querySelectorAll(".chip")) b.setAttribute("aria-pressed", String(b.dataset.id === id));
+  giro.visible = true;
+  escenario.classList.add("mostrando");
+}
+
+function pintarFicha(id, conf, fuente) {
+  const e = EQUIPOS[id];
+  $("hudTitulo").textContent = fuente === "catalogo" ? "Holograma · catálogo" : "Equipo detectado";
+  $("hudNombre").textContent = e.nombre;
+  $("hudConf").hidden = conf == null;
+  if (conf != null) $("hudConf").textContent = `${Math.round(conf * 100)} % de seguridad`;
+  const parecidos = id === "amp" || id === "bajo" || id === "monitor"
+    ? `<p class="tipo">MobileNet ve un parlante: puede ser también ${["amp", "bajo", "monitor"].filter((x) => x !== id).map((x) => EQUIPOS[x].nombre.toLowerCase()).join(" o ")}. Toca el correcto en el catálogo.</p>` : "";
+  $("ficha").innerHTML = `<h2>Ficha</h2><h3>${e.nombre}</h3><p class="tipo">${e.tipo}</p>${fuente !== "catalogo" ? parecidos : ""}
+    <dl><dt>Referencias</dt><dd>${e.ejemplos}</dd><dt>Energía</dt><dd>${e.energia}</dd><dt>Canal</dt><dd>${e.canal}</dd></dl>
+    <h2>Qué revisar</h2><ul>${e.revisar.map((r) => `<li>${r}</li>`).join("")}</ul>`;
+}
+
+const cat = $("catalogo");
+for (const [id, e] of Object.entries(EQUIPOS)) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "chip"; b.dataset.id = id; b.textContent = e.nombre; b.setAttribute("aria-pressed", "false");
+  b.onclick = () => mostrar(id); cat.append(b);
+}
+
+/* ───────── Cámara, foto y reconocimiento ───────── */
+const video = document.createElement("video");
+video.playsInline = true; video.muted = true; video.setAttribute("playsinline", "");
+let flujo = null, foto = null, modelo = null, ocupado = false;
+
+function aviso(txt, ms = 3500) {
+  const a = $("aviso"); a.textContent = txt; a.hidden = !txt;
+  clearTimeout(aviso.t); if (txt && ms) aviso.t = setTimeout(() => (a.hidden = true), ms);
+}
+function fondo(tex, w, h) {
+  if (fondoU.tFondo.value && fondoU.tFondo.value !== tex) fondoU.tFondo.value.dispose();
+  fondoU.tFondo.value = tex; fondoU.uHay.value = tex ? 1 : 0; fondoU.dims = tex ? [w, h] : null; ajustarFondo();
+}
+function ajustarFondo() {
+  if (!fondoU.dims) return;
+  const [w, h] = fondoU.dims, ac = escenario.clientWidth / escenario.clientHeight, ai = w / h;
+  fondoU.uEscala.value.set(ac > ai ? 1 : ac / ai, ac > ai ? ai / ac : 1); // cubrir sin deformar
+}
+
+$("btnCamara").onclick = async () => {
+  if (flujo) { flujo.getTracks().forEach((t) => t.stop()); flujo = null; fondo(null); camaraUI(false); return; }
+  try {
+    flujo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 960 } }, audio: false });
+    video.srcObject = flujo; await video.play();
+    const tex = new THREE.VideoTexture(video); tex.colorSpace = THREE.SRGBColorSpace;
+    fondo(tex, video.videoWidth, video.videoHeight); foto = null; camaraUI(true);
+    cargarModelo();
+  } catch (err) {
+    flujo = null;
+    aviso(err && err.name === "NotAllowedError" ? "No hay permiso para la cámara. Puedes subir una foto." : "No se pudo abrir la cámara. Puedes subir una foto.", 5000);
+  }
+};
+function camaraUI(on) {
+  $("btnCamara").textContent = on ? "Apagar" : "Cámara";
+  $("btnEscanear").disabled = !on;
+  $("hudEstado").textContent = on ? "● En vivo" : foto ? "● Foto" : "● Sin cámara";
+  escenario.classList.toggle("con-camara", on);
+  if (on) { escenario.classList.remove("mostrando"); giro.visible = false; $("hudTitulo").textContent = "Apunta al equipo"; $("hudNombre").textContent = "—"; $("hudConf").hidden = true; aviso("Pon el equipo dentro del recuadro y pulsa Escanear"); }
+}
+
+$("btnFoto").onclick = () => $("archivo").click();
+$("archivo").onchange = async (ev) => {
+  const f = ev.target.files[0]; ev.target.value = ""; if (!f) return;
+  const img = new Image(); img.src = URL.createObjectURL(f);
+  try { await img.decode(); } catch { aviso("No se pudo leer la imagen."); return; }
+  if (flujo) { flujo.getTracks().forEach((t) => t.stop()); flujo = null; camaraUI(false); }
+  foto = img;
+  const tex = new THREE.Texture(img); tex.colorSpace = THREE.SRGBColorSpace; tex.needsUpdate = true;
+  fondo(tex, img.naturalWidth, img.naturalHeight);
+  $("hudEstado").textContent = "● Foto";
+  escanear(img, 1);
+};
+$("btnEscanear").onclick = () => escanear(video, 6);
+
+async function cargarModelo() {
+  if (modelo) return modelo;
+  if (!cargarModelo.p) cargarModelo.p = (async () => {
+    $("hudEstado").textContent = "● Cargando modelo…";
+    await tf.ready();
+    const m = await tf.loadLayersModel("modelo/model.json");
+    tf.tidy(() => m.predict(tf.zeros([1, 224, 224, 3]))); // calienta los shaders
+    modelo = m;
+    $("hudEstado").textContent = flujo ? "● En vivo" : foto ? "● Foto" : "● Sin cámara";
+    return m;
+  })().catch((e) => { cargarModelo.p = null; throw e; });
+  return cargarModelo.p;
+}
+
+async function probabilidades(fuente) {
+  const t = tf.tidy(() => {
+    let img = tf.browser.fromPixels(fuente);
+    const [h, w] = img.shape, s = Math.min(h, w);
+    img = img.slice([Math.floor((h - s) / 2), Math.floor((w - s) / 2), 0], [s, s, 3]); // centro cuadrado, como la mira
+    img = tf.image.resizeBilinear(img, [224, 224]).toFloat().div(127.5).sub(1).expandDims(0);
+    return modelo.predict(img).reshape([-1]);
+  });
+  const p = await t.data(); t.dispose(); return p;
+}
+
+async function escanear(fuente, cuadros) {
+  if (ocupado) return; ocupado = true;
+  escenario.classList.add("escaneando"); escenario.classList.remove("mostrando"); giro.visible = false;
+  $("btnEscanear").disabled = true; aviso("Escaneando…", 0);
+  try {
+    await cargarModelo();
+    const suma = new Float32Array(1000);
+    for (let i = 0; i < cuadros; i++) {
+      const p = await probabilidades(fuente);
+      for (let k = 0; k < 1000; k++) suma[k] += p[k] / cuadros;
+      if (i < cuadros - 1) await new Promise((r) => setTimeout(r, 110));
+    }
+    resultado(suma);
+  } catch (e) {
+    console.error(e); aviso("No se pudo cargar el modelo de reconocimiento.", 5000);
+  } finally {
+    ocupado = false; escenario.classList.remove("escaneando"); $("btnEscanear").disabled = !flujo;
+  }
+}
+
+function resultado(p) {
+  const puntaje = {};
+  for (const [n, i] of INDICES) for (const [eq, w] of Object.entries(MAPA[n])) puntaje[eq] = (puntaje[eq] || 0) + p[i] * w;
+  const [mejor, conf] = Object.entries(puntaje).sort((a, b) => b[1] - a[1])[0] || [null, 0];
+  const top = [...p].map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]).slice(0, 5);
+  $("vioVacio").hidden = true;
+  $("vio").innerHTML = top.map(([v, i]) => {
+    const n = corto(CLASES[i]), eq = MAPA[n] && Object.keys(MAPA[n])[0];
+    return `<li class="${eq ? "eq" : ""}"><span class="n">${n}${eq ? ` → <em>${EQUIPOS[eq].nombre}</em>` : ""}</span><span class="p">${(v * 100).toFixed(1)}%</span><span class="barra"><i style="width:${Math.max(2, v * 100)}%"></i></span></li>`;
+  }).join("");
+  if (mejor && conf >= .08) { aviso(""); mostrar(mejor, { conf: Math.min(1, conf), fuente: "camara" }); }
+  else { if (!flujo) giro.visible = true; aviso(`No reconozco equipo de backline (parece "${corto(CLASES[top[0][1]])}"). Acércate más o elige en el catálogo.`, 6000); }
+}
+
+/* ───────── Color, giro, tamaño y animación ───────── */
+for (const r of document.querySelectorAll('input[name="color"]')) r.onchange = () => {
+  const c = COLORES[r.value]; holoU.uColor.value.setHex(c); conColor.forEach((m) => m.color.setHex(c));
+  document.documentElement.style.setProperty("--holo", r.value === "cian" ? "#35e0ff" : "#ff7a2e");
+};
+$("girar").onchange = (e) => (controles.autoRotate = e.target.checked);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(fondoScene, fondoCam));
+const pasoEscena = new RenderPass(scene, camera); pasoEscena.clear = false; composer.addPass(pasoEscena);
+const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), .85, .55, .5); composer.addPass(bloom);
+composer.addPass(new OutputPass());
+
+function tamano() {
+  const w = escenario.clientWidth, h = escenario.clientHeight;
+  renderer.setSize(w, h, false); composer.setSize(w, h);
+  camera.aspect = w / h; camera.position.z = w / h < .8 ? 6.6 : 5.2; camera.updateProjectionMatrix(); ajustarFondo();
+}
+new ResizeObserver(tamano).observe(escenario); tamano();
+
+const reloj = new THREE.Clock(); let falla = 0;
+const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(reloj.getDelta(), .05), t = reloj.elapsedTime;
+  holoU.uTiempo.value = t; fondoU.uTiempo.value = t;
+  if (revelado.t0 >= 0) {
+    const k = Math.min(1, (performance.now() - revelado.t0) / (reducido ? 1 : 1700));
+    const y = revelado.desde + (revelado.hasta - revelado.desde) * (1 - Math.pow(1 - k, 2));
+    holoU.uRevela.value = y; plataforma.visible = k < 1; plataforma.position.y = y;
+    if (k >= 1) { holoU.uRevela.value = 10; revelado.t0 = -1; }
+  }
+  // Parpadeo de holograma y una falla breve de vez en cuando.
+  if (!reducido && falla <= 0 && Math.random() < .004) falla = .12;
+  falla -= dt;
+  holoU.uParpadeo.value = falla > 0 ? .45 + Math.random() * .3 : .93 + .07 * Math.sin(t * 43);
+  giro.position.x = falla > 0 ? (Math.random() - .5) * .05 : 0;
+  aroGira.rotation.y = t * .4;
+  for (let i = 0; i < NP; i++) { posP[i * 3 + 1] += velP[i] * dt; if (posP[i * 3 + 1] > 2.9) posP[i * 3 + 1] = 0; }
+  geoP.attributes.position.needsUpdate = true;
+  controles.update();
+  composer.render();
+});
+
+mostrar("amp");
+</script>
+</body>
+</html>
