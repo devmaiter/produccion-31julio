@@ -337,7 +337,7 @@ function htmlSubir(){
     cuerpo = `
       <div class="encontre"><strong data-to="${r.items}">${r.items}</strong></div>
       <h2>Ítems <em>encontrados</em></h2>
-      <p class="sub">${r.bandas} ${r.bandas === 1 ? "banda" : "bandas"} · ${r.cats} ${r.cats === 1 ? "categoría" : "categorías"}${r.dudosos ? ` · ${r.dudosos} por confirmar` : ""}${r.avisos ? ` · ${r.avisos} cosas que el lector no entendió` : ""}</p>
+      <p class="sub">${r.bandas} ${r.bandas === 1 ? "banda" : "bandas"} · ${r.cats} ${r.cats === 1 ? "categoría" : "categorías"}${r.dudosos ? ` · ${r.dudosos} por confirmar` : ""}${r.avisos ? ` · ${r.avisos} ${r.avisos === 1 ? "aviso" : "avisos"} del lector` : ""}</p>
       <div class="botones"><button class="btn" data-acc="ver">Ver mis reels ${PC ? "↓" : "↑"}</button><button class="btn sec" data-acc="otro">Subir otro</button></div>${lista}`;
   } else cuerpo = `
       <button class="orbe" data-acc="elegir" aria-label="Elegir un documento"><span class="anillo"></span><span class="nucleo">+</span></button>
