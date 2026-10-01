@@ -16,6 +16,7 @@
   --accent:#ff6a1f; --accent-ink:#000; --ok:#3fbf77; --warn:#ffa83a;
   --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --gx:18px;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -32,7 +33,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* Carrusel horizontal dentro del reel */
 .slides{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none}
 .slides::-webkit-scrollbar{display:none}
-.slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;padding:calc(env(safe-area-inset-top) + 64px) 76px calc(env(safe-area-inset-bottom) + 34px) 18px;display:flex;flex-direction:column;overflow:hidden}
+.slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;padding:calc(env(safe-area-inset-top) + 64px) 76px calc(env(safe-area-inset-bottom) + 34px) var(--gx);display:flex;flex-direction:column;overflow:hidden}
 
 /* Barra de progreso tipo historias */
 .prog{position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;display:flex;gap:4px;pointer-events:none}
@@ -44,7 +45,7 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 
 /* Portada */
 .portada{justify-content:flex-end}
-.holo{flex:1;min-height:0;position:relative;margin:0 -76px 8px -18px;display:flex;align-items:center;padding-left:18px}
+.holo{flex:1;min-height:0;position:relative;margin:0 -76px 8px calc(-1 * var(--gx));display:flex;align-items:center;padding-left:var(--gx)}
 .holo .lienzo3d{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .holo.con3d .emoji{display:none}
 .emoji{font-size:clamp(90px,30vw,150px);line-height:1;filter:drop-shadow(0 10px 30px rgba(0,0,0,.6));transform:scale(.6);opacity:0;transition:transform .5s cubic-bezier(.2,1.4,.4,1),opacity .4s}
@@ -112,12 +113,41 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
   .teclas kbd{font-family:inherit;border:1px solid var(--line);border-radius:4px;padding:0 5px;color:var(--ink2)}
 }
 @media (max-width:699px){.teclas{display:none}}
+@media (min-width:900px) and (hover:hover){.teclas{left:auto;right:24px;text-align:right}}
+
+/* En PC no se desliza con el dedo: flechas sobre el reel, ↑ ↓ al lado y el índice fijo a la izquierda. */
+.lado,.flechas-v,.pasar{display:none}
+@media (hover:hover) and (pointer:fine){
+  .pasar{display:grid;place-items:center;position:absolute;z-index:4;top:50%;width:40px;height:40px;margin-top:-20px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid var(--line);font-size:20px;color:var(--ink);opacity:.75;transition:opacity .15s,background .15s}
+  .pasar:hover,.pasar:focus-visible{opacity:1;background:var(--accent);color:var(--accent-ink);outline:none}
+  .pasar.ant{left:8px}.pasar.sig{right:8px}
+  :root{--gx:58px}
+  .pasar[disabled]{display:none}
+  .reel .riel{right:12px}
+}
+@media (min-width:900px) and (hover:hover){
+  .flechas-v{display:flex;flex-direction:column;gap:10px;position:fixed;z-index:6;top:50%;left:calc(50% + 260px + 20px);transform:translateY(-50%)}
+  .flechas-v button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:20px;transition:background .15s,border-color .15s}
+  .flechas-v button:hover,.flechas-v button:focus-visible{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);outline:none}
+  .flechas-v button[disabled]{opacity:.3;pointer-events:none}
+  .lado{display:block;position:fixed;z-index:6;top:24px;bottom:120px;right:calc(50% + 260px + 24px);width:min(240px,calc(50vw - 300px));overflow-y:auto;scrollbar-width:thin}
+  .lado h1{font-family:var(--display);font-size:26px;line-height:1;text-transform:uppercase;letter-spacing:.03em;color:var(--accent);margin:0 0 4px}
+  .lado p{font-size:12px;color:var(--ink3);margin:0 0 14px}
+  .lado button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;text-align:left;color:var(--ink2);transition:background .15s}
+  .lado button:hover,.lado button:focus-visible{background:var(--surface2);outline:none}
+  .lado button[aria-current="true"]{background:var(--surface);color:var(--ink);box-shadow:inset 3px 0 0 var(--accent)}
+  .lado .e{font-size:18px;width:24px;text-align:center}
+  .lado .x{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink3);font-size:13px}
+  .lado .ok{color:var(--ok);font-weight:700}
+}
 @media (prefers-reduced-motion:reduce){.emoji,.pista .flecha,.arriba,.corazon.go{animation:none;transition:none}.emoji{transform:none;opacity:1}}
 </style>
 </head>
 <body>
 <main id="feed" aria-label="Backline por categoría"><div class="cargando">Cargando el backline de Cordillera 2026…</div></main>
 <div class="teclas"><b>Lab reels.</b> En el celular se desliza. Aquí: <kbd>↑</kbd><kbd>↓</kbd> categoría, <kbd>←</kbd><kbd>→</kbd> banda, doble clic marca listo.</div>
+<nav class="lado" id="lado" aria-label="Categorías"></nav>
+<div class="flechas-v"><button id="sube" aria-label="Categoría anterior">↑</button><button id="baja" aria-label="Categoría siguiente">↓</button></div>
 <div class="hoja" id="indice" hidden><div class="panel" role="dialog" aria-label="Índice"><h4>Categorías</h4><div id="filas"></div></div></div>
 <div class="visor" id="visor" hidden><img alt=""></div>
 
@@ -128,6 +158,7 @@ const ORDEN = ["Batería","Platillos","Percusión","Teclado","Ampli bajo","Ampli
 const EMOJI = {"Batería":"🥁","Platillos":"🔔","Percusión":"🪘","Teclado":"🎹","Ampli bajo":"🔊","Ampli guitarra":"📢","Guitarra":"🎸","Bajo":"🎸","Bases":"🎙️","Escenario":"🏗️","Cables y energía":"🔌","DJ":"🎧"};
 const HUE = {"Batería":20,"Platillos":45,"Percusión":5,"Teclado":265,"Ampli bajo":200,"Ampli guitarra":340,"Guitarra":30,"Bajo":180,"Bases":220,"Escenario":120,"Cables y energía":55,"DJ":290};
 const CLAVE = "lab-reels:listos";
+const PC = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const slug = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-");
@@ -200,7 +231,7 @@ function htmlReel(c, i, total, primero){
         <h2>${esc(c.cat)}</h2>
         <div class="big"><strong data-to="${c.aTener}">${c.aTener}</strong><span>piezas<br>a tener</span></div>
         <div class="dias">${dias}<span class="chip ac">${c.bandas.length} ${c.bandas.length === 1 ? "banda" : "bandas"}</span>${c.dudosos ? `<span class="chip warn">${c.dudosos} por confirmar</span>` : ""}</div>
-        <p class="pista">Desliza para ver banda por banda <span class="flecha">→</span></p>
+        <p class="pista">${PC ? "Pasa con › para ver banda por banda" : "Desliza para ver banda por banda"} <span class="flecha">→</span></p>
       </section>
       <section class="slide">
         <h3>Qué hay que tener</h3>
@@ -209,13 +240,15 @@ function htmlReel(c, i, total, primero){
       </section>
       ${bandas}
     </div>
+    <button class="pasar ant" aria-label="Anterior" disabled>‹</button>
+    <button class="pasar sig" aria-label="Siguiente">›</button>
     <div class="riel">
       <button class="listo" aria-pressed="${listos.has(c.id)}"><span class="ic">✓</span><span>Listo</span></button>
       <button class="compartir"><span class="ic">↗</span><span>Enviar</span></button>
       <button class="ver-indice"><span class="ic">☰</span><span>Índice</span></button>
     </div>
     <div class="corazon" aria-hidden="true">✅</div>
-    ${primero ? `<div class="arriba">Desliza ↑ para la siguiente categoría</div>` : ""}
+    ${primero ? `<div class="arriba">${PC ? "Baja con ↓ o la rueda del mouse para la siguiente categoría" : "Desliza ↑ para la siguiente categoría"}</div>` : ""}
   </article>`;
 }
 
@@ -245,6 +278,7 @@ document.addEventListener("visibilitychange", () => {
   else { const r = document.querySelector(".lienzo3d")?.closest(".reel"); if (r) holograma(r); }
 });
 
+let pintarLado = () => {};
 function iniciar(cats){
   const feed = document.getElementById("feed");
   feed.innerHTML = cats.map((c,i) => htmlReel(c, i, cats.length, i === 0)).join("");
@@ -258,6 +292,7 @@ function iniciar(cats){
     if (!r.classList.contains("visto")) { r.classList.add("visto"); contar(r.querySelector(".big strong")); }
     holograma(r);
     history.replaceState(null, "", "#" + r.id);
+    pintarLado();
   }), {root: feed, threshold: .6});
   reels.forEach(r => io.observe(r));
   // La pista "desliza ↑" sobra en cuanto la persona ya deslizó una vez.
@@ -266,13 +301,18 @@ function iniciar(cats){
   // Progreso horizontal (las rayitas de arriba).
   for (const r of reels) {
     const s = r.querySelector(".slides"), marcas = r.querySelectorAll(".prog i");
-    const pintar = () => { const k = Math.round(s.scrollLeft / s.clientWidth); marcas.forEach((m,j) => m.classList.toggle("on", j <= k)); };
+    const ant = r.querySelector(".pasar.ant"), sig = r.querySelector(".pasar.sig");
+    const pintar = () => {
+      const k = Math.round(s.scrollLeft / s.clientWidth);
+      marcas.forEach((m,j) => m.classList.toggle("on", j <= k));
+      ant.disabled = k === 0; sig.disabled = k >= marcas.length - 1;
+    };
     s.addEventListener("scroll", pintar, {passive: true}); pintar();
   }
 
   const marcar = (r, forzar) => {
     const b = r.querySelector(".listo"), on = forzar ?? !listos.has(r.id);
-    on ? listos.add(r.id) : listos.delete(r.id); guardar();
+    on ? listos.add(r.id) : listos.delete(r.id); guardar(); pintarLado();
     b.setAttribute("aria-pressed", on);
     if (on) { const c = r.querySelector(".corazon"); c.classList.remove("go"); void c.offsetWidth; c.classList.add("go"); }
   };
@@ -286,11 +326,13 @@ function iniciar(cats){
       return;
     }
     if (e.target.closest(".ver-indice")) return abrirIndice();
+    const p = e.target.closest(".pasar");
+    if (p) return mover[p.classList.contains("sig") ? "ArrowRight" : "ArrowLeft"](r);
     const img = e.target.closest(".plot");
     if (img) { const v = document.getElementById("visor"); v.querySelector("img").src = img.src; v.hidden = false; }
   });
   // Doble toque en cualquier parte = listo, igual que el "me gusta".
-  feed.addEventListener("dblclick", e => { if (!e.target.closest(".riel")) marcar(e.target.closest(".reel"), true); });
+  feed.addEventListener("dblclick", e => { if (!e.target.closest(".riel, .pasar")) marcar(e.target.closest(".reel"), true); });
   document.getElementById("visor").addEventListener("click", e => e.currentTarget.hidden = true);
 
   const indice = document.getElementById("indice");
@@ -304,13 +346,28 @@ function iniciar(cats){
     if (f) document.getElementById(f.dataset.id).scrollIntoView({behavior: "smooth"});
   });
 
+  const mover = {
+    ArrowDown: () => reels[reels.indexOf(actual)+1]?.scrollIntoView({behavior:"smooth"}),
+    ArrowUp: () => reels[reels.indexOf(actual)-1]?.scrollIntoView({behavior:"smooth"}),
+    ArrowRight: (r = actual) => { const s = r.querySelector(".slides"); s.scrollBy({left: s.clientWidth, behavior:"smooth"}); },
+    ArrowLeft: (r = actual) => { const s = r.querySelector(".slides"); s.scrollBy({left: -s.clientWidth, behavior:"smooth"}); },
+  };
   addEventListener("keydown", e => {
     if (!indice.hidden || !document.getElementById("visor").hidden) { if (e.key === "Escape") indice.hidden = document.getElementById("visor").hidden = true; return; }
-    const i = reels.indexOf(actual), s = actual.querySelector(".slides");
-    const ir = {ArrowDown: () => reels[i+1]?.scrollIntoView({behavior:"smooth"}), ArrowUp: () => reels[i-1]?.scrollIntoView({behavior:"smooth"}),
-                ArrowRight: () => s.scrollBy({left: s.clientWidth, behavior:"smooth"}), ArrowLeft: () => s.scrollBy({left: -s.clientWidth, behavior:"smooth"})}[e.key];
-    if (ir) { e.preventDefault(); ir(); }
+    if (mover[e.key]) { e.preventDefault(); mover[e.key](); }
   });
+  document.getElementById("sube").addEventListener("click", () => mover.ArrowUp());
+  document.getElementById("baja").addEventListener("click", () => mover.ArrowDown());
+
+  // Índice fijo a la izquierda en PC.
+  const lado = document.getElementById("lado");
+  pintarLado = () => {
+    lado.innerHTML = `<h1>Backline en reels</h1><p>Cordillera 2026 · Escenario 2</p>` + cats.map(c => `<button data-id="${c.id}" aria-current="${actual?.id === c.id}"><span class="e">${EMOJI[c.cat] || "📦"}</span><span>${esc(c.cat)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${c.aTener}</span></button>`).join("");
+    document.getElementById("sube").disabled = actual === reels[0];
+    document.getElementById("baja").disabled = actual === reels[reels.length - 1];
+  };
+  lado.addEventListener("click", e => { const b = e.target.closest("button"); if (b) document.getElementById(b.dataset.id).scrollIntoView({behavior: "smooth"}); });
+  pintarLado();
 
   const inicio = location.hash && document.getElementById(location.hash.slice(1));
   if (inicio) inicio.scrollIntoView();

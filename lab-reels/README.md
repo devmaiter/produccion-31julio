@@ -17,7 +17,9 @@ y los stage plots de cada banda. Un solo archivo, sin librerías.
   **Enviar** (abre el menú de compartir del celular con el enlace a esa categoría)
   e **Índice** para saltar.
 - Enlaces directos: `lab-reels/#bateria`, `#platillos`…
-- En computador: flechas del teclado.
+- En PC: índice fijo a la izquierda, flechas ‹ › sobre el reel para pasar de banda,
+  botones ↑ ↓ al lado para cambiar de categoría, y también el teclado y la rueda del mouse.
+  En el celular nada de eso aparece; se desliza.
 
 ### Holograma 3D en la portada
 
