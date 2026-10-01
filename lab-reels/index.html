@@ -627,7 +627,7 @@ function lluvia(emojis){
   document.body.append(l); setTimeout(() => l.remove(), 2800);
 }
 
-/* ── Primera vez: logo con glitch y luego la mano que enseña cada gesto, una sola vez cada uno ── */
+/* ── Al abrir: el logo de Circuito Naranja con glitch, siempre, como TikTok. La mano que enseña cada gesto sale una sola vez. ── */
 const vistos = new Set(leer("lab-reels:guias", []));
 if (location.hash === "#intro") vistos.clear();
 function guia(clave, tipo, texto, sub){
@@ -648,14 +648,12 @@ function guiaAlLlegar(r){
 }
 function splash(){
   return new Promise(ok => {
-    if (vistos.has("splash")) return ok();
-    vistos.add("splash"); escribir("lab-reels:guias", [...vistos]);
     const s = document.createElement("div"); s.className = "splash";
     const xlr = `<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="43" fill="none" stroke="currentColor" stroke-width="8"/><rect x="44" y="3" width="12" height="9" rx="2" fill="currentColor"/><circle cx="31" cy="46" r="8" fill="currentColor"/><circle cx="69" cy="46" r="8" fill="currentColor"/><circle cx="50" cy="69" r="8" fill="currentColor"/></svg>`;
     const capa = c => `<div class="capa ${c}"${c ? ' aria-hidden="true"' : ""}><div class="marca">circuit${xlr}</div><div class="naranja">Naranja</div></div>`;
     s.innerHTML = `<div class="logo" role="img" aria-label="Circuito Naranja">${capa("")}${QUIETO ? "" : capa("cian") + capa("nar")}<small>BACKLINE EN REELS</small></div>`;
     document.body.append(s);
-    setTimeout(() => { s.classList.add("fuera"); ok(); setTimeout(() => s.remove(), 500); }, QUIETO ? 600 : 1900);
+    setTimeout(() => { s.classList.add("fuera"); ok(); setTimeout(() => s.remove(), 500); }, QUIETO ? 600 : 1600);
   });
 }
 

@@ -24,8 +24,8 @@ nuevos: uno por cada categoría que encontró, con sus bandas y días.
 
 ### La primera vez
 
-Como al abrir TikTok: el logo de Circuito Naranja entra con glitch y luego una mano enseña cada gesto
-una sola vez (deslizar arriba, deslizar a la izquierda, doble toque). Para verlo de
+Como al abrir TikTok: cada vez que se abre, el logo de Circuito Naranja entra con glitch. La
+primera vez, además, una mano enseña cada gesto una sola vez (deslizar arriba, deslizar a la izquierda, doble toque). Para verlo de
 nuevo: `lab-reels/#intro`.
 
 ### Qué tiene
