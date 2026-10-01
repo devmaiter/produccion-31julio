@@ -7,6 +7,24 @@ y dentro de cada una se desliza a los lados de la portada al resumen y a cada ba
 Usa los datos reales de Cordillera 2026, ESC 2 (`../extractor/data/cordillera-2026.json`)
 y los stage plots de cada banda. Un solo archivo, sin librerías.
 
+### Subir un documento
+
+El primer reel es **＋ Sube un documento**: rider en PDF, foto de la hoja, Excel del
+desglose o el correo. Lo lee el mismo lector de la lista de Cordillera
+(`../cordillera/lector/`), en el dispositivo y sin internet, y con eso arma reels
+nuevos: uno por cada categoría que encontró, con sus bandas y días.
+
+- Lo leído se guarda en el dispositivo y sigue ahí al volver a abrir el link.
+- Abajo del reel se cambia entre **Mi documento** y **Ejemplo Cordillera**.
+- **Probar con un ejemplo** lee `extractor/muestras/hoja-backline.pdf`.
+- Cada categoría tiene **＋ Subir** en el riel para volver arriba.
+
+### La primera vez
+
+Como al abrir TikTok: el logo entra con glitch y luego una mano enseña cada gesto
+una sola vez (deslizar arriba, deslizar a la izquierda, doble toque). Para verlo de
+nuevo: `lab-reels/#intro`.
+
 ### Qué tiene
 
 - **↑ ↓** una categoría por pantalla, con imán (`scroll-snap`) para que nunca quede a medias.
