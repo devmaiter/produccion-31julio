@@ -19,6 +19,21 @@ y los stage plots de cada banda. Un solo archivo, sin librerías.
 - Enlaces directos: `lab-reels/#bateria`, `#platillos`…
 - En computador: flechas del teclado.
 
+### Holograma 3D en la portada
+
+La portada de cada categoría muestra el equipo como holograma 3D que se dibuja de abajo
+hacia arriba y gira solo. Viene de la rama del demo `reconocimiento-3d/`: usa su
+`vendor/three.js` y el mismo shader. Las piezas están en `holograma.js`.
+
+- La batería sigue una foto real de tarima: tarima con tapete, bombo con hueco en el
+  parche frontal y su pedal, dos toms montados en el bombo, tom de piso a la derecha,
+  redoblante y hi-hat a la izquierda con su pedal, crash, ride y silla.
+- También hay holograma para Platillos, Percusión (congas), Teclado, Ampli bajo (8×10),
+  Ampli guitarra, Guitarra, Bajo y Bases (base de micrófono boom). Escenario, Cables y
+  DJ siguen con su emoji.
+- Hay un solo lienzo WebGL que pasa al reel visible, porque el celular aguanta pocos.
+  Si el teléfono no tiene WebGL, se queda el emoji.
+
 ### Qué tan difícil fue
 
 Poco. Lo que hace que se sienta como reels lo da el navegador:

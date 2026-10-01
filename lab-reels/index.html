@@ -44,9 +44,12 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 
 /* Portada */
 .portada{justify-content:flex-end}
-.emoji{font-size:clamp(90px,30vw,150px);line-height:1;margin-bottom:auto;margin-top:8vh;filter:drop-shadow(0 10px 30px rgba(0,0,0,.6));transform:scale(.6);opacity:0;transition:transform .5s cubic-bezier(.2,1.4,.4,1),opacity .4s}
+.holo{flex:1;min-height:0;position:relative;margin:0 -76px 8px -18px;display:flex;align-items:center;padding-left:18px}
+.holo .lienzo3d{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.holo.con3d .emoji{display:none}
+.emoji{font-size:clamp(90px,30vw,150px);line-height:1;filter:drop-shadow(0 10px 30px rgba(0,0,0,.6));transform:scale(.6);opacity:0;transition:transform .5s cubic-bezier(.2,1.4,.4,1),opacity .4s}
 .reel.visto .emoji{transform:none;opacity:1}
-.portada h2{font-family:var(--display);font-weight:700;font-size:clamp(44px,13vw,76px);line-height:.9;letter-spacing:.01em;text-transform:uppercase;margin:0;color:var(--accent);text-wrap:balance;overflow-wrap:anywhere}
+.portada h2{font-family:var(--display);font-weight:700;font-size:clamp(40px,11vw,76px);line-height:.9;letter-spacing:.01em;text-transform:uppercase;margin:0;color:var(--accent);text-wrap:balance;overflow-wrap:anywhere}
 .big{display:flex;align-items:baseline;gap:10px;margin:10px 0 2px}
 .big strong{font-family:var(--display);font-size:clamp(80px,26vw,128px);line-height:.85;font-variant-numeric:tabular-nums}
 .big span{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);line-height:1}
@@ -193,7 +196,7 @@ function htmlReel(c, i, total, primero){
     <div class="cab"><b>${esc(c.cat)}</b><span class="n">${i+1}/${total}</span></div>
     <div class="slides">
       <section class="slide portada">
-        <div class="emoji" aria-hidden="true">${EMOJI[c.cat] || "📦"}</div>
+        <div class="holo" data-cat="${esc(c.cat)}"><div class="emoji" aria-hidden="true">${EMOJI[c.cat] || "📦"}</div></div>
         <h2>${esc(c.cat)}</h2>
         <div class="big"><strong data-to="${c.aTener}">${c.aTener}</strong><span>piezas<br>a tener</span></div>
         <div class="dias">${dias}<span class="chip ac">${c.bandas.length} ${c.bandas.length === 1 ? "banda" : "bandas"}</span>${c.dudosos ? `<span class="chip warn">${c.dudosos} por confirmar</span>` : ""}</div>
@@ -223,6 +226,25 @@ function contar(el){
   requestAnimationFrame(paso);
 }
 
+/* Holograma 3D de la rama de reconocimiento-3d en la portada. Si no hay WebGL se queda el emoji. */
+let holo3d = null;
+const holo3dListo = import("./holograma.js").then(m => holo3d = m).catch(() => null);
+function holograma(r){
+  holo3dListo.then(() => {
+    const h = r.querySelector(".holo"), tipo = holo3d?.MODELO[h.dataset.cat];
+    if (!tipo) return;
+    try {
+      if (!holo3d.mostrar(h, tipo)) return;
+      document.querySelectorAll(".holo.con3d").forEach(x => x !== h && x.classList.remove("con3d"));
+      h.classList.add("con3d");
+    } catch { holo3d = null; }
+  });
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) holo3d?.pausar();
+  else { const r = document.querySelector(".lienzo3d")?.closest(".reel"); if (r) holograma(r); }
+});
+
 function iniciar(cats){
   const feed = document.getElementById("feed");
   feed.innerHTML = cats.map((c,i) => htmlReel(c, i, cats.length, i === 0)).join("");
@@ -234,6 +256,7 @@ function iniciar(cats){
     if (!e.isIntersecting) return;
     const r = e.target; actual = r;
     if (!r.classList.contains("visto")) { r.classList.add("visto"); contar(r.querySelector(".big strong")); }
+    holograma(r);
     history.replaceState(null, "", "#" + r.id);
   }), {root: feed, threshold: .6});
   reels.forEach(r => io.observe(r));
