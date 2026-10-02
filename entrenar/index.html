@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="data:,">
+<title>Entrenar el lector</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Entrenar el lector: un renglón del documento por tarjeta. Derecha = el lector acertó, izquierda = se equivocó
+   y se le dice qué era. Al final: % de acierto, archivo de etiquetas y reels con lo confirmado. */
+:root{
+  --bg:#000; --surface:#121212; --surface2:#1c1c1c; --line:#333;
+  --ink:#fff; --ink2:#d6d6d6; --ink3:#9a9a9a;
+  --accent:#ff6a1f; --accent-ink:#000; --ok:#3fbf77; --mal:#ff4d4d; --warn:#ffa83a;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);overflow:hidden}
+body{font-family:var(--body);font-size:15px;line-height:1.4;-webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.app{height:100dvh;max-width:520px;margin:0 auto;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 16px calc(env(safe-area-inset-bottom) + 14px);position:relative}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,12vw,60px);line-height:.9;text-transform:uppercase;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--accent)}
+h2{font-family:var(--display);font-weight:700;font-size:28px;line-height:1;text-transform:uppercase;margin:0}
+.sub{color:var(--ink2);margin:10px 0 0;max-width:42ch}
+.btn{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:11px 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);transition:transform .12s}
+.btn:active{transform:scale(.95)}
+.btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.chico{font-size:16px;padding:7px 14px}
+.fila{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.volver{font-size:13px;color:var(--ink3);text-decoration:none}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:999px;background:var(--surface2);color:var(--ink2);white-space:nowrap}
+
+/* Inicio */
+.inicio{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px}
+.pasos{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pasos li{display:flex;gap:12px;align-items:baseline;background:var(--surface);border-radius:12px;padding:12px 14px}
+.pasos b{font-family:var(--display);font-size:22px;color:var(--accent);min-width:1ch}
+.estado{font-size:13px;color:var(--ink3)}
+.estado.err{color:var(--warn)}
+
+/* Texto leído */
+.cab{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cab .volver{margin-right:auto}
+.resumen{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.resumen div{background:var(--surface);border-radius:12px;padding:10px 12px}
+.resumen strong{display:block;font-family:var(--display);font-size:32px;line-height:1;font-variant-numeric:tabular-nums}
+.resumen span{font-size:12px;color:var(--ink3)}
+.texto{flex:1;min-height:0;overflow-y:auto;background:var(--surface);border-radius:12px;padding:8px 0;font-family:var(--mono);font-size:12.5px;overscroll-behavior:contain}
+.texto div{display:flex;gap:8px;padding:3px 12px;border-left:3px solid transparent}
+.texto div span:first-child{flex:none;width:76px;font-family:var(--body);font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--ink3);padding-top:1px}
+.texto div span:last-child{min-width:0;overflow-wrap:anywhere}
+.texto .e-item{border-color:var(--ok);background:rgba(63,191,119,.08)}
+.texto .e-item span:first-child{color:var(--ok)}
+.texto .e-seccion,.texto .e-grupo,.texto .e-banda{border-color:var(--accent)}
+.texto .e-seccion span:first-child,.texto .e-grupo span:first-child,.texto .e-banda span:first-child{color:var(--accent)}
+.texto .e-no-backline span:last-child{color:var(--ink3)}
+.texto .e-sin-interpretar{border-color:var(--warn)}
+.modo{display:flex;gap:6px;margin:12px 0}
+.modo button{padding:6px 12px;border-radius:999px;border:1px solid var(--line);font-size:13px;color:var(--ink2)}
+.modo button[aria-pressed="true"]{background:var(--ink);color:#000;border-color:var(--ink)}
+
+/* Tarjetas */
+.barra{height:4px;border-radius:2px;background:var(--surface2);overflow:hidden;margin:2px 0 10px}
+.barra i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.cuenta{display:flex;gap:12px;font-size:13px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.cuenta b{color:var(--ink)}
+.mesa{position:relative;flex:1;min-height:0;margin:8px 0 14px}
+.tarjeta{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:14px;touch-action:pan-y;user-select:none;will-change:transform;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.tarjeta.atras{transform:scale(.95) translateY(14px);opacity:.5;pointer-events:none}
+.tarjeta .contexto{display:flex;gap:6px;flex-wrap:wrap}
+.tarjeta .renglon{font-family:var(--mono);font-size:clamp(18px,5.4vw,24px);line-height:1.3;overflow-wrap:anywhere;flex:1;display:flex;align-items:center}
+.tarjeta .renglon.largo{font-size:15px}
+.veredicto{border-radius:14px;padding:12px 14px;background:var(--surface2)}
+.veredicto small{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.veredicto b{font-family:var(--display);font-size:24px;text-transform:uppercase;letter-spacing:.02em}
+.veredicto .item{margin-top:6px;font-size:15px}
+.veredicto .item q{quotes:none;font-weight:600}
+.veredicto .por{display:block;margin-top:4px;font-size:13px;color:var(--ink3)}
+.sello{position:absolute;top:22px;font-family:var(--display);font-size:40px;font-weight:700;padding:2px 12px;border:4px solid;border-radius:10px;opacity:0;pointer-events:none;text-transform:uppercase}
+.sello.bien{left:20px;color:var(--ok);transform:rotate(-12deg)}
+.sello.mal{right:20px;color:var(--mal);transform:rotate(12deg)}
+.acciones{display:flex;justify-content:center;align-items:center;gap:22px}
+.redondo{width:68px;height:68px;border-radius:50%;display:grid;place-items:center;font-size:30px;background:var(--surface2);border:2px solid var(--line);transition:transform .12s}
+.redondo:active{transform:scale(.9)}
+.redondo.no{color:var(--mal);border-color:var(--mal)}
+.redondo.si{color:var(--ok);border-color:var(--ok)}
+.redondo.chico{width:46px;height:46px;font-size:18px;color:var(--ink3)}
+.pista{text-align:center;font-size:12px;color:var(--ink3);margin-top:8px}
+
+/* Hoja para corregir */
+.hoja{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.hoja .panel{width:100%;max-width:520px;max-height:88dvh;overflow:auto;background:var(--surface);border-radius:20px 20px 0 0;padding:18px 16px calc(env(safe-area-inset-bottom) + 18px);display:flex;flex-direction:column;gap:14px}
+.hoja .renglon{font-family:var(--mono);font-size:14px;color:var(--ink2);background:var(--surface2);border-radius:10px;padding:8px 10px;overflow-wrap:anywhere}
+.opciones{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opciones button{text-align:left;padding:12px;border-radius:12px;background:var(--surface2);border:2px solid transparent}
+.opciones button b{display:block;font-size:15px}
+.opciones button span{font-size:12px;color:var(--ink3)}
+.opciones button[aria-pressed="true"]{border-color:var(--accent)}
+.campo{display:grid;gap:6px;font-size:13px;color:var(--ink3)}
+.campo input{font:inherit;font-size:16px;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.cantidad{display:flex;align-items:center;gap:10px}
+.cantidad button{width:44px;height:44px;border-radius:50%;background:var(--surface2);font-size:22px}
+.cantidad input{width:80px;text-align:center}
+.cats{display:flex;flex-wrap:wrap;gap:6px}
+.cats button{padding:6px 10px;border-radius:999px;border:1px solid var(--line);font-size:13px;color:var(--ink2)}
+.cats button[aria-pressed="true"]{background:var(--accent);color:#000;border-color:var(--accent)}
+
+/* Resultado */
+.resultado{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.pct{font-family:var(--display);font-weight:700;font-size:clamp(110px,36vw,170px);line-height:.8;color:var(--accent);font-variant-numeric:tabular-nums}
+.errores{list-style:none;margin:0;padding:0;max-height:30dvh;overflow:auto;font-size:13px}
+.errores li{padding:8px 0;border-bottom:1px solid var(--line)}
+.errores code{font-family:var(--mono);font-size:12px;color:var(--ink2);display:block;overflow-wrap:anywhere}
+.aviso{position:fixed;z-index:20;left:50%;bottom:30px;transform:translateX(-50%);background:var(--ink);color:#000;padding:8px 14px;border-radius:999px;font-size:14px;font-weight:600}
+@media (prefers-reduced-motion:reduce){.tarjeta,.barra i{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app" id="app"></main>
+<input type="file" id="archivo" hidden accept=".pdf,.txt,.eml,image/*">
+<input type="file" id="camara" hidden accept="image/*" capture="environment">
+
+<script>
+/* pdf.js usa Map.getOrInsert(Computed), que solo traen los navegadores más nuevos. */
+for (const C of [Map, WeakMap]) {
+  if (!C.prototype.getOrInsertComputed) C.prototype.getOrInsertComputed = function(k, f){ if (!this.has(k)) this.set(k, f(k)); return this.get(k); };
+  if (!C.prototype.getOrInsert) C.prototype.getOrInsert = function(k, v){ if (!this.has(k)) this.set(k, v); return this.get(k); };
+}
+const LECTOR = new URL("../cordillera/lector/", location.href).href;
+const MUESTRA = "../extractor/muestras/hoja-backline.pdf";
+const CATEGORIAS = ["Batería","Platillos","Percusión","Teclado","Ampli bajo","Ampli guitarra","Guitarra","Bajo","Bases","Escenario","Cables y energía","DJ","Otro"];
+const ETIQUETAS = {
+  "item": ["Ítem de backline", "Equipo que hay que poner"],
+  "no-backline": ["No es backline", "Audio, luces, catering, radios…"],
+  "seccion": ["Título de sección", "BACKLINE, INPUT LIST, CATERING…"],
+  "grupo": ["Título de grupo", "DRUMS, BASS, KEYS…"],
+  "banda": ["Nombre de banda", "o del artista"],
+  "nota": ["Nota u otra cosa", "Texto que no es un equipo"],
+};
+const NOMBRE = {"item":"Ítem de backline","no-backline":"No es backline","seccion":"Sección","grupo":"Grupo","banda":"Banda","nota":"Nota","horario":"Horario","dia":"Día","escenario":"Escenario","evento":"Evento","sin-interpretar":"No lo entendí"};
+const QUIETO = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const app = document.getElementById("app");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const leer = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const aviso = t => { const a = document.createElement("div"); a.className = "aviso"; a.textContent = t; document.body.append(a); setTimeout(() => a.remove(), 1800); };
+/* Lo que se exporta no lleva correos ni teléfonos: los riders traen los del equipo. */
+const sinContactos = t => t.replace(/[\w.+-]+@[\w-]+\.[\w.-]+/g, "[correo]").replace(/\+?\d[\d\s().-]{7,}\d/g, "[teléfono]");
+
+let lector = null;
+function cargarLector(){
+  if (window.LectorBackline) return Promise.resolve(window.LectorBackline);
+  return lector ??= new Promise((ok, mal) => {
+    const s = document.createElement("script"); s.src = LECTOR + "lector.js";
+    s.onload = () => window.LectorBackline ? ok(window.LectorBackline) : mal(new Error("El lector no cargó."));
+    s.onerror = () => { lector = null; mal(new Error("No pude cargar el lector. Revisa la conexión.")); };
+    document.head.append(s);
+  });
+}
+
+/* ── Estado ── */
+let doc = null;        // {nombre, ext, renglones:[{...traza, propuesta, correcta, revisado}]}
+let modo = "rapido";
+let cola = [];          // índices de renglones a revisar
+let pos = 0;
+let historial = [];     // para deshacer
+
+/* ── 1. Inicio ── */
+function inicio(error = ""){
+  app.innerHTML = `
+    <div class="cab"><a class="volver" href="../index.html">← Demos</a><a class="volver" href="../lab-reels/">Reels →</a></div>
+    <section class="inicio">
+      <h1>Entrena <em>el lector</em></h1>
+      <p class="sub">Tú le enseñas qué es backline. Cada renglón del documento es una tarjeta: si el lector acertó, desliza a la derecha; si se equivocó, a la izquierda y le dices qué era.</p>
+      <ol class="pasos">
+        <li><b>1</b><span>Sube un rider o listado. Primero ves el texto tal como lo leyó.</span></li>
+        <li><b>2</b><span>Revisas tarjetas: ✓ acertó, ✗ y lo corriges.</span></li>
+        <li><b>3</b><span>Te dice cuánto acertó y guarda tus correcciones para entrenarlo.</span></li>
+      </ol>
+      <div class="fila"><button class="btn" data-a="elegir">Elegir archivo</button><button class="btn sec" data-a="foto">Tomar foto</button><button class="btn sec chico" data-a="muestra">Probar con un ejemplo</button></div>
+      <p class="estado ${error ? "err" : ""}" id="estado">${error ? esc(error) : "PDF, foto, correo o texto. Todo se lee en tu dispositivo."}</p>
+    </section>`;
+}
+
+async function leerDocumento(archivo){
+  const estado = document.getElementById("estado");
+  const decir = t => { if (estado) { estado.className = "estado"; estado.textContent = t; } };
+  decir("Cargando el lector…");
+  try {
+    const L = await cargarLector();
+    const traza = [];
+    const r = await L.leerTodo([archivo], { rutas: { pdfWorker: LECTOR + "pdf.worker.min.mjs", ocr: LECTOR + "ocr/" }, traza,
+      alProgreso: (_, e) => decir(e === "leyendo…" ? "Leyendo… (una foto o un PDF escaneado tarda más)" : e) });
+    if (r.archivos[0]?.error) throw new Error(r.archivos[0].error);
+    if (!traza.length) throw new Error("No saqué texto del archivo. Si es una foto, que sea nítida y de cerca.");
+    const ext = r.extraccion;
+    doc = { nombre: archivo.name.replace(/\.[^.]+$/, ""), archivo: archivo.name, ext,
+      renglones: traza.map((t, i) => {
+        const it = t.item !== null ? ext.items[t.item] : null;
+        const propuesta = { etiqueta: t.etiqueta, ...(it ? { cantidad: it.cantidad, descripcion: it.descripcion, categoria: it.categoria } : {}) };
+        return { i, itemIdx: t.item, texto: t.texto, motivo: t.motivo, seccion: t.seccion, grupo: t.grupo, artista: it?.artista ?? null, fecha: it?.fecha ?? null, propuesta, correcta: null, revisado: false };
+      }) };
+    textoLeido();
+  } catch (err) {
+    inicio(err.message || "No pude leer el archivo.");
+  }
+}
+
+/* ── 2. El texto tal como se leyó (paso 1) ── */
+function importante(r){
+  const e = r.propuesta.etiqueta;
+  if (["item", "sin-interpretar", "banda"].includes(e)) return true;
+  // De los títulos de sección basta revisar dónde cree que empieza el backline.
+  if (e === "seccion") return /backline/.test(r.motivo) && !/no es backline/.test(r.motivo);
+  if (e === "grupo") return r.seccion === "backline" || r.seccion === "neutra";
+  if (e === "no-backline") {
+    // Lo descartado vale revisarlo si suena a instrumento: ahí es donde el lector pudo botar backline de verdad.
+    if (r.texto.split(/\s+/).length > 14) return false;
+    const cat = window.LectorBackline?.categorizar?.(r.texto) || "Otro";
+    const instrumento = !["Otro", "Bases", "Cables y energía", "Escenario"].includes(cat);
+    return instrumento || r.seccion === "backline" || r.seccion === "neutra";
+  }
+  return false;
+}
+function textoLeido(){
+  const rs = doc.renglones;
+  const n = e => rs.filter(r => r.propuesta.etiqueta === e).length;
+  const rapidas = rs.filter(importante).length;
+  app.innerHTML = `
+    <div class="cab"><button class="volver" data-a="inicio">← Otro documento</button><span class="chip">${esc(doc.archivo)}</span></div>
+    <h2>Así lo leí</h2>
+    <div class="resumen">
+      <div><strong>${rs.length}</strong><span>renglones</span></div>
+      <div><strong style="color:var(--ok)">${n("item")}</strong><span>ítems de backline</span></div>
+      <div><strong style="color:var(--ink3)">${n("no-backline")}</strong><span>descartados</span></div>
+    </div>
+    <div class="texto" aria-label="Texto leído, renglón por renglón">${rs.map(r => `<div class="e-${r.propuesta.etiqueta}"><span>${esc(NOMBRE[r.propuesta.etiqueta] || r.propuesta.etiqueta)}</span><span>${esc(r.texto)}</span></div>`).join("")}</div>
+    <div class="modo" role="group" aria-label="Qué revisar">
+      <button data-modo="rapido" aria-pressed="${modo === "rapido"}">Lo importante · ${rapidas}</button>
+      <button data-modo="todo" aria-pressed="${modo === "todo"}">Todo · ${rs.length}</button>
+    </div>
+    <button class="btn" data-a="revisar">Revisar tarjetas</button>`;
+}
+
+/* ── 3. Tarjetas ── */
+function empezar(){
+  cola = doc.renglones.filter(r => modo === "todo" || importante(r)).map(r => r.i);
+  pos = cola.findIndex(i => !doc.renglones[i].revisado); if (pos < 0) pos = cola.length;
+  historial = [];
+  tarjetas();
+}
+function veredicto(p, r){
+  const it = p.etiqueta === "item" ? `<div class="item">${p.cantidad} × <q>${esc(p.descripcion)}</q> · ${esc(p.categoria)}</div>` : "";
+  return `<div class="veredicto"><small>El lector dice</small><b>${esc(NOMBRE[p.etiqueta] || p.etiqueta)}</b>${it}<span class="por">${esc(r.motivo)}</span></div>`;
+}
+function htmlTarjeta(r, atras){
+  const ctx = [r.seccion && r.seccion !== "neutra" ? `Sección: ${r.seccion === "otra" ? "no backline" : r.seccion}` : "", r.grupo ? `Grupo: ${r.grupo}` : ""].filter(Boolean);
+  return `<article class="tarjeta ${atras ? "atras" : ""}" data-i="${r.i}">
+    <div class="contexto">${ctx.map(c => `<span class="chip">${esc(c)}</span>`).join("")}<span class="chip">Renglón ${r.i + 1}</span></div>
+    <div class="renglon ${r.texto.length > 90 ? "largo" : ""}">${esc(r.texto)}</div>
+    ${veredicto(r.propuesta, r)}
+    <span class="sello bien">Bien</span><span class="sello mal">Mal</span>
+  </article>`;
+}
+function tarjetas(){
+  if (pos >= cola.length) return resultado();
+  const r = doc.renglones[cola[pos]], sig = doc.renglones[cola[pos + 1]];
+  const hechos = cola.filter(i => doc.renglones[i].revisado).length;
+  const bien = doc.renglones.filter(x => x.revisado && !x.correcta).length;
+  const mal = doc.renglones.filter(x => x.revisado && x.correcta).length;
+  app.innerHTML = `
+    <div class="cab"><button class="volver" data-a="texto">← Texto</button><div class="cuenta"><span>✓ <b>${bien}</b></span><span>✗ <b>${mal}</b></span><span>${hechos}/${cola.length}</span></div><button class="volver" data-a="terminar">Terminar</button></div>
+    <div class="barra"><i style="width:${100 * hechos / cola.length}%"></i></div>
+    <div class="mesa">${sig ? htmlTarjeta(sig, true) : ""}${htmlTarjeta(r, false)}</div>
+    <div class="acciones">
+      <button class="redondo chico" data-a="deshacer" aria-label="Deshacer" ${historial.length ? "" : "disabled"}>↶</button>
+      <button class="redondo no" data-a="mal" aria-label="El lector se equivocó">✗</button>
+      <button class="redondo si" data-a="bien" aria-label="El lector acertó">✓</button>
+      <button class="redondo chico" data-a="saltar" aria-label="Saltar">⤼</button>
+    </div>
+    <p class="pista">${matchMedia("(hover:hover)").matches ? "Teclado: → acertó · ← se equivocó · Z deshacer" : "Desliza → si acertó · ← si se equivocó"}</p>`;
+  arrastrable(app.querySelector(".tarjeta:not(.atras)"));
+}
+function arrastrable(card){
+  let x0 = null, dx = 0;
+  const bien = card.querySelector(".sello.bien"), mal = card.querySelector(".sello.mal");
+  card.addEventListener("pointerdown", e => { x0 = e.clientX; dx = 0; card.setPointerCapture(e.pointerId); card.style.transition = "none"; });
+  card.addEventListener("pointermove", e => {
+    if (x0 === null) return;
+    dx = e.clientX - x0;
+    card.style.transform = `translateX(${dx}px) rotate(${dx / 18}deg)`;
+    bien.style.opacity = Math.max(0, Math.min(1, dx / 90)); mal.style.opacity = Math.max(0, Math.min(1, -dx / 90));
+  });
+  const soltar = () => {
+    if (x0 === null) return; x0 = null;
+    card.style.transition = "transform .25s ease";
+    if (dx > 90) return volar(card, 1, () => acerto());
+    if (dx < -90) return volar(card, -1, () => corregir());
+    card.style.transform = ""; bien.style.opacity = mal.style.opacity = 0;
+  };
+  card.addEventListener("pointerup", soltar); card.addEventListener("pointercancel", soltar);
+}
+function volar(card, lado, luego){
+  if (!card || QUIETO) return luego();
+  card.style.transition = "transform .25s ease, opacity .25s";
+  card.style.transform = `translateX(${lado * 140}%) rotate(${lado * 20}deg)`; card.style.opacity = 0;
+  setTimeout(luego, 200);
+}
+function marcar(correcta){
+  const r = doc.renglones[cola[pos]];
+  historial.push({ pos, antes: { correcta: r.correcta, revisado: r.revisado } });
+  r.revisado = true; r.correcta = correcta;
+  guardarProgreso();
+  pos++; tarjetas();
+}
+const acerto = () => marcar(null);
+
+/* Corregir: qué era en realidad. */
+function corregir(){
+  const r = doc.renglones[cola[pos]];
+  const p = r.propuesta;
+  let elegido = p.etiqueta === "item" ? "item" : p.etiqueta === "no-backline" ? "item" : "no-backline";
+  let cant = p.cantidad ?? (r.texto.match(/^\s*(\d{1,3})/)?.[1] ? +r.texto.match(/^\s*(\d{1,3})/)[1] : 1);
+  let desc = p.descripcion ?? r.texto.replace(/^\s*\d{1,3}\s*[x-]?\s*/i, "").trim();
+  let cat = p.categoria ?? (window.LectorBackline?.categorizar?.(desc) || "Otro");
+  const hoja = document.createElement("div"); hoja.className = "hoja";
+  const pintar = () => {
+    hoja.innerHTML = `<div class="panel" role="dialog" aria-label="Corregir">
+      <h2>¿Qué es entonces?</h2>
+      <div class="renglon">${esc(r.texto)}</div>
+      <div class="opciones">${Object.entries(ETIQUETAS).map(([k, [t, s]]) => `<button data-et="${k}" aria-pressed="${elegido === k}"><b>${t}</b><span>${s}</span></button>`).join("")}</div>
+      ${elegido === "item" ? `
+        <div class="campo">Cantidad<div class="cantidad"><button data-q="-1" aria-label="Menos">−</button><input id="c-cant" type="number" min="0" inputmode="numeric" value="${cant}"><button data-q="1" aria-label="Más">+</button></div></div>
+        <label class="campo">Equipo<input id="c-desc" value="${esc(desc)}"></label>
+        <div class="campo">Categoría<div class="cats">${CATEGORIAS.map(c => `<button data-cat="${esc(c)}" aria-pressed="${cat === c}">${esc(c)}</button>`).join("")}</div></div>` : ""}
+      <div class="fila"><button class="btn" data-h="guardar">Guardar</button><button class="btn sec" data-h="cancelar">Cancelar</button></div>
+    </div>`;
+  };
+  hoja.addEventListener("click", e => {
+    if (e.target === hoja || e.target.closest('[data-h="cancelar"]')) { hoja.remove(); tarjetas(); return; }
+    const leerCampos = () => { const c = hoja.querySelector("#c-cant"), d = hoja.querySelector("#c-desc"); if (c) cant = Math.max(0, Math.round(+c.value || 0)); if (d) desc = d.value.trim(); };
+    const et = e.target.closest("[data-et]"); if (et) { leerCampos(); elegido = et.dataset.et; pintar(); return; }
+    const q = e.target.closest("[data-q]"); if (q) { leerCampos(); cant = Math.max(0, cant + +q.dataset.q); hoja.querySelector("#c-cant").value = cant; return; }
+    const ct = e.target.closest("[data-cat]"); if (ct) { leerCampos(); cat = ct.dataset.cat; pintar(); return; }
+    if (e.target.closest('[data-h="guardar"]')) {
+      leerCampos();
+      const c = elegido === "item" ? { etiqueta: "item", cantidad: cant, descripcion: desc || r.texto, categoria: cat } : { etiqueta: elegido };
+      const igual = c.etiqueta === p.etiqueta && (c.etiqueta !== "item" || (c.cantidad === p.cantidad && c.descripcion === p.descripcion && c.categoria === p.categoria));
+      hoja.remove();
+      marcar(igual ? null : c);
+    }
+  });
+  pintar();
+  document.body.append(hoja);
+}
+
+function deshacer(){
+  const h = historial.pop(); if (!h) return;
+  pos = h.pos; Object.assign(doc.renglones[cola[pos]], h.antes);
+  guardarProgreso(); tarjetas();
+}
+function guardarProgreso(){
+  escribir("entrenar:ultimo", { nombre: doc.nombre, archivo: doc.archivo, renglones: doc.renglones.map(({ i, correcta, revisado }) => ({ i, correcta, revisado })) });
+}
+
+/* ── 4. Resultado ── */
+function etiquetas(){
+  return {
+    formato: "etiquetas-lector/1", documento: doc.archivo, fecha: new Date().toISOString(),
+    renglones: doc.renglones.map(r => ({
+      n: r.i + 1, texto: sinContactos(r.texto), seccion: r.seccion, grupo: r.grupo, motivo: r.motivo,
+      lector: r.propuesta, revisado: r.revisado, acerto: r.revisado ? !r.correcta : null, correcto: r.revisado ? (r.correcta || r.propuesta) : null,
+    })),
+  };
+}
+function resultado(){
+  const rev = doc.renglones.filter(r => r.revisado);
+  const bien = rev.filter(r => !r.correcta).length;
+  const pct = rev.length ? Math.round(100 * bien / rev.length) : 0;
+  const errores = rev.filter(r => r.correcta);
+  const historico = leer("entrenar:historial", []);
+  historico.push({ documento: doc.archivo, fecha: new Date().toISOString(), revisados: rev.length, aciertos: bien });
+  escribir("entrenar:historial", historico.slice(-50));
+  app.innerHTML = `
+    <div class="cab"><button class="volver" data-a="texto">← Texto</button><span class="chip">${esc(doc.archivo)}</span></div>
+    <section class="resultado">
+      <div><div class="pct">${pct}<span style="font-size:.4em">%</span></div><p class="sub">El lector acertó <b>${bien} de ${rev.length}</b> renglones revisados.</p></div>
+      ${errores.length ? `<div><h2>Lo que corregiste · ${errores.length}</h2><ul class="errores">${errores.map(r => `<li><code>${esc(r.texto)}</code>${esc(NOMBRE[r.propuesta.etiqueta])} → <b>${esc(NOMBRE[r.correcta.etiqueta])}</b>${r.correcta.etiqueta === "item" ? ` · ${r.correcta.cantidad} × ${esc(r.correcta.descripcion)} (${esc(r.correcta.categoria)})` : ""}</li>`).join("")}</ul></div>` : ""}
+      <div class="fila"><button class="btn" data-a="reels">Ver reels con lo confirmado</button></div>
+      <div class="fila"><button class="btn sec chico" data-a="descargar">Descargar etiquetas</button><button class="btn sec chico" data-a="copiar">Copiar</button><button class="btn sec chico" data-a="seguir">Seguir revisando</button></div>
+      <p class="estado">Las etiquetas van sin correos ni teléfonos. Mándame el archivo para entrenar el lector con ellas.</p>
+    </section>`;
+}
+
+/* Reels solo con lo que quedó como ítem: lo confirmado, lo corregido y lo que no se revisó del lector. */
+function aReels(){
+  // Las alternativas del rider ("opción 2") no se piden además de la opción 1, salvo que el usuario las haya corregido.
+  const alternativa = r => !r.correcta && r.itemIdx !== null && /no suma/.test(doc.ext.items[r.itemIdx]?.nota || "");
+  const items = doc.renglones.map(r => ({ r, f: r.revisado && r.correcta ? r.correcta : r.propuesta })).filter(x => x.f.etiqueta === "item" && !alternativa(x.r));
+  const fechas = [...new Set(items.map(x => x.r.fecha).filter(Boolean))].sort();
+  const nombreDia = f => new Date(f + "T12:00").toLocaleDateString("es", { weekday: "long", day: "numeric" }).replace(/^./, c => c.toUpperCase());
+  const dias = fechas.map(f => ({ id: "d-" + f, nombre: nombreDia(f), tipo: "show" }));
+  if (items.some(x => !x.r.fecha)) dias.push({ id: "d-doc", nombre: "Del documento", tipo: "show" });
+  const artistas = new Map();
+  const lista = items.map((x, n) => {
+    const nombre = (x.r.artista || doc.ext.artistas[0] || doc.nombre).trim();
+    const id = slug(nombre) || "banda"; artistas.set(id, nombre);
+    return { id: "doc-" + n, diaId: x.r.fecha ? "d-" + x.r.fecha : "d-doc", artistaId: id, cantidad: Math.max(1, x.f.cantidad || 1),
+      categoria: x.f.categoria || "Otro", referencia: x.f.descripcion, descripcion: x.f.descripcion, propietario: { tipo: "propio" }, porConfirmar: !x.r.revisado };
+  });
+  escribir("lab-reels:doc", { nombre: doc.nombre, archivos: [doc.archivo], cuando: new Date().toISOString(),
+    datos: { artistas: [...artistas].map(([id, nombre]) => ({ id, nombre })), dias, bloques: [], stagePlots: [], items: lista } });
+  location.href = "../lab-reels/#" + (slug(lista[0]?.categoria || "") || "");
+}
+
+/* ── Eventos ── */
+app.addEventListener("click", async e => {
+  const m = e.target.closest("[data-modo]"); if (m) { modo = m.dataset.modo; return textoLeido(); }
+  const a = e.target.closest("[data-a]")?.dataset.a; if (!a) return;
+  if (a === "elegir") return document.getElementById("archivo").click();
+  if (a === "foto") return document.getElementById("camara").click();
+  if (a === "muestra") { try { const b = await (await fetch(MUESTRA)).blob(); leerDocumento(new File([b], "hoja-backline.pdf", { type: "application/pdf" })); } catch { aviso("No pude abrir el ejemplo"); } return; }
+  if (a === "inicio") return inicio();
+  if (a === "texto") return textoLeido();
+  if (a === "revisar" || a === "seguir") return empezar();
+  if (a === "terminar") return resultado();
+  if (a === "bien") return volar(app.querySelector(".tarjeta:not(.atras)"), 1, acerto);
+  if (a === "mal") return volar(app.querySelector(".tarjeta:not(.atras)"), -1, corregir);
+  if (a === "saltar") { pos++; return tarjetas(); }
+  if (a === "deshacer") return deshacer();
+  if (a === "reels") return aReels();
+  const json = () => JSON.stringify(etiquetas(), null, 1);
+  if (a === "descargar") {
+    const url = URL.createObjectURL(new Blob([json()], { type: "application/json" }));
+    const l = document.createElement("a"); l.href = url; l.download = `etiquetas-${slug(doc.nombre)}.json`; document.body.append(l); l.click(); l.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000); return;
+  }
+  if (a === "copiar") { try { await navigator.clipboard.writeText(json()); aviso("Etiquetas copiadas"); } catch { aviso("No se pudo copiar; usa Descargar"); } }
+});
+for (const id of ["archivo", "camara"]) document.getElementById(id).addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; if (f) leerDocumento(f); });
+addEventListener("keydown", e => {
+  if (document.querySelector(".hoja") || !app.querySelector(".tarjeta")) return;
+  if (e.key === "ArrowRight") volar(app.querySelector(".tarjeta:not(.atras)"), 1, acerto);
+  else if (e.key === "ArrowLeft") volar(app.querySelector(".tarjeta:not(.atras)"), -1, corregir);
+  else if (e.key.toLowerCase() === "z") deshacer();
+});
+inicio();
+</script>
+</body>
+</html>

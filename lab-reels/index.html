@@ -159,6 +159,7 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .subir h2{font-family:var(--display);font-weight:700;font-size:clamp(40px,12vw,64px);line-height:.9;text-transform:uppercase;margin:0;color:var(--ink);text-wrap:balance}
 .subir h2 em{font-style:normal;color:var(--accent)}
 .subir .sub{max-width:34ch;margin:0}
+.entrenar{font-size:13px;color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor}
 .botones{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
 .btn{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:10px 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);transition:transform .12s}
 .btn:active{transform:scale(.94)}
@@ -344,7 +345,8 @@ function htmlSubir(){
       <button class="orbe" data-acc="elegir" aria-label="Elegir un documento"><span class="anillo"></span><span class="nucleo">+</span></button>
       <h2>Sube un <em>documento</em></h2>
       <p class="sub">Rider en PDF, foto de la hoja, Excel del desglose o el correo. Sale un reel por cada categoría. Se lee en tu dispositivo, sin internet.</p>
-      <div class="botones"><button class="btn" data-acc="elegir">Elegir archivo</button><button class="btn sec" data-acc="foto">Tomar foto</button><button class="btn sec" data-acc="muestra">Probar con un ejemplo</button></div>${lista}`;
+      <div class="botones"><button class="btn" data-acc="elegir">Elegir archivo</button><button class="btn sec" data-acc="foto">Tomar foto</button><button class="btn sec" data-acc="muestra">Probar con un ejemplo</button></div>
+      <a class="entrenar" href="../entrenar/">¿Quieres revisarlo renglón por renglón antes? Entrena el lector →</a>${lista}`;
   return `
   <article class="reel subir" id="subir" data-n="1" aria-label="Subir documento">
     ${flotan}

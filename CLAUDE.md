@@ -112,6 +112,26 @@ mismo qué es backline. La propuesta que se le hizo:
 un archivo que se exporta, o Firestore `backline-2797d`. En cualquier caso, sin
 datos de contacto.
 
+## `entrenar/`: enseñarle al lector (en marcha)
+
+Pantalla de tarjetas para el paso 1 y el paso 2 del plan de arriba:
+1. Se sube un PDF, una foto o un texto.
+2. "Así lo leí" muestra cada renglón con su etiqueta. Es la traza: el lector
+   recibe `ctx.traza` y `leerTodo` recibe `op.traza`.
+3. Se revisan tarjetas: derecha = acertó; izquierda = se equivocó, y se elige qué
+   era (ítem con cantidad, equipo y categoría; no backline; sección; grupo;
+   banda; nota). "Lo importante" muestra los ítems, lo no entendido, dónde
+   empieza el backline y lo descartado que suena a instrumento: unas 60
+   tarjetas por rider.
+4. Resultado: el % de acierto, la lista de correcciones y "Descargar etiquetas",
+   un JSON `etiquetas-lector/1` sin correos ni teléfonos. "Ver reels con lo
+   confirmado" arma `lab-reels:doc` solo con lo que quedó como ítem.
+
+Por ahora las etiquetas se guardan como archivo que el usuario descarga y le
+pasa a Claude. **Lo que sigue:** con esos JSON, crecer el catálogo de equipos y
+la lista de no-backline, entrenar el clasificador, y medir con cada archivo como
+prueba (que el % suba sin romper los riders anteriores).
+
 ## `lab-reels/`
 
 Una pantalla por categoría, que se cambia deslizando arriba y abajo; a los lados
