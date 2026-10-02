@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Del Excel al estado</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#EDEFF2; --surface:#FFFFFF; --surface2:#F6F7F9; --line:#D3D8DE; --line2:#E5E8EC;
+  --ink:#171A1E; --ink2:#4B5563; --ink3:#7B8592;
+  --accent:#D9541E; --accent-ink:#FFFFFF; --accent-soft:#FBE9E0;
+  --ok:#1F8A4C; --ok-soft:#DFF3E7; --warn:#B9720F; --warn-soft:#FBEFD6;
+  --xl:#1D6F42; --xl-soft:#E3F1E8; --xl-head:#F1F3F5;
+  --chip:#E8EBEF; --shadow:0 1px 2px rgba(23,26,30,.08),0 6px 20px rgba(23,26,30,.06);
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15181C; --surface:#1E2228; --surface2:#242930; --line:#3A414A; --line2:#2C323A;
+    --ink:#ECEEF1; --ink2:#B4BCC6; --ink3:#7F8894;
+    --accent:#F0703A; --accent-ink:#1A1410; --accent-soft:#3A241A;
+    --ok:#3FBF77; --ok-soft:#1B3527; --warn:#E5A03A; --warn-soft:#3D2E14;
+    --xl:#4CC286; --xl-soft:#1A3326; --xl-head:#262B32;
+    --chip:#2C333C; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15181C; --surface:#1E2228; --surface2:#242930; --line:#3A414A; --line2:#2C323A;
+  --ink:#ECEEF1; --ink2:#B4BCC6; --ink3:#7F8894;
+  --accent:#F0703A; --accent-ink:#1A1410; --accent-soft:#3A241A;
+  --ok:#3FBF77; --ok-soft:#1B3527; --warn:#E5A03A; --warn-soft:#3D2E14;
+  --xl:#4CC286; --xl-soft:#1A3326; --xl-head:#262B32;
+  --chip:#2C333C; --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35); color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.4;padding:0 16px 80px;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1360px;margin:0 auto}
+
+/* Encabezado */
+.top{padding:22px 0 14px}
+.eyebrow{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3)}
+h1{font-family:var(--display);font-weight:700;font-size:38px;letter-spacing:.01em;text-transform:uppercase;margin:2px 0 6px;line-height:1}
+.lede{color:var(--ink2);max-width:760px;margin:0}
+
+/* Flujo 1-2-3 */
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:8px;margin:16px 0 18px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;box-shadow:var(--shadow);text-align:left;display:flex;gap:10px;align-items:flex-start}
+.step .n{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:17px;background:var(--chip);color:var(--ink2)}
+.step.xl .n{background:var(--xl-soft);color:var(--xl)}
+.step.st .n{background:var(--accent-soft);color:var(--accent)}
+.step b{display:block;font-family:var(--display);font-size:19px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;line-height:1.1}
+.step span{display:block;font-size:13px;color:var(--ink2);margin-top:2px}
+.arrow{align-self:center;color:var(--ink3);font-size:20px}
+@media (max-width:760px){
+  .flow{grid-template-columns:1fr}
+  .arrow{transform:rotate(90deg);justify-self:center;line-height:1}
+}
+
+/* Layout */
+.layout{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:1100px){
+  .layout{grid-template-columns:minmax(0,1fr) minmax(0,520px);align-items:start}
+  .side{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;border-radius:10px}
+}
+.side{display:flex;flex-direction:column;gap:12px}
+@media (max-width:1099px){ .side{order:-1} }
+
+/* Panel colapsable */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.panel>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;user-select:none}
+.panel>summary::-webkit-details-marker{display:none}
+.panel>summary .n{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:14px}
+.panel.xl>summary .n{background:var(--xl-soft);color:var(--xl)}
+.panel.st>summary .n{background:var(--accent-soft);color:var(--accent)}
+.panel>summary b{font-family:var(--display);font-size:19px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.panel>summary .sub{color:var(--ink3);font-size:13px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chev{flex:none;width:18px;height:18px;color:var(--ink3);transition:transform .15s}
+details[open]>summary .chev{transform:rotate(180deg)}
+.panel[open]>summary{border-bottom:1px solid var(--line2)}
+
+/* Hoja de Excel */
+.sheet-tabs{display:flex;gap:0;border-top:1px solid var(--line2);background:var(--xl-head);padding:0 8px;align-items:stretch;flex-wrap:wrap}
+.sheet-tab{border:0;background:none;padding:7px 12px;font-size:12.5px;color:var(--ink2);border-bottom:2px solid transparent}
+.sheet-tab[aria-selected="true"]{color:var(--xl);border-bottom-color:var(--xl);background:var(--surface);font-weight:600}
+.sheet-tab.load{margin-left:auto;color:var(--ink3)}
+.grid-scroll{overflow:auto;max-height:420px;background:var(--surface)}
+table.xl{border-collapse:separate;border-spacing:0;font-size:12px;table-layout:fixed}
+table.xl th,table.xl td{border-right:1px solid var(--line2);border-bottom:1px solid var(--line2);padding:3px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:22px;text-align:left;font-weight:400}
+table.xl thead th{position:sticky;top:0;z-index:2;background:var(--xl-head);color:var(--ink3);text-align:center;font-size:11px}
+table.xl tbody th{position:sticky;left:0;z-index:1;background:var(--xl-head);color:var(--ink3);text-align:right;font-size:11px;width:34px}
+table.xl thead th:first-child{left:0;z-index:3}
+table.xl td.h{font-weight:600;background:var(--surface2)}
+table.xl td.sec{font-weight:600;color:var(--ink2)}
+table.xl td.it{cursor:pointer}
+table.xl td.it:hover{background:var(--xl-soft)}
+table.xl td.art{cursor:pointer;color:var(--xl);font-weight:600}
+table.xl td.out{color:var(--ink3);opacity:.45}
+table.xl td.hit{background:var(--xl-soft)}
+table.xl td.sel{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent);color:var(--ink);opacity:1}
+table.xl td.blk{border-left:2px solid var(--line)}
+.xl-foot{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:8px 12px;font-size:12px;color:var(--ink3);border-top:1px solid var(--line2)}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:4px;border:1px solid var(--line)}
+
+/* Estado */
+.state-body{padding:10px 14px 14px;display:grid;gap:10px}
+.state-body h4{margin:0;font-family:var(--display);font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+pre.json{margin:0;font-family:var(--mono);font-size:12px;line-height:1.5;background:var(--surface2);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;overflow:auto;max-height:260px;white-space:pre}
+pre.json .k{color:var(--ink2)} pre.json .s{color:var(--xl)} pre.json .v{color:var(--accent)}
+pre.json.flash{animation:flash .6s}
+@keyframes flash{from{background:var(--accent-soft)}to{background:var(--surface2)}}
+@media (prefers-reduced-motion:reduce){pre.json.flash{animation:none}}
+ol.log{margin:0;padding:0;list-style:none;font-family:var(--mono);font-size:12px;display:grid;gap:3px}
+ol.log li{display:flex;gap:8px;color:var(--ink2)}
+ol.log li i{font-style:normal;color:var(--ink3)}
+ol.log li:first-child{color:var(--ink)}
+.explain{font-size:13px;color:var(--ink2);margin:0}
+
+/* Filtros */
+.filters{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:12px 14px;display:grid;gap:10px}
+.frow{display:flex;gap:8px 12px;align-items:baseline;flex-wrap:wrap}
+.flabel{flex:none;width:92px;font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+@media (max-width:560px){.flabel{width:100%}}
+.chips{display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:0}
+.chip{border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:4px 11px;font-size:13px;display:inline-flex;gap:6px;align-items:center;color:var(--ink2)}
+.chip em{font-style:normal;font-size:11.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.chip[aria-pressed="true"] em{color:inherit;opacity:.7}
+.chip:disabled{opacity:.4;cursor:default}
+.search{flex:1;min-width:200px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);padding:8px 11px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface2);padding:5px 11px;font-size:13px;color:var(--ink2);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.toggle{display:inline-flex;gap:8px;align-items:center;font-size:13.5px;color:var(--ink2);cursor:pointer}
+.toggle input{width:17px;height:17px;accent-color:var(--accent)}
+.active{display:flex;gap:6px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line2);padding-top:10px;font-size:13px;color:var(--ink3)}
+.active .chip{background:var(--accent-soft);border-color:transparent;color:var(--ink)}
+.active .chip b{font-weight:600}
+.linkbtn{border:0;background:none;color:var(--accent);padding:4px 2px;font-size:13px;text-decoration:underline;text-underline-offset:2px}
+
+/* Resultados */
+.resbar{display:flex;align-items:baseline;gap:12px;margin:14px 2px 8px;flex-wrap:wrap}
+.resbar h2{margin:0;font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.resbar .count{color:var(--ink3);font-size:13.5px}
+.resbar .sp{flex:1}
+@media (max-width:560px){.resbar .count{order:3;flex-basis:100%}}
+.list{display:grid;gap:10px}
+details.artist{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+details.artist>summary{list-style:none;display:flex;gap:12px;align-items:center;padding:11px 14px;cursor:pointer;user-select:none}
+details.artist>summary::-webkit-details-marker{display:none}
+details.artist[open]>summary{border-bottom:1px solid var(--line2)}
+.aname{font-family:var(--display);font-size:22px;font-weight:600;letter-spacing:.02em;line-height:1.05}
+.ameta{font-size:12.5px;color:var(--ink3);display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.stars{color:var(--warn);letter-spacing:1px}
+.amain{flex:1;min-width:0}
+.acount{flex:none;text-align:right;font-size:12.5px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.acount b{display:block;font-family:var(--display);font-size:20px;color:var(--ink);font-weight:600;line-height:1}
+.pill{display:inline-block;border-radius:999px;padding:1px 8px;font-size:11.5px;font-weight:600}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.abody{padding:4px 14px 12px}
+.atools{display:flex;gap:14px;flex-wrap:wrap;padding:8px 0 4px;font-size:13px}
+.cat{border-top:1px solid var(--line2);padding:10px 0 6px}
+.cat:first-of-type{border-top:0}
+.cathead{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.catbtn{border:0;background:none;padding:0;font-family:var(--display);font-size:17px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.catbtn:hover{color:var(--accent)}
+.cov{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+.cols.one{grid-template-columns:1fr}
+@media (max-width:640px){.cols{grid-template-columns:1fr}}
+.colh{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-weight:600;margin:0 0 3px}
+.grp+.grp{margin-top:6px}
+.glabel{font-size:12px;color:var(--ink3);margin:2px 0}
+.note{font-size:12.5px;color:var(--ink3);font-style:italic;margin:1px 0 3px}
+ul.items{list-style:none;margin:0;padding:0}
+ul.items li{display:grid;grid-template-columns:34px 1fr auto;gap:8px;align-items:baseline;padding:4px 6px;margin:0 -6px;border-radius:6px;cursor:pointer}
+ul.items li:hover{background:var(--surface2)}
+ul.items li.sel{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.q{font-variant-numeric:tabular-nums;font-weight:600;text-align:right;color:var(--ink2)}
+.ref{font-family:var(--mono);font-size:11px;color:var(--xl);background:var(--xl-soft);border:0;border-radius:4px;padding:1px 5px}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:24px;text-align:center;color:var(--ink2)}
+/* Perfil y fuente */
+.role{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.role .seg button{padding:7px 14px;font-size:14px}
+.role .seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.role p{margin:0;font-size:13px;color:var(--ink2);flex:1;min-width:220px}
+.fuente{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:12px 14px;display:grid;gap:10px;margin-bottom:12px}
+.fuente .row{display:flex;gap:8px 14px;align-items:center;flex-wrap:wrap}
+.fuente .tag{font-family:var(--display);font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3)}
+.fuente .name{font-weight:600}
+.fuente .meta{font-size:13px;color:var(--ink3)}
+.fuente .sp{flex:1}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.draft{border:1.5px dashed var(--warn);background:var(--warn-soft);border-radius:8px;padding:10px 12px;display:grid;gap:8px}
+.diff{display:flex;gap:6px;flex-wrap:wrap;font-size:12.5px}
+.diff span{border-radius:999px;padding:2px 9px;background:var(--surface);border:1px solid var(--line)}
+.nuevo{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--ok-soft);border-radius:8px;padding:9px 12px;font-size:13.5px}
+.nuevo span{flex:1;min-width:200px}
+.fmsg{margin:0;font-size:13px;color:var(--ink2)}
+.fmsg.err{color:var(--accent)}
+.chg{font-size:10.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;border-radius:4px;padding:1px 5px;background:var(--ok-soft);color:var(--ok)}
+.chg.mod{background:var(--warn-soft);color:var(--warn)}
+
+/* Fotos */
+.cam{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:1px 6px;font-size:11.5px;color:var(--ink3);display:inline-flex;align-items:center;gap:4px;line-height:1.5}
+.cam svg{width:13px;height:13px}
+.cam.has{background:var(--ok-soft);border-color:transparent;color:var(--ok);font-weight:600}
+ul.items li .end{display:inline-flex;gap:6px;align-items:center}
+.fotos{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:6px 0 4px;cursor:default}
+.thumb{width:76px;height:76px;border-radius:8px;border:1px solid var(--line);padding:0;overflow:hidden;background:var(--surface2)}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.addfoto{width:76px;height:76px;border-radius:8px;border:1.5px dashed var(--line);background:var(--surface);color:var(--ink2);font-size:12px;display:grid;place-items:center;text-align:center;line-height:1.2;padding:4px}
+.addfoto:hover{border-color:var(--accent);color:var(--accent)}
+.addfoto[aria-busy="true"]{opacity:.6;cursor:progress}
+.fotohint{font-size:12px;color:var(--ink3);flex-basis:100%}
+.fotohint.err{color:var(--accent)}
+table.xl td.foto{background-image:linear-gradient(225deg,var(--ok) 6px,transparent 6px)}
+dialog.lb{border:0;padding:0;background:transparent;max-width:min(94vw,1100px);max-height:92vh}
+dialog.lb::backdrop{background:rgba(10,12,14,.8)}
+.lb-card{background:var(--surface);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;max-height:92vh}
+.lb-card img{display:block;max-width:100%;max-height:74vh;object-fit:contain;background:#111;margin:0 auto}
+.lb-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:10px 14px;font-size:13px;color:var(--ink2)}
+.lb-bar b{color:var(--ink)}
+.lb-bar .sp{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface2);border-radius:8px;padding:6px 12px;font-size:13px}
+.btn.danger{color:var(--accent)}
+mark{background:var(--warn-soft);color:inherit;border-radius:2px;padding:0 1px}
+.msg{font-size:13px;padding:8px 12px;color:var(--ink2);border-top:1px solid var(--line2)}
+.msg.err{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Cordillera 2026 · Prototipo</div>
+    <h1>Del Excel al estado</h1>
+    <p class="lede">La hoja de backline de Stage 4 se lee una sola vez y se convierte en un <b>estado</b>. Todo lo que ves abajo (la lista, los filtros, la hoja resaltada) lee de ese mismo estado. Haz clic en cualquier cosa y mira cómo se mueven las tres partes a la vez.</p>
+    <div class="role">
+      <div class="seg" id="role" role="group" aria-label="Ver la página como">
+        <button type="button" data-v="admin">Admin</button><button type="button" data-v="operario">Operario</button>
+      </div>
+      <p id="role-help"></p>
+    </div>
+  </header>
+
+  <div class="flow" aria-label="Cómo fluye el dato">
+    <div class="step xl"><div class="n">1</div><div><b>La hoja</b><span>El Excel tal cual: un bloque de 4 columnas por artista.</span></div></div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="step st"><div class="n">2</div><div><b>El estado</b><span>Un solo objeto con los datos, los filtros y lo seleccionado.</span></div></div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="step"><div class="n">3</div><div><b>Las vistas</b><span>Lista, filtros y hoja se dibujan solas cuando el estado cambia.</span></div></div>
+  </div>
+
+  <div class="layout">
+    <main>
+      <section class="fuente" id="fuente" aria-label="Excel publicado"></section>
+      <section class="filters" aria-label="Filtro avanzado">
+        <div class="frow">
+          <span class="flabel">Buscar</span>
+          <input id="q" class="search" type="search" placeholder="Ampeg, redoblante, SPD, Kapanga…" autocomplete="off">
+        </div>
+        <div class="frow"><span class="flabel">Día</span><div class="chips" id="f-dias"></div></div>
+        <div class="frow"><span class="flabel">Artista</span><div class="chips" id="f-artistas"></div></div>
+        <div class="frow"><span class="flabel">Equipo</span><div class="chips" id="f-cats"></div></div>
+        <div class="frow">
+          <span class="flabel">Columna</span>
+          <div class="seg" id="f-lado" role="group" aria-label="Columna de la hoja">
+            <button type="button" data-v="ambas">Ambas</button><button type="button" data-v="req">Requerimiento</button><button type="button" data-v="prop">Propuesta</button>
+          </div>
+        </div>
+        <div class="frow">
+          <span class="flabel">Categoría</span>
+          <div class="seg" id="f-stars" role="group" aria-label="Categoría mínima del artista">
+            <button type="button" data-v="0">Todas</button><button type="button" data-v="2">★★ o más</button><button type="button" data-v="3">★★★ o más</button>
+          </div>
+        </div>
+        <div class="frow">
+          <span class="flabel">Revisar</span>
+          <div class="chips">
+            <label class="toggle"><input type="checkbox" id="f-falta"> Solo tipos de equipo donde la propuesta suma menos unidades que lo pedido</label>
+            <label class="toggle"><input type="checkbox" id="f-cambios"> Solo lo que cambió en el último Excel</label>
+          </div>
+        </div>
+        <div class="frow">
+          <span class="flabel">Fotos</span>
+          <div class="seg" id="f-foto" role="group" aria-label="Fotos del equipo">
+            <button type="button" data-v="">Todas</button><button type="button" data-v="con">Con foto</button><button type="button" data-v="sin">Sin foto</button>
+          </div>
+          <span class="cov" id="foto-status"></span>
+        </div>
+        <div class="active" id="active"></div>
+      </section>
+
+      <div class="resbar">
+        <h2>Resultado</h2><span class="count" id="count"></span><span class="sp"></span>
+        <button type="button" class="linkbtn" id="openall">Abrir todo</button>
+        <button type="button" class="linkbtn" id="closeall">Cerrar todo</button>
+      </div>
+      <div class="list" id="list"></div>
+      <dialog class="lb" id="lb"></dialog>
+    </main>
+
+    <aside class="side">
+      <details class="panel xl" id="p-sheet" open>
+        <summary><span class="n">1</span><b>La hoja</b><span class="sub" id="sheet-sub">EQUIPO_CORDILLERAS_OML.xlsx</span><svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg></summary>
+        <div class="sheet-tabs" role="tablist" id="sheet-tabs"></div>
+        <div class="grid-scroll" id="grid"></div>
+        <div class="xl-foot">
+          <span><i class="sw" style="background:var(--xl-soft)"></i>entra en el filtro</span>
+          <span><i class="sw" style="background:var(--surface);opacity:.5"></i>queda fuera</span>
+          <span><i class="sw" style="background:var(--accent-soft);border-color:var(--accent)"></i>seleccionado</span>
+          <span>Clic en una celda = seleccionar · clic en un nombre = filtrar artista</span>
+        </div>
+        <input type="file" id="file" accept=".xlsx,.xls" hidden>
+        <input type="file" id="foto-file" accept="image/*" capture="environment" hidden>
+      </details>
+
+      <details class="panel st" id="p-state" open>
+        <summary><span class="n">2</span><b>El estado</b><span class="sub">lo único que la página recuerda</span><svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg></summary>
+        <div class="state-body">
+          <p class="explain">Cada clic no toca la pantalla: cambia este objeto. La lista, los contadores y la hoja se vuelven a dibujar a partir de él.</p>
+          <h4>Filtros y selección</h4>
+          <pre class="json" id="state-json"></pre>
+          <h4>Ítem seleccionado</h4>
+          <pre class="json" id="sel-json"></pre>
+          <h4>Últimos cambios</h4>
+          <ol class="log" id="log"></ol>
+        </div>
+      </details>
+    </aside>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   1 · LA HOJA
+   Las celdas de ST4-D1 y ST4-D2 tal como vienen del Excel.
+   Si se carga otro archivo, se reemplaza por lo que lea SheetJS.
+   ============================================================ */
+const SAMPLE = [{"name":"ST4-D1","rows":[["Stage 4",null,"2026-09-12",null,"Stage 4",null,"2026-09-12",null,"Stage 4",null,"2026-09-12",null,"Stage 4",null,"2026-09-12",null,"Stage 4",null,"2026-09-12",null],[null,"Paula Pera y el fin de los tiempos | Backline Stage 4 | 12/09",null,null,null,"Kapanga | Backline Stage 4 | 12/09",null,null,null,"Poligamia | Backline Stage 4 | 12/09",null,null,null,"Virus | Backline Stage 4 | 12/09",null,null,null,"Lido Pimienta | Backline Stage 4 | 12/09",null,null],["SET A",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"SET A",null,null,null],["Cat:","★★☆☆☆","Rider:","https://drive.google.com/drive/folders/1hLYxJXc8D4Npcj0c3jzq0_k-1PgOrk8t?usp=drive_link","Cat:","★★☆☆☆","Rider:","https://drive.google.com/drive/folders/1mwl9mGjk3ndqNlqfaD5tw1t5oyJvKurQ?usp=sharing","Cat:","★★★☆☆","Rider:","https://drive.google.com/drive/folders/1nG-TQ5MLaEYX-BM8A3pu42zhzO4xR47O?usp=drive_link","Cat:","★★★☆☆","Rider:","https://drive.google.com/drive/folders/1ELaVsuRBODyz_BsRDCE92phGpDQiYkrV?usp=sharing","Cat:","★★★☆☆","Rider:","https://drive.google.com/drive/folders/1ZC0dW1wE03a8smT0CNg7EGniawxmDFM-?usp=drive_link"],["Cant","Requerimiento","Cant","Propuesta","Cant","Requerimiento","Cant","Propuesta","Cant","Requerimiento","Cant","Propuesta","Cant","Requerimiento","Cant","Propuesta","Cant","Requerimiento","Cant","Propuesta"],[null,"BATERÍA",null,"BATERÍA",null,"BATERÍA",null,"DRUM",null,"BATERÍA",null,"Drum",null,"BAJO",null,"BAJO","01 x","Silla de Batería",1,"Silla de Batería"],[null,"Tama Star Classic, Yamaha Recording Custom o similar",null,"DW Performance",null,"Sonor Pro Lite / DW Collector Series / Pearl Master Custom).",null,"PEARL MASTER CUSTOM",null,"DW Collector / Yamaha Stage Custom / Pearl Master Custom",1,"Mapex Saturn","01 x","Cabezal Ampeg SVT-7 PRO o similar",1,"Ampeg svt 4 pro BASS HEAD","01 x","Base para Teclado",1,"single hercules keyboard stand KS120B"],["01 x","Bombo 22\" x 18\"",1,"Bombo 22\"","01 x","Bombo 22”",1,"22\" KICK","01 x","Bombo 24\"",1,"kick 24\"","01 x","Caja Ampeg 8x10",1,"ampeg 8x10 BAS CABINET","01 x","Mesa 2m x 1m (para Playback station)",1,"Prolyte Stage Deck 2m x 1m x 1m"],["01 x","Tom Aire 12\" x 8\"",1,"Tom 10\"","03 x","Rack Toms 8”, 10” y 12”",3,"8\" 10\" 12\" RACK TOM","01 x","Tarola 5½\" × 14\"",1,"rack tom 12\"","01 x","Bajo Fender Precision Bass USA",1,"Fender precission usa string",null,null,null,null],["01 x","Tom Piso 14\" ó 16\" x 14\"",1,"Tom de piso 16\"","01 x","Floor Tom 16”, Redoblante 14”x6”",1,"16\" FLOOR TOM","01 x","Piccolo Snare",1,"Floor tom 14\"",null,"GUITARRA 01:",null,"Guitar 1",null,null,null,null],["01 x","Redoblante 14\" x 5.5\"",1,"Redoblante 14\"","01 x","Redoblante Ludwig Supraphonic 14”x6”",1,"SNARE 14\" X 5.5\" PEARL CHAD SMITH SHELL","01 x","Tom 12\"",1,"Floor tom 16\"","01 x","Fender Hot Rod Deluxe, Deville (No Marshall)",1,"Fender hot rod deville",null,null,null,null],["01 x","Stand Hi-Hat",null,"HARDWARE","01 x","Doble pedal de bombo DW 5000 o DW 9000.",1,"SNARE 14\" X 6 GRETCH MAPLE","01 x","Tom 14\"",1,"Snare 14\" x 5\" Mapex Maple","01 x","Fender Stratocaster USA",1,"Fender stratocaster usa",null,null,null,null],["04 x","Stand platillo boom",1,"Pedal de bombo sencillo","01 x","stand de Hi-Hat DW 5000 o similar (2 patas)",null,"DRUM HEAD NEW EVANS G2","01 x","Tom 16\"",1,"Piccolo Snatre 13\" pearl",null,"GUITARRA 02:",1,"Guitar 2",null,null,null,null],["01 x","Stand redoblante",1,"Base de Hi-Hat","02 x","stands DW o similares para Double Tom",null,"HARDWARE",null,null,null,null,"01 x","Fender Hot Rod Deluxe, Deville (No Marshall)",1,"Fender hot rod deville",null,null,null,null],["01 x","Silla de batería",1,"Base de redoblante","06 x","soportes de platillo con boom (Cymbals Boom Stands)",1,"TWIN PEDAL DW 9000",null,"HARDWARE",null,"HARDWARE","01 x","Fender Stratocaster USA",1,"Fender stratocaster usa",null,null,null,null],["01 x","Tapete antideslizante",4,"Base de platillo tipo boom","02 x","soportes de redoblante (Snare Stands)",1,"HI HAT STAND","01 x","Hi-Hat Stand de 3 patas",1,"SINGLE KIKC PEDAL DW5000","01 x","Guitarra acústica Martin o Yamaha o Takamine (NO Taylor)",1,"Martin DSR1",null,null,null,null],["01 x","Base de platillo adicional con herrajes para SPD (artista trae el pad)",1,"Silla de batería","01 x","banqueta profesional (Drum Stool).",2,"SNARE STAND","01 x","Pedal de Bombo Simple",1,"HI HAT STAND 3 LEGS",null,"TECLADOS",null,"TECLADOS",null,null,null,null],[null,null,1,"Tapete de batería",null,"PLATILLOS",6,"BOOM CYMBALS STAND","05 x","Base de Platillo Tipo Boom",5,"BOOM CYMBALS STAND","01 x","Stand doble recto de teclado Ks210b",1,"DOUBLE HERCULES KEYBOARD STAND KS210B",null,null,null,null],[null,"BAJO",1,"Base para Roland SPD",null,"Sabian o Istanbul",1,"DRUM THRONE","01 x","Sillín de Batería Ajustable",1,"DRUM THRONE",null,"BATERÍA",null,"DRUM",null,null,null,null],["01 x","Ampeg SVT Classic / SVT-Pro 3 ó SVT-Pro 4 + Ampeg SVT-810E / Fender Rumble 500 / Aguilar AG700",null,"BAJO","01 x","Hi-Hat 14”",1,"DRUM CARPET","01 x","Tapete 2.40m × 2.40m",1,"DRUM CARPET",null,"Bateria DW",null,"DW COLLECTORS PERFORMANCE",null,null,null,null],["01 x","Base para bajo",1,"Ampeg SVT Classic","01 x","Crash 16”",null,null,null,"Parches: Evans Hydraulic",null,"EVANS HYDRAULIC","01 x","Bombo 22 x18",1,"22\" kick",null,null,null,null],[null,null,1,"Ampeg SVT 810E","01 x","Crash 18”",null,"SET CYMBAL SABIAN",null,null,null,null,"01 x","Tom de Pie 16 x15",1,"10\" rack tom",null,null,null,null],[null,"GUITARRA",1,"Stand para bajo","01 x","Ride 20”",1,"14\" HI HAT",null,"PLATILLOS",null,"SET CYMBALS","01 x","Tambor 14 x 6.5",1,"16\" floor tom",null,null,null,null],["02 x","Fender Hot Rod DeVille 212 IV ó Fender Twin Reverb",null,"GUITARRA","01 x","China 16”/18”",1,"16\" CRASH",null,"Zildjian K Custom",1,"ZILDJIAN K","01 x","Tom 10” similar timbal",1,"14\" x 6\" snare",null,null,null,null],["06 x","Base para guitarra (Hércules ó similar)",2,"Fender Hot Rod Deville 212","01 x","Splash 8”/10”.",1,"18\" CRASH","01 x","Hi-Hat 14\"",1,"HIT HAT 14\"","01 x","Cencerro",null,"BELL (CENCERRO)",null,null,null,null],[null,null,6,"Stand para guitarra",null,"ACCESORIOS",1,"20\" RIDE","01 x","Crash 14\"",1,"CRASH 14\" (SABIAN HHX)","01 x","Pedal de bombo Iron Cobra 900 01 Set de Hardware completo (dos fierros de tambor)",null,"HARDWARE",null,null,null,null],[null,"TECLADOS",null,"Teclados","01 x","alfombra negra de 2,40 x 2,40 mts.",1,"18\" CHINE","01 x","Crash 16\"",1,"CRASH 16\"","01 x","Ride 20 Zildjian avedis",1,"single kick pedal dw 5000",null,null,null,null],["02 x","Base de teclado",2,"Base de teclado sencilla Hercules KS120B",null,"BAJO",1,"10\" SPLASH","01 x","Ride 18\"",1,"CRASH 18\"","01 x","Hit hat 13 Master Custom",1,"hi hat stand",null,null,null,null],[null,null,1,"Base de teclado doble Hercules KS210B","01 x","Ampeg SVT 450 / SVT Classic / SVT 4 / SVT 3 Pro / Aguilar DB751 / Aguilar Tone Hammer TH500 / TH350.",null,"BASS","01 x","China 14\"",1,"SPLASH 10\"","01 x","Crash 14 Zildjian",2,"snare stand",null,null,null,null],[null,"PERCUSIÓN",null,"PERCUSION","01 x","Ampeg SVT Classic 8x10” / 4x10”",1,"SVT CLASSIC BASS HEAD","01 x","Splash 10\"",1,"CHINA 14\" (ORIENTAL)","01 x","Plato efecto Zildjian k 16 (Hardware completo con 2 soportes de tambor)",5,"boom cymabls stand",null,null,null,null],["01 x","Shaker LP",1,"SHAKER LP","01 x","Bajo Warwick Corvette / Fender Precision / Jazz Bass de 4 cuerdas (NO de 5 cuerdas).",1,"AMPEG SVT 4X10",null,null,1,"Ride K series","01 x","Banqueta regulable a rosca",1,"Drum throne",null,null,null,null],["01 x","Bongó LP ó similar",1,"BONGO LP + STAND",null,"GUITARRA",1,"FENDER PRECISSION 4 STRING",null,"GUITARRA ANDRES CEPEDA",null,"GUITAR ANDRES CEPEDA","01 x","mesa de percusión para apoyo de consola de monitoreo de batetísta",1,"Drum carpet",null,null,null,null],["02 x","Mesa de percusión",2,"MESA DE PERCUSSION","01 x","Orange Rockerverb 50 II / Marshall JCM 2000 Dual Super Lead / Fender Bassman / Mesa Boogie Recto-verb Twenty-five head",null,"GUITAR","02 x","Marshall JCM 900 Doble Stack (head + 4×12\" · ver OBS-10)",2,"MARSHALL JCM 900 GUITAR HEAD",null,"MISCELÁNEOS",null,"Set cymbals",null,null,null,null],[null,null,1,"CONGAS (CONGAY TUMBA)","01 x","Orange PPC 412 4x12” / Marshall 1960B 4x12” / Fender Hot Rod Deluxe / Fender Twin Reverb",1,"MARSHALL JCM 2000",null,null,2,"MARSHALL 1960 GUITAR CABINET","01 x","banqueta alta sin apoyabrazos.",1,"20\" ride zildjian",null,null,null,null],[null,null,1,"STAND DE CONGAS","01 x","Guitarra Gibson SG Standard o Gibson Les Paul Standard.",1,"MARSHALL 1960 4X12\"",null,"GUITARRA CAMELO",null,"GUITAR CAMELO","08 x","stands de guitarra hércules simples + guitarrero",1,"hit hats 13\" Zildjian",null,null,null,null],[null,null,1,"BAR CHIMES + STAND",null,"GUITARRA",1,"GUITAR GIBSON SG-J","01 x","Mesa Boogie Rectifier + Cabina (ver OBS-10)",1,"MESA BOOGIE RECTIFIER + GUITAR CABINET 4X12","04 x","cubos negros para elevar equipos de guitarra y apoyo de consola para bateria.",1,"crash 14\" Sabian",null,null,null,null],[null,null,2,"BOOM CYMBAL STAND","02 x","Fender Deville / Fender Hot Rod Deluxe / Fender Twin Reverb / Mesa Boogie Roadster 2x12”",null,"GUITAR","05 x","Stand de Guitarra",5,"SINGLER HERCULES GUITAR STAND",null,null,1,"crash 18\" Sabian AA aero crash",null,null,null,null],[null,null,null,null,"01 x","Guitarra Fender Jazzmaster.",2,"FENDER TWIN REVERB","02 x","Multi Stand de Guitarra",2,"GUITAR BOAT 5 SPACES",null,null,null,"MISC",null,null,null,null],[null,null,null,null,null,"TECLADOS",1,"OPCCIONS: (FENDER STRATOCASTER, TELECASTER, LESS PAUL)",null,null,null,null,null,null,8,"single hercules guitar stand",null,null,null,null],[null,null,null,null,"01 x","Roland XPS-30.",null,"KEYBOARD",null,"BAJO GUSTAVO",null,"BASS GUSTAVO",null,null,4,"racks amp w/ cobert or 2 cubos 80 x 80",null,null,null,null],[null,null,null,null,"01 x","Roland JV-30",1,"Roland XP80","01 x","Ampeg SVT 4 Pro",1,"AMPEG SVT 3 PRO BASS HEAD",null,null,null,null,null,null,null,null],[null,null,null,null,"01 x","Controlador MIDI Arturia Key Lab Essential de 61 teclas",1,"Roland Juno D","04 x","Ampeg 8×10\"",1,"AMPEG 8X10 BASS CABINET",null,null,null,null,null,null,null,null],[null,null,null,null,"01 x","Sintetizador Korg MicroKorg MK1",1,"CONTROLADOR MIDI M-AUDIO CODE 61","02 x","Stand de Bajo",2,"SINGLE HERCULES STAND",null,null,null,null,null,null,null,null],[null,null,null,null,null,"MISCELÁNEOS:",1,"SINTETIZADOR MICRO KORG MK1",null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,"06 x","Soportes para guitarra/bajo Hercules.",null,"MISC",null,"TECLADOS JUAN GABRIEL",null,"KEYS JUAN GABRIEL",null,null,null,null,null,null,null,null],[null,null,null,null,"01 x","Soporte doble para teclado (Keyboards double stand Stay 1300-02).",6,"SINGLE HERCULES GUITAR STAND","01 x","Piano Rhodes",null,null,null,null,null,null,null,null,null,null],[null,null,null,null,"01 x","Soporte para laptop, pie de teclado simple o mesa de percusión Gibraltar o LP.",1,"DOUBLE HERCULES KEYBOARD STAND","01 x","Yamaha Motif XF 8",1,"YAMAHA MOTIF XF8",null,null,null,null,null,null,null,null],[null,null,null,null,"01 x","Mesa de percusión Gibraltar o LP",1,"MAGICIAN PERCUSSION TABLE","01 x","Yamaha Motif XF 7",1,"YAMAHA MONTAGE 7",null,null,null,null,null,null,null,null],[null,null,null,null,"01 x","Soporte de teclado simple tipo X",1,"MAGICIAN PERCUSSION TABLE","01 x","Silla para Piano",1,"PIANO BENCH",null,null,null,null,null,null,null,null],[null,null,null,null,"01 x","Pandereta de mano.",1,"SINGLE HERCULES KEYBOARD STAND","04 x","Stand Doble para Teclado",4,"DOUBLE HERCULES KEYBOARD STAND KS210B",null,null,null,null,null,null,null,null],[null,null,null,null,"01 x","Ventilador de piso",1,"HAND TAMBOURINE",null,"Pedal de sustain en cada posición de teclado",null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,1,"STAGE FAN",null,null,null,null,null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,null,"MISCELÁNEOS",null,"MISC",null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,"02 x","Ventilador de Escenario",2,"STAGE FAN",null,null,null,null,null,null,null,null],[null,null,null,null,null,null,null,null,"05 x","Silla Tipo Bar",5,"BAR STOOL",null,null,null,null,null,null,null,null]],"merges":["A1:B1","A3:D3","C1:D1","E1:F1","E3:H3","G1:H1","I1:J1","I3:L3","K1:L1","M1:N1","M3:P3","O1:P1","Q1:R1","Q3:T3","S1:T1"]},{"name":"ST4-D2","rows":[["Stage 4",null,"2026-09-13",null,"Stage 4",null,"2026-09-13",null,"Stage 4",null,"2026-09-13",null,"Stage 4",null,"2026-09-13",null,"Stage 4",null,"2026-09-13",null],[null,"Flor de Lava | Backline Stage 4 | 13/09",null,null,null,"Jarabe de Palo (ft Pedro Capó) | Backline Stage 4 | 13/09",null,null,null,"Bonka | Backline Stage 4 | 13/09",null,null,null,"Diamante Eléctrico | Backline Stage 4 | 13/09",null,null,"Los Amigos Invisibles | Backline Stage 4 | 13/09",null,null,null],["SET A",null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,"SET A",null,null,null],["Cat:","★★☆☆☆","Rider:","https://drive.google.com/drive/folders/1e_mikAJDGrhNelLgVKM2PBm0n5a1ZakS?usp=drive_link","Cat:","★★★☆☆","Rider:","https://drive.google.com/drive/folders/1eHfuLqHB0voITITM6FC2E8A0leJ-KgMF?usp=drive_link","Cat:","★★★☆☆","Rider:","https://drive.google.com/drive/folders/16l0_bRgiZPR6-f_jZhp4t5dJlBe5mS-r?usp=sharing","Cat:","★★★☆☆","Rider:","https://drive.google.com/drive/folders/1LZK9XokkZvKrm_OCKArXkKVWSooE_SQY?usp=drive_link","Cat:","★★★☆☆","Rider:","https://drive.google.com/drive/folders/141G-67uSDWhGnWbddxdFBsEATeTFPVJv?usp=drive_link"],["Cant","Requerimiento","Cant","Propuesta","Cant","Requerimiento","Cant","Propuesta","Cant","Requerimiento","Cant","Propuesta","Cant","Requerimiento","Cant","Propuesta","Cant","Requerimiento","Cant","Propuesta"],[null,"BATERÍA Y PERCUSIÓN",null,"BATERÍA Y PERCUSIÓN",null,"BATERIA",null,"DRUM",null,"BATERÍA",null,"DRUM",null,"BATERÍA",null,null,null,"BATERÍA",null,"DRUM"],[null,"DW Collector's o similar (5 piezas):",null,"DRUM DW PERFORMANCE",null,"DW Collectors / Yamaha Recording Custom / Yamaha Maple Custom",null,"YAMAHA OAK",null,"V",1,"MAPEX SATURN",null,"Ludwig o Yamaha",null,"DW COLLECTORS SERIES",null,"Yamaha Maple Custom Absolute",1,"DW COLLECTORS SERIES SATIN"],["01 x","Bombo 22\"",1,"22\" KICK","01 x","Bombo 22\"",1,"22\" KICK","01 x","Bombo 22\" × 18\"",1,"22\" KICK","01 x","Bombo 22\"",1,"22\" KICK","01 x","Bombo 22×18\" (con parche nuevo)",1,"22\" KICK"],["01 x","Redoblante 14\" con base",1,"10\" 12\" RACK TOM","01 x","Tom 10\"",1,"10\" 12\" RACK TOM","01 x","Snare Stainless Steel 14\" × 6\"",1,"12\" RACK TOM","01 x","Floor Tom 14\"",1,"14\" FLOOR TOM","01 x","Tom 10×8\" (con parche nuevo)",1,"10\" RACK TOM"],["03 x","Toms: 10\" / 12\" / 16\"",1,"16\" FLOOR TOM","01 x","Tom 12\"",1,"16\" FLOOR TOM","01 x","Tom aéreo 12\"",1,"16\" FLOOR TOM","01 x","Floor Tom 16\"",1,"16\" FLOOR TOM}","01 x","Tom de Piso 14×12\" (con parche nuevo)",1,"14\" FLOOR TOM"],["01 x","Pedal de bombo",1,"14\" SNARE","01 x","Tom de piso 16\"",1,"14\" SNARE","01 x","Tom de piso 16\"",1,"14\" x 6 Snare","01 x","Tarola 14\" × 6.5\" Maple",1,"14\" SNARE","02 x","Redoblante 14×5\"",2,"14\" X 5 SNARE"],["01 x","Base de Hi-Hat",null,"HARDWARE","01 x","Redoblante 14\"",null,"HARDWARE","03 x","Base para Snare",1,"Parche evans Hydraulic","01 x","Tarola 14\" × 6.5\" Aluminio",1,"14\" SNARE",null,null,1,"DRUM HEAD NEW"],["04 x","Bases de platillo con Boom",1,"SINGLE KICK PEDAL",null,"HARDWARE",1,"SINGLE KICK PEDAL DW 9000","08 x","Base para Platillo",null,null,null,"HARDWARE",null,"HARDWARE",null,"HARDWARE",null,"HARDWARE"],["01 x","Cajón Peruano",1,"HI HAT STAND",null,"Ideal DW9000",1,"HI HAT STAND","02 x","Clamp para Splash",null,"HARDWARE","01 x","Base de Hi-Hat",2,"SINGLE KICK PEDAL","02 x","Stand de Redoblante",1,"SINGLE KICK PEDAL"],["01 x","Conga",2,"SNARE STAND","01 x","Silla de Batería",2,"SNARE STAND","01 x","Máquina de Hi-Hat",2,"SINGLE KICK PEDAL 9000","01 x","Silla de Batería",1,"HI HAT STAND","01 x","Stand de Hi-Hat",1,"HI HAT STAND"],["01 x","Bombo Leguero o Tambora",4,"BOOM CYMBALS STAND","01 x","Base de Hi-Hat",5,"BOOM CYMABLS STAND","02 x","Pedal de Bombo DW9000",1,"HI HAT STAND","04 x","Bases de Platillo",3,"SNARE STAND","07 x","Stand Boom Platillos",2,"SNARE STAND"],["01 x","Base para tambora",1,"DRUM THRONE","01 x","Base de Redoblante",1,"DRUM THRONE","01 x","Drum Throne Pork Pie + Butt Kicker (con Amplificador 400–1500W / 4Ω)",2,"SNARE STAND","03 x","Bases de Redoblante",4,"BOOM CYMBALS STAND","01 x","Silla de Batería",7,"BOOM CYMBAL STAND"],["01 x","Base extra de redoblante",1,"DRUM CARPET","02 x","Tom Holder",1,"DRUM CARPET","01 x","Alfombra 2.00m × 2.00m",8,"BOOM CYMBALS STAND","02 x","Pedal de Bombo",1,"DRUM THRONE","01 x","Pedal de Bombo (en perfectas condiciones)",1,"DRUM THRONE"],["03 x","Mesas de percusión",null,"PERCUSSION","04 x","Base de platillo tipo Boom",null,null,null,"Parches: Remo Pinstripe o Evans EC2 · NO parches corrugados",1,"PORTER N DAVIES + DRUM THRONE","01 x","Tapete de Batería 2m × 2m",1,"DRUM CARPET","06 x","Tapete 2m×2m negro",1,"DRUM CARPET"],["01 x","Plexiglass",1,"LP CONGA","01 x","Pedal de Bombo Sencillo",null,null,null,"PLATILLOS",1,"DRUM CARPET","01 x","Atril musical",1,"MUSIC STAND",null,null,null,null],[null,null,1,"CAJON PERUANO",null,"PLATILLOS",null,null,null,"Zildjian K / Sabian HHX / Paiste Masters",null,null,null,"BAJO",null,"BASS",null,"PLATILLOS",null,"SET CYMBAL"],[null,"BAJO",1,"TAMBORA + STAND",null,"Zildjian A / K Custom",null,"SET CYMBAL K CUSTOM","01 x","Hi-Hat 14\"",null,null,"01 x","Ampeg SVT Classic",1,"AMPEG SVT CLASSIC",null,"Paiste Signature Series",null,"PAISTE 2002"],["01 x","Amplificador de bajo Ampeg o Aguilar con cabezote",3,"MAGICIAN PERCUSSION TABLE","01 x","Hi-Hat 14\" New Beat o Master Sound",1,"14\" HIT HATS","02 x","Crash 18\"",null,"SET CYMBALS","01 x","Gabinete 8×10\"",1,"AMPEG 8X10 CABINET","01 x","Ride 22\"",1,"RIDE 22\""],["01 x","Base para Bajo",1,"PLEXIGLASS","01 x","Ride 20\" K Ride",1,"16\" CRASH","01 x","China 18\"",null,"HHX","02 x","Bases para Bajo",2,"SINGLE HERCULES GUITAR STAND","03 x","Crash 18\"",1,"CRASH 20\""],[null,null,null,"BASS","01 x","Crash 16\" A Custom",1,"18\" CRASH","01 x","Ride 21\"",1,"HIT HATS","01 x","Silla para Piano o Silla de Batería",1,"SILLA PARA PIANO","01 x","China 16\"",1,"CRASH 18\""],[null,"GUITARRAS",1,"AMPEG 8X10 + SVT 3 PRO BASS HEAD","01 x","Crash 17\" A Custom",1,"20\" RIDE","01 x","Splash 10\"",2,"CRASH 18\"","01 x","Mesa de Percusión",1,"MESA DE PERCUSSION SENCILLA","01 x","Splash 10\"",1,"CRASH 18\" (SABIAN O ZILDJIAN)"],["01 x","Amplificador Fender Twin Reverb o similar",1,"SINGLE HERCULES GUITAR STAND","01 x","China 17\"",null,null,"01 x","Splash 12\"",1,"CHINE 18\"","01 x","Ventilador",1,"STAGE FAN",null,null,1,"CRASH 16\""],["04 x","Base para Guitarra Acústica",null,"GUITAR",null,"TECLADOS",null,"KEYBOARDS",null,"PERCUSIÓN",1,"RIDE 20\"",null,"GUITARRA",null,"GUITAR",null,"PERCUSIÓN",null,"PERCUSSION"],["02 x","Base para Guitarra Eléctrica",1,"AMP. FENDER TWIN REVERB","01 x","Nord Stage 88",1,"NORD STAGE 3 + SUSTAIN PEDAL","01 x","Set de Congas LP Giovanni Hidalgo (Conga · Tumba · Quinto — parches sintéticos)",1,"SPLASH 10\"","02 x","Amplificador Fender Hot Rod DeVille 4×10",2,"FENDER HOT ROD DEVILLE",null,"Meinl Professional Series",1,"LP PALLADIUM GIOVANNY HIDALGO"],["01 x","Guitarrero offstage",6,"SINGLE HERCULES GUITAR STAND","01 x","Nord Electro 4D",1,"NORD ELECTRO 6D + SUSTAIN PEDAL","03 x","Stand LP636 para Congas",1,"SPLASH 12\"","01 x","Mesa de Percusión",1,"MAGICIAN PERCUSSION TABLE","01 x","Conga 11¾\"",1,"CONGA"],[null,null,1,"DUITAR BOAT","01 x","Stand Doble K&M",1,"PIANO BENCH","01 x","Djembe + Stand",null,null,"03 x","Bases para Guitarra",3,"SINGLE HERCULES GUITAR STAND","01 x","Tumbadora 12½\"",1,"TUMBA"],[null,"TECLADOS",null,"TECLADOS","01 x","Silla K&M",1,"PEDAL DE VOLUMEN","01 x","Hand Cymbal Sabian HHX 16\" o 18\" + Stand",null,"PERCUSSION","01 x","Rack de Guitarra 6 slots",1,"GUITAR BOAT 6 SPACES","01 x","Stand Doble de Congas",1,"STAND DOBLE DE CONGAS"],["01 x","Base para Teclado (sencilla en X)",1,"SINGLE KEYBOARD STAND KS120B","02 x","Pedal Sustain (Clavia, Yamaha o Roland)",1,"DOUBLE HERCULES KEYBOARD STAND KS210B","01 x","Hand Tambourine LP",1,"LP CONGAS GALAXY GIOVANNI HIDALGO (QUINTO, CONGA Y TUMBA)",null,"TECLADOS",null,"KEYBOARDS","01 x","Set de Timbales 14\" y 15\" Luis Conte",1,"SET TIMBALES TITO PUENTE 14\" Y 15\""],[null,null,null,null,"01 x","Pedal Volumen Estéreo (Boss, Roland, Dunlop o Clavia)",null,null,"01 x","Set de Toys",3,"LP 636 STAND PARA CONGAS","04 x","Stand sencillo tipo X Heavy Duty",4,"SINGLE HERCULES KEYBOARD STAND KS120B","01 x","Stand de Timbal con soporte de cencerro",1,"TOYS TIMBALES (CHACHA BELL, CENCERRO , JAMBLOCK ROJO)"],[null,"MISCELÁNEOS",null,"MISCELÁNEOS",null,"SAX / PERCUSIÓN",null,"MISC/SAXO/PERCUSSION","01 x","Mesa de Multipercusión LP760A",1,"DJEMBE","01 x","Stand doble tipo X Heavy Duty",1,"DOUBLE HERCULES KEYBOARD STAND KS210B","01 x","Bongó (7\" y 8½\")",1,"BONGOS MEINL FREE RIDE SERIES"],["01 x","Mesa con 02 sillas tipo bar/restaurante (no sillas altas)",2,"MAGICIAN PERCUSSION TABLE","01 x","Stand para Saxofón Tenor Hercules",1,"SAXO STAND","02 x","Cymbal Clamp",1,"STAND GPDS GIBRALTAR - (DJEMBE)","02 x","Sillas altas / Bar Stools",2,"BAR STOOL","01 x","Stand de Bongó",1,"STAND BONGO"],[null,null,2,"BAR STOOL","01 x","Güiro Plástico LP",1,"TOYS (GUIRO PLASTICO, SHAKER, PANDERETA, CENCERRO",null,"BAJO",1,"HAND CYMBAL SABIAN AA 16\"",null,"PERCUSIÓN",null,"PERCUSSION","04 x","Stand Boom Platillos",4,"BOOM CYMBAL STAND"],[null,null,null,null,"01 x","Shaker LP",1,"RASPA PLASTICA","01 x","Fender Jazz Bass 5 Strings",1,"HAND TAMBOURINE","01 x","Set Congas + Tumba LP Galaxy Giovanni Hidalgo con base",1,"LP GALAXY GIOVANNI HIDALGO (CONGA Y TUMBA + STAND)","01 x","Meinl CH27 Cortina 27 Barras",1,"LP BAR CHIMES 27 BARRAS"],[null,null,null,null,"01 x","Pandereta LP",null,null,"02 x","Cable TS (Plug/Jack) 15m",1,"SET TOYS","01 x","Djembé LP Galaxy Giovanni Hidalgo con base",1,"LP DJEMBE + STAND GPDS GUBRALTAR","01 x","Mesa de Percusión LP Aspire",1,"MESA DE PERCUSION SENCILLA"],[null,null,null,null,"01 x","Cencerro LP",null,null,"03 x","Stand de Instrumento",1,"LP 760A PERCUSSION TABLE","01 x","Bongós LP Galaxy Giovanni Hidalgo con base",1,"LP BONGOS GIOVANNI HILDALGO + STAND","01 x","Ventilador de Piso",1,"VENTILADOR DE PISO"],[null,null,null,null,"01 x","Raspa Plástica LP",null,null,null,"GUITARRAS",2,"CYMBAL CLAMP","01 x","Mesa de Percusión LP 760 con Rack de Campanas",1,"LP 760A PERCUSSION TABLE","01 x","Tapete de Percusión",1,"DRUM CARPET"],[null,null,null,null,null,"BAJO",null,"BASS","02 x","Fender Stratocaster American Deluxe (con palanca de trémolo)",1,"Percussion table","01 x","Tapete 2m × 2m",null,"DRUM CARPET",null,null,null,null],[null,null,null,null,"01 x","Fender Precision / Jazz Bass USA (cuerdas nuevas 45-105)",1,"FENDER PRECISSION USA","01 x","Guitarra Electroacústica Fender",null,null,"04 x","Bases de Platillo con Boom",4,"BOOM CYMBAL STAND",null,"FRONTAL",null,"FRONTAL"],[null,null,null,null,"01 x","Ampeg Heritage SVT",1,"AMPEG SVT HERITAGE BASS HEAD","01 x","Guitarra Electroacústica Taylor 414CE (o similar)",null,"BASS","01 x","Gajate con Campana",1,"GAJATE CON CAMPANA","01 x","LP Handheld Salsa Cowbell con beater",1,"LP COWBELL DE MANO CON BAQUETA"],[null,null,null,null,"01 x","Ampeg 8x10\" Classic",1,"AMPEG 8X1O CABINET","02 x","Cable TS (Plug/Jack) 15m",1,"FENDER JAZZ BASS 5 STRING","01 x","Platillo China 16\"",1,"18\" CHINA SABIAN","01 x","LP Professional Maracas Set",1,"MARACAS LP281"],[null,null,null,null,"01 x","Base para Bajo Hercules",1,"SINGLE HERCULES GUITAR STAND","06 x","Stand de Instrumento",3,"SINGLE HERCULES GUITAR STAND","01 x","Platillo Crash 14\"",1,"14\" CRASH SABIAN","01 x","LP Pro Merengue Güira con scraper",1,"LP GUIRA 305 CON SCRAPER"],[null,null,null,null,null,"GUITARRA",null,"GUITAR",null,"DIRECTOR MUSICAL",null,null,"01 x","Set de Toys completo",1,"SET TOYS","01 x","Mesa de Percusión LP Aspire",1,"MESA DE PERCUSION SENCILLA"],[null,null,null,null,"01 x","Fender Stratocaster USA",1,"FENDER STRATOCASTER USA","01 x","Controlador MIDI (con Pitch Wheel y Mod Wheel)",null,null,"01 x","Pandereta de Mano",1,"PANDERETA DE MANO",null,null,null,null],[null,null,null,null,"01 x","Gibson Les Paul Custom",1,"GIBSON LES PAUL","01 x","Nord Electro 6D",null,"GUITAR","01 x","Stand para Pandereta",1,"TAMBOURINE STAND",null,"BAJO",null,"BASS"],[null,null,null,null,"01 x","Fender Twin Reverb",1,"AMP. FENDER TWIN REVERB","01 x","Stand de Teclado",2,"FENDER STRATOCASTER CON TRÉMOLO","01 x","Double Jamblock LP Gogo",1,"LP GOGO",null,"Ampeg",1,"AMPEG SVT 4 PRO"],[null,null,null,null,null,null,null,null,"02 x","Guitar Stand",1,"Martin DSR1","01 x","Cencerro Chacha LP",1,"CENCERRO LP","01 x","Head SVT-4 Series",1,"AMPEG SVT 8X10 CABINET"],[null,null,null,null,null,null,null,null,"01 x","Mesa de Percusión LP LPA521",1,"TAYLOR 414CE","01 x","Cabasa LP",1,"CABASA LP","01 x","Gabinete 8×10\"",2,"SINGLE HERCULES GUITAR STAND"],[null,null,null,null,null,null,null,null,null,"MISCELÁNEOS",6,"SINGLE HERCULES GUITAR STAND","01 x","Vibra Slap",1,"VIBRA SLAP","02 x","Ultimate GS-100 Guitar Stand",1,"VENTILADOR DE PISO"],[null,null,null,null,null,null,null,null,"10 x","Silla tipo Bar (con espaldar)",null,null,"01 x","Set de Shakers",1,"SHAKERS","01 x","Ventilador de Piso",null,null],[null,null,null,null,null,null,null,null,"02 x","Guitar Boat (6 instrumentos c/u)",null,null,"01 x","Set de Campanas de Timbal LP",1,"SET DE CAMPANAS- TIMBAL",null,null,null,"GUITAR"],[null,null,null,null,null,null,null,null,null,null,null,"DIRECTOR MUSICAL",null,null,null,null,null,"GUITARRA",2,"ROLAND JC 120 JAZZ CHORUS"],[null,null,null,null,null,null,null,null,null,null,1,"YAMAHA MOTIF XF7",null,null,null,null,"02 x","Roland JC 120 Jazz Chorus",2,"SINGLE HERCULES GUITAR STAND"],[null,null,null,null,null,null,null,null,null,null,1,"NORD ELECTRO 6D",null,null,null,null,"02 x","Ultimate JS-TG101 Guitar Stand",null,null],[null,null,null,null,null,null,null,null,null,null,1,"SINGLE HERCULES KEYBOARD STAND",null,null,null,null,null,null,null,"KEYBOARDS"],[null,null,null,null,null,null,null,null,null,null,2,"SINGLE HERCULES GUITAR STAND",null,null,null,null,null,"TECLADOS",1,"NORD STAGE 2 + SUSTAIN PEDAL"],[null,null,null,null,null,null,null,null,null,null,1,"MAGICIAN PERCUSSION TABLE",null,null,null,null,"01 x","Nord Stage 2 SW73 o HA76",1,"ULTIMATE APEX AX-48"],[null,null,null,null,null,null,null,null,null,null,1,"ROLAND SPD SX",null,null,null,null,"01 x","Ultimate Apex AX-48 Pro Stand (doble)",1,"SINGLE HERCULES KEYBOARD STAND KS120B"],[null,null,null,null,null,null,null,null,null,null,null,"MISC",null,null,null,null,"01 x","Ultimate IQ 2000 X Stand (sencillo)",1,"MAGICIAN PERCUSSION TABLE"],[null,null,null,null,null,null,null,null,null,null,10,"SILLA TIPO BAR",null,null,null,null,"01 x","Mesa de Percusión LP Aspire",2,"SUSTAIN PEDAL"],[null,null,null,null,null,null,null,null,null,null,2,"GUITAR BOAT",null,null,null,null,"02 x","Pedal Sustain",null,null],[null,null,null,null,null,null,null,null,null,null,6,"STAGE FAN",null,null,null,null,null,null,null,null]],"merges":["A1:B1","A3:D3","C1:D1","E1:F1","E3:H3","G1:H1","I1:J1","I3:L3","K1:L1","M1:N1","M3:P3","O1:P1","Q1:R1","Q3:T3","S1:T1"]}];
+
+/* ============================================================
+   Del Excel a datos: un solo lector para el ejemplo y para
+   cualquier archivo que se cargue.
+   ============================================================ */
+const CATS = [
+  // Hardware y platillos cuentan como batería: el requerimiento suele meter
+  // los stands bajo BATERÍA y la propuesta los separa. El rótulo original se conserva.
+  ["bateria",   "Batería",     /^(bater[ií]a( dw)?|drum|bater[ií]a y percusi[oó]n|hardware|platillos|set cymbals?|cymbals)$/],
+  ["percusion", "Percusión",   /^(percusi[oó]n|percussion|frontal)$/],
+  ["bajo",      "Bajo",        /^(bajo|bass)\b/],
+  ["guitarra",  "Guitarra",    /^(guitarras?|guitar)\b/],
+  ["teclados",  "Teclados",    /^(teclados|keyboards?|keys)\b/],
+  ["misc",      "Misceláneos", /^(misc|miscel[aá]neos|accesorios|sax|director musical)/],
+];
+const CAT_NAME = Object.fromEntries(CATS.map(([id, n]) => [id, n]));
+const COL = i => { let s = ""; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = (i - m - 1) / 26; } return s; };
+const clean = v => v == null ? "" : String(v).replace(/\s+/g, " ").trim();
+const fold = s => clean(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+function sectionOf(text) {
+  const t = clean(text).toLowerCase().replace(/[:.]+$/, "");
+  for (const [id, , re] of CATS) if (re.test(t)) return id;
+  return null;
+}
+function qtyOf(v) {
+  if (v == null || v === "") return null;
+  if (typeof v === "number") return v;
+  const m = String(v).match(/\d+/);
+  return m ? +m[0] : null;
+}
+function dayLabel(iso) {
+  if (!iso) return "Sin fecha";
+  const d = new Date(String(iso).slice(0, 10) + "T12:00:00");
+  if (isNaN(d)) return String(iso);
+  const W = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"], M = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  return `${W[d.getDay()]} ${d.getDate()} ${M[d.getMonth()]}`;
+}
+
+function parseWorkbook(sheets) {
+  const artists = [], groups = [], items = [], cellIndex = {};
+  for (const sh of sheets) {
+    const R = sh.rows, cell = (r, c) => (R[r] || [])[c];
+    // Una hoja de backline tiene "Requerimiento" en la fila 5.
+    const width = Math.max(...R.slice(0, 6).map(r => r.length));
+    for (let b = 0; b + 3 < width + 3; b += 4) {
+      if (fold(cell(4, b + 1)) !== "requerimiento") continue;
+      const title = [0, 1, 2, 3].map(i => clean(cell(1, b + i))).find(Boolean) || "";
+      const name = title.split("|")[0].trim() || `Bloque ${COL(b)}`;
+      const date = clean(cell(0, b + 2));
+      const a = {
+        id: `${sh.name}:${COL(b)}`, name, sheet: sh.name, block: b,
+        stage: clean(cell(0, b)) || "—", date, dia: dayLabel(date),
+        set: clean(cell(2, b)), stars: (clean(cell(3, b + 1)).match(/★/g) || []).length,
+        rider: clean(cell(3, b + 3)), cell: `${COL(b)}2`,
+      };
+      artists.push(a);
+      [0, 1, 2, 3].forEach(i => { for (let r = 0; r < 4; r++) cellIndex[`${sh.name}!${COL(b + i)}${r + 1}`] = { artist: a.id }; });
+
+      for (const [lado, qc] of [["req", b], ["prop", b + 2]]) {
+        let g = null;
+        for (let r = 5; r < R.length; r++) {
+          const text = clean(cell(r, qc + 1)), qty = qtyOf(cell(r, qc));
+          if (!text) continue;
+          const ref = `${COL(qc + 1)}${r + 1}`;
+          const sec = qty == null ? sectionOf(text) : null;
+          if (sec || !g) {
+            g = { id: `${a.id}:${lado}:${ref}`, artist: a.id, lado, cat: sec || "misc", label: text, notes: [], cell: ref };
+            groups.push(g);
+            cellIndex[`${sh.name}!${ref}`] = { artist: a.id, group: g.id };
+            if (sec) continue;
+          }
+          if (qty == null) { g.notes.push(text); cellIndex[`${sh.name}!${ref}`] = { artist: a.id, group: g.id }; continue; }
+          const it = { id: `${sh.name}!${ref}`, artist: a.id, group: g.id, lado, cat: g.cat, qty, raw: clean(cell(r, qc)), text, sheet: sh.name, cell: ref, qtyCell: `${COL(qc)}${r + 1}` };
+          items.push(it);
+          cellIndex[it.id] = cellIndex[`${sh.name}!${it.qtyCell}`] = { artist: a.id, item: it.id };
+        }
+      }
+    }
+  }
+  const byId = o => Object.fromEntries(o.map(x => [x.id, x]));
+  const A = byId(artists), G = byId(groups);
+  // Cobertura: unidades pedidas vs propuestas por artista y tipo de equipo.
+  const cov = {};
+  for (const it of items) {
+    const k = `${it.artist}|${it.cat}`;
+    (cov[k] ||= { req: 0, prop: 0 })[it.lado] += it.qty;
+  }
+  for (const it of items) it.search = fold([it.text, A[it.artist].name, G[it.group].label, ...G[it.group].notes].join(" "));
+  return { artists, groups, items, A, G, I: byId(items), cellIndex, cov };
+}
+
+/* ============================================================
+   2 · EL ESTADO
+   Un store mínimo: get / set / subscribe. Nada más.
+   ============================================================ */
+function createStore(initial) {
+  let state = initial;
+  const subs = new Set();
+  return {
+    get: () => state,
+    set(patch, label) {
+      const prev = state;
+      const next = typeof patch === "function" ? patch(prev) : patch;
+      state = { ...prev, ...next, log: label ? [{ t: new Date(), label }, ...prev.log].slice(0, 6) : prev.log };
+      subs.forEach(fn => fn(state, prev));
+    },
+    subscribe: fn => (subs.add(fn), () => subs.delete(fn)),
+  };
+}
+
+const EMPTY_FILTERS = { q: "", dias: [], artistas: [], cats: [], lado: "ambas", minStars: 0, soloFaltantes: false, foto: "", cambios: false };
+
+function filtersFromHash() {
+  const p = new URLSearchParams(location.hash.slice(1)), list = k => (p.get(k) || "").split(",").filter(Boolean);
+  return {
+    q: p.get("q") || "", dias: list("dia"), artistas: list("art"), cats: list("cat"),
+    lado: ["req", "prop"].includes(p.get("lado")) ? p.get("lado") : "ambas",
+    minStars: +p.get("min") || 0, soloFaltantes: p.get("falta") === "1", foto: ["con", "sin"].includes(p.get("foto")) ? p.get("foto") : "", cambios: p.get("cambios") === "1",
+  };
+}
+function filtersToHash(f) {
+  const p = new URLSearchParams();
+  if (f.q) p.set("q", f.q);
+  if (f.dias.length) p.set("dia", f.dias.join(","));
+  if (f.artistas.length) p.set("art", f.artistas.join(","));
+  if (f.cats.length) p.set("cat", f.cats.join(","));
+  if (f.lado !== "ambas") p.set("lado", f.lado);
+  if (f.minStars) p.set("min", f.minStars);
+  if (f.soloFaltantes) p.set("falta", "1");
+  if (f.foto) p.set("foto", f.foto);
+  if (f.cambios) p.set("cambios", "1");
+  const h = p.toString();
+  history.replaceState(null, "", h ? "#" + h : location.pathname + location.search);
+}
+
+/* Perfil: el admin carga y publica el Excel; el operario solo ve lo publicado.
+   Hay dos versiones del Excel en el estado: la publicada (la de todos) y el
+   borrador del admin. Lo que se ve en pantalla sale de una de las dos. */
+function readRole() { try { return localStorage.getItem("cordillera:perfil") === "operario" ? "operario" : "admin"; } catch (_) { return "admin"; } }
+function withView(next) {
+  const src = next.role === "admin" && next.draft ? next.draft : next.published;
+  if (src.data === next.data) return { ...next, diff: src.diff };
+  return { ...next, sheets: src.sheets, data: src.data, source: src.source, diff: src.diff, selected: null, sheetTab: 0 };
+}
+// Qué cambió entre dos lecturas del Excel, ítem por ítem (por celda).
+function diffData(prev, next) {
+  const added = [], changed = [], removed = [];
+  for (const it of next.items) {
+    const o = prev.I[it.id];
+    if (!o) added.push(it.id);
+    else if (o.text !== it.text || o.qty !== it.qty) changed.push(it.id);
+  }
+  for (const it of prev.items) if (!next.I[it.id]) removed.push(it.id);
+  const names = d => new Set(d.artists.map(a => a.name));
+  const pn = names(prev), nn = names(next);
+  return { added, changed, removed, artistsIn: [...nn].filter(n => !pn.has(n)), artistsOut: [...pn].filter(n => !nn.has(n)) };
+}
+const SAMPLE_DATA = parseWorkbook(SAMPLE);
+
+const store = createStore({
+  role: readRole(),
+  published: { sheets: SAMPLE, source: "EQUIPO_CORDILLERAS_OML.xlsx", data: SAMPLE_DATA, at: null, by: null, diff: null },
+  draft: null,
+  excelModo: "local",
+  nuevo: null,
+  source: "EQUIPO_CORDILLERAS_OML.xlsx",
+  sheets: SAMPLE,
+  data: SAMPLE_DATA,
+  diff: null,
+  filters: filtersFromHash(),
+  selected: null,
+  open: {},
+  sheetTab: 0,
+  // Fotos por ítem: { "ST4-D1!B20": [{ doc, asset, url, by, at }] }. Llegan de la base
+  // de datos del artifact; en una vista local se quedan solo en memoria.
+  fotos: {},
+  fotosModo: "local",
+  log: [],
+});
+
+/* Derivados: se calculan a partir del estado, nunca se guardan. */
+function matches(it, f, D, skip, fotos) {
+  const a = D.A[it.artist];
+  if (skip !== "q" && f.q) { const words = fold(f.q).split(" ").filter(Boolean); if (!words.every(w => it.search.includes(w))) return false; }
+  if (skip !== "dias" && f.dias.length && !f.dias.includes(a.dia)) return false;
+  if (skip !== "artistas" && f.artistas.length && !f.artistas.includes(a.id)) return false;
+  if (skip !== "cats" && f.cats.length && !f.cats.includes(it.cat)) return false;
+  if (f.lado !== "ambas" && it.lado !== f.lado) return false;
+  if (f.minStars && a.stars < f.minStars) return false;
+  if (f.soloFaltantes) { const c = D.cov[`${it.artist}|${it.cat}`]; if (!(c && c.prop < c.req)) return false; }
+  if (f.foto) { const n = fotos[it.id]?.length || 0; if (f.foto === "con" ? !n : n) return false; }
+  if (f.cambios && !CHANGED.has(it.id)) return false;
+  return true;
+}
+let memo = { key: null, val: null }, CHANGED = new Set();
+function derive(s) {
+  const key = s.data;
+  if (memo.key === key && memo.f === s.filters && memo.fotos === s.fotos && memo.diff === s.diff) return memo.val;
+  const D = s.data, f = s.filters;
+  CHANGED = new Set(s.diff ? [...s.diff.added, ...s.diff.changed] : []);
+  const visible = new Set(D.items.filter(it => matches(it, f, D, null, s.fotos)).map(it => it.id));
+  const facet = (dim, keyOf) => {
+    const c = {};
+    for (const it of D.items) if (matches(it, f, D, dim, s.fotos)) { const k = keyOf(it); c[k] = (c[k] || 0) + 1; }
+    return c;
+  };
+  const val = {
+    visible,
+    artistsVisible: new Set([...visible].map(id => D.I[id].artist)),
+    facets: {
+      dias: facet("dias", it => D.A[it.artist].dia),
+      artistas: facet("artistas", it => it.artist),
+      cats: facet("cats", it => it.cat),
+    },
+  };
+  memo = { key, f, fotos: s.fotos, diff: s.diff, val };
+  return val;
+}
+const filtersActive = f => JSON.stringify(f) !== JSON.stringify(EMPTY_FILTERS);
+
+/* Acciones: la única forma de cambiar el estado. */
+const actions = {
+  setFilter(k, v, label) { store.set(s => ({ filters: { ...s.filters, [k]: v } }), label); },
+  toggleIn(k, v, label) {
+    const cur = store.get().filters[k];
+    actions.setFilter(k, cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v], label);
+  },
+  onlyArtist(id) {
+    const a = store.get().data.A[id];
+    store.set(s => ({ filters: { ...s.filters, artistas: [id] }, open: { ...s.open, [id]: true } }), `filters.artistas = ["${a.name}"]`);
+  },
+  select(itemId, from) {
+    const s = store.get();
+    if (!itemId || s.selected === itemId) return store.set({ selected: null }, "selected = null");
+    const it = s.data.I[itemId];
+    const tab = s.sheets.findIndex(x => x.name === it.sheet);
+    store.set(st => ({ selected: itemId, sheetTab: tab, open: { ...st.open, [it.artist]: true }, _from: from }), `selected = "${it.sheet}!${it.cell}"`);
+  },
+  clear() { store.set({ filters: { ...EMPTY_FILTERS } }, "filters = {…vacío}"); },
+  setOpen(id, open) { store.set(s => ({ open: { ...s.open, [id]: open } })); },
+  setAllOpen(open) { const ids = [...derive(store.get()).artistsVisible]; store.set(s => ({ open: { ...s.open, ...Object.fromEntries(ids.map(i => [i, open])) } })); },
+  setRole(role) {
+    try { localStorage.setItem("cordillera:perfil", role); } catch (_) {}
+    store.set(s => withView({ ...s, role, excelMsg: null }), `perfil = "${role}"`);
+  },
+  // El admin carga un Excel: queda como borrador, solo él lo ve.
+  loadSheets(sheets, source) {
+    const data = parseWorkbook(sheets);
+    if (!data.items.length) throw new Error("No encontré bloques con «Cant · Requerimiento · Cant · Propuesta» en la fila 5.");
+    store.set(s => withView({ ...s, draft: { sheets, source, data, diff: diffData(s.published.data, data) }, excelMsg: null }), `draft = "${source}"`);
+  },
+  discardDraft() { store.set(s => withView({ ...s, draft: null, excelMsg: null }), "draft = null"); },
+  // Llega un Excel publicado: de la base de datos, o del propio admin en local.
+  receivePublished(pub, initial, fromDraft) {
+    store.set(s => withView({ ...s, published: pub, draft: fromDraft ? null : s.draft,
+      nuevo: initial ? s.nuevo : { source: pub.source, at: pub.at } }), initial ? null : `published = "${pub.source}"`);
+  },
+  dismissNuevo() { store.set({ nuevo: null }); },
+};
+
+/* ============================================================
+   3 · LAS VISTAS
+   Cada vista es una función del estado. Se suscriben y listo.
+   ============================================================ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const CHEV = `<svg class="chev" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 8l5 5 5-5" fill="none" stroke="currentColor" stroke-width="2"/></svg>`;
+function hl(text, q) {
+  const words = fold(q).split(" ").filter(w => w.length > 1);
+  if (!words.length) return esc(text);
+  const f = fold(text); const marks = new Array(text.length).fill(false);
+  for (const w of words) { let i = f.indexOf(w); while (i >= 0) { for (let k = i; k < i + w.length; k++) marks[k] = true; i = f.indexOf(w, i + 1); } }
+  let out = "", on = false;
+  for (let i = 0; i < text.length; i++) { if (marks[i] !== on) { out += marks[i] ? "<mark>" : "</mark>"; on = marks[i]; } out += esc(text[i]); }
+  return out + (on ? "</mark>" : "");
+}
+
+/* Filtros */
+function renderFilters(s) {
+  const D = s.data, f = s.filters, d = derive(s);
+  const dias = [...new Set(D.artists.map(a => a.dia))];
+  $("#f-dias").innerHTML = dias.map(v => chip("dias", v, v, d.facets.dias[v] || 0, f.dias.includes(v))).join("");
+  $("#f-artistas").innerHTML = D.artists.map(a => chip("artistas", a.id, a.name, d.facets.artistas[a.id] || 0, f.artistas.includes(a.id))).join("");
+  $("#f-cats").innerHTML = CATS.filter(([id]) => D.items.some(i => i.cat === id))
+    .map(([id, n]) => chip("cats", id, n, d.facets.cats[id] || 0, f.cats.includes(id))).join("");
+  document.querySelectorAll("#f-lado button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === f.lado));
+  document.querySelectorAll("#f-stars button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.v === f.minStars));
+  $("#f-falta").checked = f.soloFaltantes;
+  $("#f-cambios").checked = f.cambios;
+  $("#f-cambios").closest("label").hidden = !s.diff;
+  document.querySelectorAll("#f-foto button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === f.foto));
+  const conFoto = D.items.filter(it => s.fotos[it.id]?.length).length;
+  $("#foto-status").textContent = `${conFoto} de ${D.items.length} ítems con foto` + (s.fotosModo === "local" ? " · vista local, no se guardan" : "");
+  if (document.activeElement !== $("#q")) $("#q").value = f.q;
+
+  const act = [];
+  if (f.q) act.push(pill("q", "", `Texto: <b>${esc(f.q)}</b>`));
+  f.dias.forEach(v => act.push(pill("dias", v, `Día: <b>${esc(v)}</b>`)));
+  f.artistas.forEach(v => act.push(pill("artistas", v, `Artista: <b>${esc(D.A[v]?.name || v)}</b>`)));
+  f.cats.forEach(v => act.push(pill("cats", v, `Equipo: <b>${esc(CAT_NAME[v])}</b>`)));
+  if (f.lado !== "ambas") act.push(pill("lado", "", `Columna: <b>${f.lado === "req" ? "Requerimiento" : "Propuesta"}</b>`));
+  if (f.minStars) act.push(pill("minStars", "", `<b>${"★".repeat(f.minStars)}</b> o más`));
+  if (f.soloFaltantes) act.push(pill("soloFaltantes", "", `<b>Propuesta corta</b>`));
+  if (f.foto) act.push(pill("foto", "", `<b>${f.foto === "con" ? "Con foto" : "Sin foto"}</b>`));
+  if (f.cambios) act.push(pill("cambios", "", `<b>Cambios del último Excel</b>`));
+  $("#active").innerHTML = act.length
+    ? `<span>Filtrando por</span>${act.join("")}<button type="button" class="linkbtn" data-act="clear">Limpiar todo</button>`
+    : `<span>Sin filtros. Toca un chip, un nombre en la hoja o una categoría dentro de un artista.</span>`;
+}
+function chip(k, v, label, n, on) {
+  return `<button type="button" class="chip" data-toggle="${k}" data-v="${esc(v)}" aria-pressed="${on}"${!n && !on ? " disabled" : ""}>${esc(label)}<em>${n}</em></button>`;
+}
+function pill(k, v, html) {
+  return `<button type="button" class="chip" data-remove="${k}" data-v="${esc(v)}" aria-label="Quitar filtro">${html} <span aria-hidden="true">×</span></button>`;
+}
+
+/* Lista por artista */
+function renderList(s) {
+  const D = s.data, f = s.filters, d = derive(s);
+  const nItems = d.visible.size, nArt = d.artistsVisible.size;
+  $("#count").textContent = `${nItems} ${nItems === 1 ? "ítem" : "ítems"} en ${nArt} ${nArt === 1 ? "artista" : "artistas"} · de ${D.items.length} en la hoja`;
+  if (!nItems) {
+    $("#list").innerHTML = `<div class="empty">Nada coincide con estos filtros.<br><button type="button" class="linkbtn" data-act="clear">Limpiar filtros</button></div>`;
+    return;
+  }
+  const narrowed = filtersActive(f) && nArt <= 3;
+  $("#list").innerHTML = D.artists.filter(a => d.artistsVisible.has(a.id)).map(a => {
+    const its = D.items.filter(it => it.artist === a.id && d.visible.has(it.id));
+    const cats = CATS.map(c => c[0]).filter(c => its.some(it => it.cat === c));
+    const short = cats.filter(c => { const v = D.cov[`${a.id}|${c}`]; return v && v.prop < v.req; });
+    const open = s.open[a.id] ?? narrowed;
+    const body = open ? artistBody(a, its, cats, s) : "";
+    return `<details class="artist" data-artist="${esc(a.id)}"${open ? " open" : ""}>
+      <summary>
+        <div class="amain">
+          <div class="aname">${hl(a.name, f.q)}</div>
+          <div class="ameta"><span>${esc(a.dia)}</span><span>${esc(a.stage)}</span>${a.set ? `<span>${esc(a.set)}</span>` : ""}<span class="stars" title="Categoría ${a.stars} de 5">${"★".repeat(a.stars)}${"☆".repeat(5 - a.stars)}</span>
+          ${short.length ? `<span class="pill warn">${short.length} ${short.length === 1 ? "tipo" : "tipos"} con propuesta corta</span>` : `<span class="pill ok">propuesta completa</span>`}</div>
+        </div>
+        <div class="acount"><b>${its.length}</b>ítems · ${its.filter(it => s.fotos[it.id]?.length).length} con foto</div>${CHEV}
+      </summary>
+      <div class="abody">${body}</div>
+    </details>`;
+  }).join("");
+}
+function artistBody(a, its, cats, s) {
+  const D = s.data, f = s.filters;
+  const sides = f.lado === "ambas" ? ["req", "prop"] : [f.lado];
+  const tools = `<div class="atools">
+    <button type="button" class="linkbtn" data-only="${esc(a.id)}">Ver solo ${esc(a.name)}</button>
+    ${a.rider ? `<a class="linkbtn" href="${esc(a.rider)}" target="_blank" rel="noopener">Abrir rider</a>` : ""}
+    <span class="cov">Bloque ${esc(COL(a.block))}–${esc(COL(a.block + 3))} de ${esc(a.sheet)}</span></div>`;
+  return tools + cats.map(c => {
+    const v = D.cov[`${a.id}|${c}`] || { req: 0, prop: 0 };
+    const cls = v.prop < v.req ? "warn" : "ok";
+    const col = lado => {
+      const mine = its.filter(it => it.cat === c && it.lado === lado);
+      if (!mine.length) return `<div><p class="colh">${lado === "req" ? "Requerimiento" : "Propuesta"}</p><p class="note">—</p></div>`;
+      const gids = [...new Set(mine.map(it => it.group))];
+      return `<div><p class="colh">${lado === "req" ? "Requerimiento" : "Propuesta"}</p>${gids.map(gid => {
+        const g = D.G[gid];
+        const showLabel = fold(g.label) !== fold(CAT_NAME[c]) && sectionOf(g.label);
+        return `<div class="grp">${showLabel ? `<p class="glabel">${esc(g.label)}</p>` : ""}${g.notes.map(n => `<p class="note">${hl(n, f.q)}</p>`).join("")}
+          <ul class="items">${mine.filter(it => it.group === gid).map(it => itemRow(it, s)).join("")}</ul></div>`;
+      }).join("")}</div>`;
+    };
+    return `<div class="cat"><div class="cathead"><button type="button" class="catbtn" data-cat="${c}" title="Filtrar por ${esc(CAT_NAME[c])}">${esc(CAT_NAME[c])}</button>
+      <span class="cov">pedido ${v.req} · propuesto ${v.prop}</span>${v.prop < v.req ? `<span class="pill ${cls}">faltan ${v.req - v.prop}</span>` : ""}</div>
+      <div class="cols${sides.length === 1 ? " one" : ""}">${sides.map(col).join("")}</div></div>`;
+  }).join("");
+}
+
+const CAM = `<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6.5h3l1.5-2h5L14 6.5h3v9H3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="10" cy="11" r="2.8" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>`;
+function itemRow(it, s) {
+  const fs = s.fotos[it.id] || [], sel = s.selected === it.id;
+  return `<li data-item="${esc(it.id)}"${sel ? ' class="sel"' : ""}>
+    <span class="q">${it.qty}×</span><span>${hl(it.text, s.filters.q)}${CHANGED.has(it.id) ? (s.diff.added.includes(it.id) ? ` <span class="chg">nuevo</span>` : ` <span class="chg mod">cambió</span>`) : ""}</span>
+    <span class="end"><span class="cam${fs.length ? " has" : ""}" title="${fs.length ? fs.length + " foto(s)" : "Sin foto"}">${CAM}${fs.length || ""}</span><button type="button" class="ref" data-ref="${esc(it.id)}" title="Ver en la hoja">${esc(it.cell)}</button></span>
+    ${sel ? fotoStrip(it, fs, s) : ""}</li>`;
+}
+function fotoStrip(it, fs, s) {
+  const busy = s.subiendo === it.id;
+  return `<div class="fotos" data-stop>
+    ${fs.map((f, i) => `<button type="button" class="thumb" data-foto="${esc(it.id)}" data-i="${i}" title="Ver foto"><img src="${esc(f.url)}" alt="Foto ${i + 1} de ${esc(it.text)}" loading="lazy"></button>`).join("")}
+    ${s.fotosModo === "lectura" ? "" : `<button type="button" class="addfoto" data-addfoto="${esc(it.id)}"${busy ? ' aria-busy="true" disabled' : ""}>${busy ? "Subiendo…" : "+ Agregar foto"}</button>`}
+    ${s.fotoError?.item === it.id ? `<span class="fotohint err">${esc(s.fotoError.msg)}</span>`
+      : !fs.length ? `<span class="fotohint">${s.fotosModo === "lectura" ? "Todavía no hay foto de este equipo." : "Todavía no hay foto. Desde el celular abre la cámara directo."}</span>` : ""}
+  </div>`;
+}
+
+/* Perfil y Excel publicado */
+function when(iso) { return iso ? new Date(iso).toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short" }) : ""; }
+function diffPills(d, title) {
+  if (!d) return "";
+  const p = [];
+  if (d.added.length) p.push(`<span>+${d.added.length} ítems nuevos</span>`);
+  if (d.changed.length) p.push(`<span>${d.changed.length} cambiados</span>`);
+  if (d.removed.length) p.push(`<span>−${d.removed.length} quitados</span>`);
+  if (d.artistsIn.length) p.push(`<span>Entra: ${esc(d.artistsIn.join(", "))}</span>`);
+  if (d.artistsOut.length) p.push(`<span>Sale: ${esc(d.artistsOut.join(", "))}</span>`);
+  return `<div class="diff"${title ? ` title="${esc(title)}"` : ""}>${p.join("") || "<span>Sin cambios frente a lo publicado</span>"}</div>`;
+}
+let fuenteSeq = 0;
+async function renderFuente(s) {
+  const seq = ++fuenteSeq;
+  document.querySelectorAll("#role button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === s.role));
+  $("#role-help").textContent = s.role === "admin"
+    ? "Admin: carga el Excel, revisa el borrador y lo publica. Los operarios no ven nada nuevo hasta que publiques."
+    : "Operario: ve solo el Excel publicado por el admin, filtra y sube fotos del equipo. No puede cambiar el Excel.";
+  const P = s.published, by = P.by ? await nameOf(P.by) : "";
+  if (seq !== fuenteSeq) return;
+  let html = `<div class="row"><span class="tag">Publicado</span><span class="name">${esc(P.source)}</span>
+    <span class="meta">${P.data.artists.length} artistas · ${P.data.items.length} ítems · ${P.at ? `${by ? "por " + esc(by) + " · " : ""}${esc(when(P.at))}` : "Excel de ejemplo del prototipo"}</span>
+    <span class="sp"></span>${s.role === "admin" && !s.draft ? `<button type="button" class="btn primary" data-act="load">Cargar Excel nuevo</button>` : ""}</div>`;
+  if (s.role === "admin" && s.draft) {
+    html += `<div class="draft"><div class="row"><span class="tag">Borrador</span><span class="name">${esc(s.draft.source)}</span>
+      <span class="meta">${s.draft.data.artists.length} artistas · ${s.draft.data.items.length} ítems · solo tú lo ves, y es lo que tienes en pantalla</span></div>
+      ${diffPills(s.draft.diff)}
+      <div class="row"><button type="button" class="btn primary" data-act="publish"${s.publishing ? " disabled" : ""}>${s.publishing ? "Publicando…" : "Publicar para operarios"}</button>
+      <button type="button" class="btn" data-act="discard">Descartar</button></div></div>`;
+  }
+  if (s.role === "operario" && s.nuevo) {
+    const n = s.diff ? s.diff.added.length + s.diff.changed.length : 0;
+    html += `<div class="nuevo"><span>El admin publicó <b>${esc(s.nuevo.source)}</b>${s.nuevo.at ? " · " + esc(when(s.nuevo.at)) : ""}${n ? ` Marca <b>Solo lo que cambió</b> para ver los ${n} ítems nuevos o cambiados.` : ""}</span>
+      <button type="button" class="btn" data-act="nuevo-ok">Entendido</button></div>`;
+  } else if (s.role === "operario" && P.diff) html += diffPills(P.diff, "Cambios del último Excel publicado");
+  if (s.excelMsg) html += `<p class="fmsg${s.excelMsg.err ? " err" : ""}">${esc(s.excelMsg.text)}</p>`;
+  $("#fuente").innerHTML = html;
+}
+
+/* La hoja */
+function renderSheetTabs(s) {
+  $("#sheet-tabs").innerHTML = s.sheets.map((sh, i) =>
+    `<button type="button" class="sheet-tab" role="tab" data-tab="${i}" aria-selected="${i === s.sheetTab}">${esc(sh.name)}</button>`).join("")
+    + (s.role === "admin" ? `<button type="button" class="sheet-tab load" data-act="load">Cargar otro Excel…</button>` : "");
+  $("#sheet-sub").textContent = s.source;
+}
+function renderGrid(s) {
+  const sh = s.sheets[s.sheetTab]; if (!sh) return;
+  const idx = s.data.cellIndex, blockStarts = new Set(s.data.artists.filter(a => a.sheet === sh.name).map(a => a.block));
+  const nCols = Math.max(...sh.rows.map(r => r.length), 1);
+  const merged = {}, covered = new Set();
+  for (const m of sh.merges || []) {
+    const [a, b] = m.split(":"); const p = x => { const [, c, r] = x.match(/([A-Z]+)(\d+)/); return [+r - 1, [...c].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1]; };
+    const [r1, c1] = p(a), [r2, c2] = p(b || a);
+    merged[`${r1},${c1}`] = [r2 - r1 + 1, c2 - c1 + 1];
+    for (let r = r1; r <= r2; r++) for (let c = c1; c <= c2; c++) if (r !== r1 || c !== c1) covered.add(`${r},${c}`);
+  }
+  const widths = [...Array(nCols)].map((_, c) => c % 2 === 0 ? 46 : 170);
+  let html = `<table class="xl" style="width:${34 + widths.reduce((a, b) => a + b, 0)}px"><colgroup><col style="width:34px">${widths.map(w => `<col style="width:${w}px">`).join("")}</colgroup>
+    <thead><tr><th></th>${widths.map((_, c) => `<th>${COL(c)}</th>`).join("")}</tr></thead><tbody>`;
+  sh.rows.forEach((row, r) => {
+    html += `<tr><th>${r + 1}</th>`;
+    for (let c = 0; c < nCols; c++) {
+      if (covered.has(`${r},${c}`)) continue;
+      const v = row[c], ref = `${COL(c)}${r + 1}`, info = idx[`${sh.name}!${ref}`];
+      const span = merged[`${r},${c}`];
+      const cls = [];
+      if (blockStarts.has(c)) cls.push("blk");
+      if (r < 5 && v != null) cls.push("h");
+      let data = "";
+      if (info?.item) {
+        cls.push("it"); data = ` data-item="${esc(info.item)}"`;
+        cls.push(s.selected === info.item ? "sel" : cellState(s, info.item));
+        if (s.fotos[info.item]?.length) cls.push("foto");
+      } else if (info?.group && v != null) {
+        cls.push("sec");
+        if (!groupVisible(s, info.group)) cls.push("out");
+      } else if (info?.artist && r === 1 && v != null) {
+        cls.push("art"); data = ` data-artist-cell="${esc(info.artist)}"`;
+        if (!derive(s).artistsVisible.has(info.artist)) cls.push("out");
+      }
+      const txt = v == null ? "" : String(v);
+      html += `<td${span ? ` rowspan="${span[0]}" colspan="${span[1]}"` : ""} class="${cls.join(" ")}"${data} title="${esc(ref + (txt ? " · " + txt : ""))}">${esc(txt)}</td>`;
+    }
+    html += `</tr>`;
+  });
+  $("#grid").innerHTML = html + `</tbody></table>`;
+}
+function cellState(s, id) { return derive(s).visible.has(id) ? (filtersActive(s.filters) ? "hit" : "") : "out"; }
+function groupVisible(s, gid) { const d = derive(s); return s.data.items.some(it => it.group === gid && d.visible.has(it.id)); }
+function scrollGridToSelected(s) {
+  if (!s.selected || !$("#p-sheet").open) return;
+  const td = $(`#grid td[data-item="${CSS.escape(s.selected)}"]`);
+  if (!td) return;
+  const box = $("#grid"), b = box.getBoundingClientRect(), t = td.getBoundingClientRect();
+  box.scrollTo({ top: box.scrollTop + t.top - b.top - b.height / 2 + t.height / 2, left: Math.max(0, box.scrollLeft + t.left - b.left - 60), behavior: "smooth" });
+}
+
+/* El estado, visible */
+function renderState(s, prev) {
+  const f = s.filters, d = derive(s);
+  const view = {
+    perfil: s.role,
+    viendo: s.role === "admin" && s.draft ? "borrador" : "publicado",
+    fuente: s.source,
+    filtros: { ...f, artistas: f.artistas.map(id => s.data.A[id]?.name || id) },
+    seleccionado: s.selected,
+    fotos: { guardadas: Object.values(s.fotos).reduce((n, l) => n + l.length, 0), modo: s.fotosModo },
+    derivado: { items: d.visible.size, artistas: d.artistsVisible.size },
+  };
+  setJson("#state-json", view, prev && prev.filters === s.filters && prev.selected === s.selected);
+  const it = s.selected && s.data.I[s.selected];
+  setJson("#sel-json", it ? {
+    celda: `${it.sheet}!${it.cell}`, cantidadEnHoja: it.raw, cantidad: it.qty, texto: it.text,
+    columna: it.lado === "req" ? "Requerimiento" : "Propuesta", tipo: CAT_NAME[it.cat],
+    seccionEnHoja: s.data.G[it.group].label, artista: s.data.A[it.artist].name, dia: s.data.A[it.artist].dia,
+    fotos: (s.fotos[it.id] || []).map(f => f.asset || "(local)"),
+  } : null, prev && prev.selected === s.selected);
+  $("#log").innerHTML = s.log.length
+    ? s.log.map(l => `<li><i>${l.t.toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}</i><span>${esc(l.label)}</span></li>`).join("")
+    : `<li><span>Todavía nada. Haz clic en algo.</span></li>`;
+}
+function setJson(sel, obj, same) {
+  const el = $(sel);
+  el.innerHTML = obj == null ? `<span class="k">null  // haz clic en un ítem</span>` : esc(JSON.stringify(obj, null, 2))
+    .replace(/^(\s*)(&quot;[^&]+?&quot;):/gm, '$1<span class="k">$2</span>:')
+    .replace(/: (&quot;.*?&quot;)(,?)$/gm, ': <span class="s">$1</span>$2')
+    .replace(/: (-?\d+|true|false|null)(,?)$/gm, ': <span class="v">$1</span>$2');
+  if (!same) { el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); }
+}
+
+/* Suscripciones: cada vista decide si le toca redibujar. */
+function render(s, p) {
+  const dataChanged = s.data !== p.data;
+  if (s.role !== p.role || s.published !== p.published || s.draft !== p.draft || s.nuevo !== p.nuevo || s.excelMsg !== p.excelMsg || s.publishing !== p.publishing || s.diff !== p.diff) renderFuente(s);
+  const diffChanged = s.diff !== p.diff;
+  const fotosChanged = s.fotos !== p.fotos || s.fotosModo !== p.fotosModo || s.subiendo !== p.subiendo || s.fotoError !== p.fotoError;
+  if (dataChanged || diffChanged || s.filters !== p.filters || fotosChanged) { renderFilters(s); filtersToHash(s.filters); }
+  if (dataChanged || diffChanged || s.filters !== p.filters || s.open !== p.open || s.selected !== p.selected || fotosChanged) renderList(s);
+  if (dataChanged || s.sheetTab !== p.sheetTab || s.source !== p.source || s.role !== p.role) renderSheetTabs(s);
+  if (dataChanged || diffChanged || s.filters !== p.filters || s.selected !== p.selected || s.sheetTab !== p.sheetTab || s.fotos !== p.fotos) renderGrid(s);
+  renderState(s, p);
+  if (s.selected && s.selected !== p.selected) {
+    requestAnimationFrame(() => {
+      scrollGridToSelected(s);
+      if (s._from === "sheet") document.querySelector(`#list li[data-item="${CSS.escape(s.selected)}"]`)?.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
+  }
+}
+store.subscribe(render);
+
+/* Eventos → acciones. Ningún manejador toca el DOM directamente. */
+let qTimer;
+$("#q").addEventListener("input", e => { clearTimeout(qTimer); const v = e.target.value; qTimer = setTimeout(() => actions.setFilter("q", v, `filters.q = "${v}"`), 180); });
+$("#f-cambios").addEventListener("change", e => actions.setFilter("cambios", e.target.checked, `filters.cambios = ${e.target.checked}`));
+$("#role").addEventListener("click", e => { const b = e.target.closest("button"); if (b && b.dataset.v !== store.get().role) actions.setRole(b.dataset.v); });
+$("#f-falta").addEventListener("change", e => actions.setFilter("soloFaltantes", e.target.checked, `filters.soloFaltantes = ${e.target.checked}`));
+$("#f-lado").addEventListener("click", e => { const b = e.target.closest("button"); if (b) actions.setFilter("lado", b.dataset.v, `filters.lado = "${b.dataset.v}"`); });
+$("#f-foto").addEventListener("click", e => { const b = e.target.closest("button"); if (b) actions.setFilter("foto", b.dataset.v, `filters.foto = "${b.dataset.v}"`); });
+$("#f-stars").addEventListener("click", e => { const b = e.target.closest("button"); if (b) actions.setFilter("minStars", +b.dataset.v, `filters.minStars = ${b.dataset.v}`); });
+$("#openall").addEventListener("click", () => actions.setAllOpen(true));
+$("#closeall").addEventListener("click", () => actions.setAllOpen(false));
+
+document.addEventListener("click", e => {
+  if (e.target.closest("[data-addfoto]")) return fotos.pick(e.target.closest("[data-addfoto]").dataset.addfoto);
+  if (e.target.closest("[data-foto]")) { const b = e.target.closest("[data-foto]"); return fotos.show(b.dataset.foto, +b.dataset.i); }
+  if (e.target.closest("[data-stop]")) return;
+  const t = e.target.closest("[data-toggle],[data-remove],[data-act],[data-only],[data-cat],[data-ref],[data-item],[data-artist-cell],[data-tab]");
+  if (!t) return;
+  const s = store.get(), D = s.data;
+  if (t.dataset.toggle) {
+    const k = t.dataset.toggle, v = t.dataset.v, name = k === "artistas" ? D.A[v].name : k === "cats" ? CAT_NAME[v] : v;
+    return actions.toggleIn(k, v, `filters.${k} ${s.filters[k].includes(v) ? "−" : "+"} "${name}"`);
+  }
+  if (t.dataset.remove) {
+    const k = t.dataset.remove, v = t.dataset.v;
+    const reset = { q: "", lado: "ambas", minStars: 0, soloFaltantes: false, foto: "", cambios: false };
+    return k in reset ? actions.setFilter(k, reset[k], `filters.${k} = ${JSON.stringify(reset[k])}`) : actions.toggleIn(k, v, `filters.${k} − "${k === "artistas" ? D.A[v].name : k === "cats" ? CAT_NAME[v] : v}"`);
+  }
+  if (t.dataset.act === "clear") return actions.clear();
+  if (t.dataset.act === "load") return $("#file").click();
+  if (t.dataset.act === "publish") return excel.publish();
+  if (t.dataset.act === "discard") return actions.discardDraft();
+  if (t.dataset.act === "nuevo-ok") return actions.dismissNuevo();
+  if (t.dataset.only) return actions.onlyArtist(t.dataset.only);
+  if (t.dataset.cat) return actions.toggleIn("cats", t.dataset.cat, `filters.cats ${s.filters.cats.includes(t.dataset.cat) ? "−" : "+"} "${CAT_NAME[t.dataset.cat]}"`);
+  if (t.dataset.ref) { e.stopPropagation(); $("#p-sheet").open = true; if (s.selected === t.dataset.ref) return scrollGridToSelected(s); return actions.select(t.dataset.ref, "list"); }
+  if (t.dataset.tab) return store.set({ sheetTab: +t.dataset.tab }, `sheetTab = "${s.sheets[+t.dataset.tab].name}"`);
+  if (t.dataset.artistCell) return actions.onlyArtist(t.dataset.artistCell);
+  if (t.dataset.item) return actions.select(t.dataset.item, t.closest("#grid") ? "sheet" : "list");
+});
+$("#list").addEventListener("toggle", e => {
+  const d = e.target; if (!d.matches?.("details.artist")) return;
+  const id = d.dataset.artist, cur = store.get().open[id];
+  if (cur !== d.open) actions.setOpen(id, d.open);
+}, true);
+$("#p-sheet").addEventListener("toggle", () => requestAnimationFrame(() => scrollGridToSelected(store.get())));
+
+/* Cargar otro Excel: SheetJS se trae solo si hace falta. */
+function loadScript(src) {
+  return new Promise((ok, fail) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => fail(new Error("No se pudo descargar el lector de Excel.")); document.head.appendChild(s); });
+}
+$("#file").addEventListener("change", async e => {
+  const file = e.target.files[0]; e.target.value = ""; if (!file) return;
+  store.set({ excelMsg: { text: `Leyendo ${file.name}…` } });
+  try {
+    if (!window.XLSX) await loadScript("https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js");
+    const wb = XLSX.read(await file.arrayBuffer(), { cellDates: true });
+    const sheets = wb.SheetNames.map(name => {
+      const ws = wb.Sheets[name];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: true })
+        .map(r => r.map(v => v instanceof Date ? v.toISOString().slice(0, 10) : v));
+      while (rows.length && rows[rows.length - 1].every(v => v == null)) rows.pop();
+      return { name, rows, merges: (ws["!merges"] || []).map(m => XLSX.utils.encode_range(m)) };
+    }).filter(sh => sh.rows.length > 4 && (sh.rows[4] || []).some(v => fold(v) === "requerimiento"));
+    actions.loadSheets(sheets, file.name);
+  } catch (err) {
+    store.set({ excelMsg: { err: true, text: err.message } });
+  }
+});
+
+/* ============================================================
+   EXCEL PUBLICADO
+   El admin guarda el Excel en un solo documento de la base de datos
+   (config/excel). Cada operario está suscrito a ese documento: cuando
+   cambia, su estado cambia y la página se redibuja sola.
+   ============================================================ */
+let USER = null;
+async function nameOf(id) {
+  if (!USER?.profiles) return "";
+  try { return (await USER.profiles([id]))[id]?.name || ""; } catch (_) { return ""; }
+}
+const excel = (() => {
+  let db = null, first = true;
+  function connect(dbRef) {
+    db = dbRef;
+    store.set({ excelModo: "compartido" });
+    db.doc("config/excel").onSnapshot(snap => {
+      const initial = first; first = false;
+      if (!snap.exists) return;
+      const d = snap.data();
+      if (d.at === store.get().published.at) return;
+      try {
+        const sheets = JSON.parse(d.sheetsJson), data = parseWorkbook(sheets);
+        const mine = store.get().draft?.source === d.source && store.get().publishing;
+        actions.receivePublished({ sheets, source: d.source, data, at: d.at, by: d.by || null, diff: d.diffJson ? JSON.parse(d.diffJson) : null }, initial, mine);
+      } catch (_) { store.set({ excelMsg: { err: true, text: "El Excel publicado no se pudo leer." } }); }
+    }, () => store.set({ excelModo: "lectura" }));
+  }
+  async function publish() {
+    const s = store.get(), dr = s.draft;
+    if (!dr || s.publishing) return;
+    const at = new Date().toISOString();
+    if (s.excelModo !== "compartido") {
+      // Vista local: se publica en memoria. Cambia a Operario para ver lo que le llega.
+      actions.receivePublished({ sheets: dr.sheets, source: dr.source, data: dr.data, at, by: null, diff: dr.diff }, false, true);
+      store.set({ excelMsg: { text: "Publicado en esta vista local. Cambia a Operario para ver lo que le llega." } });
+      return;
+    }
+    // El permiso real lo pone la página publicada: solo quien puede editarla escribe config/.
+    if (USER && !(await USER.canEdit().catch(() => false)))
+      return store.set({ excelMsg: { err: true, text: "Tu cuenta no puede publicar el Excel. Pide permiso de edición de esta página." } });
+    const sheetsJson = JSON.stringify(dr.sheets);
+    if (sheetsJson.length > 240000) return store.set({ excelMsg: { err: true, text: `Este Excel ocupa ${Math.round(sheetsJson.length / 1024)} KB y el límite es 240 KB. Quita las hojas que no son de backline y vuelve a cargarlo.` } });
+    store.set({ publishing: true, excelMsg: null });
+    try {
+      const by = USER ? await USER.id().catch(() => null) : null;
+      await db.doc("config/excel").set({ source: dr.source, sheetsJson, diffJson: JSON.stringify(dr.diff), at, by, artistas: dr.data.artists.length, items: dr.data.items.length });
+      store.set(st => withView({ ...st, publishing: false, draft: null, excelMsg: { text: "Publicado. Los operarios ya lo están viendo." } }));
+    } catch (e) {
+      store.set({ publishing: false, excelMsg: { err: true, text: e?.code === "quota_exceeded" ? "Se llenó el espacio de la base de datos de esta página." : "No se pudo publicar. Inténtalo otra vez." } });
+    }
+  }
+  return { connect, publish };
+})();
+
+/* ============================================================
+   FOTOS POR EQUIPO
+   La imagen va al almacén de archivos del artifact (assets) y una fila
+   en la base de datos (db) dice a qué celda pertenece. Todos los que
+   abren la página ven las mismas fotos, en vivo.
+   Sin publicar (archivo local) se quedan solo en memoria.
+   ============================================================ */
+const fotos = (() => {
+  let db = null, assets = null, user = null, pendingItem = null;
+
+  // Reduce la foto del celular a 1600 px de lado mayor: sube rápido y gasta menos cuota.
+  async function shrink(file) {
+    try {
+      const bmp = await createImageBitmap(file);
+      const k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+      return await new Promise(ok => c.toBlob(b => ok(b || file), "image/jpeg", .82));
+    } catch (_) { return file; }
+  }
+  const ERR = {
+    too_large: "La foto pesa demasiado.", unsupported_type: "Ese formato no se puede subir. Usa JPG o PNG.",
+    quota_or_state: "Se llenó el espacio de fotos de esta página.", rate_limited: "Muchas fotos seguidas. Espera un momento.",
+    not_granted: "No tienes permiso para subir fotos aquí.", upstream_auth: "Vuelve a iniciar sesión e inténtalo otra vez.",
+  };
+
+  function apply(docs) {
+    const map = {};
+    for (const d of docs) (map[d.item] ||= []).push(d);
+    for (const k in map) map[k].sort((a, b) => a.at.localeCompare(b.at));
+    store.set({ fotos: map });
+  }
+
+  async function connect() {
+    if (!window.claude?.use) return;
+    db = await claude.use("db");
+    if (!db) return;
+    assets = await claude.use("assets");
+    user = USER = await claude.use("user");
+    excel.connect(db);
+    store.set({ fotosModo: assets ? "compartido" : "lectura" });
+    db.collection("fotos").limit(1000).onSnapshot(
+      snap => apply(snap.docs.map(d => ({ doc: d.id, ...d.data(), url: "/_blob/" + d.data().asset }))),
+      () => store.set({ fotosModo: "lectura" }),
+    );
+  }
+
+  return {
+    connect,
+    pick(itemId) { pendingItem = itemId; store.set({ fotoError: null }); $("#foto-file").click(); },
+    async upload(file) {
+      const itemId = pendingItem; pendingItem = null;
+      if (!file || !itemId) return;
+      const s = store.get(), it = s.data.I[itemId];
+      store.set({ subiendo: itemId });
+      try {
+        const blob = await shrink(file);
+        if (s.fotosModo === "compartido") {
+          const up = await assets.upload(blob, { type: blob.type || "image/jpeg" });
+          const by = user ? await user.id().catch(() => null) : null;
+          await db.collection("fotos").add({ item: itemId, asset: up.id, by, at: new Date().toISOString(), artista: s.data.A[it.artist].name, texto: it.text });
+        } else {
+          const cur = store.get().fotos;
+          store.set({ fotos: { ...cur, [itemId]: [...(cur[itemId] || []), { url: URL.createObjectURL(blob), at: new Date().toISOString() }] } });
+        }
+        store.set({ subiendo: null }, `fotos["${it.sheet}!${it.cell}"] + 1`);
+      } catch (e) {
+        store.set({ subiendo: null, fotoError: { item: itemId, msg: ERR[e?.code] || "No se pudo subir la foto. Inténtalo otra vez." } });
+      }
+    },
+    async show(itemId, i) {
+      const s = store.get(), it = s.data.I[itemId], f = s.fotos[itemId]?.[i];
+      if (!f) return;
+      let who = "";
+      if (f.by) who = await nameOf(f.by);
+      const me = user ? await user.id().catch(() => null) : null;
+      const canDelete = s.fotosModo === "local" || s.role === "admin" || (me && f.by === me);
+      const lb = $("#lb");
+      lb.innerHTML = `<div class="lb-card"><img src="${esc(f.url)}" alt="${esc(it.text)}">
+        <div class="lb-bar"><span><b>${esc(it.text)}</b> · ${esc(s.data.A[it.artist].name)} · ${esc(it.sheet)}!${esc(it.cell)}</span>
+        <span>${who ? `Subida por ${esc(who)} · ` : ""}${new Date(f.at).toLocaleString("es-CO", { dateStyle: "medium", timeStyle: "short" })}</span>
+        <span class="sp"></span>${canDelete ? `<button type="button" class="btn danger" id="lb-del">Borrar foto</button>` : ""}
+        <button type="button" class="btn" id="lb-close">Cerrar</button></div></div>`;
+      lb.querySelector("#lb-close").onclick = () => lb.close();
+      const del = lb.querySelector("#lb-del");
+      if (del) del.onclick = async () => {
+        // Dos pasos en la página: el visor de artifacts no muestra confirm().
+        if (!del.dataset.armed) { del.dataset.armed = "1"; del.textContent = "Sí, borrarla para todos"; return; }
+        del.disabled = true;
+        try {
+          if (f.doc) { await db.collection("fotos").doc(f.doc).delete(); await assets.delete(f.asset).catch(() => {}); }
+          else { const cur = store.get().fotos; store.set({ fotos: { ...cur, [itemId]: cur[itemId].filter(x => x !== f) } }); }
+          store.set({}, `fotos["${it.sheet}!${it.cell}"] − 1`);
+          lb.close();
+        } catch (_) { del.disabled = false; del.textContent = "No se pudo borrar"; }
+      };
+      lb.onclick = e => { if (e.target === lb) lb.close(); };
+      lb.showModal();
+    },
+  };
+})();
+$("#foto-file").addEventListener("change", e => { const f = e.target.files[0]; e.target.value = ""; fotos.upload(f); });
+
+/* Primer dibujo: todo cuenta como cambiado. */
+document.body.dataset.role = store.get().role;
+render(store.get(), {});
+fotos.connect();
+</script>
+</body>
+</html>

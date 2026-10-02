@@ -1,6 +1,8 @@
 
 ## Home de demos y publicación
 
+Este es el único repositorio del proyecto; el contexto completo para trabajar en él está en `CLAUDE.md`.
+
 GitHub Pages publica la rama `main` en https://devmaiter.github.io/produccion-31julio/.
 La raíz es la Home (`index.html`) con un enlace a cada demo:
 
@@ -12,6 +14,7 @@ La raíz es la Home (`index.html`) con un enlace a cada demo:
 | `reconocimiento-3d/` | Reconocimiento de equipo con cámara y holograma 3D | aquí mismo |
 | `produccion-31-julio/` | Hoja de producción del 31 de julio | aquí mismo (antes estaba en la raíz) |
 | `lab-reels/` | Lab: el backline en reels, una categoría por pantalla | aquí mismo |
+| `prototipos/estado/` | Prototipo: Excel de Stage 4 como estado, perfiles Admin/Operario | repo `cordillera` (unificado aquí) |
 
 Para renovar los demos desde sus ramas: `./construir-sitio.sh`, commit y push a
 `main`; Pages lo publica solo en uno o dos minutos. Para probar local:
