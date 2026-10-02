@@ -408,7 +408,7 @@ function contar(el){
   if (!el || !el.dataset.to) return;
   const to = +el.dataset.to; if (QUIETO) return;
   const t0 = performance.now();
-  const paso = t => { const k = Math.min(1, (t - t0) / 700); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(paso); };
+  const paso = t => { const k = Math.min(1, Math.max(0, (t - t0) / 700)); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(paso); };
   requestAnimationFrame(paso);
 }
 
