@@ -186,6 +186,19 @@ ALIMENTOS ARTISTA:
     expect(e.items.at(-2)!.nota).toBeNull();
   });
 
+  it("DRUMS después de la sección de audio es backline; dentro del input list con micrófonos, no", () => {
+    expect(resumen(interpretar([doc('RIDER TÉCNICO\nLA BANDA\nSONIDO\nConsola digital de 48 canales\nDRUMS\n1 Kick 22"\n2 Snare stand\nBASS\n1 Ampeg SVT')])))
+      .toEqual(['1 Batería: Kick 22"', "2 Bases: Snare stand", "1 Ampli bajo: Ampeg SVT"]);
+    expect(resumen(interpretar([doc('RIDER TÉCNICO\nLA BANDA\nINPUT LIST\nDRUMS\n1 KICK   BETA 91\n2 SNARE   SM57\n3 HH   SM81\nBACKLINE\n1 Kick 22"')])))
+      .toEqual(['1 Batería: Kick 22"']);
+  });
+
+  it("si no reconoce la sección de backline, lee todo y lo deja para revisar en vez de no sacar nada", () => {
+    const e = interpretar([doc("RIDER TÉCNICO\nLA BANDA\nAUDIO REQUIREMENTS\nWe need the following\n2 Snare stand\n1 Fender Twin Reverb")]);
+    expect(resumen(e)).toEqual(["2 Bases: Snare stand", "1 Ampli guitarra: Fender Twin Reverb"]);
+    expect(e.items.every(i => i.dudoso)).toBe(true);
+  });
+
   it("sin títulos de sección se lee como antes", () => {
     const e = interpretar([doc("LOS RAYOS\n2 Snare stand\n1 Ampeg SVT")]);
     expect(resumen(e)).toEqual(["2 Bases: Snare stand", "1 Ampli bajo: Ampeg SVT"]);

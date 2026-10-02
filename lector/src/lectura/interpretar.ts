@@ -83,6 +83,18 @@ export function nombrePropio(s: string): string {
 }
 
 export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extraccion {
+  const ext = interpretarCon(docs, ctx, true);
+  if (ext.items.length) return ext;
+  // Nada salió leyendo solo las secciones de backline: puede que el rider las llame de otra forma.
+  // Se lee de nuevo sin separar secciones (los canales del input list igual se saltan) y todo queda para revisar.
+  const todo = interpretarCon(docs, ctx, false);
+  if (!todo.items.length) return ext;
+  for (const i of todo.items) { i.dudoso = true; i.nota = [i.nota, "no encontré la sección de backline: revisar"].filter(Boolean).join(" · "); }
+  todo.avisos.push("No reconocí la sección de backline del documento; lo encontrado queda para revisar.");
+  return todo;
+}
+
+function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: boolean): Extraccion {
   const ext: Extraccion = { evento: null, escenarios: [], dias: [], artistas: [], bloques: [], items: [], avisos: [], zonas: [], puestos: [], canales: [], requisitos: [], planos: [] };
   const base = ctx.base ?? null;
   const conocidos = new Map<string, string>(); // clave → nombre como está registrado
@@ -111,21 +123,27 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
 
     if (doc.asunto) tituloEvento(doc.asunto);
 
-    for (const l of sinRepetidos(unirRenglones(doc.lineas)).flatMap(dividirLista)) {
+    const renglones = sinRepetidos(unirRenglones(doc.lineas)).flatMap(dividirLista);
+    // ¿Lo que sigue es un input list? Canal + instrumento + micrófono en 2 de los próximos 4 renglones.
+    const MIC = /\b(mic|sm ?\d{2}|beta ?\d{2}|d ?box|di\b|e ?9\d{2}|e ?6\d{2}|md ?4\d{2}|ksm|akg|shure|sennheiser|neumann|audix|re ?20|c ?414)\b/i;
+    const siguenCanales = (n: number) => renglones.slice(n + 1, n + 5).filter(x => CANAL.test(x.texto) || (/^\d{1,2}\s+\S/.test(x.texto.trim()) && MIC.test(x.texto))).length >= 2;
+    for (let n = 0; n < renglones.length; n++) {
+      const l = renglones[n]!;
       const texto = limpiar(l.texto);
       if (!texto || letras(texto) + (texto.match(/\d/g) ?? []).length < 2) continue;
       if (riderDe(texto)) continue;
-      const sec = seccionDe(texto.replace(/[\s:·|–—-]+$/, ""));
+      const sec = usarSecciones ? seccionDe(texto.replace(/[\s:·|–—-]+$/, "")) : null;
       if (sec) {
         const comoGrupo = sec.tipo === "backline" && GRUPOS.test(texto.replace(/[\s:·|–—-]+$/, "")) && !SECCION_BACKLINE.test(texto);
         // "DRUMS" dentro del input list es un grupo de canales, no el backline.
-        if (!(comoGrupo && seccion === "audio")) { seccion = sec.tipo; grupo = null; modoAlternativa = false; }
+        if (!(comoGrupo && seccion === "audio" && siguenCanales(n))) { seccion = sec.tipo; grupo = null; modoAlternativa = false; }
         if (sec.tipo === "backline" && !comoGrupo) continue;
         if (sec.tipo !== "backline") continue;
       }
       if (seccion === "audio" || seccion === "otra") {
         const sinColaF = texto.replace(/[\s:·|–—-]+$/, "");
-        if (GRUPOS.test(sinColaF) && seccion === "otra") { seccion = "backline"; grupo = nombrePropio(sinColaF); }
+        // "DRUMS" después de la sección de audio: es el backline, salvo que debajo vengan canales con micrófono.
+        if (GRUPOS.test(sinColaF) && !SECCION_BACKLINE.test(sinColaF) && (seccion === "otra" || !siguenCanales(n))) { seccion = "backline"; grupo = nombrePropio(sinColaF); }
         continue;
       }
       if (CANAL.test(texto)) continue;
@@ -475,7 +493,8 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
  * un bloque de 3 o más renglones iguales a uno anterior se lee una sola vez. Los renglones
  * sueltos repetidos ("4 STAND CON BOOM" en batería y en percusión) sí cuentan. */
 export function sinRepetidos(lineas: Linea[]): Linea[] {
-  const norm = (l: Linea | undefined) => (l?.texto ?? "").replace(/\s+/g, " ").trim().toUpperCase();
+  // Sin espacios: la misma página repetida puede venir con "61STAND" en una y "61 STAND" en otra.
+  const norm = (l: Linea | undefined) => (l?.texto ?? "").replace(/\s+/g, "").toUpperCase();
   const claves = lineas.map(norm);
   const vistos = new Map<string, number[]>();
   const fuera = new Set<number>();
