@@ -26,6 +26,23 @@ export interface ContextoLectura {
   fecha?: string;
   /** Año por defecto; si no, el del correo, el del evento o el actual. */
   anio?: number;
+  /** Si viene, se llena con lo que se decidió de cada renglón (para revisarlo y enseñarle al lector). */
+  traza?: RenglonLeido[];
+}
+
+/** Qué hizo el lector con un renglón. */
+export type Etiqueta = "item" | "no-backline" | "seccion" | "grupo" | "banda" | "nota" | "horario" | "dia" | "escenario" | "evento" | "sin-interpretar";
+export interface RenglonLeido {
+  documento: string;
+  texto: string;
+  etiqueta: Etiqueta;
+  /** Por qué, en palabras: "sección de luces", "canal del input list", "radios y pilas no son backline"… */
+  motivo: string;
+  /** Sección del rider en ese momento: "backline", "audio", "otra" o "neutra". */
+  seccion: string;
+  grupo: string | null;
+  /** Índice del ítem en extraccion.items cuando la etiqueta es "item". */
+  item: number | null;
 }
 
 /** Líneas de OCR por debajo de esta confianza se marcan "confirmar". */
@@ -85,10 +102,12 @@ export function nombrePropio(s: string): string {
 export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extraccion {
   const ext = interpretarCon(docs, ctx, true);
   if (ext.items.length) return ext;
+  const trazaPrimera = ctx.traza ? [...ctx.traza] : null;
+  if (ctx.traza) ctx.traza.length = 0;
   // Nada salió leyendo solo las secciones de backline: puede que el rider las llame de otra forma.
   // Se lee de nuevo sin separar secciones (los canales del input list igual se saltan) y todo queda para revisar.
   const todo = interpretarCon(docs, ctx, false);
-  if (!todo.items.length) return ext;
+  if (!todo.items.length) { if (ctx.traza && trazaPrimera) ctx.traza.splice(0, ctx.traza.length, ...trazaPrimera); return ext; }
   for (const i of todo.items) { i.dudoso = true; i.nota = [i.nota, "no encontré la sección de backline: revisar"].filter(Boolean).join(" · "); }
   todo.avisos.push("No reconocí la sección de backline del documento; lo encontrado queda para revisar.");
   return todo;
@@ -131,45 +150,55 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const l = renglones[n]!;
       const texto = limpiar(l.texto);
       if (!texto || letras(texto) + (texto.match(/\d/g) ?? []).length < 2) continue;
-      if (riderDe(texto)) continue;
+      const anotar = (etiqueta: Etiqueta, motivo: string, item: number | null = null) =>
+        ctx.traza?.push({ documento: doc.nombre, texto, etiqueta, motivo, seccion, grupo, item });
+      if (riderDe(texto)) { anotar("banda", "nombre del rider"); continue; }
       const sec = usarSecciones ? seccionDe(texto.replace(/[\s:·|–—-]+$/, "")) : null;
       if (sec) {
         const comoGrupo = sec.tipo === "backline" && GRUPOS.test(texto.replace(/[\s:·|–—-]+$/, "")) && !SECCION_BACKLINE.test(texto);
         // "DRUMS" dentro del input list es un grupo de canales, no el backline.
         if (!(comoGrupo && seccion === "audio" && siguenCanales(n))) { seccion = sec.tipo; grupo = null; modoAlternativa = false; }
-        if (sec.tipo === "backline" && !comoGrupo) continue;
-        if (sec.tipo !== "backline") continue;
+        if (sec.tipo === "backline" && !comoGrupo) { anotar("seccion", "empieza el backline"); continue; }
+        if (sec.tipo !== "backline") { anotar("seccion", sec.tipo === "audio" ? "empieza una sección de audio (no es backline)" : "empieza una sección que no es backline"); continue; }
       }
       if (seccion === "audio" || seccion === "otra") {
         const sinColaF = texto.replace(/[\s:·|–—-]+$/, "");
         // "DRUMS" después de la sección de audio: es el backline, salvo que debajo vengan canales con micrófono.
-        if (GRUPOS.test(sinColaF) && !SECCION_BACKLINE.test(sinColaF) && (seccion === "otra" || !siguenCanales(n))) { seccion = "backline"; grupo = nombrePropio(sinColaF); }
+        if (GRUPOS.test(sinColaF) && !SECCION_BACKLINE.test(sinColaF) && (seccion === "otra" || !siguenCanales(n))) { seccion = "backline"; grupo = nombrePropio(sinColaF); anotar("grupo", "título de instrumento: vuelve el backline"); continue; }
+        anotar("no-backline", seccion === "audio" ? "está en una sección de audio" : "está en una sección que no es backline");
         continue;
       }
-      if (CANAL.test(texto)) continue;
+      if (CANAL.test(texto)) { anotar("no-backline", "canal del input list (instrumento + micrófono)"); continue; }
       // "IMAGEN DE EJEMPLO" (debajo de una foto) y "2 SETS DE BATERÍAS IGUALES" (la tabla ya trae las cantidades).
-      if (/^(imagen|foto|image|picture)s? (de )?(ejemplo|referencia|example|reference)\b/i.test(texto)) continue;
-      if (/\bsets? de (bater[ií]as?|drums?)\b|\biguales\b|\bidentical\b/i.test(texto) && texto.split(/\s+/).length <= 7) continue;
+      if (/^(imagen|foto|image|picture)s? (de )?(ejemplo|referencia|example|reference)\b/i.test(texto)) { anotar("nota", "pie de foto"); continue; }
+      if (/\bsets? de (bater[ií]as?|drums?)\b|\biguales\b|\bidentical\b/i.test(texto) && texto.split(/\s+/).length <= 7) { anotar("nota", "dice cuántos sets; las cantidades vienen en la tabla"); continue; }
       const quien = quienPone(texto);
-      if (quien !== undefined) { proveedorActual = quien; if (letras(texto) > 40 || texto.split(/\s+/).length <= 5) continue; }
+      if (quien !== undefined) { proveedorActual = quien; if (letras(texto) > 40 || texto.split(/\s+/).length <= 5) { anotar("nota", quien ? "lo que sigue lo trae la banda" : "lo que sigue lo pone la producción"); continue; } }
 
-      if (!artistaFijo && esEncabezadoArtistaConocido(texto)) { artista = conocidos.get(clave(texto))!; grupo = null; continue; }
-      if (PROVEEDOR_SUELTO.test(texto)) continue; // columna de proveedor que el OCR separó de su fila
-      if (nota(texto)) continue;
+      if (!artistaFijo && esEncabezadoArtistaConocido(texto)) { artista = conocidos.get(clave(texto))!; grupo = null; anotar("banda", "banda conocida del evento"); continue; }
+      if (PROVEEDOR_SUELTO.test(texto)) { anotar("nota", "proveedor suelto"); continue; } // columna de proveedor que el OCR separó de su fila
+      if (nota(texto)) { anotar("nota", "nota del rider"); continue; }
       const sinCola = texto.replace(/[\s:·|–—-]+$/, "");
       const pegados = variosGrupos(sinCola);
-      if (GRUPOS.test(sinCola) || pegados) { grupo = nombrePropio(pegados ?? sinCola); modoAlternativa = false; continue; }
-      if (encabezadoFuerte(sinCola, l)) { grupo = nombrePropio(sinCola); modoAlternativa = false; continue; }
+      if (GRUPOS.test(sinCola) || pegados) { grupo = nombrePropio(pegados ?? sinCola); modoAlternativa = false; anotar("grupo", "título de instrumento"); continue; }
+      if (encabezadoFuerte(sinCola, l)) { grupo = nombrePropio(sinCola); modoAlternativa = false; anotar("grupo", "título en mayúsculas"); continue; }
       const sola = sinCola.match(/^opci[oó]n\s*#?\s*(\d)$/i);
-      if (sola) { modoAlternativa = Number(sola[1]) > 1; continue; }
+      if (sola) { modoAlternativa = Number(sola[1]) > 1; anotar("nota", "opción"); continue; }
       const alt = marcaAlternativa(sinCola);
-      if (alt !== undefined) { modoAlternativa = alt; if (letras(sinCola) < 4 || /^(opci[oó]n|sustitu|alternativa|spare|.*\bspare)/i.test(sinCola) && sinCola.split(/\s+/).length <= 4) continue; }
-      if (bloqueHorario(texto)) continue;
-      if (item(texto, l)) continue;
-      if (!ctx.fecha && diaDeLinea(texto)) continue;
-      if (lineaEscenario(texto)) continue;
-      if (encabezado(texto)) continue;
-      if (!ext.evento && tituloEvento(texto)) continue;
+      if (alt !== undefined) { modoAlternativa = alt; if (letras(sinCola) < 4 || /^(opci[oó]n|sustitu|alternativa|spare|.*\bspare)/i.test(sinCola) && sinCola.split(/\s+/).length <= 4) { anotar("nota", alt ? "empiezan alternativas" : "vuelve lo preferido"); continue; } }
+      if (bloqueHorario(texto)) { anotar("horario", "hora de un bloque"); continue; }
+      const antes = ext.items.length, artistaAntes = artista;
+      if (item(texto, l)) {
+        if (ext.items.length > antes) anotar("item", "equipo con cantidad o reconocido", ext.items.length - 1);
+        else anotar("no-backline", artistaAntes ? "radios, pilas, cinta… no son backline" : "parece backline pero no se sabe de qué banda");
+        continue;
+      }
+      if (!ctx.fecha && diaDeLinea(texto)) { anotar("dia", "fecha"); continue; }
+      if (lineaEscenario(texto)) { anotar("escenario", "nombre del escenario"); continue; }
+      const artistaPrevio = artista;
+      if (encabezado(texto)) { anotar(artista !== artistaPrevio ? "banda" : "grupo", artista !== artistaPrevio ? "título que parece nombre de banda" : "título de grupo"); continue; }
+      if (!ext.evento && tituloEvento(texto)) { anotar("evento", "nombre del evento"); continue; }
+      anotar("sin-interpretar", "no lo entendí");
       sinInterpretar.push(texto);
     }
 
@@ -300,7 +329,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       }
       if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.length > (explicita ? 140 : 90)) return false;
       const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
-      if (categoria === "Otro" && NO_BACKLINE.test(descripcion)) return true; // radios, pilas, cinta: se lee pero no es backline
+      if (NO_BACKLINE.test(descripcion) && categorizar(principal ?? descripcion) === "Otro") return true; // radios, pilas, cinta: se lee pero no es backline
       // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
       // (salvo lo que la banda dice que trae: "Gaita hembra" también cuenta).
       const loTraeLaBanda = proveedorActual === "ARTISTA" && !proveedor && descripcion.split(" ").length <= 4 && !/[.?!]$/.test(t);

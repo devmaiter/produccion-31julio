@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { afterAll, describe, expect, it } from "vitest";
-import { agruparLineas, interpretar, leerArchivo, lineasDeTexto, type Documento } from "../src/lectura";
+import { agruparLineas, interpretar, leerArchivo, lineasDeTexto, type Documento, type RenglonLeido } from "../src/lectura";
 import { lectoresNode } from "../src/lectura/node/lectores";
 
 /* Riders completos: además del backline traen input list, monitores, luces,
@@ -202,6 +202,22 @@ ALIMENTOS ARTISTA:
   it("sin títulos de sección se lee como antes", () => {
     const e = interpretar([doc("LOS RAYOS\n2 Snare stand\n1 Ampeg SVT")]);
     expect(resumen(e)).toEqual(["2 Bases: Snare stand", "1 Ampli bajo: Ampeg SVT"]);
+  });
+});
+
+describe("traza: qué decidió el lector con cada renglón", () => {
+  it("marca ítems, secciones, canales y lo que no es backline, con el motivo", () => {
+    const traza: RenglonLeido[] = [];
+    const e = interpretar([{ nombre: "rider", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLA BANDA\nINPUT LIST\n1 KICK   BETA 91\nBACKLINE\nDRUMS\n1 Kick 22\"\n6 pilas AA\nCATERING\n24 botellas de agua") }], { traza });
+    expect(traza.map(t => [t.etiqueta, t.texto])).toEqual([
+      ["banda", "RIDER TÉCNICO"], ["banda", "LA BANDA"],
+      ["seccion", "INPUT LIST"], ["no-backline", "1 KICK   BETA 91"],
+      ["seccion", "BACKLINE"], ["grupo", "DRUMS"],
+      ["item", '1 Kick 22"'], ["no-backline", "6 pilas AA"],
+      ["seccion", "CATERING"], ["no-backline", "24 botellas de agua"],
+    ]);
+    expect(traza.find(t => t.etiqueta === "item")!.item).toBe(0);
+    expect(e.items[0]!.descripcion).toBe('Kick 22"');
   });
 });
 

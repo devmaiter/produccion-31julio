@@ -2,6 +2,7 @@
  * un solo archivo `lector.js` que deja `window.LectorBackline`. La página
  * dice dónde sirve el worker de PDF y la carpeta del OCR. */
 import { PaqueteEvento } from "../../lector/src/dominio/entidades";
+import type { RenglonLeido } from "../../lector/src/lectura/interpretar";
 import { extraccionVacia, integrar, interpretar, leerArchivo, leerDesglose, unirExtracciones, type Extraccion, type ImagenPlano } from "../../lector/src/lectura";
 import { lineasDeTexto } from "../../lector/src/lectura/documento";
 import { lectoresNavegador, type RutasNavegador } from "../../lector/src/lectura/navegador";
@@ -14,6 +15,8 @@ export interface OpcionesLectura {
   fecha?: string;
   /** Se llama antes y después de cada archivo. */
   alProgreso?: (nombre: string, estado: string) => void;
+  /** Si viene, se llena con lo que se decidió de cada renglón (PDF, fotos, correos y texto; no el desglose .xlsx). */
+  traza?: RenglonLeido[];
 }
 
 export interface Lectura {
@@ -38,7 +41,7 @@ export async function leerTodo(entradas: Array<File | { nombre: string; texto: s
     try {
       let ext: Extraccion;
       if (!(e instanceof File)) {
-        ext = interpretar([{ nombre, tipo: "texto", lineas: lineasDeTexto(e.texto), avisos: [] }], { base, artista: op.artista, fecha: op.fecha });
+        ext = interpretar([{ nombre, tipo: "texto", lineas: lineasDeTexto(e.texto), avisos: [] }], { base, artista: op.artista, fecha: op.fecha, traza: op.traza });
       } else if (/\.xlsx$/i.test(nombre)) {
         op.alProgreso?.(nombre, "leyendo hojas y planos (OCR)…");
         const d = await leerDesglose(new Uint8Array(await e.arrayBuffer()), nombre, { base, lectores });
@@ -46,7 +49,7 @@ export async function leerTodo(entradas: Array<File | { nombre: string; texto: s
       } else {
         if (/\.(jpe?g|png|webp|gif|bmp)$/i.test(nombre) || e.type.startsWith("image/")) op.alProgreso?.(nombre, "leyendo con OCR…");
         const docs = await leerArchivo(nombre, new Uint8Array(await e.arrayBuffer()), e.type, lectores);
-        ext = interpretar(docs, { base, artista: op.artista, fecha: op.fecha });
+        ext = interpretar(docs, { base, artista: op.artista, fecha: op.fecha, traza: op.traza });
       }
       parciales.push(ext);
       const resumen = [`${ext.items.length} ítem(s)`, ext.bloques.length ? `${ext.bloques.length} bloque(s) de horario` : "", ext.zonas.length ? `${ext.zonas.length} zona(s)` : "", ext.canales.length ? `${ext.canales.length} canal(es)` : "", ext.planos.length ? `${ext.planos.length} plano(s)` : ""].filter(Boolean).join(" · ");
@@ -62,3 +65,4 @@ export async function leerTodo(entradas: Array<File | { nombre: string; texto: s
 }
 
 export { extraccionVacia, integrar, interpretar, leerArchivo, leerDesglose, unirExtracciones, lectoresNavegador };
+export { categorizar } from "../../lector/src/dominio/categorias";
