@@ -68,7 +68,7 @@ describe("riders completos en PDF", () => {
       "3 Percusión: Congas LP con sus bases",
       "2 Percusión: Timbales con base",
       "1 Percusión: Mesa de percusión",
-      "1 Ampli bajo: Ampeg SVT con caja",
+      "1 Ampli bajo: Ampeg SVT con caja 8x10",
     ]);
   });
 });
@@ -127,6 +127,63 @@ PLANTA DE ILUMINACION - LISTA DE MATERIALES
       "1 Bajo: BASS GUITAR Fender Jazz Bass 5",
       "1 Teclado: Keyboard Controller 61 Keys",
     ]);
+  });
+
+  it("tabla PIEZA | MEDIDA | MARCA, páginas repetidas, snakes y opciones de teclado", () => {
+    const e = interpretar([doc(`Technical Rider
+LOS TIGRES DEL NORTE 2026
+P.A.
+12 MAIN PER SIDE   PANTHER MEYER
+8 SUBS PER SIDE   2100 LF MEYER
+SUBSNAKES
+1 SNAKE FOR DRUMS 16 CHANNELS W/4 RETURNS
+BACKLINE
+2 SETS DE BATERIAS IGUALES
+PIEZA   MEDIDA   MARCA   MODELO   MIC
+2-KICK   22" x 20"   DW   SERIE COLECTOR
+2-SNARE   14" X 6"   DW   SERIE COLECTOR
+2-TOM 1   10"   DW   SERIE COLECTOR
+Technical Rider
+BACKLINE
+DRUMSET2 SETS DE BATERIAS IGUALES
+2-KICK   22" x 20"   DW   SERIE COLECTOR
+2-SNARE   14" X 6"   DW   SERIE COLECTOR
+2-TOM 1   10"   DW   SERIE COLECTOR
+2-TOM 2   12"   DW   SERIE COLECTOR
+2-ASIENTO CON RESPALDO   DW   9120AL
+2-PAR DE H/H   14"   ZILDJIAN   A CUSTOM
+STAND DE MIC
+4 STAND CON BOOM
+SUB SNAKE BATERIA
+1 SNAKE DE 16 CH, 4 RETORNOS
+IMAGEN DE EJEMPLO
+BACKLINE
+PERCUSIONPERCUSSIONS
+CONGA HI   QUINTO   LP559X   CLASIC
+MESA DE TOYS   CORTINA, SHEKER, PANDERO CLAMP, TOYS VARIOS,CHACHA BELL, WOODBLOCK
+TECALDO
+OPCION #1   YAMAHA MO6 STAND   SUSTEIN
+OPCION #2   KORG KRONOS 61 STAND   SUSTEIN
+PRONTERS
+3 pronters de TV. Minimo 40" conexcion hdmi al area de trabajo de monitores
+ALIMENTOS ARTISTA:
+16 ELECTROLIT SABOR DE COCO
+50 BOTELLAS DE AGUA PURIFICADA`)]);
+    expect(e.artistas).toEqual(["Los Tigres del Norte"]);
+    expect(resumen(e)).toEqual([
+      '2 Batería: KICK (22" x 20", DW, SERIE COLECTOR)',
+      '2 Batería: SNARE (14" X 6", DW, SERIE COLECTOR)',
+      '2 Batería: TOM 1 (10", DW, SERIE COLECTOR)',
+      '2 Batería: TOM 2 (12", DW, SERIE COLECTOR)',
+      "2 Bases: ASIENTO CON RESPALDO (DW, 9120AL)",
+      '2 Platillos: PAR DE H/H (14", ZILDJIAN, A CUSTOM)',
+      "1 Percusión: CONGA HI (QUINTO, LP559X, CLASIC)",
+      "1 Percusión: MESA DE TOYS (CORTINA, SHEKER, PANDERO CLAMP, TOYS VARIOS,CHACHA BELL, WOODBLOCK)",
+      "1 Teclado: YAMAHA MO6 STAND (SUSTEIN)",
+      "1 Teclado: KORG KRONOS 61 STAND (SUSTEIN)",
+    ]);
+    expect(e.items.at(-1)!.nota).toContain("no suma"); // la opción 2 es alternativa
+    expect(e.items.at(-2)!.nota).toBeNull();
   });
 
   it("sin títulos de sección se lee como antes", () => {

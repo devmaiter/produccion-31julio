@@ -31,7 +31,7 @@ export interface ContextoLectura {
 /** Líneas de OCR por debajo de esta confianza se marcan "confirmar". */
 export const CONFIANZA_MINIMA = 75;
 
-const GRUPOS = /^(drums?|drum ?kit|bater[ií]a|hardware( set)?|cymbals?( set)?|cymbal set|set cymbals|platillos|percussion|percusi[oó]n|bass|bajo|guitars?|guitarras?|keys|keyboards?|teclados?|dj( set)?|misc(elaneous)?|varios|otros|backline|equipos?|stage|tarima|amps?|amplificadores?|vientos|brass|horns|strings|cuerdas|vocals?|voces|power|energ[ií]a|cables|accesorios|sobre\s*tarimas?|risers?)$/i;
+const GRUPOS = /^(drums?|drum ?kit|bater[ií]a|hardware( set)?|cymbals?( set)?|cymbal set|set cymbals|platillos|percussion|percusi[oó]n|bass|bajo|guitars?|guitarras?|keys|keyboards?|teclados?|tecaldo|dj( set)?|misc(elaneous)?|varios|otros|backline|equipos?|stage|tarima|amps?|amplificadores?|vientos|brass|horns|strings|cuerdas|vocals?|voces|power|energ[ií]a|cables|accesorios|sobre\s*tarimas?|risers?)$/i;
 const MARCAS = /\b(puertas|doors|noise curfew|curfew|almuerzo|lunch|cena|dinner|break|receso|apertura|cierre)\b/i;
 const TIPO_BLOQUE: Array<[RegExp, Extraccion["bloques"][number]["tipo"]]> = [
   [/\b(line ?check)\b/i, "linecheck"],
@@ -53,16 +53,17 @@ const PROVEEDOR_SUELTO = /^(cn|oml|backline( cop)?|propio|banda)$/i;
  * Esas secciones tienen cantidades ("1 VAN para 15 personas", "27 SNARE 2 SM57")
  * que no son backline; dentro de ellas no se leen ítems. */
 const SECCION_BACKLINE = /^(backline|back line|instrumentos|requerimientos? de backline|equipos? de backline|listado de backline|lista de backline)\b/i;
-const SECCION_AUDIO = /^(input(s| list)?|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|mezclas?( de monitores)?|iem|in ?ears?|pa\b|p\.a\.|sistema de (sonido|pa)|sonido|audio|foh|front of house|consolas?|microfon[ií]a|mic list|cue monitor|arreglo principal)/i;
-const SECCION_OTRA = /^(iluminaci[oó]n|planta de iluminaci[oó]n|lighting|luces|lista de materiales|video|pantallas|screens?|led\b|catering|camerinos?|camarines?|dressing ?rooms?|hospitality|alimentaci[oó]n|comidas?|bebidas|hotel(es)?|hospedaje|alojamiento|estad[ií]a|transporte|traslados?|viajes?|vuelos?|seguridad|security|contactos?|contact|comunicaci[oó]n|prensa|grabaci[oó]n|fotograf[ií]a|merch(andising)?|pagos?|contrato|rigging|estructura|energ[ií]a el[eé]ctrica|planta el[eé]ctrica|generador(es)?|radios?|handies|walkie|motorola|intercom|backstage|pre-?show|after-?show|medidas|dimensiones|especiales|control\b|barricada|vallas?|credenciales|acreditaciones|invitaciones|guest ?list)/i;
+const SECCION_AUDIO = /^(input(s| list)?|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|monitor world|mezclas?( de monitores)?|iem|in ?ears?|pa\b|p\.\s?a\.?|sistema de (sonido|pa)|sonido|audio|foh|front of house|consolas?|control (foh|monitor(es|s)?)|microfon[ií]a|micr[oó]fonos|microphones?|mic (list|packages?)|stands? de mic(r[oó]fonos?)?|mic stands?|microphone stands?|cue monitor|arreglo principal|(sub ?)?snakes?|multipares?|wireless|inal[aá]mbricos|rf\b)/i;
+const SECCION_OTRA = /^(stage$|stage plot|planta de escenario|ground support|stage ?hands|power( generators)?|generadores?|moving heads|follow ?spots?|fx$|efectos|led screens?|pantallas led|pronters|prompters?|teleprompters?|quick change|accesorios (artista|ballet|mariachi|staff|producci[oó]n)|alimentos|bebidas|comida|cena|iluminaci[oó]n|planta de iluminaci[oó]n|lighting|luces|lista de materiales|video|pantallas|screens?|led\b|catering|camerinos?|camarines?|dressing ?rooms?|hospitality|alimentaci[oó]n|comidas?|bebidas|hotel(es)?|hospedaje|alojamiento|estad[ií]a|transporte|traslados?|viajes?|vuelos?|seguridad|security|contactos?|contact|comunicaci[oó]n|prensa|grabaci[oó]n|fotograf[ií]a|merch(andising)?|pagos?|contrato|rigging|estructura|energ[ií]a el[eé]ctrica|planta el[eé]ctrica|generador(es)?|radios?|handies|walkie|motorola|intercom|backstage|pre-?show|after-?show|medidas|dimensiones|especiales|control\b|barricada|vallas?|credenciales|acreditaciones|invitaciones|guest ?list)/i;
 /* Lo que no es backline aunque aparezca con cantidad dentro de la lista. */
-const NO_BACKLINE = /\b(handies?|radios?|walkie|motorola|pilas?|cintas?|gaf+er|toallas?|agua|hielo|bebidas?|personas|habitaci[oó]n(es)?|suburban|vans?|guardias?|sillones?|espejos?|percheros?)\b/i;
+const NO_BACKLINE = /\b(handies?|radios?|walkie|motorola|pilas?|cintas?|gaf+er|toallas?|agua|hielo|bebidas?|personas|habitaci[oó]n(es)?|suburban|vans?|guardias?|sillones?|espejos?|percheros?|(sub ?)?snakes?|multipar(es)?|retornos?|returns|canales|channels|pronters?|prompters?)\b/i;
 /* Renglón de input list: canal, instrumento y micrófono ("27  SNARE 2  SM 57  SHORT BOOM"). */
 const CANAL = /^\d{1,2}\s+.*\b(sm ?\d{2}|beta ?\d{2}|e ?9\d{2}|e ?6\d{2}|md ?4\d{2}|d ?box|di\b|ksm|c ?414|re ?20|m ?88|psm ?\d+|xlr|phantom|short boom|tall boom|claw)\b/i;
 
 function seccionDe(t: string): { tipo: "backline" | "audio" | "otra" } | null {
   const h = t.replace(/^[\s•·*\d.)-]+(?=\p{L})/u, "").trim();
-  if (h.length > 70 || h.split(/\s+/).length > 9 || /[.?!]$/.test(h)) return null;
+  // "P.A." es abreviatura, no fin de frase.
+  if (h.length > 70 || h.split(/\s+/).length > 9 || (/[.?!]$/.test(h) && h.split(/\s+/).length > 2)) return null;
   if (SECCION_BACKLINE.test(h)) return { tipo: "backline" };
   if (SECCION_AUDIO.test(h)) return { tipo: "audio" };
   if (SECCION_OTRA.test(h)) return { tipo: "otra" };
@@ -110,7 +111,7 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
 
     if (doc.asunto) tituloEvento(doc.asunto);
 
-    for (const l of unirRenglones(doc.lineas).flatMap(dividirLista)) {
+    for (const l of sinRepetidos(unirRenglones(doc.lineas)).flatMap(dividirLista)) {
       const texto = limpiar(l.texto);
       if (!texto || letras(texto) + (texto.match(/\d/g) ?? []).length < 2) continue;
       if (riderDe(texto)) continue;
@@ -128,6 +129,9 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
         continue;
       }
       if (CANAL.test(texto)) continue;
+      // "IMAGEN DE EJEMPLO" (debajo de una foto) y "2 SETS DE BATERÍAS IGUALES" (la tabla ya trae las cantidades).
+      if (/^(imagen|foto|image|picture)s? (de )?(ejemplo|referencia|example|reference)\b/i.test(texto)) continue;
+      if (/\bsets? de (bater[ií]as?|drums?)\b|\biguales\b|\bidentical\b/i.test(texto) && texto.split(/\s+/).length <= 7) continue;
       const quien = quienPone(texto);
       if (quien !== undefined) { proveedorActual = quien; if (letras(texto) > 40 || texto.split(/\s+/).length <= 5) continue; }
 
@@ -135,7 +139,8 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
       if (PROVEEDOR_SUELTO.test(texto)) continue; // columna de proveedor que el OCR separó de su fila
       if (nota(texto)) continue;
       const sinCola = texto.replace(/[\s:·|–—-]+$/, "");
-      if (GRUPOS.test(sinCola)) { grupo = nombrePropio(sinCola); modoAlternativa = false; continue; }
+      const pegados = variosGrupos(sinCola);
+      if (GRUPOS.test(sinCola) || pegados) { grupo = nombrePropio(pegados ?? sinCola); modoAlternativa = false; continue; }
       if (encabezadoFuerte(sinCola, l)) { grupo = nombrePropio(sinCola); modoAlternativa = false; continue; }
       const sola = sinCola.match(/^opci[oó]n\s*#?\s*(\d)$/i);
       if (sola) { modoAlternativa = Number(sola[1]) > 1; continue; }
@@ -219,6 +224,12 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
         }
       }
       let cols = t.split(/\t|\s{2,}|\s+\|\s+/).map(c => c.trim()).filter(Boolean);
+      // "CONGA HI | QUINTO | LP559X | CLASIC": tabla sin cantidad cuya primera columna es el equipo;
+      // el resto son medida, marca y modelo.
+      const primera = cols.length >= 2 ? separarCantidad(cols[0]!) : null;
+      if (primera && !cols.some((c, i) => i > 0 && (/^(x\s*)?\d{1,3}(\s*x)?$/i.test(c) || PROVEEDOR_SUELTO.test(c) || /^(cn|oml|artista|producci[oó]n)$/i.test(c))) && categorizar(primera.descripcion) !== "Otro" && letras(primera.descripcion) >= 3) {
+        t = `${cols[0]} (${cols.slice(1).join(", ")})`; cols = [t];
+      }
       // "Fender  Deville 2x12": dos espacios de más no son columnas si ninguna es cantidad ni proveedor.
       if (cols.length >= 2 && !cols.some((c, i) => /^(x\s*)?\d{1,3}(\s*x)?$/i.test(c) && (i > 0 || cols.length >= 3)) && !cols.some(c => PROVEEDOR_SUELTO.test(c) || /^(cn|oml|artista|producci[oó]n)$/i.test(c))) {
         cols = [cols.join(" ")];
@@ -269,17 +280,19 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
         const medidas = descripcion.match(/\b\d{1,2}\s*(?:["”″]|pulg)/g) ?? [];
         if (medidas.length >= 2) cantidad = medidas.length;
       }
-      if ((letras(descripcion) < 2 && categorizar(descripcion) === "Otro") || descripcion.length > (explicita ? 140 : 90)) return false;
+      if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.length > (explicita ? 140 : 90)) return false;
       const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
       if (categoria === "Otro" && NO_BACKLINE.test(descripcion)) return true; // radios, pilas, cinta: se lee pero no es backline
       // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
       // (salvo lo que la banda dice que trae: "Gaita hembra" también cuenta).
       const loTraeLaBanda = proveedorActual === "ARTISTA" && !proveedor && descripcion.split(" ").length <= 4 && !/[.?!]$/.test(t);
       if (!explicita && opcion === null && categorizar(descripcion) === "Otro" && !loTraeLaBanda) return false;
-      if (!explicita && descripcion.split(",").length >= 3 && !/\d/.test(descripcion)) return false; // "Ampeg, Markbass, Fender o equivalente": marcas, no equipo
+      const sinNotas = descripcion.replace(/\([^)]*\)/g, "");
+      if (!explicita && sinNotas.split(",").length >= 3 && !/\d/.test(sinNotas)) return false; // "Ampeg, Markbass, Fender o equivalente": marcas, no equipo
       if (!explicita && /[.?!]$/.test(descripcion) && descripcion.split(" ").length > 6) return false; // una frase del correo
       if (!proveedor && proveedorActual) proveedor = proveedorActual;
-      const alternativa = opcion !== null || modoAlternativa;
+      // "OPCIÓN #1" es lo preferido; desde la 2 son alternativas que no suman.
+      const alternativa = (opcion !== null && opcion !== "1") || modoAlternativa;
       if (!artista) { ext.avisos.push(`${doc.nombre}: "${t}" parece backline pero no se sabe de qué artista. Indica el artista y vuelve a leer.`); return true; }
       const deOcr = l.confianza !== undefined;
       const baja = deOcr && l.confianza! < CONFIANZA_MINIMA;
@@ -446,7 +459,9 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
       const sig = lineas[i + 1]!.texto.trim();
       const cerrar = abiertos(actual.texto) > 0 && abiertos(sig) < 0 && sig.split(/\s+/).length <= 4;
       const sigue = /^\p{Ll}/u.test(sig) && !/[.:;]$/.test(actual.texto.trim()) && actual.texto.trim().split(/\s+/).length >= 3 && !/\s{3}/.test(actual.texto) && !/^(x\s*\d|o\s)/i.test(sig);
-      if (!cerrar && !sigue) break;
+      // "1 Ampeg SVT con caja" + "8x10": la medida que quedó sola abajo.
+      const medida = /^\d{1,2}\s*[x×]\s*\d{1,2}\b/i.test(sig) && sig.split(/\s+/).length <= 2 && /\p{L}$/u.test(actual.texto.trim());
+      if (!cerrar && !sigue && !medida) break;
       actual = juntar(actual, lineas[i + 1]!); i++;
     }
     // Una frase partida que resultó ser lista corrida ("3 Congas LP con sus bases 2 Timbales con base 1 Mesa…").
@@ -456,12 +471,57 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
   return out;
 }
 
+/* Riders que repiten una página entera (la misma tabla de batería en la página 3 y en la 4):
+ * un bloque de 3 o más renglones iguales a uno anterior se lee una sola vez. Los renglones
+ * sueltos repetidos ("4 STAND CON BOOM" en batería y en percusión) sí cuentan. */
+export function sinRepetidos(lineas: Linea[]): Linea[] {
+  const norm = (l: Linea | undefined) => (l?.texto ?? "").replace(/\s+/g, " ").trim().toUpperCase();
+  const claves = lineas.map(norm);
+  const vistos = new Map<string, number[]>();
+  const fuera = new Set<number>();
+  let j = -1; // renglón anterior que el bloque repetido va siguiendo
+  for (let i = 0; i < lineas.length; i++) {
+    const k = claves[i]!;
+    if (j >= 0 && j + 1 < i && claves[j + 1] === k) { j++; fuera.add(i); }
+    else {
+      j = -1;
+      if (letras(k) >= 3) {
+        const antes = (vistos.get(k) ?? []).find(a => a + 2 < i && claves[a + 1] === claves[i + 1] && claves[a + 2] === claves[i + 2] && letras(claves[a + 1]!) >= 2);
+        if (antes !== undefined) { j = antes; fuera.add(i); }
+      }
+    }
+    if (!vistos.has(k)) vistos.set(k, []);
+    vistos.get(k)!.push(i);
+  }
+  return lineas.filter((_, i) => !fuera.has(i));
+}
+
+/** "PERCUSSIONS PERCUSION", "PERCUSIONPERCUSSIONS", "DRUMS / BATERÍA": títulos de grupo repetidos o pegados. */
+function variosGrupos(t: string): string | null {
+  const G = /^(drums?|drum ?kit|bater[ií]as?|percusi[oó]n|percussions?|bass|bajos?|guitars?|guitarras?|keys|keyboards?|teclados?|cymbals?|platillos|hardware)/i;
+  let resto = t.replace(/[\s/|·–-]+/g, "");
+  if (!resto || /\d/.test(resto)) return null;
+  const primero = resto.match(G)?.[0] ?? null;
+  let n = 0;
+  while (resto && G.test(resto)) { resto = resto.replace(G, ""); n++; }
+  return resto === "" && n >= 2 ? primero : null;
+}
+
 /** Cantidades seguidas de un nombre con mayúscula: "1 Bombo", "2 Toms" (no "3 head" ni "88 keys"). */
-const MARCA_LISTA = /(?:^|\s)(?:[1-9]|1\d|2[0-4])\s+(?!["”″])\p{Lu}\p{L}/gu; // hasta 24: "61 Keys" es una medida
-const marcas = (x: string) => (x.match(MARCA_LISTA) ?? []).length;
+/* Cantidad (1 a 24) seguida de un nombre con mayúscula: "1 Bombo", "2 Toms". No cuenta "3 head"
+ * ni "88 keys" (minúscula o medida), ni "16 CH" / "4 RETORNOS" (unidades). */
+const MARCA_LISTA = /(?:^|\s)((?:[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]*))/gu;
+const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft)$/i;
+function posicionesLista(t: string): number[] {
+  const pos: number[] = [];
+  for (const m of t.matchAll(MARCA_LISTA)) if (!UNIDADES.test(m[2]!)) pos.push(m.index! + m[0].length - m[1]!.length);
+  return pos;
+}
+const marcas = (x: string) => posicionesLista(x).length;
 function cortar(t: string): string[] {
-  if (marcas(t) < 2) return [t];
-  return t.split(/\s+(?=(?:[1-9]|1\d|2[0-4])\s+(?!["”″])\p{Lu}\p{L})/u).map(x => x.trim()).filter(Boolean);
+  const pos = posicionesLista(t);
+  if (pos.length < 2) return [t];
+  return [0, ...pos].filter((p, n, a) => n === 0 || p !== a[n - 1]).map((p, n, a) => t.slice(p, a[n + 1] ?? t.length).trim()).filter(Boolean);
 }
 
 /** "Hardware: 2x soportes de caja, 1x soporte charles, 11x soportes…" → una línea por ítem. */
