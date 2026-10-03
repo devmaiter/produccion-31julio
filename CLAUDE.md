@@ -145,6 +145,8 @@ están el resumen y cada banda. Todo usa CSS scroll-snap.
 - En cada portada hay un holograma 3D (`holograma.js`, con el Three.js de
   `reconocimiento-3d/vendor/`). La batería se modeló según una foto real de
   tarima. Un solo lienzo WebGL pasa al reel visible.
+- El holograma se arma con el listado (`receta.js`): si dice 4 bases de platillo,
+  salen 4; lo que no diga sale del formato de siempre de una batería.
 - En PC hay índice lateral y flechas para el mouse; en el celular nada de eso.
 - Lleva un reemplazo de `Map.getOrInsertComputed`, porque pdf.js lo necesita en
   navegadores no tan nuevos.

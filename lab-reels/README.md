@@ -54,6 +54,17 @@ hacia arriba y gira solo. Viene de la rama del demo `reconocimiento-3d/`: usa su
 - También hay holograma para Platillos, Percusión (congas), Teclado, Ampli bajo (8×10),
   Ampli guitarra, Guitarra, Bajo y Bases (base de micrófono boom). Escenario, Cables y
   DJ siguen con su emoji.
+- **El holograma sigue el listado** (`receta.js`): cuenta las piezas de cada renglón
+  ("4 bases de platillo", '10" – 12" – 14" Rack tom', "Set de platillos: 1 ride, 2 crash,
+  1 splash y hi-hat") y dibuja eso: tantos toms, tom de piso, bombos, bases de platillo
+  (cada una con su platillo: crash, splash, ride, china), doble pedal, X-hat o pad como
+  diga la lista. Lo que no diga sale del formato de siempre: bombo 22, toms 10 y 12,
+  piso 16, redoblante 14, hi-hat, crash y ride, silla. Las Bases salen por tipo (platillo,
+  hi-hat, redoblante, silla, micrófono, teclado, guitarra, atril, taburete) y los
+  teclados, amplis y guitarras salen tantos como haya (hasta 4).
+- Con varias bandas se toma, pieza por pieza, lo más grande de una sola banda: es el
+  montaje que le sirve a cualquiera. Por eso el número "a tener" (que suma las bandas del
+  mismo día) puede ser mayor que lo que se ve.
 - Hay un solo lienzo WebGL que pasa al reel visible, porque el celular aguanta pocos.
   Si el teléfono no tiene WebGL, se queda el emoji.
 

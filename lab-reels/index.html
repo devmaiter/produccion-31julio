@@ -422,7 +422,7 @@ function holograma(r){
     const h = r.querySelector(".holo"), tipo = h && holo3d?.MODELO[h.dataset.cat];
     if (!tipo) { holo3d?.pausar(); return; }
     try {
-      if (!holo3d.mostrar(h, tipo)) return;
+      if (!holo3d.mostrar(h, tipo, datos().items, h.dataset.cat)) return;
       document.querySelectorAll(".holo.con3d").forEach(x => x !== h && x.classList.remove("con3d"));
       h.classList.add("con3d");
     } catch { holo3d = null; }

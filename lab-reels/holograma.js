@@ -4,6 +4,7 @@
    permiten pocos contextos y doce reels con su propio WebGL se caerían en el celular. */
 import * as THREE from "../reconocimiento-3d/vendor/three.js";
 import { RoundedBoxGeometry } from "../reconocimiento-3d/vendor/three.js";
+import { receta } from "./receta.js";
 
 const COLOR = 0xff7a2e;
 
@@ -71,46 +72,78 @@ function cono(g, r, x, y, z) {
   pieza(p, new THREE.CylinderGeometry(r * .3, r * .95, r * .35, 32, 1, true), 0, 0, -r * .17, -Math.PI / 2);
   pieza(p, new THREE.SphereGeometry(r * .28, 16, 8, 0, 6.283, 0, 1.2), 0, 0, -r * .2, Math.PI / 2);
 }
-function platillo(g, x, y, z, r, inclina = .25) {
-  pieza(g, cil(.012, r, .025), x, y, z, inclina, 0, .15);
-  barra(g, [x, 0, z - .15], [x, y - .25, z - .05]); barra(g, [x, y - .25, z - .05], [x, y - .02, z]);
-  tripode(g, x, .3, z - .15);
+/* Platillo en su base, mirando hacia el baterista (en `mira`). La china va al revés. */
+const PULG = {crash: 17, ride: 21, splash: 10, china: 18};
+const ALTO = {crash: 1.42, ride: 1.2, splash: 1.28, china: 1.38};
+function platilloEnBase(g, x, z, p, mira) {
+  const r = (p.pulgadas || PULG[p.tipo] || 17) * .0127, h = ALTO[p.tipo] || 1.4;
+  const b = new THREE.Group(); b.position.set(x, 0, z); b.rotation.y = Math.atan2(mira[0] - x, mira[1] - z); g.add(b);
+  pieza(b, p.tipo === "china" ? cil(r, .02, .035) : cil(.012, r, .025), 0, h, 0, .3);
+  barra(b, [0, .3, -.18], [0, h - .3, -.12]); barra(b, [0, h - .3, -.12], [0, h - .02, 0]);
+  tripode(b, 0, .3, -.18);
+}
+/* Bases de platillo en arco detrás del set, de izquierda a derecha. */
+function arcoPlatillos(g, lista, {cx = 0, cz = .25, rx = .9, rz = .6, mira = [0, .82], dx = 0} = {}) {
+  const n = lista.length;
+  lista.forEach((p, i) => {
+    const a = n === 1 ? .75 * Math.PI : n === 2 ? [.75, .2][i] * Math.PI : (.9 - i * .82 / (n - 1)) * Math.PI;
+    const x = cx + rx * Math.cos(a), z = cz - rz * Math.sin(a);
+    platilloEnBase(g, x + Math.sign(x) * dx, z, p, mira);
+  });
+}
+function hihat(g, x, z, r, alto = .96) {
+  pieza(g, cil(r, r, .012), x, alto, z); pieza(g, cil(r, r, .012), x, alto + .03, z);
+  barra(g, [x, 0, z], [x, alto, z]); tripode(g, x, .3, z);
 }
 
-/* Cada equipo. La batería sigue la foto de referencia: tarima con tapete, bombo con
-   frente con hueco, dos toms montados en el bombo, tom de piso a la derecha,
-   redoblante y hi-hat a la izquierda con sus pedales, platillos y la silla. */
+/* Cada equipo. La batería sigue la foto de referencia (tarima con tapete, bombo con hueco,
+   toms montados en el bombo, tom de piso a la derecha, redoblante y hi-hat a la izquierda,
+   platillos y silla) y se arma con la receta del listado: tantos toms, pisos y bases de
+   platillo como diga. Sin receta sale el formato de siempre (ver receta.js). */
+const KIT = {bombos: [22], toms: [10, 12], pisos: [16], redoblante: 14, hihat: 14, platillos: [{tipo: "crash"}, {tipo: "ride"}]};
 const CONSTRUIR = {
-  bateria(g) {
-    contorno(g, new THREE.BoxGeometry(2.3, .2, 1.9), 0, .1, .25);  // tarima
-    contorno(g, new THREE.BoxGeometry(1.9, .01, 1.5), 0, .205, .3); // tapete
-    const k = new THREE.Group(); k.position.y = .21; g.add(k);
-    pieza(k, cil(.29, .29, .42), 0, .3, 0, Math.PI / 2);           // bombo
-    pieza(k, aro(.29, .012), 0, .3, .21); pieza(k, aro(.29, .012), 0, .3, -.21);
-    pieza(k, aro(.07, .006), .1, .22, -.215);                      // hueco del parche frontal
-    barra(k, [-.18, .05, .3], [-.24, 0, .38]); barra(k, [.18, .05, .3], [.24, 0, .38]);
-    pieza(k, caja(.1, .02, .26, .006), 0, .012, .36);              // pedal de bombo
-    barra(k, [0, .03, .26], [0, .3, .22], .008);
-    pieza(k, cil(.15, .15, .2), -.17, .78, .04, .35); pieza(k, cil(.16, .16, .22), .18, .78, .04, .35); // toms
-    barra(k, [0, .58, 0], [-.12, .72, .02]); barra(k, [0, .58, 0], [.12, .72, .02]);
-    pieza(k, cil(.18, .18, .14), -.46, .66, .32, .12);              // redoblante
-    tripode(k, -.46, .58, .32);
-    pieza(k, cil(.22, .22, .42), .5, .46, .34);                     // tom de piso
-    for (const a of [.8, 2.4, 4.2]) barra(k, [.5 + Math.cos(a) * .24, .35, .34 + Math.sin(a) * .24], [.5 + Math.cos(a) * .3, 0, .34 + Math.sin(a) * .3]);
-    pieza(k, cil(.18, .18, .012), -.78, .96, .2); pieza(k, cil(.18, .18, .012), -.78, .99, .2); // hi-hat
-    barra(k, [-.78, 0, .2], [-.78, .96, .2]); tripode(k, -.78, .3, .2);
-    pieza(k, caja(.09, .02, .24, .006), -.74, .012, .4);            // pedal de hi-hat
-    pieza(k, cil(.012, .24, .03), -.48, 1.42, -.18, .35, 0, .2);    // crash
-    barra(k, [-.48, 0, -.4], [-.48, 1.12, -.25]); barra(k, [-.48, 1.12, -.25], [-.48, 1.4, -.18]);
-    pieza(k, cil(.012, .28, .03), .62, 1.2, -.12, .3, 0, -.25);     // ride
-    barra(k, [.7, 0, -.35], [.68, .95, -.2]); barra(k, [.68, .95, -.2], [.62, 1.18, -.12]);
-    pieza(k, cil(.19, .19, .08), 0, .55, .82);                      // silla
-    barra(k, [0, .51, .82], [0, .12, .82]); tripode(k, 0, .12, .82, .25);
+  bateria(g, k = KIT) {
+    const dx = k.bombos.length > 1 ? .21 : 0, pulg = n => n * .0127;
+    contorno(g, new THREE.BoxGeometry(2.5 + dx * 2, .2, 2.05), 0, .1, .25);  // tarima
+    contorno(g, new THREE.BoxGeometry(2.05 + dx * 2, .01, 1.6), 0, .205, .3); // tapete
+    const kit = new THREE.Group(); kit.position.y = .21; g.add(kit);
+    let alto = 0;
+    k.bombos.forEach((p, i) => {                                   // bombo(s)
+      const rb = pulg(p || 22), x = k.bombos.length > 1 ? (i ? dx : -dx) : 0;
+      alto = Math.max(alto, rb * 2);
+      pieza(kit, cil(rb, rb, .42), x, rb + .01, 0, Math.PI / 2);
+      pieza(kit, aro(rb, .012), x, rb + .01, .21); pieza(kit, aro(rb, .012), x, rb + .01, -.21);
+      pieza(kit, aro(.07, .006), x + .1, rb * .75, -.215);           // hueco del parche frontal
+      barra(kit, [x - rb * .62, .05, .3], [x - rb * .83, 0, .38]); barra(kit, [x + rb * .62, .05, .3], [x + rb * .83, 0, .38]);
+      const pedales = k.doblePedal && k.bombos.length === 1 ? [-.07, .07] : [0];
+      for (const px of pedales) { pieza(kit, caja(.1, .02, .26, .006), x + px, .012, .36); barra(kit, [x + px, .03, .26], [x + px * .3, rb + .01, .22], .008); }
+    });
+    const n = k.toms.length, sep = n > 2 ? .34 : .35;               // toms montados
+    k.toms.forEach((p, i) => {
+      const r = pulg(p || 12), x = n === 1 ? .04 : (i - (n - 1) / 2) * sep, lejos = Math.abs(x) > .4;
+      const y = alto + .19 - (lejos ? .05 : 0), z = lejos ? .12 : .04;
+      pieza(kit, cil(r, r, r * 1.35), x, y, z, .35, 0, -x * .35);
+      if (lejos) { barra(kit, [x, y - .1, z - .05], [x, .3, z - .12]); tripode(kit, x, .3, z - .12, .16); }
+      else barra(kit, [0, alto, 0], [x * .75, y - .06, z - .02]);
+    });
+    const rs = pulg(k.redoblante || 14), zs = n > 2 ? .4 : .32;      // redoblante
+    pieza(kit, cil(rs, rs, .14), -.46 - dx, .66, zs, .12); tripode(kit, -.46 - dx, .58, zs);
+    [[.5, .34], [.8, -.06], [.97, .4]].slice(0, k.pisos.length).forEach(([x, z], i) => { // tom(s) de piso
+      const r = pulg(k.pisos[i] || 16), h = Math.min(.46, r * 1.9); x += dx;
+      pieza(kit, cil(r, r, h), x, .25 + h / 2, z);
+      for (const a of [.8, 2.4, 4.2]) barra(kit, [x + Math.cos(a) * (r + .02), .35, z + Math.sin(a) * (r + .02)], [x + Math.cos(a) * (r + .08), 0, z + Math.sin(a) * (r + .08)]);
+    });
+    hihat(kit, -.78 - dx, .2, pulg(k.hihat || 14));                 // hi-hat
+    pieza(kit, caja(.09, .02, .24, .006), -.74 - dx, .012, .4);
+    if (k.xhat) { pieza(kit, cil(.15, .15, .012), .28 + dx, .98, .58); pieza(kit, cil(.15, .15, .012), .28 + dx, 1.01, .58); barra(kit, [.28 + dx, .3, .58], [.28 + dx, .98, .58]); tripode(kit, .28 + dx, .3, .58, .15); }
+    if (k.pad) { pieza(kit, caja(.3, .04, .22, .01), -.7 - dx, .9, .64, .35, -.6); barra(kit, [-.7 - dx, .3, .64], [-.7 - dx, .88, .64]); tripode(kit, -.7 - dx, .3, .64, .16); }
+    arcoPlatillos(kit, k.platillos, {dx});                           // una base por platillo
+    pieza(kit, cil(.19, .19, .08), 0, .55, .82);                     // silla
+    barra(kit, [0, .51, .82], [0, .12, .82]); tripode(kit, 0, .12, .82, .25);
   },
-  platillos(g) {
-    platillo(g, -.55, 1.15, 0, .26); platillo(g, 0, 1.35, -.2, .3, .15); platillo(g, .55, 1.1, 0, .28);
-    pieza(g, cil(.18, .18, .012), 0, .95, .45); pieza(g, cil(.18, .18, .012), 0, .98, .45);
-    barra(g, [0, 0, .45], [0, .95, .45]); tripode(g, 0, .3, .45);
+  platillos(g, r = {hihat: true, platillos: [{tipo: "crash"}, {tipo: "crash"}, {tipo: "ride"}]}) {
+    arcoPlatillos(g, r.platillos, {cz: .35, rx: .75, rz: .55, mira: [0, .9]});
+    if (r.hihat) hihat(g, 0, .45, .18, .95);
   },
   percusion(g) {
     [[-.42, .74, .3], [0, .78, .32], [.42, .72, .3]].forEach(([x, h, r], i) => {
@@ -159,7 +192,47 @@ const CONSTRUIR = {
     pieza(gt, caja(.085, .19, .016, .008), .008, .82, .005, 0, 0, -.05);
     barra(g, [-.18, 0, .18], [-.04, .7, -.06]); barra(g, [.18, 0, .18], [.04, .7, -.06]); barra(g, [0, 0, -.25], [0, .7, -.08]);
   },
-  base(g) { // base de micrófono tipo boom: la categoría Bases es casi toda bases
+  base(g, r) { // sin receta: base de micrófono tipo boom
+    if (!r || !Object.keys(r).length) return BASES.microfono(g);
+    // Hasta 20 piezas: con más, el holograma ya no se lee. Si sobran, se quitan del tipo que
+    // más tiene, así cada tipo de base de la lista sigue saliendo al menos una vez.
+    const n = Object.fromEntries(Object.keys(BASES).map(t => [t, Math.min(r[t] || 0, 8)]));
+    for (let total = Object.values(n).reduce((a, b) => a + b, 0); total > 20; total--) {
+      const t = Object.keys(n).reduce((a, b) => n[b] > n[a] ? b : a); n[t]--;
+    }
+    const lista = Object.keys(BASES).flatMap(t => Array(n[t]).fill(t));
+    if (!lista.length) return BASES.microfono(g);
+    const porFila = Math.ceil(Math.sqrt(lista.length * 1.6));
+    for (let f = 0; f * porFila < lista.length; f++) {
+      const fila = lista.slice(f * porFila, (f + 1) * porFila);
+      const total = fila.reduce((s, t) => s + ANCHO[t], 0);
+      let x = -total / 2;
+      for (const t of fila) {
+        const p = new THREE.Group(); p.position.set(x + ANCHO[t] / 2, 0, -f * .75); g.add(p);
+        BASES[t](p); x += ANCHO[t];
+      }
+    }
+  },
+};
+
+/* Cada tipo de base, dibujada en su sitio. ANCHO = cuánto ocupa en la fila. */
+const ANCHO = {platillo: .55, hihat: .45, redoblante: .45, silla: .5, microfono: .95, teclado: 1, guitarra: .42, atril: .5, taburete: .5, otra: .4};
+const BASES = {
+  platillo(g) {
+    tripode(g, 0, .3, 0, .2); barra(g, [0, .3, 0], [0, 1.1, 0], .013); barra(g, [0, 1.1, 0], [.18, 1.36, 0], .011);
+    pieza(g, cil(.035, .035, .03, 16), .19, 1.37, 0, 0, 0, -.6);
+  },
+  hihat(g) {
+    tripode(g, 0, .3, 0, .18); barra(g, [0, 0, 0], [0, .92, 0], .014); barra(g, [0, .92, 0], [0, 1.1, 0], .007);
+    pieza(g, cil(.03, .03, .05, 16), 0, 1.02, 0); pieza(g, caja(.09, .02, .24, .006), 0, .012, .2);
+  },
+  redoblante(g) {
+    tripode(g, 0, .3, 0, .18); barra(g, [0, .3, 0], [0, .56, 0], .013);
+    pieza(g, aro(.13, .009), 0, .6, 0, Math.PI / 2);
+    for (const a of [0, 2.1, 4.2]) barra(g, [0, .56, 0], [Math.cos(a) * .13, .6, Math.sin(a) * .13], .007);
+  },
+  silla(g) { pieza(g, cil(.19, .19, .08), 0, .55, 0); barra(g, [0, .51, 0], [0, .12, 0]); tripode(g, 0, .12, 0, .25); },
+  microfono(g) {
     tripode(g, 0, .42, 0, .36);
     barra(g, [0, .42, 0], [0, 1.22, 0], .014);
     barra(g, [-.36, 1.04, 0], [.46, 1.48, 0], .011);
@@ -168,7 +241,44 @@ const CONSTRUIR = {
     pieza(m, cil(.024, .017, .14, 20), 0, 0, 0);
     pieza(m, new THREE.SphereGeometry(.034, 20, 12), 0, .095, 0);
   },
+  teclado(g) {
+    for (const x of [-.4, .4]) { barra(g, [x, 0, .17], [x, .78, -.15], .016); barra(g, [x, 0, -.17], [x, .78, .15], .016); }
+    barra(g, [-.4, .39, 0], [.4, .39, 0], .016);
+    for (const z of [-.15, .15]) barra(g, [-.46, .78, z], [.46, .78, z], .01);
+  },
+  guitarra(g) {
+    barra(g, [-.15, 0, .12], [0, .62, -.02]); barra(g, [.15, 0, .12], [0, .62, -.02]); barra(g, [0, 0, -.18], [0, .62, -.02]);
+    barra(g, [-.13, .25, .1], [.13, .25, .1], .01);
+    pieza(g, aro(.05, .007), 0, .66, -.02, 0, 0, 0);
+  },
+  atril(g) {
+    tripode(g, 0, .3, 0, .2); barra(g, [0, .3, 0], [0, 1.02, 0], .012);
+    pieza(g, caja(.44, .3, .012, .004), 0, 1.12, .04, -.5);
+  },
+  taburete(g) {
+    pieza(g, cil(.17, .17, .05), 0, .76, 0);
+    for (const a of [.8, 2.4, 3.9, 5.5]) barra(g, [Math.cos(a) * .12, .74, Math.sin(a) * .12], [Math.cos(a) * .22, 0, Math.sin(a) * .22]);
+    pieza(g, aro(.19, .008), 0, .3, 0, Math.PI / 2);
+  },
+  otra(g) { tripode(g, 0, .3, 0, .18); barra(g, [0, .3, 0], [0, .8, 0], .013); pieza(g, caja(.3, .02, .22, .006), 0, .82, 0); },
 };
+
+/* Teclados, amplis, guitarras: tantos como diga el listado (hasta 4), en dos filas si son más de dos. */
+for (const t of ["teclado", "amp", "bajo", "guitarra"]) {
+  const uno = CONSTRUIR[t];
+  CONSTRUIR[t] = (g, r) => {
+    const n = Math.max(1, Math.min(4, r?.n || 1));
+    if (n === 1) return uno(g);
+    const partes = [];
+    for (let i = 0; i < n; i++) { const p = new THREE.Group(); uno(p); partes.push(p); }
+    const tam = new THREE.Box3().setFromObject(partes[0]).getSize(new THREE.Vector3());
+    const ancho = tam.x + (t === "guitarra" ? .15 : .1), fondo = tam.z + .35, cols = n > 2 ? 2 : n;
+    partes.forEach((p, i) => {
+      const f = Math.floor(i / cols), enFila = Math.min(cols, n - f * cols);
+      p.position.set((i % cols - (enFila - 1) / 2) * ancho, 0, -f * fondo); g.add(p);
+    });
+  };
+}
 
 export const MODELO = {
   "Batería": "bateria", "Platillos": "platillos", "Percusión": "percusion", "Teclado": "teclado",
@@ -213,20 +323,22 @@ function cuadro() {
   renderer.render(scene, camera);
 }
 
-/* Pone el holograma de `tipo` dentro de `contenedor` y lo dibuja desde abajo. */
-export function mostrar(contenedor, tipo) {
+/* Pone el holograma de `tipo` dentro de `contenedor` y lo dibuja desde abajo. Con `items`
+   (los del documento) se arma según el listado: 4 bases de platillo en la lista, 4 en el holograma. */
+export function mostrar(contenedor, tipo, items, categoria) {
   if (!CONSTRUIR[tipo]) return false;
   if (!renderer) iniciar();
   if (renderer.domElement.parentElement !== contenedor) contenedor.append(renderer.domElement);
-  if (actual !== tipo) {
+  const rec = receta(tipo, items, categoria) || undefined, clave = tipo + JSON.stringify(rec || null);
+  if (actual !== clave) {
     giro.traverse(o => { if (o.geometry && o !== giro) o.geometry.dispose(); });
     giro.clear();
-    const g = new THREE.Group(); CONSTRUIR[tipo](g);
+    const g = new THREE.Group(); CONSTRUIR[tipo](g, rec);
     const b = new THREE.Box3().setFromObject(g), tam = b.getSize(new THREE.Vector3());
     const s = Math.min(2.1 / tam.y, 2.1 / Math.max(tam.x, tam.z));
     const c = b.getCenter(new THREE.Vector3());
     g.scale.setScalar(s); g.position.set(-c.x * s, -b.min.y * s + .02, -c.z * s);
-    giro.add(g); actual = tipo;
+    giro.add(g); actual = clave;
   }
   t0 = reloj.getElapsedTime();
   if (!corriendo) { corriendo = true; cuadro(); }
