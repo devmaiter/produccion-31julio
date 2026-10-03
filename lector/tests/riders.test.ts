@@ -193,6 +193,24 @@ ALIMENTOS ARTISTA:
       .toEqual(['1 Batería: Kick 22"']);
   });
 
+  it("con el nombre de la banda en un logo, \"HOLA\" no es la banda: se toma el nombre que el rider repite", () => {
+    const e = interpretar([doc(`RIDER TECNICO
+HOLA
+En este documento encontraran nuestros contactos de producción.
+1. SONIDO
+- consola FOH DIAMANTE ELÉCTRICO:
+-Consola OSM sugeridas por DIAMANTE ELÉCTRICO son:
+Sistemas In Ears para DIAMANTE ELÉCTRICO son:
+2. BACKLINE
+DRUMS:
+· 1 22” Bass drum
+ELECTRIC BASS / BASS GUITAR:
+· 1 Percussion table`)]);
+    expect(e.artistas).toEqual(["Diamante Eléctrico"]);
+    expect(e.items.map(i => [i.artista, i.grupo, i.descripcion])).toEqual([
+      ["Diamante Eléctrico", "Drums", "22” Bass drum"], ["Diamante Eléctrico", "Electric Bass / Bass Guitar", "Percussion table"]]);
+  });
+
   it("si no reconoce la sección de backline, lee todo y lo deja para revisar en vez de no sacar nada", () => {
     const e = interpretar([doc("RIDER TÉCNICO\nLA BANDA\nAUDIO REQUIREMENTS\nWe need the following\n2 Snare stand\n1 Fender Twin Reverb")]);
     expect(resumen(e)).toEqual(["2 Bases: Snare stand", "1 Ampli guitarra: Fender Twin Reverb"]);

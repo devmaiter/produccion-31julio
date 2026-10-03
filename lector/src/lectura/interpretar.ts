@@ -224,7 +224,12 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (esperarArtista) {
         esperarArtista = false;
         const nombre = t.replace(/\b(19|20)\d\d\b/g, "").replace(/[\s:·|–—-]+$/, "").trim();
-        if (letras(nombre) >= 3 && nombre.split(/\s+/).length <= 6 && !/[.?!,;]/.test(nombre)) { fijar(nombre); return true; }
+        const saludo = SALUDO.test(nombre);
+        if (!saludo && letras(nombre) >= 3 && nombre.split(/\s+/).length <= 6 && !/[.?!,;]/.test(nombre)) { fijar(nombre); return true; }
+        // El nombre venía en un logo (imagen) y lo siguiente es "HOLA": se busca el nombre que el rider repite.
+        const repetido = nombreRepetido(doc.lineas);
+        if (repetido) fijar(repetido);
+        return saludo;
       }
       return false;
     }
@@ -516,6 +521,28 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
     for (const parte of partes) out.push({ ...actual, texto: parte });
   }
   return out;
+}
+
+/* Lo que sigue a "RIDER TÉCNICO" cuando el nombre de la banda es un logo: saludos e índices, no bandas. */
+const SALUDO = /^(hola|hello|hi|buen[oa]s|bienvenid|welcome|estimad|dear|saludos|[ií]ndice|index|contenidos?|contents?|introducci[oó]n|presentaci[oó]n|informaci[oó]n( general)?)\b/i;
+
+/** El nombre en mayúsculas que el rider repite después de "para", "por", "de"…:
+ *  "Sistemas In Ears para DIAMANTE ELÉCTRICO son", "Consola sugerida por DIAMANTE ELÉCTRICO".
+ *  Hace falta que salga al menos dos veces. */
+export function nombreRepetido(lineas: ReadonlyArray<{ texto: string }>): string | null {
+  const PAL = "[A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ'&.]*";
+  const re = new RegExp(`(?:^|\\s)(?:[Pp]ara|[Pp]or|[Dd]el?|[Ff]or|[Bb]y|[Oo]f)\\s+(${PAL}(?:\\s+${PAL}){0,3})(?=$|[\\s:.,;)])`, "gu");
+  const cuenta = new Map<string, number>();
+  for (const l of lineas) {
+    if (l.texto === l.texto.toUpperCase()) continue; // en un renglón todo en mayúsculas no se distingue el nombre
+    for (const m of l.texto.matchAll(re)) {
+      const nombre = m[1]!.replace(/[.']+$/, "");
+      if (nombre !== nombre.toUpperCase() || letras(nombre) < 4) continue;
+      cuenta.set(nombre, (cuenta.get(nombre) ?? 0) + 1);
+    }
+  }
+  const [mejor] = [...cuenta].sort((a, b) => b[1] - a[1] || b[0].length - a[0].length);
+  return mejor && mejor[1] >= 2 ? mejor[0] : null;
 }
 
 /* Riders que repiten una página entera (la misma tabla de batería en la página 3 y en la 4):
