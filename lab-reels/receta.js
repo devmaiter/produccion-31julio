@@ -14,7 +14,7 @@ function texto(it) {
 /* "4 bases de platillo" con cantidad 1: el número del texto manda. */
 function cuantos(it, t) {
   const q = Math.max(1, Math.round(+it.cantidad || 1));
-  const m = t.match(/^\s*(\d{1,2})\s*(x\s)?\s*[a-z]/);
+  const m = t.match(/^\s*(\d{1,2})\s+(x\s+)?(?=[a-z])/);   // "8x10 cabina" no son 8
   return q === 1 && m && +m[1] > 1 && +m[1] < 30 ? +m[1] : q;
 }
 
@@ -95,7 +95,7 @@ function completarBateria(r) {
     bombos: r.bombos.length ? r.bombos.slice(0, 2) : [22],
     toms: tambores ? r.toms.slice(0, 4) : [10, 12],
     pisos: tambores ? r.pisos.slice(0, 3) : [16],
-    redoblante: r.redoblantes[0] || 14,
+    redoblante: r.redoblantes[0] || 14, redoblante2: r.redoblantes[1] || 0,
     doblePedal: r.doblePedal, pad: r.pad,
   };
   const pl = r.platillos;
@@ -125,7 +125,7 @@ const TIPOS_BASE = [
   ["hihat", /(hi ?-?hat|\bh\/h\b|charles)/],
   ["redoblante", /(snare|redoblante|tarola)/],
   ["platillo", /(cymbal|platillo|plato|crash|ride|boom (?!mic))/],
-  ["teclado", /(teclado|keyboard|\bks ?\d|ax-?\d|tipo z|piano)/],
+  ["teclado", /(teclado|keyboard|\bkeys? stand|\bks ?\d|ax-?\d|tipo z|piano)/],
   ["guitarra", /(guitar|guitarra|guitarrero|bajo|bass)/],
   ["atril", /(atril|music stand|partitura)/],
   ["taburete", /(stool|silla|asiento|chair|butaco)/],
@@ -149,12 +149,39 @@ const ACCESORIO = {
 };
 function copiasDe(tipo, items) {
   let l = items.map(it => ({it, t: texto(it)})).filter(x => !ACCESORIO[tipo]?.test(x.t));
-  if (tipo === "bajo" && l.some(x => !/(head|cabezal)/.test(x.t))) l = l.filter(x => !/(head|cabezal)/.test(x.t));
+  // "AMPEG SVT Classic" es el cabezal; lo que se dibuja son las cajas.
+  const cabezal = /(head|cabezal|\bsvt\b(?!.*(8 ?x ?10|810|cab)))/;
+  if (tipo === "bajo" && l.some(x => !cabezal.test(x.t))) l = l.filter(x => !cabezal.test(x.t));
   return l.reduce((s, x) => s + cuantos(x.it, x.t), 0);
 }
 
+/* ── Percusión: congas, bongós, djembe, timbales, cajón, mesa y platillos del grupo ── */
+function percusionDe(items) {
+  const r = {congas: 0, bongos: 0, djembe: 0, timbales: 0, cajon: 0, mesa: 0};
+  for (const it of items) {
+    const t = texto(it), q = cuantos(it, t);
+    if (/(conga|tumba|quinto)/.test(t)) {
+      const piezas = ["requinto", "quinto", "conga", "tumba"].filter(w => new RegExp("\\b" + w).test(t)).length;
+      r.congas += Math.max(q, piezas, /\bset\b|juego/.test(t) && piezas < 2 ? 2 : 0);
+    } else if (/bongo/.test(t)) r.bongos += q;
+    else if (/(djemb|yemb)/.test(t)) r.djembe += q;
+    else if (/timbal(es|itos)?\b/.test(t) && !/(bell|campana)/.test(t)) r.timbales += q;
+    else if (/caj[oó]n/.test(t)) r.cajon += q;
+    else if (/(table|mesa)/.test(t)) r.mesa += q;
+  }
+  const b = bateriaDe(items);
+  let pl = b.platillos.filter(p => p.tipo !== "hihat");
+  const bases = b.basesPlatillo || pl.length;
+  while (pl.length < bases) pl.push({tipo: "crash"});
+  r.platillos = ordenarPlatillos(pl.slice(0, Math.min(bases, 6)));
+  for (const k of ["congas", "bongos", "djembe", "timbales", "cajon", "mesa"]) r[k] = Math.min(r[k], 4);
+  if (!r.congas && !r.bongos && !r.djembe && !r.timbales && !r.cajon && !r.platillos.length) r.congas = 3;
+  return r;
+}
+
 const CATS = {
-  bateria: ["Batería", "Platillos", "Bases"], platillos: ["Platillos", "Batería", "Bases"], base: ["Bases"],
+  percusion: ["Percusión", "Otro", "Platillos", "Bases"],
+  bateria: ["Batería", "Platillos", "Bases"], platillos: ["Platillos", "Batería", "Bases"], base: ["Bases", "Otro"],
   teclado: ["Teclado"], amp: ["Ampli guitarra"], bajo: ["Ampli bajo"], guitarra: ["Guitarra", "Bajo"],
 };
 
@@ -188,6 +215,7 @@ export function receta(tipo, items, categoria) {
       x = {hihat: pl.some(p => p.tipo === "hihat") || !!b.hihatBase, platillos: ordenarPlatillos(arriba.slice(0, 8))};
     }
     else if (tipo === "base") x = basesDe(g);
+    else if (tipo === "percusion") x = percusionDe(g);
     else x = {n: Math.min(4, copiasDe(tipo, g))};
     r = mayor(r, x);
   }

@@ -42,6 +42,15 @@ nuevo: `lab-reels/#intro`.
   botones ↑ ↓ al lado para cambiar de categoría, y también el teclado y la rueda del mouse.
   En el celular nada de eso aparece; se desliza.
 
+### Un reel por grupo del rider
+
+Cada banda agrupa su backline a su manera ("DRUMS", "ELECTRIC BASS", "KEYS"…) y eso se
+respeta: cada grupo es un reel, con sus ítems en el orden del documento. Si en el grupo del
+bajo pidieron una mesa de percusión y un ventilador, quedan en Bajo, no se mandan a
+Percusión. Los nombres se unifican (Drums = Batería, Keys = Teclado, Bass = Bajo…) para
+juntar bandas en un mismo reel; los que no son instrumentos ("Extras") quedan con su nombre
+y su emoji. Si el documento no trae grupos, los reels salen por categoría como antes.
+
 ### Holograma 3D en la portada
 
 La portada de cada categoría muestra el equipo como holograma 3D que se dibuja de abajo
@@ -62,6 +71,9 @@ hacia arriba y gira solo. Viene de la rama del demo `reconocimiento-3d/`: usa su
   piso 16, redoblante 14, hi-hat, crash y ride, silla. Las Bases salen por tipo (platillo,
   hi-hat, redoblante, silla, micrófono, teclado, guitarra, atril, taburete) y los
   teclados, amplis y guitarras salen tantos como haya (hasta 4).
+- El holograma de cada reel es el del equipo principal del grupo y se arma solo con lo
+  que pide ese grupo (en Teclado sin teclados, solo bases, salen las bases; en Percusión
+  salen las congas, bongós, djembe, timbales, cajón, mesa y platillos que diga).
 - Con varias bandas se toma, pieza por pieza, lo más grande de una sola banda: es el
   montaje que le sirve a cualquiera. Por eso el número "a tener" (que suma las bandas del
   mismo día) puede ser mayor que lo que se ve.

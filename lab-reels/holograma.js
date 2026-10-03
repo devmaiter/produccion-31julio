@@ -128,6 +128,7 @@ const CONSTRUIR = {
     });
     const rs = pulg(k.redoblante || 14), zs = n > 2 ? .4 : .32;      // redoblante
     pieza(kit, cil(rs, rs, .14), -.46 - dx, .66, zs, .12); tripode(kit, -.46 - dx, .58, zs);
+    if (k.redoblante2) { const r2 = pulg(k.redoblante2); pieza(kit, cil(r2, r2, .13), -1.1 - dx, .7, .45, .15, 0, .1); tripode(kit, -1.1 - dx, .62, .45); } // segundo redoblante
     [[.5, .34], [.8, -.06], [.97, .4]].slice(0, k.pisos.length).forEach(([x, z], i) => { // tom(s) de piso
       const r = pulg(k.pisos[i] || 16), h = Math.min(.46, r * 1.9); x += dx;
       pieza(kit, cil(r, r, h), x, .25 + h / 2, z);
@@ -145,14 +146,41 @@ const CONSTRUIR = {
     arcoPlatillos(g, r.platillos, {cz: .35, rx: .75, rz: .55, mira: [0, .9]});
     if (r.hihat) hihat(g, 0, .45, .18, .95);
   },
-  percusion(g) {
-    [[-.42, .74, .3], [0, .78, .32], [.42, .72, .3]].forEach(([x, h, r], i) => {
-      const z = i === 1 ? -.15 : .1;
-      pieza(g, cil(r * .82, r * .62, h), x, .3 + h / 2, z);
-      pieza(g, aro(r * .82, .012), x, .3 + h, z, Math.PI / 2);
-      pieza(g, aro(r * .62, .01), x, .3, z, Math.PI / 2);
-      tripode(g, x, .32, z, .22);
-    });
+  percusion(g, r = {congas: 3, platillos: []}) {
+    // Cada instrumento en su sitio, en fila de izquierda a derecha; los platillos atrás.
+    const fila = [];
+    if (r.congas) fila.push([.4 * r.congas, x => {
+      const altos = [.72, .78, .74, .7], radios = [.3, .32, .3, .28];
+      for (let i = 0; i < r.congas; i++) {
+        const cx = x + (i - (r.congas - 1) / 2) * .4, z = i % 2 ? -.12 : .1, h = altos[i], rr = radios[i];
+        pieza(g, cil(rr * .82, rr * .62, h), cx, .3 + h / 2, z);
+        pieza(g, aro(rr * .82, .012), cx, .3 + h, z, Math.PI / 2);
+        pieza(g, aro(rr * .62, .01), cx, .3, z, Math.PI / 2);
+        tripode(g, cx, .32, z, .22);
+      }
+    }]);
+    for (let i = 0; i < (r.bongos || 0); i++) fila.push([.5, x => {
+      pieza(g, cil(.1, .09, .16), x - .12, .82, 0); pieza(g, cil(.125, .11, .17), x + .12, .82, 0);
+      pieza(g, caja(.08, .05, .06, .01), x, .8, 0); barra(g, [x, .78, 0], [x, .3, 0]); tripode(g, x, .3, 0, .2);
+    }]);
+    for (let i = 0; i < (r.djembe || 0); i++) fila.push([.45, x => {
+      pieza(g, cil(.07, .15, .3), x, .15, 0); pieza(g, cil(.17, .08, .34), x, .47, 0);
+      pieza(g, aro(.17, .012), x, .64, 0, Math.PI / 2);
+    }]);
+    for (let i = 0; i < (r.timbales || 0); i++) fila.push([.75, x => {
+      pieza(g, cil(.17, .17, .17), x - .2, .92, 0); pieza(g, cil(.19, .19, .17), x + .2, .92, 0);
+      barra(g, [x - .2, .83, 0], [x + .2, .83, 0]); barra(g, [x, .83, 0], [x, .3, 0]); tripode(g, x, .3, 0, .22);
+    }]);
+    for (let i = 0; i < (r.cajon || 0); i++) fila.push([.4, x => {
+      pieza(g, caja(.3, .48, .3, .01), x, .24, 0); pieza(g, aro(.05, .006), x, .32, -.151);
+    }]);
+    for (let i = 0; i < (r.mesa || 0); i++) fila.push([.75, x => {
+      pieza(g, caja(.6, .03, .4, .006), x, .85, 0);
+      for (const [a, b] of [[-.27, -.17], [.27, -.17], [-.27, .17], [.27, .17]]) barra(g, [x + a, .84, b], [x + a, 0, b], .01);
+    }]);
+    let x = -fila.reduce((s, [w]) => s + w, 0) / 2;
+    for (const [w, dibujar] of fila) { dibujar(x + w / 2); x += w; }
+    if (r.platillos?.length) arcoPlatillos(g, r.platillos, {cz: .2, rx: Math.max(.8, -x + .2), rz: .75, mira: [0, 1.3]});
   },
   amp(g) {
     pieza(g, caja(.72, .56, .28, .03), 0, .28, 0);
