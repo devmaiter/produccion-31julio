@@ -9,6 +9,8 @@ Convierte lo que llega de producción (correos `.eml` con sus adjuntos, PDF, fot
 ```bash
 npm install
 npm test                                   # pruebas (PDF, foto nítida, foto torcida, correo con adjunto)
+npm run texto -- rider.pdf desglose.xlsx    # → el texto tal como se leyó (Markdown), sin interpretar
+npm run texto -- --guardar riders-reales/*  # → escribe <archivo>.md al lado de cada uno
 npm run leer -- hoja.pdf foto.jpg          # → JSON de la extracción
 npm run leer -- --evento cordillera-2026 --artista "Sean Paul" correo.eml
 npm run leer -- --evento cordillera-2026 --integrar --guardar correo.eml   # suma al evento y escribe data/

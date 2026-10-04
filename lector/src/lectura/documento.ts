@@ -3,6 +3,14 @@
 export interface Linea {
   texto: string;
   confianza?: number;
+  /** Página del PDF de donde salió (1-based); solo en PDF. */
+  pagina?: number;
+}
+
+/** Cómo se leyó cada página de un PDF: su texto, OCR (escaneada) o nada. */
+export interface PaginaDocumento {
+  numero: number;
+  origen: "texto" | "ocr" | "sin-leer";
 }
 
 /** Lo que se pudo leer de un archivo, ya como texto. */
@@ -14,6 +22,8 @@ export interface Documento {
   fechaReferencia?: string;
   /** Asunto del correo: a veces es lo único que nombra el evento o la banda. */
   asunto?: string;
+  /** Solo en PDF. */
+  paginas?: PaginaDocumento[];
   avisos: string[];
 }
 

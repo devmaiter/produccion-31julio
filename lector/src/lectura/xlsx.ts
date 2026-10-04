@@ -13,13 +13,26 @@ export interface ImagenHoja {
   colHasta: number;
 }
 
+/** Un rango de celdas combinadas (1-based, inclusivo). */
+export interface Rango {
+  filaDesde: number;
+  filaHasta: number;
+  colDesde: number;
+  colHasta: number;
+}
+
 export interface Hoja {
   nombre: string;
   filas: number;
   columnas: number;
-  /** Texto de la celda (fila y columna 1-based); "" si está vacía. */
+  /** Texto de la celda (fila y columna 1-based); "" si está vacía.
+   *  Ojo: en una celda combinada, exceljs devuelve el valor de la primera en
+   *  TODAS las del rango; `combinadas` dice cuáles son copias. */
   celda(fila: number, col: number): string;
   imagenes: ImagenHoja[];
+  combinadas: Rango[];
+  /** Ancho de cada columna en caracteres, como en Excel (índice 0 = columna A); undefined = el de siempre. */
+  anchos: Array<number | undefined>;
 }
 
 export interface Libro {
@@ -56,9 +69,40 @@ export async function leerLibro(bytes: Uint8Array): Promise<Libro> {
           colHasta: Math.floor(br.col) + 1,
         };
       }),
+      combinadas: (ws.model.merges ?? []).map(rango),
+      anchos: Array.from({ length: ws.columnCount }, (_, c) => {
+        const col = ws.getColumn(c + 1);
+        return col.hidden ? 0 : col.width;
+      }),
     };
   });
   return { hojas, hoja: patron => hojas.find(h => patron.test(h.nombre)) };
+}
+
+/** "B2:D3" (o "B2") → rango 1-based. */
+export function rango(ref: string): Rango {
+  const [a, b = a] = ref.toUpperCase().split(":");
+  const celdaDe = (r: string) => {
+    const m = r.match(/^\$?([A-Z]+)\$?(\d+)$/);
+    if (!m) throw new Error(`Rango inválido: ${ref}`);
+    return { col: [...m[1]!].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0), fila: Number(m[2]) };
+  };
+  const ini = celdaDe(a!), fin = celdaDe(b!);
+  return {
+    filaDesde: Math.min(ini.fila, fin.fila), filaHasta: Math.max(ini.fila, fin.fila),
+    colDesde: Math.min(ini.col, fin.col), colHasta: Math.max(ini.col, fin.col),
+  };
+}
+
+/** Celdas que una combinación tapa (todas las del rango menos la primera), como "fila,col". */
+export function tapadas(combinadas: readonly Rango[]): Set<string> {
+  const out = new Set<string>();
+  for (const r of combinadas) {
+    for (let f = r.filaDesde; f <= r.filaHasta; f++) {
+      for (let c = r.colDesde; c <= r.colHasta; c++) if (f !== r.filaDesde || c !== r.colDesde) out.add(`${f},${c}`);
+    }
+  }
+  return out;
 }
 
 /** Lo que haya en la celda, como texto: números, fechas, texto enriquecido, fórmulas (su resultado). */

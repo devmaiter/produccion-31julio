@@ -1,7 +1,7 @@
 /* Archivo (correo, PDF, foto, texto) → Documento(s) de texto. Todo corre en
  * el dispositivo. Un correo devuelve su cuerpo y un documento por adjunto. */
 import PostalMime from "postal-mime";
-import { lineasDeTexto, type Documento } from "./documento";
+import { lineasDeTexto, type Documento, type Linea } from "./documento";
 import type { Ocr } from "./ocr";
 import { leerPdf, type LibPdf, type RenderizarPagina } from "./pdf";
 
@@ -59,14 +59,19 @@ async function leerCorreo(nombre: string, datos: Uint8Array, lectores: Lectores)
 
 async function leerPdfComoDocumento(nombre: string, datos: Uint8Array, lectores: Lectores): Promise<Documento> {
   if (!lectores.pdf) return vacio(nombre, "pdf", `${nombre}: la lectura de PDF no está disponible aquí.`);
-  const doc: Documento = { nombre, tipo: "pdf", lineas: [], avisos: [] };
+  const doc: Documento = { nombre, tipo: "pdf", lineas: [], paginas: [], avisos: [] };
+  const deLaPagina = (lineas: Linea[], n: number) => lineas.map(l => ({ ...l, pagina: n }));
   for (const p of await leerPdf(await lectores.pdf(), datos)) {
-    if (!p.escaneada) { doc.lineas.push(...p.lineas); continue; }
-    if (lectores.ocr && lectores.renderizarPagina) {
+    if (!p.escaneada) {
+      doc.lineas.push(...deLaPagina(p.lineas, p.numero));
+      doc.paginas!.push({ numero: p.numero, origen: "texto" });
+    } else if (lectores.ocr && lectores.renderizarPagina) {
       const ocr = await lectores.ocr();
-      doc.lineas.push(...await ocr.reconocer(await lectores.renderizarPagina(p.pagina)));
+      doc.lineas.push(...deLaPagina(await ocr.reconocer(await lectores.renderizarPagina(p.pagina)), p.numero));
+      doc.paginas!.push({ numero: p.numero, origen: "ocr" });
     } else {
       doc.avisos.push(`${nombre}, página ${p.numero}: es una imagen escaneada y aquí no hay OCR; súbela como foto.`);
+      doc.paginas!.push({ numero: p.numero, origen: "sin-leer" });
     }
   }
   return doc;
