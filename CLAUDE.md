@@ -168,14 +168,18 @@ están el resumen y cada banda. Todo usa CSS scroll-snap.
   tarima. Un solo lienzo WebGL pasa al reel visible.
 - El holograma se arma con el listado (`receta.js`): si dice 4 bases de platillo,
   salen 4; lo que no diga sale del formato de siempre de una batería.
-- **Lo que importa son las bandas** (lo pidió el usuario): la portada dice cuántas
-  bandas y cuántas por día; los totales por referencia ("4 kick") quedan de fondo,
-  detrás de "Totales de fondo". La ficha de cada banda se lee como el rider: sus
-  secciones completas y en orden; lo de otro reel, tenue. Un listado sin banda
-  (`sinBanda` del lector) no sale como banda, pero sí en los totales.
-- En un Excel "Cant | Requerimiento | Cant | Propuesta" (OML), cada ficha tiene el botón
-  **Pide vs propuesta** con las dos columnas en el orden de la hoja y el total de cada
-  lado. Se compara por total, no fila por fila: en los Excel reales no van alineadas.
+- **Siempre** (cualquier modo): la ficha de cada banda se lee como el rider, con sus
+  secciones completas y en orden (lo de otro reel, tenue); y todo es dinámico:
+  reglas generales, nada amarrado a un documento ni palabras fijas por categoría.
+- **Modo festival** (así lo llama el usuario: un evento con varias bandas):
+  - Lo que importa son las bandas: la portada dice cuántas bandas y cuántas por día;
+    los totales por referencia ("4 kick") quedan de fondo, detrás de "Totales de fondo".
+  - En un Excel "Cant | Requerimiento | Cant | Propuesta" (OML), cada ficha tiene el
+    botón **Pide vs propuesta** con las dos columnas en el orden de la hoja y el total
+    de cada lado. Se compara por total, no fila por fila: no van alineadas.
+  - Las reglas de modo festival no se imponen en el otro modo: si se trabaja ese modo,
+    preguntarle al usuario cómo debe verse.
+- Un listado sin banda (`sinBanda` del lector) no sale como banda, pero sí en los totales.
 - En PC hay índice lateral y flechas para el mouse; en el celular nada de eso.
 - Lleva un reemplazo de `Map.getOrInsertComputed`, porque pdf.js lo necesita en
   navegadores no tan nuevos.
