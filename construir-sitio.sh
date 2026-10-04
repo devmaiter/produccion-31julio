@@ -1,19 +1,22 @@
 #!/usr/bin/env bash
-# Trae a la raíz de main (lo que publica GitHub Pages en
-# https://devmaiter.github.io/produccion-31julio/) la última versión de cada demo
-# desde su rama. La Home es index.html; la app del 31 de julio vive en
-# produccion-31-julio/ y no se toca aquí.
-# Uso: ./construir-sitio.sh   (en la rama main) y luego commit + push.
+# Arma lo que publica GitHub Pages (https://devmaiter.github.io/produccion-31julio/)
+# desde el código que vive en main. Ya no hay ramas por demo: todo está aquí.
+#
+#   lector/            código del lector  → cordillera/lector/ (lector.js empaquetado;
+#                                            lo usan Cordillera, los reels y la planilla)
+#   extractor-fuente/  código del extractor → extractor/ (su build)
+#   demo-listado/      pagina.html + datos → index.html y publicar.html
+#
+# La app del 31 de julio vive en produccion-31-julio/ y no se toca aquí.
+# Uso: ./construir-sitio.sh   (en main) y luego commit + push.
 set -euo pipefail
 cd "$(dirname "$0")"
-rm -rf cordillera demo-listado
-git archive cordillera cordillera/backline-esc2.html cordillera/lector cordillera/README.md | tar -x
-git archive demo demo-listado/index.html demo-listado/vendor demo-listado/datos demo-listado/README.md | tar -x
-if [ -d "${EXTRACTOR_DIST:-/nonexistent}" ]; then
-  rm -rf extractor && cp -rL "$EXTRACTOR_DIST" extractor
-else
-  echo "aviso: extractor/ se deja como está. Para renovarlo: en la rama extractor 'cd extractor && npm install && npm run build', y aquí EXTRACTOR_DIST=/ruta/a/extractor/dist ./construir-sitio.sh" >&2
-fi
+
+(cd lector && npm install && npm run preparar)        # dependencias y datos del OCR (no se suben)
+(cd extractor-fuente && npm install && npm run build:cordillera -- ../cordillera/lector && npm run build)
+rm -rf extractor && cp -rL extractor-fuente/dist extractor
+node demo-listado/construir.mjs
+
 # Bytes de control crudos dentro de cadenas de los scripts minificados → \xNN (igual para JS).
 python3 - <<'PY'
 import re, pathlib

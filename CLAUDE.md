@@ -32,18 +32,19 @@ histórico: su contenido ya está aquí (`cordillera/` y `prototipos/estado/`).
 | `reconocimiento-3d/` | Cámara + MobileNet que reconoce un equipo y lo muestra como holograma 3D (Three.js). |
 | `produccion-31-julio/` | La app que se usó en producción el 31 de julio (Firestore del proyecto `backline-2797d`, `functions/`). |
 | `prototipos/estado/` | Prototipo del Excel de Stage 4 como estado reactivo, con perfiles Admin/Operario y fotos por equipo (venía del repo `cordillera`; sus funciones de base de datos eran de un artifact y aquí solo corren en memoria). |
-| `construir-sitio.sh` | Trae a `main` la última versión de cada demo desde su rama. |
+| `lector/` | **Código fuente del lector** (TypeScript + Vitest). Aquí se arregla el lector. |
+| `extractor-fuente/` | Código fuente del extractor (Vite). `extractor/` es su build. |
+| `app/` | La app definitiva en Elm (en construcción): entidades, JSON del lector y pruebas. |
+| `app-unificada/` | La app en TypeScript que une los dos prototipos (lectura local y modo evento sin internet); la de la demo. |
+| `prototipos/31-julio/` | Variantes de la app del 31 de julio que no entraron al evento (fotos por ítem, IA, backline entre días). |
+| `construir-sitio.sh` | Arma lo publicado desde el código de main: `cordillera/lector/` y `extractor/` desde `lector/` y `extractor-fuente/`, y `demo-listado/index.html`. |
 
 ## Ramas
 
-| Rama | Contenido |
-|---|---|
-| `main` | El sitio publicado. |
-| `extractor` | **Código fuente del lector** (`lector/`, TypeScript + Vitest) y del extractor (`extractor/`, Vite). Aquí se arregla el lector. |
-| `lector` | Versión vieja del lector; la vigente está en `extractor`. |
-| `cordillera` | Fuente de la página de Cordillera. |
-| `demo`, `elm` | Demo del listado y la app definitiva en Elm (en construcción). |
-| `claude/*` | Trabajo viejo sobre la app del 31 de julio. |
+**Todo el código está en `main`** (pedido del usuario, 2026-10-03). Las demás ramas
+(`extractor`, `lector`, `cordillera`, `demo`, `elm`, `ccr-*`, `claude/*`) ya están
+fusionadas y quedan solo como historia: **no trabajes en ellas**. Se trabaja en una
+rama propia sacada de `main` y, probado, se integra a `main`.
 
 ## El lector de documentos (lo primordial ahora)
 
@@ -52,7 +53,7 @@ backline: cantidad, descripción, categoría, banda y día. Corre en el disposit
 y **sin IA de pago ni internet** (pdf.js, Tesseract para OCR y exceljs); es una
 decisión del proyecto.
 
-Piezas, en `lector/src/lectura/` de la rama `extractor`:
+Piezas, en `lector/src/lectura/`:
 - `pdf.ts`: texto del PDF por renglones. Detecta páginas a 2–3 columnas y las
   lee columna por columna. No parte las tablas "Cant | Equipo | Observación".
 - `interpretar.ts`: reglas que recorren los renglones.
@@ -87,18 +88,16 @@ Piezas, en `lector/src/lectura/` de la rama `extractor`:
   sección (tarima, wifi, consolas) se quita; el hardware de batería es Batería;
   en la planilla no entran párrafos del contrato ("deberá…", transporte, hotel).
 
-Trabajar el lector:
+Trabajar el lector (todo en main):
 ```bash
-git worktree add ../lector-wt origin/extractor -b <rama>
-cd ../lector-wt/lector && npm install && npm run preparar   # datos del OCR
+cd lector && npm install && npm run preparar    # datos del OCR (no se suben)
 npx vitest run && npx tsc --noEmit -p .
-cd ../extractor && npm install
-npm run build:cordillera -- <ruta-a-main>/cordillera/lector   # lector.js para el sitio
-npm run build    # dist/ → copiar a <main>/extractor/ (rm -rf extractor && cp -rL dist extractor)
+cd .. && ./construir-sitio.sh                   # lector.js, build del extractor, demo y bytes escapados
 ```
-Después, en `main`, escapar los bytes de control de los .js como hace el paso
-de Python de `construir-sitio.sh`, probar `lab-reels/` con un rider real y
-publicar. El código fuente se empuja a `extractor` (autorizado).
+Después probar `lab-reels/` y `planilla/` con un rider real y publicar `main`.
+En Windows (sin symlinks) los enlaces de `extractor-fuente/public/` quedan como
+archivos de texto: para el build hay que cambiarlos localmente por carpetas reales
+y no subir ese cambio.
 
 **Riders reales probados.** No están en el repo porque traen teléfonos y
 correos del equipo; no se suben:
