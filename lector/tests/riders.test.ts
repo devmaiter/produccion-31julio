@@ -211,6 +211,27 @@ ELECTRIC BASS / BASS GUITAR:
       ["Diamante Eléctrico", "Drums", "22” Bass drum"], ["Diamante Eléctrico", "Electric Bass / Bass Guitar", "Percussion table"]]);
   });
 
+  it("cada instrumento con su músico es un grupo; sus subtítulos (opciones, stands, tipo, accesorios) no abren otro", () => {
+    const texto = readFileSync(new URL("./fixtures/riders/rider-grupos-con-subtitulos.txt", import.meta.url), "utf8");
+    const e = interpretar([doc(texto)]);
+    const grupos = [...new Set(e.items.map(i => i.grupo))];
+    expect(grupos).toEqual(["Drums/bateria", "Bass/bajo", "Gtr/guitarra 1"]);
+    const cuenta = e.items.filter(i => !i.nota?.includes("no suma")).map(i => `${i.cantidad} ${i.descripcion}`);
+    // "Sizes KD 22” - Rack Toms 8” - 10”- 12” - …" sale pieza por pieza.
+    expect(cuenta.slice(0, 4)).toEqual(["1 KD 22”", "3 Rack Toms 8” - 10”- 12”", "1 Floor tom 16”", "1 Snare 14” x 6”"]);
+    // "1. SONOR PRO LITE 2. DW…" son marcas preferidas, no tres baterías; "(dos) SNARE STANDS" son 2.
+    expect(cuenta).not.toContain("2 DW COLLECTOR SERIES");
+    expect(cuenta).toContain("2 SNARE STANDS");
+    expect(cuenta).toContain("6 CYMBALS BOOM STANDS");
+    // Opciones en orden de prioridad: solo la primera suma.
+    expect(e.items.filter(i => i.grupo === "Gtr/guitarra 1" && !i.nota).map(i => i.descripcion))
+      .toEqual(["Orange ROCKERVERB 50 II + Orange PPC 412 4x12” + Fender Deville", "GTR Gibson SG Standard o Gibson Les Paul Standard"]);
+    // "1 Fan / 1 Ventilador": un solo ítem, y "AMPEG SVT 3 Pro" no se parte.
+    expect(cuenta).toContain("1 Ventilador de piso preferentemente negro (black)");
+    expect(cuenta).toContain("1 AMPEG SVT 450/SVT Classic/SVT 4/SVT 3 Pro/");
+    expect(cuenta.some(d => /parches nuevos|EVANS/i.test(d))).toBe(false);
+  });
+
   it("si no reconoce la sección de backline, lee todo y lo deja para revisar en vez de no sacar nada", () => {
     const e = interpretar([doc("RIDER TÉCNICO\nLA BANDA\nAUDIO REQUIREMENTS\nWe need the following\n2 Snare stand\n1 Fender Twin Reverb")]);
     expect(resumen(e)).toEqual(["2 Bases: Snare stand", "1 Ampli guitarra: Fender Twin Reverb"]);

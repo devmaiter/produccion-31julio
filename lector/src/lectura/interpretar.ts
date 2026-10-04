@@ -131,6 +131,14 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     let proveedorActual: string | null = null;
     // "Sustituciones aceptables:", "Guitarras spare", "Opción 2 …" → lo que sigue es alternativa, no suma.
     let modoAlternativa = false;
+    // Dentro de un grupo ("DRUMS/BATERIA - CLAUDIO MAFFIA"), los subtítulos ("OPCIONES", "STANDS",
+    // "Type/Tipo", "Accesorios") no abren otro grupo. Después de "OPCIONES EN ORDEN DE PRIORIDAD",
+    // "1. … 2. … 3. …" es un ranking: solo la 1 cuenta. Después de "PARCHES", lo que sigue es nota.
+    let familiaGrupo: string | null = null, listaOpciones = false, ranking = false, enParches = false, itemsDelSubgrupo = 0;
+    const ponerGrupo = (nombre: string | null) => {
+      grupo = nombre; familiaGrupo = nombre ? familiaDe(nombre) : null;
+      listaOpciones = false; ranking = false; enParches = false; itemsDelSubgrupo = 0;
+    };
     // En qué sección del rider va la lectura: "fuera" = audio, luces, catering…; ahí no se leen ítems.
     let seccion: "neutra" | "backline" | "audio" | "otra" = "neutra";
     // "RIDER TÉCNICO / DREAD MAR I 2026": el rider es de una sola banda y su nombre ya no cambia.
@@ -153,18 +161,35 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const anotar = (etiqueta: Etiqueta, motivo: string, item: number | null = null) =>
         ctx.traza?.push({ documento: doc.nombre, texto, etiqueta, motivo, seccion, grupo, item });
       if (riderDe(texto)) { anotar("banda", "nombre del rider"); continue; }
+      if (seccion !== "audio" && seccion !== "otra") {
+        const sinColaS = texto.replace(/[\s:·|–—-]+$/, "");
+        const conMusico = grupoConMusico(sinColaS);
+        if (conMusico) { ponerGrupo(nombrePropio(conMusico)); modoAlternativa = false; seccion = "backline"; anotar("grupo", "instrumento y músico"); continue; }
+        if (grupo && esSubtitulo(sinColaS) && !otraFamilia(sinColaS)) {
+          listaOpciones = false; ranking = false; enParches = false; modoAlternativa = false;
+          if (/\b(options?|opciones?|opci[oó]n)\b/i.test(sinColaS) && !/^no\b/i.test(sinColaS)) {
+            listaOpciones = true; ranking = /prioridad|priority/i.test(sinColaS);
+            // "OPTIONS" sin ranking, después de lo pedido: lo que sigue es alternativa.
+            // ("OPTIONS CABINETS" no: son las opciones de otra cosa, las cajas.)
+            if (/^(options?|opciones?)(\s*\/\s*(options?|opciones?))?$/i.test(sinColaS) && itemsDelSubgrupo > 0) modoAlternativa = true;
+          }
+          if (/\b(parches|heads?)\b/i.test(sinColaS)) enParches = true;
+          itemsDelSubgrupo = 0;
+          anotar("nota", "subtítulo dentro del grupo"); continue;
+        }
+      }
       const sec = usarSecciones ? seccionDe(texto.replace(/[\s:·|–—-]+$/, "")) : null;
       if (sec) {
         const comoGrupo = sec.tipo === "backline" && GRUPOS.test(texto.replace(/[\s:·|–—-]+$/, "")) && !SECCION_BACKLINE.test(texto);
         // "DRUMS" dentro del input list es un grupo de canales, no el backline.
-        if (!(comoGrupo && seccion === "audio" && siguenCanales(n))) { seccion = sec.tipo; grupo = null; modoAlternativa = false; }
+        if (!(comoGrupo && seccion === "audio" && siguenCanales(n))) { seccion = sec.tipo; ponerGrupo(null); modoAlternativa = false; }
         if (sec.tipo === "backline" && !comoGrupo) { anotar("seccion", "empieza el backline"); continue; }
         if (sec.tipo !== "backline") { anotar("seccion", sec.tipo === "audio" ? "empieza una sección de audio (no es backline)" : "empieza una sección que no es backline"); continue; }
       }
       if (seccion === "audio" || seccion === "otra") {
         const sinColaF = texto.replace(/[\s:·|–—-]+$/, "");
         // "DRUMS" después de la sección de audio: es el backline, salvo que debajo vengan canales con micrófono.
-        if (GRUPOS.test(sinColaF) && !SECCION_BACKLINE.test(sinColaF) && (seccion === "otra" || !siguenCanales(n))) { seccion = "backline"; grupo = nombrePropio(sinColaF); anotar("grupo", "título de instrumento: vuelve el backline"); continue; }
+        if (GRUPOS.test(sinColaF) && !SECCION_BACKLINE.test(sinColaF) && (seccion === "otra" || !siguenCanales(n))) { seccion = "backline"; ponerGrupo(nombrePropio(sinColaF)); anotar("grupo", "título de instrumento: vuelve el backline"); continue; }
         anotar("no-backline", seccion === "audio" ? "está en una sección de audio" : "está en una sección que no es backline");
         continue;
       }
@@ -175,13 +200,28 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const quien = quienPone(texto);
       if (quien !== undefined) { proveedorActual = quien; if (letras(texto) > 40 || texto.split(/\s+/).length <= 5) { anotar("nota", quien ? "lo que sigue lo trae la banda" : "lo que sigue lo pone la producción"); continue; } }
 
-      if (!artistaFijo && esEncabezadoArtistaConocido(texto)) { artista = conocidos.get(clave(texto))!; grupo = null; anotar("banda", "banda conocida del evento"); continue; }
+      if (!artistaFijo && esEncabezadoArtistaConocido(texto)) { artista = conocidos.get(clave(texto))!; ponerGrupo(null); anotar("banda", "banda conocida del evento"); continue; }
       if (PROVEEDOR_SUELTO.test(texto)) { anotar("nota", "proveedor suelto"); continue; } // columna de proveedor que el OCR separó de su fila
       if (nota(texto)) { anotar("nota", "nota del rider"); continue; }
       const sinCola = texto.replace(/[\s:·|–—-]+$/, "");
       const pegados = variosGrupos(sinCola);
-      if (GRUPOS.test(sinCola) || pegados) { grupo = nombrePropio(pegados ?? sinCola); modoAlternativa = false; anotar("grupo", "título de instrumento"); continue; }
-      if (encabezadoFuerte(sinCola, l)) { grupo = nombrePropio(sinCola); modoAlternativa = false; anotar("grupo", "título en mayúsculas"); continue; }
+      if (GRUPOS.test(sinCola) || pegados) {
+        // "CYMBALS" después de "DRUMS": es la misma batería, sigue en su grupo.
+        if (grupo && familiaGrupo && familiaDe(sinCola) === familiaGrupo) { anotar("nota", "subtítulo del mismo instrumento"); continue; }
+        ponerGrupo(nombrePropio(pegados ?? sinCola)); modoAlternativa = false; anotar("grupo", "título de instrumento"); continue;
+      }
+      if (encabezadoFuerte(sinCola, l)) { ponerGrupo(nombrePropio(sinCola)); modoAlternativa = false; anotar("grupo", "título en mayúsculas"); continue; }
+      // "* LA BATERÍA DEBERÁ CONTAR CON PARCHES NUEVOS": indicación, no equipo.
+      if (/\b(deber[aá]n?|debe|should|must)(?!\p{L})/iu.test(texto) && !/^\d/.test(texto)) { anotar("nota", "indicación del rider"); continue; }
+      if (enParches && !/^\d/.test(texto)) { anotar("nota", "parches recomendados"); continue; }
+      // "1. SONOR PRO LITE  2. DW COLLECTOR": opciones en orden; la 1 es la preferida y las demás no suman.
+      // Con "EN ORDEN DE PRIORIDAD" también vale sin punto: "1 AMPEG SVT 450", "2 AGUILAR DB751".
+      const rank = listaOpciones ? texto.match(ranking ? /^(\d)\s*[.)]?\s+(\p{L}.*)$/u : /^(\d)\s*[.)]\s*(\p{L}.*)$/u) : null;
+      if (rank) {
+        if (categorizar(rank[2]!) === "Otro") { anotar("nota", `opción ${rank[1]}: marca o modelo`); continue; }
+        const antesR = ext.items.length;
+        if (item(`Opción ${rank[1]} ${rank[2]}`, l) && ext.items.length > antesR) { itemsDelSubgrupo++; anotar("item", `opción ${rank[1]}`, ext.items.length - 1); continue; }
+      }
       const sola = sinCola.match(/^opci[oó]n\s*#?\s*(\d)$/i);
       if (sola) { modoAlternativa = Number(sola[1]) > 1; anotar("nota", "opción"); continue; }
       const alt = marcaAlternativa(sinCola);
@@ -189,7 +229,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (bloqueHorario(texto)) { anotar("horario", "hora de un bloque"); continue; }
       const antes = ext.items.length, artistaAntes = artista;
       if (item(texto, l)) {
-        if (ext.items.length > antes) anotar("item", "equipo con cantidad o reconocido", ext.items.length - 1);
+        if (ext.items.length > antes) { itemsDelSubgrupo++; anotar("item", "equipo con cantidad o reconocido", ext.items.length - 1); }
         else anotar("no-backline", artistaAntes ? "radios, pilas, cinta… no son backline" : "parece backline pero no se sabe de qué banda");
         continue;
       }
@@ -233,7 +273,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       }
       return false;
     }
-    function fijar(nombre: string) { artista = registrarArtista(nombre); artistaFijo = true; grupo = null; }
+    function fijar(nombre: string) { artista = registrarArtista(nombre); artistaFijo = true; ponerGrupo(null); }
 
     function bloqueHorario(t: string): boolean {
       const rango = new RegExp(`(${HORA})\\s*(?:-|–|—|a|al|hasta|to)?\\s*(${HORA})?`, "i");
@@ -312,7 +352,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       } else {
         // "Snare stand 2 CN" cuando el OCR juntó las columnas
         const junta = t.match(/^(.+?\p{L}.*?)\s+(\d{1,3})\s+(CN|OML|BACKLINE(?: COP)?|[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ]{1,15}(?: [A-ZÁÉÍÓÚÑ]{2,15})?)$/u);
-        const conCat = t.match(/^([\p{L}][\p{L}\s/&]{1,30}):\s*(.+)$/u); // "Platillos: 1 ride, 2 crash"
+        const conCat = t.match(/^([\p{L}][\p{L}\s/&]{1,40}):\s*(.+)$/u); // "Platillos: 1 ride, 2 crash"
         if (junta && letras(junta[1]!) >= 3) {
           descripcion = junta[1]!; cantidad = +junta[2]!; proveedor = junta[3]!; explicita = true;
         } else {
@@ -326,13 +366,13 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (!explicita && /:$/.test(t)) return false; // "BASS ASI:" es un encabezado, no un ítem
       // Sin cantidad, más de 8 palabras es una frase del rider ("Cada equipo deberá estar en perfectas condiciones…").
       const palabras = descripcion.replace(/\([^)]*\)/g, " ").split(/\s+/).filter(w => letras(w) > 0).length;
-      if (!explicita && palabras > 8) return false;
+      if (!explicita && opcion === null && palabras > 8) return false;
       // "TOMS 10”, 12”" son dos toms.
       if (!explicita && /^toms?\b/i.test(descripcion)) {
         const medidas = descripcion.match(/\b\d{1,2}\s*(?:["”″]|pulg)/g) ?? [];
         if (medidas.length >= 2) cantidad = medidas.length;
       }
-      if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.length > (explicita ? 140 : 90)) return false;
+      if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.length > (explicita || opcion !== null ? 140 : 90)) return false;
       const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
       if (NO_BACKLINE.test(descripcion) && categorizar(principal ?? descripcion) === "Otro") return true; // radios, pilas, cinta: se lee pero no es backline
       // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
@@ -424,10 +464,10 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const mayus = limpio === limpio.toUpperCase() && letras(limpio) >= 3;
       const titulo = palabras.every(p => !/^\p{L}/u.test(p) || /^\p{Lu}/u.test(p) || /^(de|del|la|las|los|y|e|el)$/.test(p));
       if (!mayus && !titulo && !t.endsWith(":")) return false;
-      if (categorizar(limpio) !== "Otro") { grupo = nombrePropio(limpio); return true; }
+      if (categorizar(limpio) !== "Otro") { ponerGrupo(nombrePropio(limpio)); return true; }
       if (artistaFijo || letras(limpio) < 4) return false;
       artista = registrarArtista(limpio);
-      grupo = null;
+      ponerGrupo(null);
       return true;
     }
 
@@ -523,6 +563,42 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
   return out;
 }
 
+/* Familia de instrumento de un título: "DRUMS/BATERIA", "CYMBALS SET" y "STANDS DE PLATOS" son la batería. */
+const FAMILIAS: ReadonlyArray<readonly [string, RegExp]> = [
+  ["bateria", /\b(drums?|drum ?kit|bater[ií]a|hardware|cymbals?|platillos|platos|snare|redoblante|kick|bombo|toms?)\b/i],
+  ["percusion", /percus/i],
+  ["bajo", /\b(bass|bajo)\b/i],
+  ["guitarra", /\b(guitars?|guitarras?|gtr)\b/i],
+  ["teclado", /\b(keys|keyboards?|teclados?|pianos?|synths?)\b/i],
+  ["vientos", /\b(vientos|brass|horns?|saxo?s?|trompetas?)\b/i],
+  ["voces", /\b(vocals?|voces|voz)\b/i],
+  ["dj", /\bdj\b/i],
+];
+export function familiaDe(t: string): string | null {
+  return FAMILIAS.find(([, re]) => re.test(t))?.[0] ?? null;
+}
+const SUBTITULO = /^(no\s+(hay\s+)?)?(options?|opciones?|opci[oó]n)\b|^(type|tipo)s?\b|^(accessor|accesor)|^parches|^(drum\s+)?heads?\b|^(stands?|soportes?)\b|^(amps?|amplificador(es)?|amplificaci[oó]n)\b|^(cabinets?|cajas?)\b|^instrument|^sizes?\b|^medidas|^marcas?\b|^brands?\b|^configuraci|^set ?up\b|^(cymbals?\s+set|set\s+de\s+platos)|^hardware\b|^(kick\s+drum\s+)?pedal/i;
+/** "OPTIONS/OPCIONES EN ORDEN DE PRIORIDAD", "Type/ Tipo": subtítulo corto, sin cantidades. */
+function esSubtitulo(t: string): boolean {
+  return SUBTITULO.test(t) && !/\d/.test(t) && t.split(/\s+/).length <= 9 && !/[.?!]$/.test(t);
+}
+/** "BASS AMPS" dentro del bloque de guitarra sí es otro instrumento; "STANDS CYMBALS" no. */
+function otraFamilia(t: string): boolean {
+  const f = familiaDe(t);
+  return !!f && f !== "bateria" && !/^(cymbals?|stands?|soportes?|hardware|pedal|kick|amps?|amplificador|cabinets?|cajas?|instrument|options?|opciones?)/i.test(t);
+}
+/** "DRUMS/BATERIA * - CLAUDIO MAFFIA", "GTR/GUITARRA 1 - MAIKEL DE LUNA CAMPOS": instrumento y quién lo toca.
+ *  Devuelve el instrumento ("DRUMS/BATERIA", "GTR/GUITARRA 1"). */
+export function grupoConMusico(t: string): string | null {
+  const m = t.match(/^(.{2,40}?)\s*\*?\s+[-–—]\s+(\p{Lu}[\p{L}'’".]*(?:\s+\p{Lu}[\p{L}'’".]*){0,4})$/u);
+  if (!m) return null;
+  const instrumento = m[1]!.replace(/\*/g, "").trim();
+  const sinNumero = instrumento.replace(/\s+\d+$/, "");
+  if (/\d/.test(sinNumero)) return null;
+  if (!sinNumero.split(/\s*\/\s*/).every(p => GRUPOS.test(p) || /^gtr$/i.test(p) || familiaDe(p))) return null;
+  return instrumento;
+}
+
 /* Lo que sigue a "RIDER TÉCNICO" cuando el nombre de la banda es un logo: saludos e índices, no bandas. */
 const SALUDO = /^(hola|hello|hi|buen[oa]s|bienvenid|welcome|estimad|dear|saludos|[ií]ndice|index|contenidos?|contents?|introducci[oó]n|presentaci[oó]n|informaci[oó]n( general)?)\b/i;
 
@@ -589,7 +665,13 @@ const MARCA_LISTA = /(?:^|\s)((?:[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]
 const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft)$/i;
 function posicionesLista(t: string): number[] {
   const pos: number[] = [];
-  for (const m of t.matchAll(MARCA_LISTA)) if (!UNIDADES.test(m[2]!)) pos.push(m.index! + m[0].length - m[1]!.length);
+  for (const m of t.matchAll(MARCA_LISTA)) {
+    if (UNIDADES.test(m[2]!)) continue;
+    const antes = t.slice(0, m.index! + m[0].length - m[1]!.length);
+    // "1 Fan / 1 Ventilador": la traducción, no otro ítem. "AMPEG SVT 3 Pro": el 3 es del modelo.
+    if (/\/\s*$/.test(antes) || (/\p{Ll}/u.test(t) && /\b[A-Z]{2,4}\s+$/.test(antes))) continue;
+    pos.push(m.index! + m[0].length - m[1]!.length);
+  }
   return pos;
 }
 const marcas = (x: string) => posicionesLista(x).length;
@@ -601,11 +683,22 @@ function cortar(t: string): string[] {
 
 /** "Hardware: 2x soportes de caja, 1x soporte charles, 11x soportes…" → una línea por ítem. */
 function dividirLista(l: Linea): Linea[] {
-  const marca = /(?:^|[,;]|\s(?:y|and|e|\+))\s*(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L}/giu;
+  // "1 Fan / 1 Ventilador de piso": inglés / español, es un solo ítem; se deja el segundo.
+  const bilingue = l.texto.match(/^[\s•·*-]*(\d{1,3})\s+(.+?)\s*\/\s*\1\s+(\p{L}.+)$/u);
+  if (bilingue) return [{ ...l, texto: `${bilingue[1]} ${bilingue[3]}` }];
+  // "Sizes KD 22” - Rack Toms 8” - 10”- 12” - Floor tom 16” - Snare 14” x 6”": una pieza por parte.
+  const tam = l.texto.match(/^(?:sizes?|medidas|tama[ñn]os?)\s*:?\s+(.+)$/i);
+  if (tam && /\d\s*["”″]/.test(tam[1]!)) {
+    return tam[1]!.split(/\s+[-–]\s+(?=\p{L})|,\s*(?=\p{L})/u).map(p => p.trim()).filter(p => letras(p) >= 2).map(p => {
+      const n = (p.replace(/x\s*\d+(?:[.,]\d+)?\s*["”″]/gi, "").match(/\d+(?:[.,]\d+)?\s*["”″]/g) ?? []).length;
+      return { ...l, texto: `${Math.max(1, n)} ${p}` };
+    });
+  }
+  const marca = /(?:^|(?<!\d)[,;]|\s(?:y|and|e|\+))\s*(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L}/giu;
   if ((l.texto.match(marca) ?? []).length < 2) return dividirEnumeracion(l);
   const [cabeza, ...resto] = l.texto.split(/:\s+(?=(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+\p{L})/iu);
   const cuerpo = resto.length ? resto.join(": ") : cabeza!;
-  const partes = cuerpo.split(/(?:[,;]\s*|\s+(?:y|and|e|\+)\s+)(?=(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L})/iu).map(t => t.trim()).filter(Boolean);
+  const partes = cuerpo.split(/(?:(?<!\d)[,;]\s*|\s+(?:y|and|e|\+)\s+)(?=(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L})/iu).map(t => t.trim()).filter(Boolean);
   const lineas = partes.map(texto => ({ ...l, texto }));
   return resto.length ? [{ ...l, texto: cabeza! + ":" }, ...lineas] : lineas;
 }
@@ -630,5 +723,6 @@ function quienPone(t: string): string | null | undefined {
 }
 
 function limpiar(t: string): string {
-  return t.replace(/[   ]/g, " ").replace(/[|¦]{2,}/g, " ").replace(/\*\*/g, "").replace(/^\s*(?:[-–•·*●▪■➢✓>]+\s*|o\s+)(?=[\p{L}\d(])/u, "").replace(/\s+$/, "").trim();
+  return t.replace(/[   ]/g, " ").replace(/[|¦]{2,}/g, " ").replace(/\*\*/g, "").replace(/^\s*(?:[-–•·*●▪■➢✓>]+\s*|o\s+)(?=[\p{L}\d(])/u, "").replace(/\s+$/, "").trim()
+    .replace(/^(\d{1,3})\s*\((?:un|una|uno|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|one|two|three|four|five|six)\)\s*/i, "$1 "); // "2 (dos) SNARE STANDS"
 }
