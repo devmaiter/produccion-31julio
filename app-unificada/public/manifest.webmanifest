@@ -1,0 +1,11 @@
+{
+  "name": "Backline",
+  "short_name": "Backline",
+  "description": "Backline de festivales: listas, conteo en cancha y horario, también sin internet.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111111",
+  "icons": [{ "src": "icono.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

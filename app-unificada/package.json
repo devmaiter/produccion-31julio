@@ -1,0 +1,39 @@
+{
+  "name": "backline",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gestión de backline para festivales: lectura local de correos, PDF y fotos, y modo evento sin internet.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "importar": "tsx scripts/importar-prototipos.ts",
+    "preparar": "tsx scripts/preparar-ocr.ts",
+    "predev": "npm run -s preparar",
+    "prebuild": "npm run -s preparar",
+    "pretest": "npm run -s preparar",
+    "evento": "npm run -s build && tsx servidor/evento.ts",
+    "servidor": "tsx servidor/evento.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/qrcode": "^1.5.6",
+    "fake-indexeddb": "^6.2.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  },
+  "dependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
+    "@tesseract.js-data/spa": "^1.0.0",
+    "pdfjs-dist": "^6.3.289",
+    "postal-mime": "^4.0.0",
+    "qrcode": "^1.5.4",
+    "tesseract.js": "^7.0.0",
+    "zod": "^4.6.5"
+  }
+}

@@ -1,0 +1,397 @@
+{
+ "evento": {
+  "id": "vallenato-al-parque-2026",
+  "nombre": "Vallenato al Parque 2026",
+  "lugar": "Parque Simón Bolívar",
+  "ciudad": "Bogotá",
+  "desde": "2026-08-21",
+  "hasta": "2026-08-23"
+ },
+ "escenarios": [
+  {
+   "id": "principal",
+   "eventoId": "vallenato-al-parque-2026",
+   "nombre": "Tarima principal"
+  }
+ ],
+ "dias": [
+  {
+   "id": "vallenato-21",
+   "eventoId": "vallenato-al-parque-2026",
+   "fecha": "2026-08-21",
+   "nombre": "Vie 21 ago · Pruebas",
+   "tipo": "pruebas"
+  },
+  {
+   "id": "vallenato-22",
+   "eventoId": "vallenato-al-parque-2026",
+   "fecha": "2026-08-22",
+   "nombre": "Sáb 22 ago",
+   "tipo": "show"
+  },
+  {
+   "id": "vallenato-23",
+   "eventoId": "vallenato-al-parque-2026",
+   "fecha": "2026-08-23",
+   "nombre": "Dom 23 ago",
+   "tipo": "show"
+  }
+ ],
+ "artistas": [
+  {
+   "id": "vacap",
+   "nombre": "VACAP"
+  },
+  {
+   "id": "combo-nuestra-tierra",
+   "nombre": "Combo Nuestra Tierra"
+  },
+  {
+   "id": "alfredo-gomez-y-los-hijos-de-majagual",
+   "nombre": "Alfredo Gómez y Los Hijos de Majagual"
+  },
+  {
+   "id": "homenaje-100-anos-de-rafael-escalona",
+   "nombre": "Homenaje \"100 años de Rafael Escalona\""
+  },
+  {
+   "id": "por-confirmar",
+   "nombre": "Por confirmar"
+  },
+  {
+   "id": "kandymaku",
+   "nombre": "Kandymaku"
+  },
+  {
+   "id": "otto-serge",
+   "nombre": "Otto Serge"
+  },
+  {
+   "id": "los-diablitos",
+   "nombre": "Los Diablitos"
+  },
+  {
+   "id": "amin-martinez-el-original",
+   "nombre": "Amín Martínez \"El Original\""
+  },
+  {
+   "id": "beto-zabaleta",
+   "nombre": "Beto Zabaleta"
+  },
+  {
+   "id": "jaime-espitaleta",
+   "nombre": "Jaime Espitaleta"
+  },
+  {
+   "id": "los-k-morales",
+   "nombre": "Los K Morales"
+  },
+  {
+   "id": "jorge-pabuena-y-las-leyendas-silvio-brito-y-marcos-diaz",
+   "nombre": "Jorge Pabuena y Las Leyendas Silvio Brito y Marcos Díaz"
+  },
+  {
+   "id": "aniel-velasquez",
+   "nombre": "Aniel Velásquez"
+  },
+  {
+   "id": "ana-del-castillo",
+   "nombre": "Ana del Castillo"
+  },
+  {
+   "id": "rafa-perez",
+   "nombre": "Rafa Pérez"
+  },
+  {
+   "id": "elder-dayan",
+   "nombre": "Elder Dayán"
+  },
+  {
+   "id": "karen-lizarazo",
+   "nombre": "Karen Lizarazo"
+  },
+  {
+   "id": "farid-ortiz",
+   "nombre": "Farid Ortiz"
+  }
+ ],
+ "bloques": [
+  {
+   "id": "vallenato-21-b1",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "artistaId": "vacap",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "09:00",
+   "fin": "09:30"
+  },
+  {
+   "id": "vallenato-21-b2",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "09:30",
+   "fin": "09:45"
+  },
+  {
+   "id": "vallenato-21-b3",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "artistaId": "combo-nuestra-tierra",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "09:45",
+   "fin": "10:15"
+  },
+  {
+   "id": "vallenato-21-b4",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "10:15",
+   "fin": "10:30"
+  },
+  {
+   "id": "vallenato-21-b5",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "artistaId": "alfredo-gomez-y-los-hijos-de-majagual",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "10:30",
+   "fin": "11:00"
+  },
+  {
+   "id": "vallenato-21-b6",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "11:00",
+   "fin": "11:15"
+  },
+  {
+   "id": "vallenato-21-b7",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "artistaId": "homenaje-100-anos-de-rafael-escalona",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "11:15",
+   "fin": "11:55"
+  },
+  {
+   "id": "vallenato-21-b8",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "titulo": "Cambio",
+   "tipo": "cambio",
+   "inicio": "11:55",
+   "fin": "12:10"
+  },
+  {
+   "id": "vallenato-21-b9",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "artistaId": "por-confirmar",
+   "titulo": "Prueba de sonido",
+   "tipo": "soundcheck",
+   "inicio": "12:10",
+   "fin": "12:50"
+  },
+  {
+   "id": "vallenato-21-b10",
+   "diaId": "vallenato-21",
+   "escenarioId": "principal",
+   "titulo": "Almuerzo",
+   "tipo": "marca",
+   "inicio": "12:50",
+   "fin": "13:50"
+  },
+  {
+   "id": "vallenato-22-b0",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "vacap",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "13:30",
+   "fin": "14:10"
+  },
+  {
+   "id": "vallenato-22-b1",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "kandymaku",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:10",
+   "fin": "14:50"
+  },
+  {
+   "id": "vallenato-22-b2",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "combo-nuestra-tierra",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:50",
+   "fin": "15:35"
+  },
+  {
+   "id": "vallenato-22-b3",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "otto-serge",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:35",
+   "fin": "16:50"
+  },
+  {
+   "id": "vallenato-22-b4",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "homenaje-100-anos-de-rafael-escalona",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "16:50",
+   "fin": "17:45"
+  },
+  {
+   "id": "vallenato-22-b5",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "los-diablitos",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "17:45",
+   "fin": "19:00"
+  },
+  {
+   "id": "vallenato-22-b6",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "alfredo-gomez-y-los-hijos-de-majagual",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "19:00",
+   "fin": "19:45"
+  },
+  {
+   "id": "vallenato-22-b7",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "amin-martinez-el-original",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "19:45",
+   "fin": "21:00"
+  },
+  {
+   "id": "vallenato-22-b8",
+   "diaId": "vallenato-22",
+   "escenarioId": "principal",
+   "artistaId": "beto-zabaleta",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "21:00",
+   "fin": "21:00"
+  },
+  {
+   "id": "vallenato-23-b0",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "jaime-espitaleta",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "12:30",
+   "fin": "13:15"
+  },
+  {
+   "id": "vallenato-23-b1",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "los-k-morales",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "13:15",
+   "fin": "14:10"
+  },
+  {
+   "id": "vallenato-23-b2",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "jorge-pabuena-y-las-leyendas-silvio-brito-y-marcos-diaz",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "14:10",
+   "fin": "15:25"
+  },
+  {
+   "id": "vallenato-23-b3",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "aniel-velasquez",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "15:25",
+   "fin": "16:20"
+  },
+  {
+   "id": "vallenato-23-b4",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "ana-del-castillo",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "16:20",
+   "fin": "17:25"
+  },
+  {
+   "id": "vallenato-23-b5",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "rafa-perez",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "17:25",
+   "fin": "18:30"
+  },
+  {
+   "id": "vallenato-23-b6",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "elder-dayan",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "18:30",
+   "fin": "19:45"
+  },
+  {
+   "id": "vallenato-23-b7",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "karen-lizarazo",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "19:45",
+   "fin": "20:50"
+  },
+  {
+   "id": "vallenato-23-b8",
+   "diaId": "vallenato-23",
+   "escenarioId": "principal",
+   "artistaId": "farid-ortiz",
+   "titulo": "Show",
+   "tipo": "show",
+   "inicio": "20:50",
+   "fin": "20:50"
+  }
+ ],
+ "items": [],
+ "stagePlots": []
+}

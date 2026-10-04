@@ -1,0 +1,37 @@
+/* Estilos mínimos a propósito: el diseño viene después. */
+:root { color-scheme: light dark; --ok: #1a7f37; --mal: #c62828; --warn: #b26a00; --linea: #8884; }
+body { font: 15px/1.4 system-ui, sans-serif; margin: 0; padding: 0 16px 48px; }
+header { position: sticky; top: 0; background: Canvas; padding: 8px 0; border-bottom: 1px solid var(--linea); z-index: 1; }
+h1 { font-size: 18px; margin: 4px 0; }
+nav { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+button[aria-pressed="true"] { font-weight: 700; outline: 2px solid currentColor; }
+table { border-collapse: collapse; width: 100%; margin: 6px 0 12px; }
+th, td { border-bottom: 1px solid var(--linea); padding: 4px 6px; text-align: left; vertical-align: top; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+input[type="number"] { width: 4em; }
+details { border: 1px solid var(--linea); border-radius: 6px; margin: 8px 0; padding: 4px 10px; }
+summary { cursor: pointer; font-weight: 600; }
+.ok { color: var(--ok); } .falta, .sobra { color: var(--mal); } .pendiente { opacity: .6; }
+.aviso { color: var(--warn); font-size: 12px; }
+.chip { font-size: 12px; border: 1px solid var(--linea); border-radius: 10px; padding: 0 6px; margin-left: 4px; }
+img.plot { max-width: 100%; height: auto; }
+textarea { width: 100%; min-height: 10em; font: inherit; }
+.tabla-scroll { overflow-x: auto; }
+.fila { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.estado { font-size: 12px; border-radius: 12px; padding: 2px 8px; }
+.estado.ok { color: var(--ok); } .estado.falta { color: var(--warn); }
+.acciones { display: flex; flex-wrap: wrap; gap: 6px; }
+.boton { display: inline-block; border: 1px solid currentColor; border-radius: 4px; padding: 1px 8px; cursor: pointer; font-size: 13px; }
+.galeria { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.miniatura { padding: 0; border: 0; background: none; }
+.miniatura img { width: 88px; height: 88px; object-fit: cover; border-radius: 4px; }
+dialog img { max-width: 90vw; max-height: 75vh; }
+.edicion label, .formulario label { display: block; margin: 4px 0; }
+.formulario input:not([type=checkbox]), .formulario select, .formulario textarea { width: 100%; max-width: 420px; box-sizing: border-box; }
+table.revision input:not([type=checkbox]) { width: 100%; min-width: 7em; box-sizing: border-box; }
+table.revision input[type=number] { min-width: 3.5em; }
+tr.dudoso { background: #b26a0014; }
+.enlace { border: 0; background: none; padding: 0; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; }
+.peligro { color: var(--mal); }
+.exito { color: var(--ok); }
+#aviso { position: fixed; left: 16px; right: 16px; bottom: 16px; background: CanvasText; color: Canvas; padding: 10px 12px; border-radius: 8px; text-align: center; }

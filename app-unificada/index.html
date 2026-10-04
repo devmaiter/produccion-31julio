@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111111">
+  <title>Backline</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icono.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/src/ui/estilos.css">
+</head>
+<body>
+  <header>
+    <div class="fila">
+      <h1>Backline</h1>
+      <button id="estado" class="estado" aria-live="polite">…</button>
+    </div>
+    <label>Evento <select id="evento"></select></label>
+    <nav id="vistas"></nav>
+    <nav id="dias"></nav>
+    <p id="resumen"></p>
+  </header>
+  <main id="contenido"></main>
+  <div id="aviso" role="status" hidden></div>
+  <script type="module" src="/src/ui/main.ts"></script>
+</body>
+</html>
