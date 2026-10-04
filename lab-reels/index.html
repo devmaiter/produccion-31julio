@@ -271,13 +271,18 @@ const GRUPOS = [[/bater|drum|\bkit\b/, "Batería"], [/platillo|cymbal/, "Platill
 function reelDe(it){
   const g = (it.grupo || "").trim(); if (!g) return it.categoria;
   const n = g.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  return GRUPOS.find(([re]) => re.test(n))?.[1] || g.charAt(0).toUpperCase() + g.slice(1).toLowerCase();
+  // "GTR/GUITARRA 1" y "GTR/GUITARRA 2": dos guitarristas, dos reels.
+  const num = n.match(/\s(\d)\s*$/)?.[1];
+  const canon = GRUPOS.find(([re]) => re.test(n))?.[1];
+  return canon ? canon + (num ? " " + num : "") : g.charAt(0).toUpperCase() + g.slice(1).toLowerCase();
 }
 /* El holograma de cada reel: el del equipo principal del grupo (en "Teclado" sin teclados,
    solo bases, salen las bases) y armado solo con lo que pide ese grupo. */
 const PRINCIPAL = {"Batería": ["Batería", "Platillos"], "Bajo": ["Ampli bajo", "Bajo"], "Guitarra": ["Ampli guitarra", "Guitarra"], "Teclado": ["Teclado"]};
 const PRIORIDAD = ["Batería","Ampli bajo","Ampli guitarra","Teclado","Percusión","Platillos","Guitarra","Bajo","Bases"];
+const sinNum = r => r.replace(/\s\d$/, "");   // "Guitarra 1" se ve como Guitarra
 function catHolograma(reel, items){
+  reel = sinNum(reel);
   const hay = new Set(items.map(i => i.categoria));
   if (!ORDEN.includes(reel)) return reel;   // "Extras" y otros grupos que no son instrumentos: su emoji
   return [...(PRINCIPAL[reel] || [reel]), ...PRIORIDAD].find(c => hay.has(c)) || reel;
@@ -401,12 +406,12 @@ function htmlReel(c, i, total){
         ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span></li>`).join("")}</ul>
     </section>`).join("");
   return `
-  <article class="reel" id="${c.id}" style="--h:${HUE[c.cat] ?? 20}" data-n="${n}" aria-label="${esc(c.cat)}">
+  <article class="reel" id="${c.id}" style="--h:${HUE[sinNum(c.cat)] ?? 20}" data-n="${n}" aria-label="${esc(c.cat)}">
     <div class="prog">${"<i></i>".repeat(n)}</div>
     <div class="cab"><b>${esc(c.cat)}</b><span class="n">${i+1}/${total}</span></div>
     <div class="slides">
       <section class="slide portada">
-        <div class="holo" data-cat="${esc(c.holo)}"><div class="emoji" aria-hidden="true">${EMOJI[c.cat] || "📦"}</div></div>
+        <div class="holo" data-cat="${esc(c.holo)}"><div class="emoji" aria-hidden="true">${EMOJI[sinNum(c.cat)] || "📦"}</div></div>
         <h2>${esc(c.cat)}</h2>
         <div class="big"><strong data-to="${c.aTener}">${c.aTener}</strong><span>piezas<br>a tener</span></div>
         <div class="dias">${dias}<span class="chip ac">${c.bandas.length} ${c.bandas.length === 1 ? "banda" : "bandas"}</span>${c.dudosos ? `<span class="chip warn">${c.dudosos} por confirmar</span>` : ""}</div>
@@ -550,7 +555,7 @@ feed.addEventListener("dblclick", e => { if (!e.target.closest(".riel, .pasar, .
 document.getElementById("visor").addEventListener("click", e => e.currentTarget.hidden = true);
 
 const indice = document.getElementById("indice");
-const filaIndice = (c, cls, actualId) => `<button class="${cls}" data-id="${c.id}" aria-current="${actualId === c.id}"><span class="e">${EMOJI[c.cat] || "📦"}</span><span>${esc(c.cat)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${c.aTener}</span></button>`;
+const filaIndice = (c, cls, actualId) => `<button class="${cls}" data-id="${c.id}" aria-current="${actualId === c.id}"><span class="e">${EMOJI[sinNum(c.cat)] || "📦"}</span><span>${esc(c.cat)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${c.aTener}</span></button>`;
 const filaSubir = (cls, actualId) => `<button class="${cls}" data-id="subir" aria-current="${actualId === "subir"}"><span class="e">＋</span><span>Subir documento</span></button>`;
 function abrirIndice(){
   document.getElementById("filas").innerHTML = filaSubir("fila") + cats.map(c => filaIndice(c, "fila")).join("");
@@ -636,7 +641,7 @@ async function leerYArmar(archivos){
   subida.estado = "listo";
   subida.resultado = {items: d.items.length, bandas: d.artistas.length, cats: categorias.length, dudosos: d.items.filter(i => i.porConfirmar).length, avisos: ext.avisos.length};
   pintar("subir");
-  lluvia(categorias.map(c => EMOJI[c] || "📦"));
+  lluvia(categorias.map(c => EMOJI[sinNum(c)] || "📦"));
 }
 
 async function probarMuestra(){

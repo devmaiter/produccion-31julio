@@ -63,6 +63,11 @@ Piezas, en `lector/src/lectura/` de la rama `extractor`:
   - **Páginas repetidas:** un bloque igual a uno anterior se lee una vez.
   - **Unidades:** "16 CH" o "4 RETORNOS" no son cantidades.
   - **Opciones:** "OPCIÓN #2" es alternativa y no suma.
+  - **Grupos y subtítulos:** "DRUMS/BATERIA - CLAUDIO MAFFIA" (instrumento + músico)
+    abre un grupo; dentro, "OPCIONES", "STANDS", "Type/Tipo", "Accesorios",
+    "CYMBALS SET"… son subtítulos y no abren otro. "OPCIONES EN ORDEN DE PRIORIDAD"
+    + "1. … 2. …": solo la 1 suma (y si es solo una marca, es nota). "Sizes KD 22” -
+    Rack Toms 8”-10”-12” - …" sale pieza por pieza. "1 Fan / 1 Ventilador" es uno.
   - **Respaldo:** si no sale nada, relee sin secciones y marca todo "para revisar".
 - `../dominio/categorias.ts`: categoría por palabras clave (Batería, Platillos,
   Percusión, Teclado, Ampli bajo, Ampli guitarra, Guitarra, Bajo, Bases,

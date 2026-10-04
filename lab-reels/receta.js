@@ -69,9 +69,11 @@ function bateriaDe(items) {
       continue;
     }
     if (tipoPlatillo(t) && it.categoria !== "Batería" || /x ?-?hat/.test(t)) { r.platillos.push(...platillos(t, q)); continue; }
-    if (/(\bkick\b|bombo|\bbd\b|bass drum)/.test(t)) { for (let i = 0; i < cuenta; i++) r.bombos.push(tam(i)); continue; }
+    if (/(\bkick\b|bombo|\bbd\b|\bkd\b|bass drum)/.test(t)) { for (let i = 0; i < cuenta; i++) r.bombos.push(tam(i)); continue; }
     if (/(snare|redoblante|tarola|\bcaja\b)/.test(t)) {
-      if (!/(spare|repuesto|auxiliar|backup|reserva)/.test(t)) for (let i = 0; i < q; i++) r.redoblantes.push(tam(i));
+      // "SNARE / REDOBLANTE: Ludwig 14”" después de "Sizes … Snare 14”" es el mismo redoblante, con su marca.
+      const mismo = /^[^:]*(snare|redoblante)[^:]*:/.test(t) && r.redoblantes.includes(tam(0));
+      if (!mismo && !/(spare|repuesto|auxiliar|backup|reserva)/.test(t)) for (let i = 0; i < q; i++) r.redoblantes.push(tam(i));
       continue;
     }
     if (/\btoms?\b|tom-?tom/.test(t)) {
