@@ -147,10 +147,12 @@ están el resumen y cada banda. Todo usa CSS scroll-snap.
   `../cordillera/lector/` y arma reels solo con lo que encontró. Se guarda en
   `localStorage` (`lab-reels:doc`) y "Borrar" lo quita. No hay datos de ejemplo
   fijos: el usuario no quiere ver Cordillera ahí.
-- **Un reel por grupo del rider** ("DRUMS", "ELECTRIC BASS"…, el `grupo` que da
-  el lector), en el orden del documento: el usuario pidió respetar cómo agrupa
-  cada banda (una mesa de percusión pedida en el grupo del bajo se queda en Bajo).
-  Sin grupos, los reels salen por categoría.
+- **Siempre 7 reels, en este orden:** Batería, Bajo, Guitarra, Teclado, Percusión,
+  Platillos y Extras (lo pidió el usuario; nada de "Tarimas", "Vientos" ni "DJ").
+  Se respeta el bloque de la banda (el `grupo` del lector): lo pedido en el bloque
+  del bajo se queda en Bajo y los platillos del bloque de batería, en Batería. Sin
+  grupo de instrumento, cada ítem va por su categoría; las bases van con su
+  instrumento y lo que no es instrumento, a Extras.
 - En cada portada hay un holograma 3D (`holograma.js`, con el Three.js de
   `reconocimiento-3d/vendor/`). La batería se modeló según una foto real de
   tarima. Un solo lienzo WebGL pasa al reel visible.

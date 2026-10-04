@@ -42,14 +42,13 @@ nuevo: `lab-reels/#intro`.
   botones ↑ ↓ al lado para cambiar de categoría, y también el teclado y la rueda del mouse.
   En el celular nada de eso aparece; se desliza.
 
-### Un reel por grupo del rider
+### Siempre los mismos 7 reels
 
-Cada banda agrupa su backline a su manera ("DRUMS", "ELECTRIC BASS", "KEYS"…) y eso se
-respeta: cada grupo es un reel, con sus ítems en el orden del documento. Si en el grupo del
-bajo pidieron una mesa de percusión y un ventilador, quedan en Bajo, no se mandan a
-Percusión. Los nombres se unifican (Drums = Batería, Keys = Teclado, Bass = Bajo…) para
-juntar bandas en un mismo reel; los que no son instrumentos ("Extras") quedan con su nombre
-y su emoji. Si el documento no trae grupos, los reels salen por categoría como antes.
+Batería, Bajo, Guitarra, Teclado, Percusión, Platillos y Extras, en ese orden. Se
+respeta cómo agrupa la banda: lo que pidió en el bloque del bajo (una mesa de percusión,
+un ventilador) se queda en Bajo, y los platillos y bases del bloque de batería, en
+Batería. Un grupo que no es de un instrumento ("Tarimas", "Vientos", "DJ") no abre reel:
+cada ítem va por su categoría, las bases con su instrumento y el resto a Extras.
 
 ### Holograma 3D en la portada
 

@@ -262,19 +262,27 @@ const VACIO = {artistas: [], dias: [], bloques: [], stagePlots: [], items: []};
 const datos = () => doc?.datos || VACIO;
 const titulo = () => doc ? doc.nombre : "Sube un documento para empezar";
 
-/* Cada grupo del rider es un reel, como lo armó la banda: si en "Bajo" pidió una mesa de
-   percusión, se queda en Bajo. Los nombres se unifican para juntar bandas ("Drums" y
-   "Batería" van al mismo reel). Sin grupo, el ítem va por su categoría. */
+/* Siempre los mismos siete reels, en este orden. Se respeta cómo agrupa la banda: lo que
+   pidió en el bloque del bajo (una mesa de percusión) se queda en Bajo, y los platillos del
+   bloque de batería, en Batería. Un grupo que no es de un instrumento ("Tarimas", "Vientos",
+   "DJ") no es un reel: cada ítem va por su categoría y lo que no es instrumento, a Extras. */
+const REELES = ["Batería", "Bajo", "Guitarra", "Teclado", "Percusión", "Platillos", "Extras"];
 const GRUPOS = [[/bater|drum|\bkit\b/, "Batería"], [/platillo|cymbal/, "Platillos"], [/percus|\bperc\b/, "Percusión"],
-  [/teclad|\bkeys?\b|piano|synth|sintet/, "Teclado"], [/\bbajo|bass/, "Bajo"], [/guitar/, "Guitarra"], [/\bdj\b/, "DJ"],
-  [/vient|horns?\b|brass|\bsax|trompet|trombon/, "Vientos"], [/\bvo(z|ces)\b|vocal/, "Voces"]];
+  [/teclad|\bkeys?\b|piano|synth|sintet/, "Teclado"], [/\bbajo|bass/, "Bajo"], [/guitar|\bgtr\b/, "Guitarra"]];
+const POR_CATEGORIA = {"Batería": "Batería", "Platillos": "Platillos", "Percusión": "Percusión", "Teclado": "Teclado",
+  "Ampli bajo": "Bajo", "Bajo": "Bajo", "Ampli guitarra": "Guitarra", "Guitarra": "Guitarra"};
+// Una base o un tapete sin grupo va con su instrumento: "Boom cymbal stand" a Batería.
+const DE_QUIEN = [[/cymbal|platillo|plato|hi ?-?hat|snare|redoblante|throne|drum|bater|tom stand|porter/, "Batería"],
+  [/teclado|keyboard|\bks ?\d|ax-?\d|tipo z|\bkeys? stand/, "Teclado"], [/guitar|guitarrero/, "Guitarra"],
+  [/\bbajo|\bbass\b/, "Bajo"], [/conga|bongo|timbal|percus|cradle/, "Percusión"]];
 function reelDe(it){
-  const g = (it.grupo || "").trim(); if (!g) return it.categoria;
-  const n = g.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  // "GTR/GUITARRA 1" y "GTR/GUITARRA 2": dos guitarristas, dos reels.
-  const num = n.match(/\s(\d)\s*$/)?.[1];
-  const canon = GRUPOS.find(([re]) => re.test(n))?.[1];
-  return canon ? canon + (num ? " " + num : "") : g.charAt(0).toUpperCase() + g.slice(1).toLowerCase();
+  const norm = t => (t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const n = norm(it.grupo);
+  const g = n && GRUPOS.find(([re]) => re.test(n))?.[1];
+  if (g) return g;
+  if (POR_CATEGORIA[it.categoria]) return POR_CATEGORIA[it.categoria];
+  if (["Bases", "Escenario"].includes(it.categoria)) { const t = norm(it.referencia); return DE_QUIEN.find(([re]) => re.test(t))?.[1] || "Extras"; }
+  return "Extras";
 }
 /* El holograma de cada reel: el del equipo principal del grupo (en "Teclado" sin teclados,
    solo bases, salen las bases) y armado solo con lo que pide ese grupo. */
@@ -284,7 +292,7 @@ const sinNum = r => r.replace(/\s\d$/, "");   // "Guitarra 1" se ve como Guitarr
 function catHolograma(reel, items){
   reel = sinNum(reel);
   const hay = new Set(items.map(i => i.categoria));
-  if (!ORDEN.includes(reel)) return reel;   // "Extras" y otros grupos que no son instrumentos: su emoji
+  if (reel === "Extras") return reel;   // Extras lleva su emoji, no holograma
   return [...(PRINCIPAL[reel] || [reel]), ...PRIORIDAD].find(c => hay.has(c)) || reel;
 }
 
@@ -303,10 +311,8 @@ function armar(d){
     if (!cats.has(r)) cats.set(r, []);
     cats.get(r).push(it);
   }
-  // Con grupos del rider, los reels van en el orden del documento; sin grupos, en el de siempre.
-  const primero = [...cats.keys()];
   const porGrupo = d.items.some(i => i.grupo);
-  const pos = porGrupo ? c => primero.indexOf(c) : c => ORDEN.includes(c) ? ORDEN.indexOf(c) : 99;
+  const pos = c => REELES.indexOf(c);
   return [...cats.keys()].sort((a,b) => pos(a) - pos(b)).map(cat => {
     const items = cats.get(cat);
     const porDia = Object.fromEntries(diasShow.map(id => [id, 0]));
