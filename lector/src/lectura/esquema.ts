@@ -42,6 +42,7 @@ export const ExtraccionItem = z.object({
   proveedor: z.string().nullable().describe("Quién lo pone, tal como aparece: 'CN', 'OML', 'BACKLINE COP', un nombre… null si no se indica"),
   dudoso: z.boolean().describe("true si la cantidad o el texto no se leen con seguridad (foto borrosa, tachones, anotación a mano)"),
   nota: z.string().nullable().describe("Anotaciones relevantes: 'trae la banda', 'confirmar', texto a mano…"),
+  sinBanda: z.boolean().optional().describe("true si el documento no dice de qué banda es (un listado general): `artista` es solo el nombre de la hoja o del archivo"),
 });
 
 /* ---- La tarima (vienen del desglose: hojas Risers, IO List y los planos) ---- */
@@ -100,6 +101,34 @@ export const RequisitoExtraido = z.object({
 });
 export type RequisitoExtraido = z.infer<typeof RequisitoExtraido>;
 
+/* ---- Lo que pide la banda contra lo que se le propone ("Cant | Requerimiento | Cant | Propuesta") ---- */
+
+/** Cada lado lleva su propia categoría: en los Excel reales las dos columnas NO van
+ *  alineadas renglón por renglón (la propuesta va en otro orden), así que se comparan
+ *  por categoría y no por fila. */
+export const LadoComparado = z.object({
+  cantidad: z.number().int().nullable().describe("null si esa fila no trae cantidad"),
+  texto: z.string(),
+  grupo: z.string().nullable(),
+  categoria: z.enum(CATEGORIAS),
+});
+export type LadoComparado = z.infer<typeof LadoComparado>;
+
+export const FilaComparada = z.object({
+  fila: z.number().int().describe("Fila de la hoja (1-based), para verlas como en el Excel"),
+  pide: LadoComparado.nullable().describe("null: en esa fila el requerimiento está vacío"),
+  propone: LadoComparado.nullable().describe("null: en esa fila no hay propuesta"),
+});
+export type FilaComparada = z.infer<typeof FilaComparada>;
+
+export const ComparacionExtraida = z.object({
+  artista: z.string(),
+  fecha: z.string().nullable(),
+  hoja: z.string(),
+  filas: z.array(FilaComparada),
+});
+export type ComparacionExtraida = z.infer<typeof ComparacionExtraida>;
+
 /** El archivo del plano lo entrega el lector aparte (bytes); aquí va su nombre. */
 export const PlanoExtraido = z.object({
   artista: z.string(),
@@ -120,5 +149,7 @@ export const Extraccion = z.object({
   canales: z.array(CanalExtraido).default([]),
   requisitos: z.array(RequisitoExtraido).default([]),
   planos: z.array(PlanoExtraido).default([]),
+  /** Solo para mostrar el pedido junto a la propuesta: los ítems (y los totales) salen de `items`. */
+  comparaciones: z.array(ComparacionExtraida).default([]),
 });
 export type Extraccion = z.infer<typeof Extraccion>;

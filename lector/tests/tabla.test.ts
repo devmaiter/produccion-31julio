@@ -38,18 +38,40 @@ describe("tablas de backline en Excel", () => {
       "1 PEARL MASTER CUSTOM [Drum]", '1 22" KICK [Drum]', '3 8" 10" 12" RACK TOM [Drum]', "6 BOOM CYMBALS STAND [Hardware]",
     ]);
     expect(kap[0]).toMatchObject({ dudoso: true, nota: "sin cantidad en la hoja", fecha: "2026-09-12", categoria: "Batería" });
-    expect(kap[3]!.categoria).toBe("Bases");
+    expect(kap[3]!.categoria).toBe("Batería"); // el hardware de la batería es batería
     const req = e.requisitos.find(r => r.artista === "Kapanga")!;
     expect(req.tema).toBe("backline");
     expect(req.texto).toContain("1 Bombo 22”");
     expect(req.texto).toContain("6 soportes de platillo con boom");
     expect(e.items.filter(i => i.artista === "Poligamia").map(i => i.descripcion)).toEqual(["Mapex Saturn", 'kick 24"', 'rack tom 12"', "BOOM CYMBALS STAND"]);
   });
+  it("lo que pide la banda contra lo propuesto, fila por fila como en la hoja", async () => {
+    const e = leerTablas(await leerLibro(await libroOml()));
+    expect(e.comparaciones.map(c => `${c.artista} ${c.hoja} ${c.fecha}`)).toEqual(["Kapanga ST4-D1 2026-09-12", "Poligamia ST4-D1 2026-09-12"]);
+    const lado = (l: { cantidad: number | null; texto: string; categoria: string } | null) => (l ? `${l.cantidad ?? "·"} ${l.texto} [${l.categoria}]` : "—");
+    expect(e.comparaciones[0]!.filas.map(f => `${f.fila} ${lado(f.pide)} → ${lado(f.propone)}`)).toEqual([
+      "6 · Sonor Pro Lite o similar [Batería] → · PEARL MASTER CUSTOM [Batería]",
+      '7 1 Bombo 22” [Batería] → 1 22" KICK [Batería]',
+      '8 3 Rack Toms 8”, 10” y 12” [Batería] → 3 8" 10" 12" RACK TOM [Batería]',
+      // Cada lado con su grupo: el pedido sigue en BATERÍA, la propuesta pasó a HARDWARE.
+      "10 6 soportes de platillo con boom [Batería] → 6 BOOM CYMBALS STAND [Batería]",
+    ]);
+    expect(e.comparaciones[0]!.filas[3]).toMatchObject({ pide: { grupo: "Batería" }, propone: { grupo: "Hardware" } });
+    // La categoría de cada propuesta es la misma de su ítem.
+    const kap = e.items.filter(i => i.artista === "Kapanga");
+    expect(e.comparaciones[0]!.filas.map(f => f.propone?.categoria)).toEqual(kap.map(i => i.categoria));
+    expect(e.comparaciones[1]!.filas[0]).toMatchObject({ fila: 6, pide: { cantidad: null, texto: "DW Collector" }, propone: { cantidad: 1, texto: "Mapex Saturn" } });
+    // La hoja plana no tiene requerimiento: no hay comparación.
+    expect(e.comparaciones.some(c => c.artista === "Equipo Solicitado")).toBe(false);
+  });
   it("una hoja plana sin banda: columnas extra como nota y aviso de que no dice la banda", async () => {
     const e = leerTablas(await leerLibro(await libroOml()));
     const eq = e.items.filter(i => i.artista === "Equipo Solicitado");
     expect(eq.map(i => `${i.cantidad} ${i.descripcion} [${i.grupo ?? "-"}]`)).toEqual(["1 DW COLLECTORS SERIES [-]", '1 22" KICK [-]', "5 BOOM CYMBAL STAND [Hardware]"]);
     expect(eq[0]!.nota).toBe("dias: 2 · valor: 800000");
+    // Es un listado general: cada ítem lo dice, para no mostrarlo como si fuera una banda.
+    expect(eq.every(i => i.sinBanda === true)).toBe(true);
+    expect(e.items.filter(i => i.artista !== "Equipo Solicitado").some(i => i.sinBanda)).toBe(false);
     expect(e.avisos).toEqual([`EQUIPO SOLICITADO: la tabla no dice de qué banda es; quedó como "Equipo Solicitado".`]);
   });
   it("leerDesglose usa las tablas cuando el libro no es el desglose y empareja con el evento", async () => {

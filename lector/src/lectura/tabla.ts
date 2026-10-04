@@ -12,7 +12,7 @@
  * requisito, para no contar el equipo dos veces.
  */
 import { categorizar } from "../dominio/categorias";
-import type { Extraccion } from "./esquema";
+import type { Extraccion, FilaComparada } from "./esquema";
 import { nombrePropio } from "./interpretar";
 import { extraccionVacia } from "./unir";
 import type { Hoja, Libro } from "./xlsx";
@@ -35,7 +35,8 @@ const NO_ES_BANDA = /^(cat|rider|set\s+[a-z]|stage\s*\d*|escenario|cant|d[ií]a|
 const REQUERIMIENTO = /requerimiento|rider|solicit|pide|request/i;
 const PROPUESTA = /propuesta|propone|oml|equipo|backline|suministr|entrega|proposal/i;
 
-interface Bloque { hoja: Hoja; fila: number; col: number; fin: number; titulo: string; banda: string | null; fecha: string | null; escenario: string | null; filas: Array<{ cantidad: number | null; texto: string; extras: string[] }> }
+interface FilaBloque { fila: number; cantidad: number | null; texto: string; extras: string[] }
+interface Bloque { hoja: Hoja; fila: number; col: number; fin: number; titulo: string; banda: string | null; fecha: string | null; escenario: string | null; filas: FilaBloque[] }
 
 export function leerTablas(libro: Libro, ctx: ContextoTabla = {}): Extraccion {
   const ext = extraccionVacia();
@@ -71,6 +72,8 @@ export function leerTablas(libro: Libro, ctx: ContextoTabla = {}): Extraccion {
     const artista = ctx.emparejar?.(nombre) ?? nombre;
     if (!ext.artistas.includes(artista)) ext.artistas.push(artista);
     const hayPropuesta = suyos.some(b => PROPUESTA.test(b.titulo)) && suyos.some(b => REQUERIMIENTO.test(b.titulo));
+    // Ninguna banda encima de la tabla ni dada por quien la sube: es un listado general, no el rider de una banda.
+    const sinBanda = !suyos.some(b => b.banda) && !ctx.artista;
     for (const b of suyos) {
       if (b.escenario && !ext.escenarios.includes(b.escenario)) ext.escenarios.push(b.escenario);
       const fecha = b.fecha ?? ctx.fecha ?? null;
@@ -78,23 +81,24 @@ export function leerTablas(libro: Libro, ctx: ContextoTabla = {}): Extraccion {
       if (hayPropuesta && REQUERIMIENTO.test(b.titulo)) {
         const texto = b.filas.map(f => (f.cantidad !== null ? `${f.cantidad} ${f.texto}` : f.texto)).join("\n");
         ext.requisitos.push({ artista, tema: "backline", texto: `${b.titulo} (${b.hoja.nombre}):\n${texto}` });
+        // Y fila por fila contra la propuesta que tiene a su derecha, para verlos lado a lado.
+        const propuesta = suyos.filter(o => o !== b && o.hoja === b.hoja && o.fila === b.fila && o.col > b.col && PROPUESTA.test(o.titulo))
+          .sort((x, y) => x.col - y.col)[0];
+        if (propuesta) ext.comparaciones.push({ artista, fecha, hoja: b.hoja.nombre, filas: comparar(b, propuesta) });
         continue;
       }
-      let grupo: string | null = null, anteriorFueGrupo = false;
-      for (const f of b.filas) {
-        // "DRUM" y debajo "PEARL MASTER CUSTOM": dos filas seguidas sin cantidad, la segunda es el modelo, no otro grupo.
-        if (f.cantidad === null && esGrupo(f.texto) && !anteriorFueGrupo) { grupo = nombrePropio(f.texto.replace(/[:\s]+$/, "")); anteriorFueGrupo = true; continue; }
-        anteriorFueGrupo = false;
+      for (const { grupo, ...f } of recorrer(b)) {
         const sinCantidad = f.cantidad === null;
         const item: Extraccion["items"][number] = {
           artista, fecha, grupo, descripcion: f.texto, cantidad: sinCantidad ? 1 : f.cantidad!,
           categoria: categorizar(`${f.texto} ${grupo ?? ""}`), proveedor: null,
           dudoso: sinCantidad, nota: [sinCantidad ? "sin cantidad en la hoja" : "", ...f.extras].filter(Boolean).join(" · ") || null,
+          ...(sinBanda ? { sinBanda: true } : {}),
         };
         ext.items.push(item);
       }
     }
-    if (!suyos.some(b => b.banda) && !ctx.artista) ext.avisos.push(`${suyos[0]!.hoja.nombre}: la tabla no dice de qué banda es; quedó como "${artista}".`);
+    if (sinBanda) ext.avisos.push(`${suyos[0]!.hoja.nombre}: la tabla no dice de qué banda es; quedó como "${artista}".`);
   }
   return ext;
 }
@@ -134,9 +138,34 @@ function leerBloque(h: Hoja, fila: number, col: number, fin: number, ctx: Contex
     if (!t) continue;
     const n = q.match(/\d+([.,]\d+)?/);
     const cantidad = n ? Math.round(Number(n[0].replace(",", "."))) : (q && !/x/i.test(q) ? null : null);
-    filas.push({ cantidad, texto: t.replace(/\s+/g, " "), extras: extras.map(([c, tit]) => { const v = h.celda(r, c).trim(); return v ? `${tit.toLowerCase()}: ${v}` : ""; }).filter(Boolean) });
+    filas.push({ fila: r, cantidad, texto: t.replace(/\s+/g, " "), extras: extras.map(([c, tit]) => { const v = h.celda(r, c).trim(); return v ? `${tit.toLowerCase()}: ${v}` : ""; }).filter(Boolean) });
   }
   return { hoja: h, fila, col, fin, titulo, banda, fecha, escenario, filas };
+}
+
+/** Las filas de un bloque sin los encabezados de grupo, cada una con su grupo. */
+function recorrer(b: Bloque): Array<FilaBloque & { grupo: string | null }> {
+  const out: Array<FilaBloque & { grupo: string | null }> = [];
+  let grupo: string | null = null, anteriorFueGrupo = false;
+  for (const f of b.filas) {
+    // "DRUM" y debajo "PEARL MASTER CUSTOM": dos filas seguidas sin cantidad, la segunda es el modelo, no otro grupo.
+    if (f.cantidad === null && esGrupo(f.texto) && !anteriorFueGrupo) { grupo = nombrePropio(f.texto.replace(/[:\s]+$/, "")); anteriorFueGrupo = true; continue; }
+    anteriorFueGrupo = false;
+    out.push({ ...f, grupo });
+  }
+  return out;
+}
+
+/** Requerimiento y propuesta por fila de la hoja, como se ven en el Excel. Cada lado
+ *  lleva su categoría (la de la propuesta es la misma que la de su ítem). */
+function comparar(pide: Bloque, propone: Bloque): FilaComparada[] {
+  const lado = (f: (FilaBloque & { grupo: string | null }) | undefined) => f
+    ? { cantidad: f.cantidad, texto: f.texto, grupo: f.grupo, categoria: categorizar(`${f.texto} ${f.grupo ?? ""}`) }
+    : null;
+  const p = new Map(recorrer(pide).map(f => [f.fila, f]));
+  const q = new Map(recorrer(propone).map(f => [f.fila, f]));
+  const filas = [...new Set([...p.keys(), ...q.keys()])].sort((a, b) => a - b);
+  return filas.map(fila => ({ fila, pide: lado(p.get(fila)), propone: lado(q.get(fila)) }));
 }
 
 /** "BATERÍA", "Hardware", "SAX / PERCUSIÓN", "Teclados:" — corto, sin números y sin marca. */

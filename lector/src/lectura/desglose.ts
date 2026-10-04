@@ -46,7 +46,7 @@ const DIA = /day\s*(\d+)|d[ií]a\s*(\d+)/i;
 
 export async function leerDesglose(bytes: Uint8Array, nombreArchivo: string, ctx: ContextoDesglose = {}): Promise<LecturaDesglose> {
   const libro = await leerLibro(bytes);
-  const ext: Extraccion = { evento: null, escenarios: [], dias: [], artistas: [], bloques: [], items: [], avisos: [], zonas: [], puestos: [], canales: [], requisitos: [], planos: [] };
+  const ext: Extraccion = { evento: null, escenarios: [], dias: [], artistas: [], bloques: [], items: [], avisos: [], zonas: [], puestos: [], canales: [], requisitos: [], planos: [], comparaciones: [] };
   const imagenes: ImagenPlano[] = [];
   const base = ctx.base ?? null;
   const eventoId = ctx.eventoId ?? base?.evento.id ?? "evento";
@@ -174,7 +174,7 @@ export async function leerDesglose(bytes: Uint8Array, nombreArchivo: string, ctx
   /* ---- Cualquier otra hoja con tablas "Cant | descripción" -------------- */
   const conocida = (h: Hoja) => numeroDia(h) !== null && /backline|riser|tarima|power|energ|crew|io\s*list|input\s*list|patch|stage\s*plots?|planos?/i.test(h.nombre) || /^backline\s+[a-z]{2,4}$/i.test(h.nombre);
   const tablas = leerTablas(libro, { artista: ctx.artista, fecha: ctx.fecha, anio: ctx.anio ?? (base ? Number(base.evento.desde?.slice(0, 4)) : undefined), emparejar: artista, omitir: conocida });
-  for (const k of ["items", "requisitos", "avisos"] as const) (ext[k] as unknown[]).push(...tablas[k]);
+  for (const k of ["items", "requisitos", "avisos", "comparaciones"] as const) (ext[k] as unknown[]).push(...tablas[k]);
   for (const e of tablas.escenarios) if (!ext.escenarios.includes(e)) ext.escenarios.push(e);
   for (const d of tablas.dias) if (!ext.dias.some(x => x.fecha === d.fecha)) ext.dias.push(d);
   if (!ext.items.length && !ext.zonas.length && !ext.canales.length && !ext.planos.length) {
