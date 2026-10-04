@@ -10,7 +10,7 @@
  *   - encabezados: de grupo ("DRUMS", "Bass") o de artista ("LOS RAYOS")
  * Lo que no entiende no lo inventa: lo devuelve en avisos para revisarlo.
  */
-import { categorizar, NUNCA_BACKLINE } from "../dominio/categorias";
+import { CAJA_AMPLI, categorizar, NUNCA_BACKLINE } from "../dominio/categorias";
 import type { Categoria, PaqueteEvento } from "../dominio/entidades";
 import { separarCantidad } from "../dominio/lista";
 import type { Documento, Linea } from "./documento";
@@ -295,6 +295,20 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const alt = marcaAlternativa(sinCola);
       if (alt !== undefined) { modoAlternativa = alt; if (letras(sinCola) < 4 || /^(opci[oó]n|sustitu|alternativa|spare|.*\bspare)/i.test(sinCola) && sinCola.split(/\s+/).length <= 4) { anotar("nota", alt ? "empiezan alternativas" : "vuelve lo preferido"); continue; } }
       if (bloqueHorario(texto)) { anotar("horario", "hora de un bloque"); continue; }
+      // "1 Ampeg SVT Classic + 8x10": cabezal y caja son dos piezas (lo definió el usuario).
+      const ampli = cabezalYCaja(texto);
+      if (ampli) {
+        const antesA = ext.items.length;
+        for (const parte of ampli) {
+          const a = ext.items.length;
+          if (item(parte, l) && ext.items.length > a) {
+            itemsDelSubgrupo++; anotar("item", "cabezal y caja por separado", ext.items.length - 1);
+            const g = grupo as string | null;
+            fueraDeSeccion.set(ext.items.length - 1, seccion === "neutra" && !(g && (GRUPOS.test(g) || esTituloGenerico(g) || categorizar(g) !== "Otro")));
+          }
+        }
+        if (ext.items.length > antesA) continue;
+      }
       const antes = ext.items.length, artistaAntes = artista;
       if (item(texto, l)) {
         if (ext.items.length > antes) {
@@ -623,6 +637,20 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
  *   - una frase que sigue en minúscula: "Cada equipo deberá…" + "condiciones de…"
  *   - una lista corrida: "4 Boom Stand 3" + "Snare Stand 1 Hi" + "Hat Stand 1 Kick"
  *     → "4 Boom Stand", "3 Snare Stand", "1 Hi Hat Stand", "1 Kick …" */
+/** "1 Ampeg SVT Classic + 8x10" → ["1 Ampeg SVT Classic", "1 Caja 8x10"]; null si no es cabezal + caja. */
+export function cabezalYCaja(t: string): string[] | null {
+  if (!t.includes("+")) return null;
+  const m = t.match(/^\s*(\d{1,2})\s*(?:x\s+)?(?=\p{L})/u);
+  const cant = m ? m[1]! : "1";
+  const partes = (m ? t.slice(m[0].length) : t).split(/\s*\+\s*/).map(p => p.trim()).filter(Boolean);
+  if (partes.length < 2) return null;
+  const esCaja = (p: string) => CAJA_AMPLI.test(p);
+  const esAmpli = (p: string) => ["Ampli bajo", "Ampli guitarra"].includes(categorizar(p)) || /\b(head|cabezal|amp)\b/i.test(p);
+  if (!partes.some(esCaja) || !partes.some(p => esAmpli(p) && !esCaja(p))) return null;
+  // Una caja escrita solo con la medida ("8x10") se nombra: "Caja 8x10".
+  return partes.map(p => `${cant} ${/^[\d\s x×"”]+$/i.test(p) ? `Caja ${p}` : p}`);
+}
+
 /** Un renglón que termina en preposición, conjunción o coma sigue en el próximo. */
 const COLGADO = /(\b(para|de|del|con|sin|y|e|o|u|la|el|los|las|en|por|tipo|for|of|with|and|or|the|to)|,)$/i;
 

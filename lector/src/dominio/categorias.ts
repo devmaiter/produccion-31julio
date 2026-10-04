@@ -39,8 +39,17 @@ const SECCION_PERCUSION = /\b(percusi[oó]n|percussion|percu|perc)\b/i;
 const ALFOMBRA = /\b(alfombras?|tapetes?|carpets?|rugs?|mats?)\b/i;
 const HARDWARE = /\b(stands?|soportes?|bases?|sillas?|banquetas?|asientos?|throne|stool|tapetes?|alfombras?|carpet|rug|mat|pedal(es)?)\b/i;
 
-/** Lo que nunca es backline aunque venga con el backline (lo definió el usuario: risers y sobretarimas). */
-export const NUNCA_BACKLINE = /\b(risers?|drum ?risers?|sobre ?-?tarimas?|sobretarimas?|stage ?dex|plataformas?)\b/i;
+/** Lo que nunca es backline aunque venga con el backline (lo definió el usuario): risers y sobretarimas,
+ *  pedestales de micrófono, cajas directas, cables y la corriente en tarima. */
+export const NUNCA_BACKLINE = new RegExp([
+  "\\b(risers?|drum ?risers?|sobre ?-?tarimas?|sobretarimas?|stage ?dex|plataformas?)\\b",
+  "\\bpedestal(es)?\\b|\\bpies? de micr[oó]fonos?|\\bmic(rophone)? stands?\\b|\\bstands? (de |para )?(micr[oó]fonos?|mics?)\\b|\\bjirafas?\\b",
+  "\\bcajas? directas?|\\bdirect ?box(es)?\\b|\\bdi ?box(es)?\\b|\\bd\\.i\\.|\\bDI\\b",
+  "\\bcables?\\b|\\bcableado\\b|\\bextensi[oó]n(es)?\\b|\\bregletas?\\b|\\bmultitomas?\\b|\\bpower ?strips?\\b|\\btransformador(es)?\\b|\\bconvertidor(es)?\\b|\\bups\\b",
+].join("|"), "i");
+
+/** "Ampeg SVT Classic + 8x10": la caja de un ampli (para separarla del cabezal). */
+export const CAJA_AMPLI = /\b(\d{1,2}\s*[x×]\s*(10|12|15)\b|cabinets?|\bcab\b|cajas?\b|bafles?|810e?|412|410|212|115)/i;
 
 export function categorizar(texto: string): Categoria {
   // "Congas LP con sus bases", "Timbales con base": la base viene con el instrumento, no es una base.
