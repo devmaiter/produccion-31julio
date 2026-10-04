@@ -49,6 +49,32 @@ export interface RenglonLeido {
 export const CONFIANZA_MINIMA = 75;
 
 const GRUPOS = /^(drums?|drum ?kit|bater[ií]a|hardware( set)?|cymbals?( set)?|cymbal set|set cymbals|platillos|percussion|percusi[oó]n|bass|bajo|guitars?|guitarras?|keys|keyboards?|teclados?|tecaldo|dj( set)?|misc(elaneous)?|varios|otros|backline|equipos?|stage|tarima|amps?|amplificadores?|vientos|brass|horns|strings|cuerdas|vocals?|voces|power|energ[ií]a|cables|accesorios|sobre\s*tarimas?|risers?)$/i;
+/* Títulos de sección hechos solo de palabras genéricas de instrumentos, como los escribe cada
+ * rider a su manera: "Baterías", "Amplificadores de bajo", "Amplificadores de Guitarras
+ * Eléctricas", "Teclado / Piano", "Percu", "Adicionales". Un modelo ("Fender Twin Reverb") no lo es. */
+const PALABRAS_TITULO = new Set(("bateria baterias drum drums kit kits hardware platillo platillos cymbal cymbals percu perc percusion percussion " +
+  "bajo bajos bass basses guitarra guitarras guitar guitars electrica electricas electrico electricos electric acustica acusticas acoustic " +
+  "amplificador amplificadores amp amps ampli amplis teclado teclados keys keyboard keyboards piano pianos synth synths " +
+  "sintetizador sintetizadores adicional adicionales extra extras otros varios misc miscelaneos accesorios vientos brass horns cuerdas " +
+  "strings dj backline").split(" "));
+const CONECTORES_TITULO = new Set(["de", "del", "y", "e", "para", "la", "las", "el", "los", "and", "for", "the", "of"]);
+export function esTituloGenerico(t: string): boolean {
+  const s = t.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[\s:·|–—-]+$/, "");
+  if (/\d/.test(s) || s.length > 50) return false;
+  const palabras = s.split(/[\s/&+,()-]+/).filter(Boolean);
+  if (!palabras.length || palabras.length > 6) return false;
+  return palabras.some(p => PALABRAS_TITULO.has(p)) && palabras.every(p => PALABRAS_TITULO.has(p) || CONECTORES_TITULO.has(p));
+}
+/** Títulos de un rider que no son el nombre de la banda. */
+const NO_ES_NOMBRE = /^(informaci[oó]n|contactos?|contact|datos|[ií]ndice|contenidos?|introducci[oó]n|presentaci[oó]n|requerimientos?|requisitos?|importante|management|producci[oó]n|staff|notas?|generalidades|tabla de contenido|tour|gira|world tour)\b/i;
+/** Marcas de backline: un título que empieza por una de ellas es el modelo de la sección. */
+const MARCA_EQUIPO = /^(yamaha|dw|pearl|tama|ludwig|gretsch|sonor|mapex|zildjian|paiste|sabian|meinl|istanbul|lp|fender|ampeg|marshall|vox|orange|mesa|roland|nord|korg|kurzweil|moog|gibson|hartke|aguilar|markbass|gallien|evans|remo|aquarian|vic)$/i;
+/** Correos y teléfonos: nunca son backline. */
+const CONTACTO = /[\w.+-]+@[\w-]+\.[\w.]+|\+\d{1,3}[\s.)-]*\d{2,3}[\s.-]?\d{3,4}[\s.-]?\d{3,4}|\b\d{3}[\s.-]\d{3}[\s.-]\d{4}\b|\(\+?\d{2,3}\)\s*\d{3}/;
+/** Consumibles: nunca son backline, aunque nombren una marca de amplis ("ORANGE GAFFER TAPE"). */
+const CONSUMIBLE = /\b(gaf+er|tape|cinta|pilas?|batteries|procell|duracell|toallas?|towels?)\b/i;
+/** Banda de un rider que no dice su nombre en el texto. */
+export const SIN_NOMBRE = "Banda sin nombre";
 const MARCAS = /\b(puertas|doors|noise curfew|curfew|almuerzo|lunch|cena|dinner|break|receso|apertura|cierre)\b/i;
 const TIPO_BLOQUE: Array<[RegExp, Extraccion["bloques"][number]["tipo"]]> = [
   [/\b(line ?check)\b/i, "linecheck"],
@@ -70,10 +96,10 @@ const PROVEEDOR_SUELTO = /^(cn|oml|backline( cop)?|propio|banda)$/i;
  * Esas secciones tienen cantidades ("1 VAN para 15 personas", "27 SNARE 2 SM57")
  * que no son backline; dentro de ellas no se leen ítems. */
 const SECCION_BACKLINE = /^(backline|back line|instrumentos|requerimientos? de backline|equipos? de backline|listado de backline|lista de backline)\b/i;
-const SECCION_AUDIO = /^(input(s| list)?|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|monitor world|mezclas?( de monitores)?|iem|in ?ears?|pa\b|p\.\s?a\.?|sistema de (sonido|pa)|sonido|audio|foh|front of house|consolas?|control (foh|monitor(es|s)?)|microfon[ií]a|micr[oó]fonos|microphones?|mic (list|packages?)|stands? de mic(r[oó]fonos?)?|mic stands?|microphone stands?|cue monitor|arreglo principal|(sub ?)?snakes?|multipares?|wireless|inal[aá]mbricos|rf\b)/i;
-const SECCION_OTRA = /^(stage$|stage plot|planta de escenario|ground support|stage ?hands|power( generators)?|generadores?|moving heads|follow ?spots?|fx$|efectos|led screens?|pantallas led|pronters|prompters?|teleprompters?|quick change|accesorios (artista|ballet|mariachi|staff|producci[oó]n)|alimentos|bebidas|comida|cena|iluminaci[oó]n|planta de iluminaci[oó]n|lighting|luces|lista de materiales|video|pantallas|screens?|led\b|catering|camerinos?|camarines?|dressing ?rooms?|hospitality|alimentaci[oó]n|comidas?|bebidas|hotel(es)?|hospedaje|alojamiento|estad[ií]a|transporte|traslados?|viajes?|vuelos?|seguridad|security|contactos?|contact|comunicaci[oó]n|prensa|grabaci[oó]n|fotograf[ií]a|merch(andising)?|pagos?|contrato|rigging|estructura|energ[ií]a el[eé]ctrica|planta el[eé]ctrica|generador(es)?|radios?|handies|walkie|motorola|intercom|backstage|pre-?show|after-?show|medidas|dimensiones|especiales|control\b|barricada|vallas?|credenciales|acreditaciones|invitaciones|guest ?list)/i;
+const SECCION_AUDIO = /^(input(s| list)?|mixers?( de monitores?)?|mezcladoras?|requerimientos? de (sala|audio|sonido)|amplificaci[oó]n de sala|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|monitor world|mezclas?( de monitores)?|iem|in ?ears?|pa\b|p\.\s?a\.?|sistema de (sonido|pa)|sonido|audio|foh|front of house|consolas?|control (foh|monitor(es|s)?)|microfon[ií]a|micr[oó]fonos|microphones?|mic (list|packages?)|stands? de mic(r[oó]fonos?)?|mic stands?|microphone stands?|cue monitor|arreglo principal|(sub ?)?snakes?|multipares?|wireless|inal[aá]mbricos|rf\b)/i;
+const SECCION_OTRA = /^(stage$|avisos?( importantes?)?$|stage plot|planta de escenario|ground support|stage ?hands|power( generators)?|generadores?|moving heads|follow ?spots?|fx$|efectos|led screens?|pantallas led|pronters|prompters?|teleprompters?|quick change|accesorios (artista|ballet|mariachi|staff|producci[oó]n)|alimentos|bebidas|comida|cena|iluminaci[oó]n|planta de iluminaci[oó]n|lighting|luces|lista de materiales|video|pantallas|screens?|led\b|catering|camerinos?|camarines?|dressing ?rooms?|hospitality|alimentaci[oó]n|comidas?|bebidas|hotel(es)?|hospedaje|alojamiento|estad[ií]a|transporte|traslados?|viajes?|vuelos?|seguridad|security|contactos?|contact|comunicaci[oó]n|prensa|grabaci[oó]n|fotograf[ií]a|merch(andising)?|pagos?|contrato|rigging|estructura|energ[ií]a el[eé]ctrica|planta el[eé]ctrica|generador(es)?|radios?|handies|walkie|motorola|intercom|backstage|pre-?show|after-?show|medidas|dimensiones|especiales|control\b|barricada|vallas?|credenciales|acreditaciones|invitaciones|guest ?list)/i;
 /* Lo que no es backline aunque aparezca con cantidad dentro de la lista. */
-const NO_BACKLINE = /\b(handies?|radios?|walkie|motorola|pilas?|cintas?|gaf+er|toallas?|agua|hielo|bebidas?|personas|habitaci[oó]n(es)?|suburban|vans?|guardias?|sillones?|espejos?|percheros?|(sub ?)?snakes?|multipar(es)?|retornos?|returns|canales|channels|pronters?|prompters?)\b/i;
+const NO_BACKLINE = /\b(handies?|radios?|walkie|motorola|pilas?|cintas?|gaf+er|toallas?|agua|hielo|bebidas?|personas|habitaci[oó]n(es)?|suburban|vans?|guardias?|sillones?|espejos?|percheros?|(sub ?)?snakes?|multipar(es)?|retornos?|returns|canales|channels|pronters?|prompters?|iems?|in ?-?ears?|cuñas?|wedges?|sidefills?|subwoofers?)\b/i;
 /* Renglón de input list: canal, instrumento y micrófono ("27  SNARE 2  SM 57  SHORT BOOM"). */
 const CANAL = /^\d{1,2}\s+.*\b(sm ?\d{2}|beta ?\d{2}|e ?9\d{2}|e ?6\d{2}|md ?4\d{2}|d ?box|di\b|ksm|c ?414|re ?20|m ?88|psm ?\d+|xlr|phantom|short boom|tall boom|claw)\b/i;
 
@@ -114,7 +140,7 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
 }
 
 function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: boolean): Extraccion {
-  const ext: Extraccion = { evento: null, escenarios: [], dias: [], artistas: [], bloques: [], items: [], avisos: [], zonas: [], puestos: [], canales: [], requisitos: [], planos: [] };
+  const ext: Extraccion = { evento: null, escenarios: [], dias: [], artistas: [], bloques: [], items: [], avisos: [], zonas: [], puestos: [], canales: [], requisitos: [], planos: [], comparaciones: [] };
   const base = ctx.base ?? null;
   const conocidos = new Map<string, string>(); // clave → nombre como está registrado
   base?.artistas.forEach(a => conocidos.set(clave(a.nombre), a.nombre));
@@ -127,6 +153,10 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     let escenario: string | null = null;
     let artista = ctx.artista ? registrarArtista(ctx.artista) : null;
     let grupo: string | null = null;
+    // Lo último que se decidió: "DRUMS" y debajo "YAMAHA MAPLE CUSTOM ABSOLUTE" es el modelo, no otra sección.
+    let ultimaEtiqueta: Etiqueta | null = null;
+    // Índice de cada ítem leído en este documento → ¿se leyó fuera de toda sección (antes del backline)?
+    const fueraDeSeccion = new Map<number, boolean>();
     // "La agrupación lleva…" → lo que sigue lo pone el artista; "El festival suministra…" → lo pone la producción.
     let proveedorActual: string | null = null;
     // "Sustituciones aceptables:", "Guitarras spare", "Opción 2 …" → lo que sigue es alternativa, no suma.
@@ -158,14 +188,18 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const l = renglones[n]!;
       const texto = limpiar(l.texto);
       if (!texto || letras(texto) + (texto.match(/\d/g) ?? []).length < 2) continue;
-      const anotar = (etiqueta: Etiqueta, motivo: string, item: number | null = null) =>
+      const anotar = (etiqueta: Etiqueta, motivo: string, item: number | null = null) => {
+        ultimaEtiqueta = etiqueta;
         ctx.traza?.push({ documento: doc.nombre, texto, etiqueta, motivo, seccion, grupo, item });
+      };
       if (riderDe(texto)) { anotar("banda", "nombre del rider"); continue; }
       if (seccion !== "audio" && seccion !== "otra") {
         const sinColaS = texto.replace(/[\s:·|–—-]+$/, "");
         const conMusico = grupoConMusico(sinColaS);
         if (conMusico) { ponerGrupo(nombrePropio(conMusico)); modoAlternativa = false; seccion = "backline"; anotar("grupo", "instrumento y músico"); continue; }
-        if (grupo && esSubtitulo(sinColaS) && !otraFamilia(sinColaS)) {
+        // "Amplificadores de bajo" después de "Baterías" nombra otro instrumento: no es subtítulo, es otra sección.
+        const otroInstrumento = !!familiaDe(sinColaS) && familiaDe(sinColaS) !== familiaGrupo;
+        if (grupo && esSubtitulo(sinColaS) && !otraFamilia(sinColaS) && !otroInstrumento) {
           listaOpciones = false; ranking = false; enParches = false; modoAlternativa = false;
           if (/\b(options?|opciones?|opci[oó]n)\b/i.test(sinColaS) && !/^no\b/i.test(sinColaS)) {
             listaOpciones = true; ranking = /prioridad|priority/i.test(sinColaS);
@@ -194,6 +228,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         continue;
       }
       if (CANAL.test(texto)) { anotar("no-backline", "canal del input list (instrumento + micrófono)"); continue; }
+      // Un correo o un teléfono nunca es backline (y no debe terminar en una planilla).
+      if (CONTACTO.test(texto)) { anotar("no-backline", "datos de contacto"); continue; }
       // "IMAGEN DE EJEMPLO" (debajo de una foto) y "2 SETS DE BATERÍAS IGUALES" (la tabla ya trae las cantidades).
       if (/^(imagen|foto|image|picture)s? (de )?(ejemplo|referencia|example|reference)\b/i.test(texto)) { anotar("nota", "pie de foto"); continue; }
       if (/\bsets? de (bater[ií]as?|drums?)\b|\biguales\b|\bidentical\b/i.test(texto) && texto.split(/\s+/).length <= 7) { anotar("nota", "dice cuántos sets; las cantidades vienen en la tabla"); continue; }
@@ -205,12 +241,26 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (nota(texto)) { anotar("nota", "nota del rider"); continue; }
       const sinCola = texto.replace(/[\s:·|–—-]+$/, "");
       const pegados = variosGrupos(sinCola);
-      if (GRUPOS.test(sinCola) || pegados) {
+      // Un renglón con viñeta ("• Bajo eléctrico") es un equipo de una lista, no un título.
+      // "PERCUSSION (MEINL PROFESSIONAL SERIES)", "BAJO (Omar)": el título sin lo que va entre paréntesis.
+      const sinParentesis = sinCola.replace(/\s*\([^)]*\)\s*$/, "");
+      if (GRUPOS.test(sinCola) || (sinParentesis !== sinCola && GRUPOS.test(sinParentesis)) || pegados || (esTituloGenerico(sinCola) && !/^\s*[•●▪◦·*–-]/.test(l.texto))) {
         // "CYMBALS" después de "DRUMS": es la misma batería, sigue en su grupo.
         if (grupo && familiaGrupo && familiaDe(sinCola) === familiaGrupo) { anotar("nota", "subtítulo del mismo instrumento"); continue; }
         ponerGrupo(nombrePropio(pegados ?? sinCola)); modoAlternativa = false; anotar("grupo", "título de instrumento"); continue;
       }
-      if (encabezadoFuerte(sinCola, l)) { ponerGrupo(nombrePropio(sinCola)); modoAlternativa = false; anotar("grupo", "título en mayúsculas"); continue; }
+      // Dentro de una sección, sin cantidad, empieza por una marca y no nombra ningún equipo
+      // ("YAMAHA MAPLE CUSTOM ABSOLUTE" dentro de DRUMS): es el modelo. "Fender Twin Reverb" sí es un ampli.
+      const primera = sinCola.split(/[\s(]/)[0]!;
+      if (grupo && !/^\d/.test(sinCola) && sinCola.split(/\s+/).length <= 6 && !/[.:;]$/.test(sinCola)
+        && MARCA_EQUIPO.test(primera) && !GRUPOS.test(primera) && !esTituloGenerico(primera) && categorizar(sinCola) === "Otro") {
+        anotar("nota", "marca o modelo de la sección"); continue;
+      }
+      if (encabezadoFuerte(sinCola, l)) {
+        // Justo debajo del título de la sección, sin nada en medio: es la marca o el modelo, no otra sección.
+        if (ultimaEtiqueta === "grupo" && grupo) { anotar("nota", "marca o modelo de la sección"); continue; }
+        ponerGrupo(nombrePropio(sinCola)); modoAlternativa = false; anotar("grupo", "título en mayúsculas"); continue;
+      }
       // "* LA BATERÍA DEBERÁ CONTAR CON PARCHES NUEVOS": indicación, no equipo.
       if (/\b(deber[aá]n?|debe|should|must)(?!\p{L})/iu.test(texto) && !/^\d/.test(texto)) { anotar("nota", "indicación del rider"); continue; }
       if (enParches && !/^\d/.test(texto)) { anotar("nota", "parches recomendados"); continue; }
@@ -229,8 +279,13 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (bloqueHorario(texto)) { anotar("horario", "hora de un bloque"); continue; }
       const antes = ext.items.length, artistaAntes = artista;
       if (item(texto, l)) {
-        if (ext.items.length > antes) { itemsDelSubgrupo++; anotar("item", "equipo con cantidad o reconocido", ext.items.length - 1); }
-        else anotar("no-backline", artistaAntes ? "radios, pilas, cinta… no son backline" : "parece backline pero no se sabe de qué banda");
+        if (ext.items.length > antes) {
+          itemsDelSubgrupo++; anotar("item", "equipo con cantidad o reconocido", ext.items.length - 1);
+          // Fuera de toda sección y sin un título de instrumento encima ("RIDER TÉCNICO" no lo es).
+          const g = grupo as string | null; // ponerGrupo lo cambia desde una función: TypeScript no lo ve
+          const deInstrumento = !!g && (GRUPOS.test(g.replace(/\s*\([^)]*\)\s*$/, "")) || esTituloGenerico(g) || categorizar(g) !== "Otro");
+          fueraDeSeccion.set(ext.items.length - 1, seccion === "neutra" && !deInstrumento);
+        } else anotar("no-backline", artistaAntes ? "radios, pilas, cinta… no son backline" : "parece backline pero no se sabe de qué banda");
         continue;
       }
       if (!ctx.fecha && diaDeLinea(texto)) { anotar("dia", "fecha"); continue; }
@@ -240,6 +295,22 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (!ext.evento && tituloEvento(texto)) { anotar("evento", "nombre del evento"); continue; }
       anotar("sin-interpretar", "no lo entendí");
       sinInterpretar.push(texto);
+    }
+
+    // Si el rider tiene sección de backline (o títulos de instrumento), lo que se leyó antes, fuera de
+    // toda sección (medidas de la tarima, wifi, consolas…), no era backline: se quita.
+    if ([...fueraDeSeccion.values()].some(fuera => !fuera)) {
+      const quitar = new Set([...fueraDeSeccion].filter(([, fuera]) => fuera).map(([i]) => i));
+      if (quitar.size) {
+        const nuevoIndice = new Map<number, number>();
+        const quedan = ext.items.filter((_, i) => { if (quitar.has(i)) return false; nuevoIndice.set(i, nuevoIndice.size); return true; });
+        ext.items.splice(0, ext.items.length, ...quedan);
+        for (const r of ctx.traza ?? []) {
+          if (r.item === null) continue;
+          if (quitar.has(r.item)) { r.etiqueta = "no-backline"; r.motivo = "antes de la sección de backline"; r.item = null; }
+          else r.item = nuevoIndice.get(r.item) ?? r.item;
+        }
+      }
     }
 
     // Subtítulos cortos ("Instrumento", "Amplificación", "Configuración:") no hace falta revisarlos.
@@ -264,12 +335,13 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (esperarArtista) {
         esperarArtista = false;
         const nombre = t.replace(/\b(19|20)\d\d\b/g, "").replace(/[\s:·|–—-]+$/, "").trim();
-        const saludo = SALUDO.test(nombre);
+        // "RIDER TÉCNICO 2026" y debajo "INFORMACIÓN DE CONTACTO" u "HOLA": el nombre no está en el texto
+        // (suele ir en el logo). Se busca el nombre que el rider repite; si no, se escribe al revisar.
+        const saludo = SALUDO.test(nombre) || NO_ES_NOMBRE.test(nombre);
         if (!saludo && letras(nombre) >= 3 && nombre.split(/\s+/).length <= 6 && !/[.?!,;]/.test(nombre)) { fijar(nombre); return true; }
-        // El nombre venía en un logo (imagen) y lo siguiente es "HOLA": se busca el nombre que el rider repite.
         const repetido = nombreRepetido(doc.lineas);
-        if (repetido) fijar(repetido);
-        return saludo;
+        if (repetido) fijar(repetido); else if (saludo) fijar(SIN_NOMBRE);
+        return saludo && SALUDO.test(nombre);
       }
       return false;
     }
@@ -311,7 +383,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (FRASE.test(t) || (/\.$/.test(t) && t.split(" ").length > 6)) {
         const [primera, ...resto] = t.replace(/\.$/, "").split(FRASE).map(x => x.trim());
         const arranque = /^(las?|los|el|es|son|se|debe|deber[aá]n?|cada|todos?|est[aeo]s?|hay|no|si|para|por|en|con)\b/i;
-        if (primera && primera.split(" ").length <= 12 && categorizar(primera) !== "Otro" && !/^\d/.test(primera) && !arranque.test(primera)) {
+        // "2 Mesas de percusión. Especial atención a estas bases…": la cantidad y el equipo van en la primera oración.
+        if (primera && primera.split(" ").length <= 12 && categorizar(primera) !== "Otro" && (!/^\d/.test(primera) || /^\d{1,2}\s+\p{L}/u.test(primera)) && !arranque.test(primera)) {
           t = primera; redactado = resto.length > 0;
         }
       }
@@ -351,7 +424,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         if (notas.length) descripcion += ` (${notas.join(", ")})`;
       } else {
         // "Snare stand 2 CN" cuando el OCR juntó las columnas
-        const junta = t.match(/^(.+?\p{L}.*?)\s+(\d{1,3})\s+(CN|OML|BACKLINE(?: COP)?|[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ]{1,15}(?: [A-ZÁÉÍÓÚÑ]{2,15})?)$/u);
+        // Si el renglón ya empieza con la cantidad ("2 ROLAND JC 120 JAZZ CHORUS", "1 MEINL CORTINA 27 BARRAS"),
+        // el número del medio es del modelo y lo último no es un proveedor.
+        const junta = /^\d{1,3}\s*\p{L}/u.test(t) ? null : t.match(/^(.+?\p{L}.*?)\s+(\d{1,3})\s+(CN|OML|BACKLINE(?: COP)?|[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ]{1,15}(?: [A-ZÁÉÍÓÚÑ]{2,15})?)$/u);
         const conCat = t.match(/^([\p{L}][\p{L}\s/&]{1,40}):\s*(.+)$/u); // "Platillos: 1 ride, 2 crash"
         if (junta && letras(junta[1]!) >= 3) {
           descripcion = junta[1]!; cantidad = +junta[2]!; proveedor = junta[3]!; explicita = true;
@@ -362,11 +437,17 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
           if (conCat && cuerpo !== t) descripcion = `${conCat[1]}: ${descripcion}`;
         }
       }
-      descripcion = descripcion.replace(/^[\s•·*-]+/, "").replace(/[\s:,;.·|–—-]+$/, "").trim();
+      descripcion = descripcion.replace(/^[\s•·*-]+/, "").replace(/[\s:,;.·|–—-]+$/, "").trim()
+        // "2 (dos) Fender Hot Rod…": la cantidad escrita en letras ya está en el número.
+        .replace(/^\((?:uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|one|two|three|four|five|six|seven|eight|nine|ten)\)\s*/i, "")
+        // "2 SNARE DRUM 14” X 5” WITH" (lo que sigue quedó en otro ítem): sin la palabra colgando.
+        .replace(/\s+(with|w\/|con|y|and|para|for|de|of)$/i, "");
       if (!explicita && /:$/.test(t)) return false; // "BASS ASI:" es un encabezado, no un ítem
-      // Sin cantidad, más de 8 palabras es una frase del rider ("Cada equipo deberá estar en perfectas condiciones…").
+      // Sin cantidad, más de 8 palabras es una frase del rider ("Cada equipo deberá estar en perfectas condiciones…"),
+      // salvo una lista de modelos ("Ampeg SVT Classic/SVT PRO 3/ SVT PRO 4 + Ampeg SVT810E, Fender Rumble 500 o Aguilar AG700").
       const palabras = descripcion.replace(/\([^)]*\)/g, " ").split(/\s+/).filter(w => letras(w) > 0).length;
-      if (!explicita && opcion === null && palabras > 8) return false;
+      const deFrase = /\b(debe|deber[aá]n?|deben|estar|est[eé]n|ser[aá]n?|tener|tengan|cada|todos?|todas?|necesitamos|requerimos|solicitamos|favor|que|cuando|must|should|will|please|each|every)\b/i;
+      if (!explicita && opcion === null && palabras > 8 && (deFrase.test(descripcion) || !/\d/.test(descripcion))) return false;
       // "TOMS 10”, 12”" son dos toms.
       if (!explicita && /^toms?\b/i.test(descripcion)) {
         const medidas = descripcion.match(/\b\d{1,2}\s*(?:["”″]|pulg)/g) ?? [];
@@ -375,6 +456,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.length > (explicita || opcion !== null ? 140 : 90)) return false;
       const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
       if (NO_BACKLINE.test(descripcion) && categorizar(principal ?? descripcion) === "Otro") return true; // radios, pilas, cinta: se lee pero no es backline
+      if (CONSUMIBLE.test(descripcion)) return true; // "ORANGE GAFFER TAPE": la marca de un ampli no lo vuelve backline
       // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
       // (salvo lo que la banda dice que trae: "Gaita hembra" también cuenta).
       const loTraeLaBanda = proveedorActual === "ARTISTA" && !proveedor && descripcion.split(" ").length <= 4 && !/[.?!]$/.test(t);
@@ -404,7 +486,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
 
     /** "Nota: los parches deben ser REMO" → se guarda como requisito, no como ítem. */
     function nota(t: string): boolean {
-      const m = t.match(/^(?:nota|note|nb|observaci[oó]n|importante)\s*[:.-]\s*(.+)$/i);
+      // "Sugerimos: Tama Star Classic, Yamaha recording custom o similares." es el modelo que prefieren, sin cantidad.
+      const m = t.match(/^(?:nota|note|nb|observaci[oó]n|importante|sugerimos|sugerido|sugerencia|sugerida|preferiblemente|preferible|preferido|preferida|recomendado|recomendamos|suggested|preferred|recommended)\s*[:.-]\s*(.+)$/i);
       if (!m) return false;
       if (artista) ext.requisitos.push({ artista, tema: "otro", texto: m[1]!.trim() });
       return true;
@@ -519,6 +602,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
  *   - una frase que sigue en minúscula: "Cada equipo deberá…" + "condiciones de…"
  *   - una lista corrida: "4 Boom Stand 3" + "Snare Stand 1 Hi" + "Hat Stand 1 Kick"
  *     → "4 Boom Stand", "3 Snare Stand", "1 Hi Hat Stand", "1 Kick …" */
+/** Un renglón que termina en preposición, conjunción o coma sigue en el próximo. */
+const COLGADO = /(\b(para|de|del|con|sin|y|e|o|u|la|el|los|las|en|por|tipo|for|of|with|and|or|the|to)|,)$/i;
+
 export function unirRenglones(lineas: Linea[]): Linea[] {
   const out: Linea[] = [];
   const conf = (a: Linea, b: Linea) => a.confianza === undefined && b.confianza === undefined ? undefined : Math.min(a.confianza ?? 100, b.confianza ?? 100);
@@ -535,8 +621,10 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
       let j = i;
       while (j + 1 < lineas.length) {
         const sig = lineas[j + 1]!.texto.trim();
-        if (encabezado(sig) || /\s{3}/.test(sig) || sig.split(/\s+/).length > 10) break;
-        const sigue = marcas(sig) >= 1 && !/^\d{1,2}\s+\p{Lu}/u.test(sig) || /^\d{1,2}\s*["”″]/.test(sig) || /^\p{Ll}/u.test(sig) || colgando(actual.texto);
+        // "…, 1 Base para" + "Teclados, 2 Mesas de percusión. Especial atención…": colgó en una preposición o coma.
+        const colgado = COLGADO.test(actual.texto.trim()) && !/\s{3}/.test(sig) && !encabezado(sig) && !esTituloGenerico(sig);
+        if (!colgado && (encabezado(sig) || /\s{3}/.test(sig) || sig.split(/\s+/).length > 10)) break;
+        const sigue = colgado || marcas(sig) >= 1 && !/^\d{1,2}\s+\p{Lu}/u.test(sig) || /^\d{1,2}\s*["”″]/.test(sig) || /^\p{Ll}/u.test(sig) || colgando(actual.texto);
         if (!sigue) break;
         actual = juntar(actual, lineas[j + 1]!); j++;
       }
@@ -552,8 +640,17 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
       const cerrar = abiertos(actual.texto) > 0 && abiertos(sig) < 0 && sig.split(/\s+/).length <= 4;
       const sigue = /^\p{Ll}/u.test(sig) && !/[.:;]$/.test(actual.texto.trim()) && actual.texto.trim().split(/\s+/).length >= 3 && !/\s{3}/.test(actual.texto) && !/^(x\s*\d|o\s)/i.test(sig);
       // "1 Ampeg SVT con caja" + "8x10": la medida que quedó sola abajo.
-      const medida = /^\d{1,2}\s*[x×]\s*\d{1,2}\b/i.test(sig) && sig.split(/\s+/).length <= 2 && /\p{L}$/u.test(actual.texto.trim());
-      if (!cerrar && !sigue && !medida) break;
+      // "1 AMPEG" + "8 X 10“ ENCLOSURE": también con una o dos palabras más, si arriba quedó corto.
+      const medida = /^\d{1,2}\s*[x×]\s*\d{1,2}\b/i.test(sig) && /\p{L}$/u.test(actual.texto.trim())
+        && (sig.split(/\s+/).length <= 2 || (sig.replace(/^\d{1,2}\s*[x×]\s*\d{1,2}\S*/i, "").trim().split(/\s+/).length <= 2 && actual.texto.trim().split(/\s+/).length <= 3));
+      // "…1 Base para" + "Teclados, 2 Mesas…": el renglón quedó colgando en una preposición o una coma.
+      const a = actual.texto.trim();
+      const prosa = !/\s{3}/.test(a) && !/\s{3}/.test(sig) && a.split(/\s+/).length >= 2 && !encabezado(sig) && !esTituloGenerico(sig);
+      const colgado = prosa && COLGADO.test(a);
+      // "…Fender Rumble" + "500 o Aguilar AG700.": un número que no puede ser cantidad de backline, sin punto antes.
+      const n = sig.match(/^(\d+)\s+(\S+)/);
+      const noEsCantidad = prosa && !!n && !/[.:;]$/.test(a) && a.split(/\s+/).length >= 3 && (Number(n[1]) > 50 || /^(o|y|u|or|and)$/i.test(n[2]!));
+      if (!cerrar && !sigue && !medida && !colgado && !noEsCantidad) break;
       actual = juntar(actual, lineas[i + 1]!); i++;
     }
     // Una frase partida que resultó ser lista corrida ("3 Congas LP con sus bases 2 Timbales con base 1 Mesa…").
@@ -565,8 +662,8 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
 
 /* Familia de instrumento de un título: "DRUMS/BATERIA", "CYMBALS SET" y "STANDS DE PLATOS" son la batería. */
 const FAMILIAS: ReadonlyArray<readonly [string, RegExp]> = [
-  ["bateria", /\b(drums?|drum ?kit|bater[ií]a|hardware|cymbals?|platillos|platos|snare|redoblante|kick|bombo|toms?)\b/i],
-  ["percusion", /percus/i],
+  ["bateria", /\b(drums?|drum ?kit|bater[ií]as?|hardware|cymbals?|platillos|platos|snare|redoblante|kick|bombo|toms?)\b/i],
+  ["percusion", /percu/i],
   ["bajo", /\b(bass|bajo)\b/i],
   ["guitarra", /\b(guitars?|guitarras?|gtr)\b/i],
   ["teclado", /\b(keys|keyboards?|teclados?|pianos?|synths?)\b/i],
@@ -614,6 +711,8 @@ export function nombreRepetido(lineas: ReadonlyArray<{ texto: string }>): string
     for (const m of l.texto.matchAll(re)) {
       const nombre = m[1]!.replace(/[.']+$/, "");
       if (nombre !== nombre.toUpperCase() || letras(nombre) < 4) continue;
+      // "sistema de CCTV", "red de WIFI": siglas técnicas, no el nombre de la banda.
+      if (/^(CCTV|WI-?FI|LED|DMX|USB|HDMI|SDI|AUDIO|VIDEO|FOH|IEM|RF|UPS|AC|DC)$/.test(nombre)) continue;
       cuenta.set(nombre, (cuenta.get(nombre) ?? 0) + 1);
     }
   }
@@ -662,7 +761,8 @@ function variosGrupos(t: string): string | null {
 /* Cantidad (1 a 24) seguida de un nombre con mayúscula: "1 Bombo", "2 Toms". No cuenta "3 head"
  * ni "88 keys" (minúscula o medida), ni "16 CH" / "4 RETORNOS" (unidades). */
 const MARCA_LISTA = /(?:^|\s)((?:[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]*))/gu;
-const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft)$/i;
+// "8 X 10" es una medida, no otra cantidad.
+const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft|x)$/i;
 function posicionesLista(t: string): number[] {
   const pos: number[] = [];
   for (const m of t.matchAll(MARCA_LISTA)) {

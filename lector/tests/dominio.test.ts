@@ -15,6 +15,20 @@ describe("categorizar", () => {
     ["Stage fan 14\"", "Escenario"],
     ["Transformador 110/220", "Cables y energía"],
     ["Cosa rara", "Otro"],
+    // El HARDWARE de la batería es batería (así vienen los riders); los demás stands son bases.
+    ["SINGLE KICK PEDAL", "Batería"],
+    ["HI HAT STAND", "Batería"],
+    ["SNARE STAND", "Batería"],
+    ["BOOM CYMBALS STAND", "Batería"],
+    ["Base de Platillo Tipo Boom", "Batería"],
+    ["DRUM THRONE", "Batería"],
+    ["Banqueta de batería", "Batería"],
+    ["DRUM CARPET", "Batería"],
+    ["Hi-Hat 14\"", "Platillos"],
+    ["Guitar stand", "Bases"],
+    ["Keyboard stand doble", "Bases"],
+    ["Pie de micrófono", "Bases"],
+    ["Tapete", "Escenario"],
   ])("%s → %s", (texto, cat) => expect(categorizar(texto)).toBe(cat));
 });
 

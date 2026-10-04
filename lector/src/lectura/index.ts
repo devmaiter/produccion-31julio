@@ -13,3 +13,5 @@ export * from "./plano";
 export * from "./desglose";
 export * from "./unir";
 export * from "./tabla";
+export * from "./texto";
+export * from "./planilla";

@@ -26,11 +26,11 @@ describe("riders completos en PDF", () => {
       '2 Batería: Rack toms 10" and 12"',
       '1 Batería: Floor tom 16"',
       '2 Batería: Snare drums 14" x 6.5"',
-      "4 Bases: Cymbal boom stands",
-      "2 Bases: Snare stands",
-      "1 Bases: Hi-hat stand",
+      "4 Batería: Cymbal boom stands",
+      "2 Batería: Snare stands",
+      "1 Batería: Hi-hat stand",
       "1 Batería: Double kick pedal DW 9000",
-      "1 Bases: Drum throne",
+      "1 Batería: Drum throne",
       "1 Ampli bajo: Ampeg SVT-4 Pro head",
       "1 Ampli bajo: Ampeg 8x10 cabinet",
       "2 Ampli guitarra: Fender Twin Reverb amps",
@@ -47,7 +47,7 @@ describe("riders completos en PDF", () => {
       '1 Batería: Bombo 22" (Parche frontal sin logo)',
       '1 Batería: Redoblante 14" Ludwig Supraphonic (Con parche Remo Coated nuevo)',
       '2 Batería: Toms 10" y 12" (Montados en el bombo)',
-      "3 Bases: Bases de platillo tipo boom (Con sus tuercas y fieltros)",
+      "3 Batería: Bases de platillo tipo boom (Con sus tuercas y fieltros)",
       "1 Ampli bajo: Amplificador de bajo Ampeg SVT (Con caja 4x10)",
       "2 Ampli guitarra: Amplificador de guitarra Fender Hot Rod Deluxe (A 110 V)",
       "1 Teclado: Teclado Nord Electro 6 (Con pedal de sustain)",
@@ -63,8 +63,8 @@ describe("riders completos en PDF", () => {
       '1 Batería: Redoblante 14"',
       '2 Batería: Toms 10" y 12"',
       '1 Batería: Tom de piso 16"',
-      "1 Bases: Silla de batería",
-      "1 Escenario: Tapete",
+      "1 Batería: Silla de batería",
+      "1 Batería: Tapete",
       "3 Percusión: Congas LP con sus bases",
       "2 Percusión: Timbales con base",
       "1 Percusión: Mesa de percusión",
@@ -117,12 +117,12 @@ PLANTA DE ILUMINACION - LISTA DE MATERIALES
       "1 Batería: BD 22",
       "2 Batería: TOMS 10” + holder float, 12” + holder float (Remo Pinstripe)",
       "3 Batería: SN 14” (Ambassador Coated)",
-      "4 Bases: Boom Stand",
-      "3 Bases: Snare Stand",
-      "1 Bases: Hi Hat Stand",
+      "4 Batería: Boom Stand",
+      "3 Batería: Snare Stand",
+      "1 Batería: Hi Hat Stand",
       "1 Batería: Kick Pedal",
-      "1 Bases: Drum Throne",
-      "1 Escenario: Carpet",
+      "1 Batería: Drum Throne",
+      "1 Batería: Carpet",
       "1 Ampli bajo: 8X10",
       "1 Bajo: BASS GUITAR Fender Jazz Bass 5",
       "1 Teclado: Keyboard Controller 61 Keys",
@@ -188,7 +188,7 @@ ALIMENTOS ARTISTA:
 
   it("DRUMS después de la sección de audio es backline; dentro del input list con micrófonos, no", () => {
     expect(resumen(interpretar([doc('RIDER TÉCNICO\nLA BANDA\nSONIDO\nConsola digital de 48 canales\nDRUMS\n1 Kick 22"\n2 Snare stand\nBASS\n1 Ampeg SVT')])))
-      .toEqual(['1 Batería: Kick 22"', "2 Bases: Snare stand", "1 Ampli bajo: Ampeg SVT"]);
+      .toEqual(['1 Batería: Kick 22"', "2 Batería: Snare stand", "1 Ampli bajo: Ampeg SVT"]);
     expect(resumen(interpretar([doc('RIDER TÉCNICO\nLA BANDA\nINPUT LIST\nDRUMS\n1 KICK   BETA 91\n2 SNARE   SM57\n3 HH   SM81\nBACKLINE\n1 Kick 22"')])))
       .toEqual(['1 Batería: Kick 22"']);
   });
@@ -234,13 +234,13 @@ ELECTRIC BASS / BASS GUITAR:
 
   it("si no reconoce la sección de backline, lee todo y lo deja para revisar en vez de no sacar nada", () => {
     const e = interpretar([doc("RIDER TÉCNICO\nLA BANDA\nAUDIO REQUIREMENTS\nWe need the following\n2 Snare stand\n1 Fender Twin Reverb")]);
-    expect(resumen(e)).toEqual(["2 Bases: Snare stand", "1 Ampli guitarra: Fender Twin Reverb"]);
+    expect(resumen(e)).toEqual(["2 Batería: Snare stand", "1 Ampli guitarra: Fender Twin Reverb"]);
     expect(e.items.every(i => i.dudoso)).toBe(true);
   });
 
   it("sin títulos de sección se lee como antes", () => {
     const e = interpretar([doc("LOS RAYOS\n2 Snare stand\n1 Ampeg SVT")]);
-    expect(resumen(e)).toEqual(["2 Bases: Snare stand", "1 Ampli bajo: Ampeg SVT"]);
+    expect(resumen(e)).toEqual(["2 Batería: Snare stand", "1 Ampli bajo: Ampeg SVT"]);
   });
 });
 

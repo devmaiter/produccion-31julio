@@ -66,7 +66,7 @@ Quedo atento, gracias.`)], { anio: 2026 });
     expect(e.items.map(i => [i.artista, i.cantidad, i.descripcion, i.categoria])).toEqual([
       ["Los Rayos", 1, "Ampeg SVT Classic", "Ampli bajo"],
       ["Los Rayos", 2, "Guitarra: Fender Twin Reverb", "Ampli guitarra"],
-      ["Los Rayos", 2, "Base de redoblante", "Bases"],
+      ["Los Rayos", 2, "Base de redoblante", "Batería"],
       ["Los Rayos", 3, "guitar stand", "Bases"],
     ]);
     expect(e.items.every(i => i.fecha === "2026-11-14" && !i.dudoso)).toBe(true);

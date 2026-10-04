@@ -66,3 +66,5 @@ export async function leerTodo(entradas: Array<File | { nombre: string; texto: s
 
 export { extraccionVacia, integrar, interpretar, leerArchivo, leerDesglose, unirExtracciones, lectoresNavegador };
 export { categorizar } from "../../lector/src/dominio/categorias";
+// La planilla de backline (formato OML): del rider leído al Requerimiento y al .xlsx.
+export { filasDelRider, planillaXlsx, cantidadPlanilla, fechaPlanilla, SIN_NOMBRE } from "../../lector/src/lectura";
