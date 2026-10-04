@@ -88,6 +88,11 @@ describe("rider de gira en inglés", () => {
   const traza: RenglonLeido[] = [];
   const e = interpretar([{ nombre: "rider.pdf", tipo: "pdf", lineas: lineasDeTexto(RIDER_TOUR), avisos: [] }], { traza });
 
+  it("risers y sobretarimas no son backline (lo definió el usuario)", () => {
+    const t: RenglonLeido[] = [];
+    const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nDRUMS\n1 Drum riser 8x8 con ruedas\n2 sobretarimas de 2x2\n1 Kick 22\nKEYS\n1 riser de teclados\n1 Nord Stage 3"), avisos: [] }], { traza: t });
+    expect(r.items.map(i => i.descripcion)).toEqual(["Kick 22", "Nord Stage 3"]);
+  });
   it("'TOUR 2026' no es el nombre de la banda", () => {
     expect(e.artistas).toEqual([SIN_NOMBRE]);
   });

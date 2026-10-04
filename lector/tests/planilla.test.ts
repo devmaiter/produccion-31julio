@@ -37,7 +37,9 @@ describe("planilla de backline (formato OML)", () => {
       "|AMPLIFICADORES DE BAJO",
       "01 x|Ampeg SVT Classic/SVT PRO 3/ SVT PRO 4 + Ampeg SVT810E, Fender Rumble 500 o Aguilar AG700",
       "|TECLADO / PIANO",
-      "|La banda lleva su teclado con computador e interfaz pero necesitamos la base de teclado",
+      // "La banda lleva su teclado … pero necesitamos la base": las dos piezas (lo definió el usuario).
+      "01 x|Teclado con computador e interfaz (lo trae la banda)",
+      "01 x|Base de teclado",
     ]); // "GUITARRA" del output list no queda (nada debajo), ni OTHER (solo cinta) ni el párrafo del contrato.
   });
 
@@ -65,6 +67,12 @@ describe("planilla de backline (formato OML)", () => {
     h.addRow([1, "kick 22"]);
     const e = leerTablas(await leerLibro(new Uint8Array(await wb.xlsx.writeBuffer() as ArrayBuffer)));
     expect(filasDelRider(e).map(f => `${cantidadPlanilla(f.cantidad)}|${f.texto}`)).toEqual(["|DRUMS", "01 x|Kick 22"]);
+  });
+
+  it("lo que la banda trae va marcado en la planilla", () => {
+    const t: RenglonLeido[] = [];
+    const e = interpretar([{ nombre: "r.pdf", tipo: "pdf", lineas: lineasDeTexto("RIDER TÉCNICO\nNELDA\nBACKLINE\nPERCUSIÓN\nLa agrupación lleva:\n1 Tambora tradicional\nEl festival suministra:\n1 Soporte para tambora"), avisos: [] }], { traza: t });
+    expect(filasDelRider(e, t).filter(f => f.tipo === "item").map(f => f.texto)).toEqual(["Tambora tradicional (lo trae la banda)", "Soporte para tambora"]);
   });
 
   it("fechas", () => {

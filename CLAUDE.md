@@ -88,6 +88,19 @@ Piezas, en `lector/src/lectura/`:
   sección (tarima, wifi, consolas) se quita; el hardware de batería es Batería;
   en la planilla no entran párrafos del contrato ("deberá…", transporte, hotel).
 
+**Qué es backline (lo definió el usuario, 2026-10-04; respetarlo siempre):**
+- Sí: ventiladores (en los reels, **siempre** a Extras), alfombras y tapetes (sueltos a
+  Extras; dentro del bloque de un instrumento se quedan ahí; "drum carpet" = "drum rug" =
+  "alfombra para batería": una cosa puede tener varios nombres), atriles, sillas y bancos de
+  músicos, pedales de efectos (guitarra, o bajo si lo dice), parches (ítem de batería),
+  cuerdas de repuesto, baquetas, instrumento spare (suma) y afinadores.
+- No: risers y sobretarimas (`NUNCA_BACKLINE` en `categorias.ts`).
+- Sin definir todavía: pedestales de micrófono, cajas directas, cables de instrumento,
+  corriente en tarima. Preguntarle al usuario antes de decidir.
+- Lo que la banda trae va marcado ("lo trae la banda"); "la banda lleva X pero necesitamos
+  Y" son dos piezas. Varias opciones para lo mismo ("Ampeg SVT / Fender Rumble o Aguilar")
+  son una sola pieza.
+
 Trabajar el lector (todo en main):
 ```bash
 cd lector && npm install && npm run preparar    # datos del OCR (no se suben)

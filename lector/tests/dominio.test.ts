@@ -37,6 +37,15 @@ describe("categorizar", () => {
     ["1 RUG Percussion (Meinl Professional Series)", "Percusión"],
     // …y suelta, o un ventilador: Escenario (en los reels, Extras).
     ["black carpet 2x2", "Escenario"], ["floor fan", "Escenario"], ["ventilador de piso", "Escenario"],
+    // Atriles, sillas y bancos de músicos son bases; los pedales de efectos son de la guitarra (o del bajo).
+    ["2 atriles con lámpara", "Bases"], ["Silla sin brazos para llamador", "Bases"], ["Bancos altura regulable", "Bases"],
+    ["pedal de efectos", "Guitarra"], ["pedalboard", "Guitarra"], ["Boss tuner pedal", "Guitarra"], ["2 pedales de efectos para bajo", "Bajo"],
+    ["kick pedal", "Batería"], ["sustain pedal", "Teclado"],
+    // Parches por su marca o modelo.
+    ["Remo Coated Ambassador", "Batería"], ["DRUM HEAD NEW EVANS G2", "Batería"],
+    // Repuestos y accesorios que sí son backline.
+    ["2 pares de baquetas Vic Firth 5A", "Batería"], ["escobillas", "Batería"], ["mallets", "Batería"],
+    ["afinador de clip", "Guitarra"], ["2 juegos de cuerdas 10-46", "Guitarra"], ["1 bajo de repuesto", "Bajo"],
   ])("%s → %s", (texto, cat) => expect(categorizar(texto)).toBe(cat));
 });
 

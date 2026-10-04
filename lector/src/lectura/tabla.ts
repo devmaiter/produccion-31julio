@@ -11,7 +11,7 @@
  * poner), los ítems salen de la propuesta y el requerimiento queda como
  * requisito, para no contar el equipo dos veces.
  */
-import { categorizar } from "../dominio/categorias";
+import { categorizar, NUNCA_BACKLINE } from "../dominio/categorias";
 import type { Extraccion, FilaComparada } from "./esquema";
 import { nombrePropio } from "./interpretar";
 import { extraccionVacia } from "./unir";
@@ -88,6 +88,7 @@ export function leerTablas(libro: Libro, ctx: ContextoTabla = {}): Extraccion {
         continue;
       }
       for (const { grupo, ...f } of recorrer(b)) {
+        if (NUNCA_BACKLINE.test(f.texto)) continue; // risers y sobretarimas no son backline
         const sinCantidad = f.cantidad === null;
         const item: Extraccion["items"][number] = {
           artista, fecha, grupo, descripcion: f.texto, cantidad: sinCantidad ? 1 : f.cantidad!,

@@ -10,13 +10,18 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   // El HARDWARE de la batería es batería: así vienen los riders (DRUMS → HARDWARE con pedal,
   // stands, banqueta y tapete). Va antes de "Escenario" (tapete) y de "Bases" (stands, throne).
   ["Batería",          /((snares?|redoblantes?|tarolas?|hi ?-?hats?|hihats?|charles|cymbals?|c[ií]mbal(es)?|platillos?|boom|toms?|bombos?|kicks?)\s*(stands?|soportes?|bases?)\b|\b(stands?|soportes?|bases?)\s+((de|para|del)\s+)?(redoblante|tarola|snare|hi ?-?hat|charles|platillos?|cymbals?|c[ií]mbal(es)?|toms?|bombo)\b|\bdouble tom\b|\bthrone\b|banqueta|silla de bater|drum (stool|carpet|rug|mat)|(tapete|alfombra) (de |para )?(la )?bater|pedal de bombo|kick pedal|(twin|doble|double) pedal)/i],
+  // Pedales de efectos y pedalboards son de la guitarra (o del bajo si lo dice), no de la batería.
+  ["Bajo",             /((pedal(es)?|pedalboard|pedal ?board|efectos?|fx)\b.{0,25}\b(bajo|bass)\b|\bbass (pedals?|pedalboard|fx|effects?)\b)/i],
+  ["Guitarra",         /(pedal(es)? de efectos?|pedalboard|pedal ?board|effects? pedals?|fx pedals?|tuner pedal|pedal afinador|\bafinador(es)?\b|\btuners?\b|\bwah\b|overdrive|distorsi[oó]n|\bhelix\b|\bkemper\b)/i],
+  // Parches por su marca o modelo ("Remo Coated Ambassador", "Evans G2") y baquetas: son de la batería.
+  ["Batería",          /(\b(remo|evans|aquarian)\b|ambassador|emperor|powerstroke|pinstripe|\bemad\b|\bg(1|2|14)\b|drum ?heads?|baquetas?|escobillas?|\bmallets?\b|drum ?sticks?|\bsticks\b|\bbrushes\b|vic firth)/i],
   ["Escenario",        /(stage fan|cooler fan|tapete|\bfans?\b|ventilador|fald[oó]n|plexiglass|sand ?bags|sacos de arena|alfombra|carpet|\brug\b|stage ?dex|\briser|tarima)/i],
   ["Percusión",        /(magician|percussion tables?|toys tables?|trap tables?|cortina|bar chimes|mark tree|mesas? (de percusi[oó]n|tipo mago|de toys))/i],
   ["Batería",          /(\bx ?-?hat\b|\bkd\b|\bclamps?\b|boom arm|\bspd\b|sample ?pad|octapad)/i],
   ["Cables y energía", /(\bcables?\b|transformador|convertidor|\bups\b|extensi[oó]n|regleta|power ?strip)/i],
   // Modelos de teclado: "YAMAHA MO6 STAND" es el teclado con su base, no una base.
   ["Teclado",          /(\bnord (stage|electro|piano|lead|wave)|kronos|montage|\bmodx\b|\bmo ?[68]\b|motif|fantom|\bjuno\b|triton|kurzweil|\bcp-?(73|88)\b|rd-?(88|2000)|yamaha es7)/i],
-  ["Bases",            /(\bbases?\b|\bsoportes?\b|\batril|\bstands?\b|pie de micr[oó]|guitar boat|guitarrero|\bstool\b|\bsillas?\b|\basientos?\b|\bthrone\b|laptop stand|mesa(?! ?boogie))/i],
+  ["Bases",            /(\bbases?\b|\bsoportes?\b|\batril|\bstands?\b|pie de micr[oó]|guitar boat|guitarrero|\bstool\b|\bsillas?\b|\bbancos?\b|\basientos?\b|\bthrone\b|laptop stand|mesa(?! ?boogie))/i],
   ["Ampli bajo",       /(\b[48] ?x ?10\b|\bampeg\b|\bsvt\b|gallien|\bgk\b|markbass|hartke|\brumble\b|aguilar|ampli(ficador)? de bajo|cabezal de bajo|bass head|bass cab)/i],
   ["Ampli guitarra",   /(hot ?rod|deville|blues junior|bassbreaker|twin reverb|deluxe reverb|jazz chorus|jc[- ]?120|marshall|vox ac|\borange\b|mesa ?boogie|princeton|katana|ampli(ficador)? de guitarra|cabezal de guitarra)/i],
   ["Teclado",          /(montage|\bnord\b|fantom|\bjuno\b|motif|kurzweil|\bkorg\b|\bmoog\b|kronos|triton|rd-?88|cp-?88|yamaha es7|teclado|\bpiano\b|keyboard|sintetizador|\bsynth\b|sustain|\bfc[47]\b)/i],
@@ -33,6 +38,9 @@ const SECCION_BATERIA = /\b(bater[ií]as?|drums?|drum ?kit|hardware)\b/i;
 const SECCION_PERCUSION = /\b(percusi[oó]n|percussion|percu|perc)\b/i;
 const ALFOMBRA = /\b(alfombras?|tapetes?|carpets?|rugs?|mats?)\b/i;
 const HARDWARE = /\b(stands?|soportes?|bases?|sillas?|banquetas?|asientos?|throne|stool|tapetes?|alfombras?|carpet|rug|mat|pedal(es)?)\b/i;
+
+/** Lo que nunca es backline aunque venga con el backline (lo definió el usuario: risers y sobretarimas). */
+export const NUNCA_BACKLINE = /\b(risers?|drum ?risers?|sobre ?-?tarimas?|sobretarimas?|stage ?dex|plataformas?)\b/i;
 
 export function categorizar(texto: string): Categoria {
   // "Congas LP con sus bases", "Timbales con base": la base viene con el instrumento, no es una base.

@@ -47,7 +47,8 @@ export function filasDelRider(ext: Extraccion, traza?: readonly RenglonLeido[], 
       const it = r.item !== null ? ext.items[r.item] : undefined;
       if (r.etiqueta === "item" && it) {
         if (artista && it.artista !== artista) continue;
-        filas.push({ tipo: "item", cantidad: it.cantidad, texto: mayuscula(it.descripcion) });
+        // Lo que la banda dice que trae va marcado: producción no tiene que conseguirlo.
+        filas.push({ tipo: "item", cantidad: it.cantidad, texto: mayuscula(it.descripcion) + (it.proveedor === "ARTISTA" ? " (lo trae la banda)" : "") });
         dentro = true;
       } else if (r.etiqueta === "grupo" && r.seccion === "backline") {
         filas.push({ tipo: "seccion", cantidad: null, texto: titulo(r.texto) });

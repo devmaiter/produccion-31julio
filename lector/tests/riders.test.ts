@@ -229,7 +229,11 @@ ELECTRIC BASS / BASS GUITAR:
     // "1 Fan / 1 Ventilador": un solo ítem, y "AMPEG SVT 3 Pro" no se parte.
     expect(cuenta).toContain("1 Ventilador de piso preferentemente negro (black)");
     expect(cuenta).toContain("1 AMPEG SVT 450/SVT Classic/SVT 4/SVT 3 Pro/");
-    expect(cuenta.some(d => /parches nuevos|EVANS/i.test(d))).toBe(false);
+    // Los parches son ítems de la batería (lo definió el usuario); "DEBERÁ CONTAR CON PARCHES NUEVOS" es una indicación.
+    expect(cuenta.some(d => /parches nuevos/i.test(d))).toBe(false);
+    expect(e.items.filter(i => /EVANS/.test(i.descripcion)).map(i => `${i.cantidad} ${i.descripcion} [${i.categoria}]`)).toEqual([
+      "1 TOMS: EVANS - G2CLEAR/G2 [Batería]", "1 KICK DRUM: EVANS POWER STROKE [Batería]", "1 SNARE: EVANS EQ3 RESONATE [Batería]",
+    ]);
   });
 
   it("si no reconoce la sección de backline, lee todo y lo deja para revisar en vez de no sacar nada", () => {

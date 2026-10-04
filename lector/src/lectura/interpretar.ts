@@ -10,7 +10,7 @@
  *   - encabezados: de grupo ("DRUMS", "Bass") o de artista ("LOS RAYOS")
  * Lo que no entiende no lo inventa: lo devuelve en avisos para revisarlo.
  */
-import { categorizar } from "../dominio/categorias";
+import { categorizar, NUNCA_BACKLINE } from "../dominio/categorias";
 import type { Categoria, PaqueteEvento } from "../dominio/entidades";
 import { separarCantidad } from "../dominio/lista";
 import type { Documento, Linea } from "./documento";
@@ -233,6 +233,19 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       // "IMAGEN DE EJEMPLO" (debajo de una foto) y "2 SETS DE BATERÍAS IGUALES" (la tabla ya trae las cantidades).
       if (/^(imagen|foto|image|picture)s? (de )?(ejemplo|referencia|example|reference)\b/i.test(texto)) { anotar("nota", "pie de foto"); continue; }
       if (/\bsets? de (bater[ií]as?|drums?)\b|\biguales\b|\bidentical\b/i.test(texto) && texto.split(/\s+/).length <= 7) { anotar("nota", "dice cuántos sets; las cantidades vienen en la tabla"); continue; }
+      // "La banda lleva su teclado … pero necesitamos la base de teclado": dos piezas, lo que trae la
+      // banda (marcado) y lo que pide (lo pone producción). Lo definió el usuario.
+      const traePide = texto.match(/\b(?:lleva|llevan|trae|traen|brings?)\s+(?:su|sus|their|its|el|la|los|las)?\s*(.+?)[,;]?\s+(?:pero|but|y|and)\s+(?:se\s+)?(?:necesit\p{L}*|requier\p{L}*|requer\p{L}*|solicit\p{L}*|need\p{L}*)\s+(?:de\s+)?(?:la|el|una|un|las|los|the|an?)?\s*(.+?)\.?$/iu);
+      if (traePide) {
+        const previo: string | null = proveedorActual, antesTP = ext.items.length;
+        proveedorActual = "ARTISTA";
+        if (item(traePide[1]!, l) && ext.items.length > antesTP) anotar("item", "lo trae la banda", ext.items.length - 1);
+        proveedorActual = null;
+        const antesPide = ext.items.length;
+        if (item(traePide[2]!, l) && ext.items.length > antesPide) anotar("item", "lo pide la banda", ext.items.length - 1);
+        proveedorActual = previo;
+        if (ext.items.length > antesTP) continue;
+      }
       const quien = quienPone(texto);
       if (quien !== undefined) { proveedorActual = quien; if (letras(texto) > 40 || texto.split(/\s+/).length <= 5) { anotar("nota", quien ? "lo que sigue lo trae la banda" : "lo que sigue lo pone la producción"); continue; } }
 
@@ -263,7 +276,12 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       }
       // "* LA BATERÍA DEBERÁ CONTAR CON PARCHES NUEVOS": indicación, no equipo.
       if (/\b(deber[aá]n?|debe|should|must)(?!\p{L})/iu.test(texto) && !/^\d/.test(texto)) { anotar("nota", "indicación del rider"); continue; }
-      if (enParches && !/^\d/.test(texto)) { anotar("nota", "parches recomendados"); continue; }
+      // Los parches son ítems de la batería (lo definió el usuario); si el renglón no se entiende como equipo, queda de nota.
+      if (enParches && !/^\d/.test(texto)) {
+        const antesP = ext.items.length;
+        if (item(texto, l) && ext.items.length > antesP) { itemsDelSubgrupo++; anotar("item", "parche", ext.items.length - 1); continue; }
+        anotar("nota", "parches recomendados"); continue;
+      }
       // "1. SONOR PRO LITE  2. DW COLLECTOR": opciones en orden; la 1 es la preferida y las demás no suman.
       // Con "EN ORDEN DE PRIORIDAD" también vale sin punto: "1 AMPEG SVT 450", "2 AGUILAR DB751".
       const rank = listaOpciones ? texto.match(ranking ? /^(\d)\s*[.)]?\s+(\p{L}.*)$/u : /^(\d)\s*[.)]\s*(\p{L}.*)$/u) : null;
@@ -457,6 +475,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
       if (NO_BACKLINE.test(descripcion) && categorizar(principal ?? descripcion) === "Otro") return true; // radios, pilas, cinta: se lee pero no es backline
       if (CONSUMIBLE.test(descripcion)) return true; // "ORANGE GAFFER TAPE": la marca de un ampli no lo vuelve backline
+      if (NUNCA_BACKLINE.test(descripcion)) return true; // risers y sobretarimas: se piden con el backline pero no lo son
       // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
       // (salvo lo que la banda dice que trae: "Gaita hembra" también cuenta).
       const loTraeLaBanda = proveedorActual === "ARTISTA" && !proveedor && descripcion.split(" ").length <= 4 && !/[.?!]$/.test(t);
@@ -505,7 +524,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     function marcaAlternativa(t: string): boolean | undefined {
       const corta = t.split(/\s+/).length <= 5;
       if (!corta) return undefined;
-      if (/^(sustituciones|sustitutos?|alternativas?|opci[oó]n alternativa|opciones alternativas|equivalentes? aceptables?|spare|.*\bspares?)\b/i.test(t)) return true;
+      if (/^(sustituciones|sustitutos?|alternativas?|opci[oó]n alternativa|opciones alternativas|equivalentes? aceptables?)\b/i.test(t)) return true;
+      // "Bajo spare", "Guitarras spare": el instrumento de repuesto también es backline y suma (lo definió el usuario).
+      if (/^(spare|.*\bspares?)\b/i.test(t)) return false;
       if (/^opci[oó]n preferida\b|^preferid[oa]s?\b|^instrumentos? solicitados?\b|^instrumentos?$|^amplificaci[oó]n$|^configuraci[oó]n$/i.test(t)) return false;
       return undefined;
     }

@@ -312,6 +312,8 @@ const DE_QUIEN = [[/cymbal|platillo|plato|hi ?-?hat|snare|redoblante|throne|drum
   [/\bbajo|\bbass\b/, "Bajo"], [/conga|bongo|timbal|percus|cradle/, "Percusión"]];
 function reelDe(it){
   const norm = t => (t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  // Los ventiladores siempre van a Extras, aunque est\u00e9n en el bloque del bajo o de la percusi\u00f3n (pedido del usuario).
+  if (/\b(fans?|ventiladore?s?|cooler)\b/.test(norm(it.referencia))) return "Extras";
   const n = norm(it.grupo);
   const g = n && GRUPOS.find(([re]) => re.test(n))?.[1];
   if (g) return g;
