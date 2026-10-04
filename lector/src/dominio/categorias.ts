@@ -30,6 +30,8 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
 ];
 
 const SECCION_BATERIA = /\b(bater[ií]as?|drums?|drum ?kit|hardware)\b/i;
+const SECCION_PERCUSION = /\b(percusi[oó]n|percussion|percu|perc)\b/i;
+const ALFOMBRA = /\b(alfombras?|tapetes?|carpets?|rugs?|mats?)\b/i;
 const HARDWARE = /\b(stands?|soportes?|bases?|sillas?|banquetas?|asientos?|throne|stool|tapetes?|alfombras?|carpet|rug|mat|pedal(es)?)\b/i;
 
 export function categorizar(texto: string): Categoria {
@@ -40,6 +42,9 @@ export function categorizar(texto: string): Categoria {
     // Dentro de la sección de batería (el texto trae el grupo: "silla batería Baterías"), los stands,
     // sillas, tapetes y pedales son de la batería, como los pone cada rider en su sección.
     if ((cat === "Bases" || cat === "Escenario") && SECCION_BATERIA.test(texto) && HARDWARE.test(texto)) return "Batería";
+    // Igual con la percusión: "percussion rug", "alfombra para percusión" o una alfombra en el
+    // bloque de percusión es de la percusión. Una alfombra o un ventilador sueltos quedan en Escenario.
+    if (cat === "Escenario" && SECCION_PERCUSION.test(texto) && ALFOMBRA.test(texto)) return "Percusión";
     return cat;
   }
   return "Otro";

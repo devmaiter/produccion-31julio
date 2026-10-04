@@ -29,6 +29,14 @@ describe("categorizar", () => {
     ["Keyboard stand doble", "Bases"],
     ["Pie de micrófono", "Bases"],
     ["Tapete", "Escenario"],
+    // Una misma cosa con varios nombres: la alfombra de la batería…
+    ["drum rug", "Batería"], ["DRUM CARPET", "Batería"], ["alfombra para batería", "Batería"], ["tapete de batería", "Batería"],
+    ["1 RUG Drums", "Batería"], // en el bloque DRUMS (el texto lleva el grupo)
+    // …la de la percusión, aunque esté en su bloque sin decirlo…
+    ["percussion rug", "Percusión"], ["alfombra para percusión", "Percusión"], ["tapete de percusión", "Percusión"],
+    ["1 RUG Percussion (Meinl Professional Series)", "Percusión"],
+    // …y suelta, o un ventilador: Escenario (en los reels, Extras).
+    ["black carpet 2x2", "Escenario"], ["floor fan", "Escenario"], ["ventilador de piso", "Escenario"],
   ])("%s → %s", (texto, cat) => expect(categorizar(texto)).toBe(cat));
 });
 
