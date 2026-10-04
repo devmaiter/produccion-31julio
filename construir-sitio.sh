@@ -13,6 +13,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 (cd lector && npm install && npm run preparar)        # dependencias y datos del OCR (no se suben)
+ln -sfn ../../lector/ocr extractor-fuente/public/ocr   # el extractor publica esos datos; el enlace no va en git
 (cd extractor-fuente && npm install && npm run build:cordillera -- ../cordillera/lector && npm run build)
 rm -rf extractor && cp -rL extractor-fuente/dist extractor
 node demo-listado/construir.mjs
