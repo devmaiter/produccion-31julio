@@ -1,0 +1,5 @@
+node_modules/
+ocr/
+*.traineddata
+# Riders reales: traen teléfonos y correos del equipo; no se suben.
+riders-reales/

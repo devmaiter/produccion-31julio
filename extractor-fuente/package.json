@@ -1,0 +1,18 @@
+{
+  "name": "backline-extractor",
+  "version": "0.1.0",
+  "description": "Demo: suelta un correo, PDF, foto o el desglose (.xlsx) y el lector llena el listado en el navegador, sin internet ni servicios pagos.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5180",
+    "typecheck": "tsc --noEmit",
+    "build:cordillera": "vite build -c vite.lib.config.ts && node scripts/empaquetar-cordillera.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.3.6"
+  },
+  "private": true,
+  "type": "module"
+}

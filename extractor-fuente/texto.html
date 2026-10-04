@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>Así lo leí</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./src/estilos.css">
+  <link rel="stylesheet" href="./src/texto.css">
+</head>
+<body>
+  <header class="cabecera">
+    <div>
+      <h1>Así lo leí</h1>
+      <p class="sub">El texto que el lector saca de cada documento, página por página y <b>sin interpretar</b>. Sirve para confirmar que se leyó bien antes de buscar el backline.</p>
+    </div>
+  </header>
+
+  <section class="entrada">
+    <div id="zona" class="zona" tabindex="0">
+      <input id="archivos" type="file" multiple accept=".eml,.pdf,.png,.jpg,.jpeg,.webp,.txt,.csv,.xlsx,message/rfc822,application/pdf,image/*,text/plain,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+      <p><strong>Suelta aquí el rider</strong> o <button id="elegir" type="button" class="enlace">elígelo</button></p>
+      <p class="mini">PDF · fotos (OCR) · .eml con adjuntos · .txt · Excel .xlsx · también puedes pegar (Ctrl+V)</p>
+    </div>
+    <div class="muestras">
+      <span>Probar con:</span>
+      <button type="button" class="chip" data-muestra="muestras/hoja-backline.pdf">Hoja de backline (PDF)</button>
+      <button type="button" class="chip" data-muestra="muestras/foto-hoja.jpg">Foto torcida (OCR)</button>
+      <button type="button" class="chip" data-muestra="muestras/desglose-cordillera-2026.xlsx">Desglose Cordillera (Excel)</button>
+    </div>
+    <p id="aviso" class="mini" role="status"></p>
+    <details class="leyenda">
+      <summary>Cómo leer el resultado</summary>
+      <ul>
+        <li><span class="n">12</span> número de renglón, de corrido en todo el archivo (en Excel, el número de fila). Úsalo para decir "el 12 salió mal".</li>
+        <li><span class="col">│</span> ahí el lector vio otra columna.</li>
+        <li><span class="duda">⟨62 %⟩</span> el OCR leyó ese renglón con poca seguridad.</li>
+        <li><b>↓ C</b> en Excel: la celda de la columna C tiene varios renglones; van debajo.</li>
+      </ul>
+    </details>
+  </section>
+
+  <section class="progreso" id="progreso" hidden></section>
+
+  <section class="resultado" id="resultado" hidden>
+    <div class="fila acciones">
+      <button id="copiar" type="button" class="primario">Copiar texto</button>
+      <button id="descargar" type="button">Descargar .md</button>
+      <button id="limpiar" type="button">Borrar</button>
+    </div>
+    <div id="salida"></div>
+  </section>
+
+  <script type="module" src="./src/texto.ts"></script>
+</body>
+</html>

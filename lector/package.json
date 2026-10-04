@@ -1,0 +1,36 @@
+{
+  "name": "backline-lector",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Lector de backline: convierte correos (.eml), PDF, fotos y texto en los datos del evento, en JSON. Todo corre en el dispositivo, sin servicios pagos ni internet.",
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "pretest": "npm run -s preparar",
+    "typecheck": "tsc --noEmit",
+    "preparar": "tsx scripts/preparar-ocr.ts",
+    "leer": "tsx scripts/leer.ts",
+    "importar": "tsx scripts/importar-prototipos.ts",
+    "texto": "tsx scripts/texto.ts",
+    "traza": "tsx scripts/traza.ts",
+    "planilla": "tsx scripts/planilla.ts"
+  },
+  "dependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
+    "@tesseract.js-data/spa": "^1.0.0",
+    "exceljs": "^4.4.0",
+    "jpeg-js": "^0.4.4",
+    "pdfjs-dist": "^6.3.289",
+    "pngjs": "^7.0.0",
+    "postal-mime": "^4.0.0",
+    "tesseract.js": "^7.0.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/pngjs": "^6.0.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.2"
+  }
+}

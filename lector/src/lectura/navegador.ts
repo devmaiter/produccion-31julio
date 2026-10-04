@@ -1,0 +1,66 @@
+/* Lectores para el navegador. La app le dice dónde sirve el worker de PDF y
+ * la carpeta del OCR (la que deja `npm run preparar`), así el lector no
+ * depende de ningún empaquetador. Todo se lee sin internet. */
+import type { Lectores } from "./leer";
+import { crearOcr, type Ocr } from "./ocr";
+import type { LibPdf, PaginaPdf } from "./pdf";
+
+export interface RutasNavegador {
+  /** URL del worker de pdfjs (`pdfjs-dist/build/pdf.worker.min.mjs`). */
+  pdfWorker: string;
+  /** Carpeta servida con `worker.min.js`, `core/` y `lang/` (lo que genera `npm run preparar`). */
+  ocr: string;
+  /** URL por idioma cuando `lang/*.traineddata.gz` no se puede servir con ese nombre. */
+  idiomas?: Record<string, string>;
+}
+
+/** La página puede fijar `window.BACKLINE_IDIOMAS = { spa: "…", eng: "…" }` sin recompilar. */
+const idiomasGlobales = (): Record<string, string> | undefined => (globalThis as { BACKLINE_IDIOMAS?: Record<string, string> }).BACKLINE_IDIOMAS;
+
+interface PaginaRenderizable extends PaginaPdf {
+  getViewport(o: { scale: number }): { width: number; height: number };
+  render(o: { canvasContext: CanvasRenderingContext2D; viewport: unknown; canvas: HTMLCanvasElement }): { promise: Promise<void> };
+}
+
+let ocr: Promise<Ocr> | null = null;
+
+export function lectoresNavegador(rutas: RutasNavegador): Lectores {
+  const base = (r: string) => new URL(r, document.baseURI).href;
+  const dirOcr = rutas.ocr.replace(/\/+$/, "");
+  return {
+    pdf: async () => {
+      const lib = await import("pdfjs-dist");
+      lib.GlobalWorkerOptions.workerSrc = rutas.pdfWorker;
+      return lib as unknown as LibPdf;
+    },
+    ocr: () => (ocr ??= crearOcr({
+      langPath: base(`${dirOcr}/lang`),
+      workerPath: base(`${dirOcr}/worker.min.js`),
+      corePath: base(`${dirOcr}/core`),
+      idiomas: rutas.idiomas ?? idiomasGlobales(),
+    }).catch(err => { ocr = null; throw err; })),
+    async ampliarImagen(bytes, extension, factor) {
+      const img = await createImageBitmap(new Blob([bytes as BlobPart], { type: extension === "png" ? "image/png" : "image/jpeg" }));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(img.width * factor);
+      canvas.height = Math.round(img.height * factor);
+      const cx = canvas.getContext("2d")!;
+      cx.imageSmoothingQuality = "high";
+      cx.fillStyle = "#fff";
+      cx.fillRect(0, 0, canvas.width, canvas.height);
+      cx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      img.close();
+      const blob = await new Promise<Blob>((ok, mal) => canvas.toBlob(b => (b ? ok(b) : mal(new Error("No se pudo ampliar la imagen"))), "image/png"));
+      return { bytes: new Uint8Array(await blob.arrayBuffer()), ancho: canvas.width, alto: canvas.height };
+    },
+    async renderizarPagina(pagina) {
+      const p = pagina as PaginaRenderizable;
+      const viewport = p.getViewport({ scale: 2.5 });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.ceil(viewport.width);
+      canvas.height = Math.ceil(viewport.height);
+      await p.render({ canvasContext: canvas.getContext("2d")!, viewport, canvas }).promise;
+      return new Promise<Blob>((ok, mal) => canvas.toBlob(b => (b ? ok(b) : mal(new Error("No se pudo convertir la página"))), "image/png"));
+    },
+  };
+}
