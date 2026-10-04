@@ -74,6 +74,41 @@ ul.lista .t small{display:block;color:var(--ink3);font-size:12px;margin-top:2px}
 ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inline-block}
 .barra{height:4px;border-radius:2px;background:var(--accent);opacity:.35;margin-top:6px}
 
+/* Totales de fondo: detrás de un botón en la portada, encima de ella */
+.ver-totales{align-self:flex-start;margin-top:14px;font-size:13px;color:var(--ink3);text-decoration:underline;text-underline-offset:3px}
+.totales{position:absolute;inset:calc(env(safe-area-inset-top) + 56px) 76px calc(env(safe-area-inset-bottom) + 24px) var(--gx);display:flex;flex-direction:column;background:rgba(0,0,0,.92);backdrop-filter:blur(8px);border-radius:14px;padding:14px;z-index:4}
+.totales .cerrar{align-self:flex-end;font-size:13px;color:var(--ink2);margin-bottom:6px}
+
+/* La banda como viene en el rider: sus secciones en orden; lo de otra categoría, tenue */
+.rider{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;mask-image:linear-gradient(#000 88%,transparent)}
+.rider ul.lista{overflow:visible;flex:none;mask-image:none}
+.rider .seccion{font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:14px 0 0;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.25)}
+.rider .seccion:first-child{margin-top:0}
+.rider li.otra{opacity:.45}
+.ver-cmp{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 12px;margin:0 0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:var(--ink2)}
+.ver-cmp b{color:var(--warn);font-weight:700}
+.ver-cmp.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ver-cmp.on b{color:inherit}
+.cmp-pane{display:flex;flex-direction:column;flex:1;min-height:0}
+
+/* Pide la banda | propuesta (Excel "Cant | Requerimiento | Cant | Propuesta") */
+.vs{display:flex;align-items:center;justify-content:center;gap:14px;margin:0 0 10px;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.06)}
+.vs div{display:flex;flex-direction:column;align-items:center;line-height:1}
+.vs b{font-family:var(--display);font-size:30px;color:var(--accent);font-variant-numeric:tabular-nums}
+.vs span{font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em;margin-top:3px}
+.vs .flecha{font-size:22px;color:var(--ink3);margin:0}
+.vs.distinto{box-shadow:inset 0 0 0 1px var(--warn)}
+.vs.distinto .flecha{color:var(--warn)}
+.cmp{overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;mask-image:linear-gradient(#000 90%,transparent);font-size:13px}
+.cab-cmp,.fila-cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cab-cmp{position:sticky;top:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);padding:4px 0;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);z-index:1}
+.fila-cmp{padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.fila-cmp>div{display:flex;gap:6px;align-items:baseline;min-width:0}
+.fila-cmp .q{font-family:var(--display);font-size:18px;font-weight:700;color:var(--accent);min-width:1.6ch;text-align:right;line-height:1;font-variant-numeric:tabular-nums}
+.fila-cmp .q.sin{color:var(--ink3)}
+.fila-cmp .t{min-width:0;overflow-wrap:anywhere}
+.fila-cmp .vacio{border-left:2px dashed rgba(255,255,255,.12)}
+
 /* Slide de banda con el stage plot de fondo */
 .banda .fondo{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(16px) brightness(.22) saturate(.6);transform:scale(1.15);z-index:-1}
 .banda{isolation:isolate}
@@ -313,6 +348,9 @@ function armar(d){
   }
   const porGrupo = d.items.some(i => i.grupo);
   const pos = c => REELES.indexOf(c);
+  // Todo lo de cada banda y día, en el orden del documento: la ficha se muestra como viene en el rider.
+  const deBanda = new Map();
+  for (const it of d.items) { if (it.sinBanda) continue; const k = it.diaId + "|" + it.artistaId; if (!deBanda.has(k)) deBanda.set(k, []); deBanda.get(k).push(it); }
   return [...cats.keys()].sort((a,b) => pos(a) - pos(b)).map(cat => {
     const items = cats.get(cat);
     const porDia = Object.fromEntries(diasShow.map(id => [id, 0]));
@@ -322,34 +360,118 @@ function armar(d){
       const r = refs.get(it.referencia) || {ref: it.referencia, dias:{}};
       r.dias[it.diaId] = (r.dias[it.diaId] || 0) + it.cantidad;
       refs.set(it.referencia, r);
+      if (it.sinBanda) continue; // listado general: solo en los totales
       const k = it.diaId + "|" + it.artistaId;
       if (!bandas.has(k)) bandas.set(k, {nombre: art[it.artistaId] || it.artistaId, dia: dia[it.diaId], show: show[k], plot: plot[it.artistaId], items: []});
       bandas.get(k).items.push(it);
     }
+    // Pide / propuesta de este reel. Las dos columnas del Excel no van alineadas renglón por
+    // renglón, así que cada lado entra por su propio reel y se compara el total.
+    for (const c of d.comparaciones || []) {
+      const enReel = l => !!l && reelDe({grupo: l.grupo, categoria: l.categoria, referencia: l.texto}) === cat;
+      const filas = c.filas.filter(f => enReel(f.pide) || enReel(f.propone))
+        .map(f => ({fila: f.fila, pide: enReel(f.pide) ? f.pide : null, propone: enReel(f.propone) ? f.propone : null}));
+      if (!filas.length) continue;
+      const k = c.diaId + "|" + c.artistaId;
+      if (!bandas.has(k)) bandas.set(k, {nombre: art[c.artistaId] || c.artistaId, dia: dia[c.diaId], show: show[k], plot: plot[c.artistaId], items: []});
+      const b = bandas.get(k);
+      b.cmp = [...(b.cmp || []), ...filas];
+      const piezas = l => l ? (l.cantidad ?? 1) : 0;
+      b.pide = (b.pide || 0) + filas.reduce((s, f) => s + piezas(f.pide), 0);
+      b.propone = (b.propone || 0) + filas.reduce((s, f) => s + piezas(f.propone), 0);
+    }
+    // Como viene en el rider: las secciones de la banda que tienen algo de este reel,
+    // completas y en su orden ("DRUM" con su pedal y su banqueta, aunque esos sean de otra categoría).
+    for (const [k, b] of bandas) {
+      const secciones = [];
+      for (const it of deBanda.get(k) || []) {
+        const g = it.grupo || "";
+        let s = secciones.find(x => x.grupo === g);
+        if (!s) secciones.push(s = {grupo: g, items: []});
+        s.items.push(it);
+      }
+      b.secciones = secciones.filter(s => s.items.some(it => reelDe(it) === cat));
+    }
     const resumen = [...refs.values()].map(r => ({ref: r.ref, q: Math.max(...Object.values(r.dias))})).sort((a,b) => porGrupo ? 0 : b.q - a.q || a.ref.localeCompare(b.ref));   // con grupos, como en el rider
     const orden = [...bandas.values()].sort((a,b) => (a.dia + (a.show?.inicio || "")).localeCompare(b.dia + (b.show?.inicio || "")));
-    return {cat, id: slug(cat), items, holo: catHolograma(cat, items), porDia, corto, aTener: resumen.reduce((s,r) => s + r.q, 0), resumen, bandas: orden, dudosos: items.filter(i => i.porConfirmar).length};
+    // Lo grande de la portada son las bandas (por banda y día) que tienen algo en este reel.
+    const equipos = orden.filter(b => b.items.length).length;
+    const bandasPorDia = {};
+    for (const [k, b] of bandas) if (b.items.length) { const id = k.split("|")[0]; bandasPorDia[id] = (bandasPorDia[id] || 0) + 1; }
+    return {cat, id: slug(cat), items, holo: catHolograma(cat, items), porDia, bandasPorDia, corto, aTener: resumen.reduce((s,r) => s + r.q, 0), equipos, resumen, bandas: orden, dudosos: items.filter(i => i.porConfirmar).length};
   });
 }
 
 /* Lo que devuelve el lector → el mismo formato de datos que Cordillera, para armar los reels. */
 function aDatos(ext){
-  const fechas = [...new Set(ext.items.map(i => i.fecha).filter(Boolean))].sort();
+  // Los reels son por banda: lo que el lector marcó como listado general (la hoja no dice de qué
+  // banda es) no sale como si fuera una banda, pero sí entra en los totales de fondo.
+  // Si el documento no trae ninguna banda, el listado se muestra como ficha.
+  const conBanda = ext.items.some(i => !i.sinBanda);
+  // "Opción 2": alternativa del rider, no se pide además de la opción 1.
+  const fuente = ext.items.filter(i => !/no suma/.test(i.nota || ""));
+  const fechas = [...new Set(fuente.map(i => i.fecha).filter(Boolean))].sort();
   const nombreDia = f => new Date(f + "T12:00").toLocaleDateString("es", {weekday: "long", day: "numeric"}).replace(/^./, c => c.toUpperCase());
   const dias = fechas.map(f => ({id: "d-" + f, nombre: nombreDia(f), tipo: "show"}));
-  if (ext.items.some(i => !i.fecha)) dias.push({id: "d-doc", nombre: "Del documento", tipo: "show"});
+  if (fuente.some(i => !i.fecha)) dias.push({id: "d-doc", nombre: "Del documento", tipo: "show"});
   const artistas = new Map();
-  // "Opción 2": alternativa del rider, no se pide además de la opción 1.
-  const items = ext.items.filter(i => !/no suma/.test(i.nota || "")).map((i, n) => {
+  const items = fuente.map((i, n) => {
     const nombre = (i.artista || "").trim() || "Sin banda";
     const id = slug(nombre) || "sin-banda";
     artistas.set(id, nombre);
     const ref = (i.descripcion || "").replace(/^[.·•\-–]\s*\d+\s+(?=\D)/, "");   // ". 1 Hi-hat stand"
     return {id: "doc-" + n, diaId: i.fecha ? "d-" + i.fecha : "d-doc", artistaId: id, cantidad: Math.max(0, Math.round(+i.cantidad || 0)) || 1,
       categoria: i.categoria || "Otro", grupo: (i.grupo || "").trim(), referencia: ref, descripcion: i.nota || ref,
-      propietario: i.proveedor === "ARTISTA" ? {tipo: "tercero", nombre: "la banda"} : {tipo: "propio"}, porConfirmar: !!i.dudoso};
+      nota: i.nota || null,   // la nota del rider, para la ficha
+      propietario: i.proveedor === "ARTISTA" ? {tipo: "tercero", nombre: "la banda"} : {tipo: "propio"}, porConfirmar: !!i.dudoso,
+      ...(conBanda && i.sinBanda ? {sinBanda: true} : {})};
   });
-  return {artistas: [...artistas].map(([id, nombre]) => ({id, nombre})), dias, bloques: [], stagePlots: [], items};
+  // "Cant | Requerimiento | Cant | Propuesta": lo que pide cada banda junto a lo que se le propone.
+  const comparaciones = (ext.comparaciones || []).map(c => {
+    const nombre = (c.artista || "").trim() || "Sin banda";
+    const id = slug(nombre) || "sin-banda";
+    artistas.set(id, artistas.get(id) || nombre);
+    return {artistaId: id, diaId: c.fecha ? "d-" + c.fecha : "d-doc", hoja: c.hoja, filas: c.filas};
+  });
+  return {artistas: [...artistas].map(([id, nombre]) => ({id, nombre})), dias, bloques: [], stagePlots: [], items, comparaciones};
+}
+
+/* La ficha de una banda: como viene en el rider (sus secciones, en orden) y, si el Excel trae
+   "Requerimiento | Propuesta", el botón para verlos lado a lado. */
+function htmlFicha(b, cat){
+  const item = x => `<li class="${reelDe(x) === cat ? "" : "otra"}"><span class="q">${x.cantidad}</span><span class="t">${esc(x.referencia)}
+        ${x.nota ? `<small>${esc(x.nota)}</small>` : x.grupo === undefined && x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
+        ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
+        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span></li>`;
+  const conTitulos = b.secciones.some(s => s.grupo);
+  const rider = b.secciones.length
+    ? b.secciones.map(s => `${conTitulos ? `<h4 class="seccion">${esc(s.grupo || "Sin sección")}</h4>` : ""}<ul class="lista">${s.items.map(item).join("")}</ul>`).join("")
+    : `<p class="sub">La propuesta no trae nada de ${esc(cat.toLowerCase())} para esta banda. Mira lo que pidió en "Pide vs propuesta".</p>`;
+  if (!b.cmp) return `<div class="rider">${rider}</div>`;
+  // Sin nada propuesto en esta categoría, la ficha abre directo en la comparación.
+  const abierta = !b.secciones.length;
+  return `
+      <button class="ver-cmp${abierta ? " on" : ""}" aria-pressed="${abierta}"><span>⇄</span> Pide vs propuesta${b.pide !== b.propone ? ` <b>${b.pide} ≠ ${b.propone}</b>` : ""}</button>
+      <div class="rider"${abierta ? " hidden" : ""}>${rider}</div>
+      <div class="cmp-pane"${abierta ? "" : " hidden"}>${htmlComparar(b)}</div>`;
+}
+
+/* Lo que pide la banda | la propuesta, en el orden de la hoja, con el total de cada lado. */
+function htmlComparar(b){
+  const lado = l => l
+    ? `<span class="q${l.cantidad === null ? " sin" : ""}">${l.cantidad ?? "·"}</span><span class="t">${esc(l.texto)}</span>`
+    : "";
+  const distinto = b.pide !== b.propone;
+  return `
+      <div class="vs${distinto ? " distinto" : ""}" title="${distinto ? "No cuadra: revisa qué falta o qué sobra" : "Cuadra el total"}">
+        <div><b>${b.pide}</b><span>pide la banda</span></div>
+        <span class="flecha">${distinto ? "≠" : "="}</span>
+        <div><b>${b.propone}</b><span>propuesta</span></div>
+      </div>
+      <div class="cmp">
+        <div class="cab-cmp"><span>Pide</span><span>Propuesta</span></div>
+        ${b.cmp.map(f => `<div class="fila-cmp" title="Fila ${f.fila} de la hoja"><div class="${f.pide ? "" : "vacio"}">${lado(f.pide)}</div><div class="${f.propone ? "" : "vacio"}">${lado(f.propone)}</div></div>`).join("")}
+      </div>`;
 }
 
 /* ── Reel 0: subir un documento ── */
@@ -396,8 +518,8 @@ function htmlSubir(){
 }
 
 function htmlReel(c, i, total){
-  const n = 2 + c.bandas.length;
-  const dias = Object.entries(c.porDia).filter(([,q]) => q).map(([id,q]) => `<span class="chip">${esc(c.corto[id])} · ${q}</span>`).join("");
+  const n = 1 + c.bandas.length;
+  const dias = Object.entries(c.bandasPorDia).map(([id,q]) => `<span class="chip">${esc(c.corto[id])} · ${q} ${q === 1 ? "banda" : "bandas"}</span>`).join("");
   const max = Math.max(1, ...c.resumen.map(r => r.q));
   const resumen = c.resumen.map(r => `<li><span class="q">${r.q}</span><span class="t">${esc(r.ref)}<div class="barra" style="width:${Math.max(8, 100*r.q/max)}%"></div></span></li>`).join("");
   const bandas = c.bandas.map(b => `
@@ -406,10 +528,7 @@ function htmlReel(c, i, total){
       <h3>${esc(b.nombre)}</h3>
       <p class="sub"><span class="hora">${esc(b.dia)}${b.show ? " · " + esc(b.show.inicio) : ""}</span> · ${b.items.reduce((s,x)=>s+x.cantidad,0)} piezas</p>
       ${b.plot ? `<img class="plot" src="${esc(b.plot)}" alt="Stage plot de ${esc(b.nombre)}" loading="lazy">` : ""}
-      <ul class="lista">${b.items.map(x => `<li><span class="q">${x.cantidad}</span><span class="t">${esc(x.referencia)}
-        ${x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
-        ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
-        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span></li>`).join("")}</ul>
+      ${htmlFicha(b, c.cat)}
     </section>`).join("");
   return `
   <article class="reel" id="${c.id}" style="--h:${HUE[sinNum(c.cat)] ?? 20}" data-n="${n}" aria-label="${esc(c.cat)}">
@@ -419,14 +538,15 @@ function htmlReel(c, i, total){
       <section class="slide portada">
         <div class="holo" data-cat="${esc(c.holo)}"><div class="emoji" aria-hidden="true">${EMOJI[sinNum(c.cat)] || "📦"}</div></div>
         <h2>${esc(c.cat)}</h2>
-        <div class="big"><strong data-to="${c.aTener}">${c.aTener}</strong><span>piezas<br>a tener</span></div>
-        <div class="dias">${dias}<span class="chip ac">${c.bandas.length} ${c.bandas.length === 1 ? "banda" : "bandas"}</span>${c.dudosos ? `<span class="chip warn">${c.dudosos} por confirmar</span>` : ""}</div>
+        <div class="big"><strong data-to="${c.equipos}">${c.equipos}</strong><span>${c.equipos === 1 ? "banda" : "bandas"}</span></div>
+        <div class="dias">${dias}${c.dudosos ? `<span class="chip warn">${c.dudosos} por confirmar</span>` : ""}</div>
         <p class="pista">${PC ? "Pasa con › para ver banda por banda" : "Desliza para ver banda por banda"} <span class="flecha">→</span></p>
-      </section>
-      <section class="slide">
-        <h3>Qué hay que tener</h3>
-        <p class="sub">Por referencia. Se suma dentro del día y se toma el máximo entre días.</p>
-        <ul class="lista">${resumen}</ul>
+        <button class="ver-totales" aria-expanded="false">Totales de fondo ›</button>
+        <div class="totales" hidden>
+          <button class="cerrar">Cerrar ✕</button>
+          <p class="sub">Por referencia, todas las bandas: se suma dentro del día y se toma el máximo entre días. ${c.aTener} piezas.</p>
+          <ul class="lista">${resumen}</ul>
+        </div>
       </section>
       ${bandas}
     </div>
@@ -540,6 +660,20 @@ feed.addEventListener("click", async e => {
   if (acc === "otro") { subida.estado = "inicio"; subida.archivos = []; return pintarSubir(); }
   if (acc === "borrar") { doc = null; escribir("lab-reels:doc", null); escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; return pintar("subir"); }
   if (acc === "ver") return reels[1]?.scrollIntoView({behavior: "smooth"});
+  const vt = e.target.closest(".ver-totales, .totales .cerrar");
+  if (vt) {
+    const p = vt.closest(".portada"), abrir = vt.classList.contains("ver-totales");
+    p.querySelector(".totales").hidden = !abrir;
+    p.querySelector(".ver-totales").setAttribute("aria-expanded", abrir);
+    return;
+  }
+  const vc = e.target.closest(".ver-cmp");
+  if (vc) {
+    const s = vc.closest(".banda"), on = !vc.classList.contains("on");
+    vc.classList.toggle("on", on); vc.setAttribute("aria-pressed", on);
+    s.querySelector(".rider").hidden = on; s.querySelector(".cmp-pane").hidden = !on;
+    return;
+  }
   if (e.target.closest(".listo")) return marcar(r);
   if (e.target.closest(".ir-subir")) return reels[0].scrollIntoView({behavior: "smooth"});
   if (e.target.closest(".compartir")) {
@@ -557,11 +691,11 @@ feed.addEventListener("change", e => {
   if (e.target.matches("#archivo, #camara")) { const fs = [...e.target.files]; e.target.value = ""; subirArchivos(fs); }
 });
 // Doble toque en cualquier parte = listo, igual que el "me gusta".
-feed.addEventListener("dblclick", e => { if (!e.target.closest(".riel, .pasar, .subir")) marcar(e.target.closest(".reel"), true); });
+feed.addEventListener("dblclick", e => { if (!e.target.closest(".riel, .pasar, .subir, .ver-cmp, .ver-totales, .totales")) marcar(e.target.closest(".reel"), true); });
 document.getElementById("visor").addEventListener("click", e => e.currentTarget.hidden = true);
 
 const indice = document.getElementById("indice");
-const filaIndice = (c, cls, actualId) => `<button class="${cls}" data-id="${c.id}" aria-current="${actualId === c.id}"><span class="e">${EMOJI[sinNum(c.cat)] || "📦"}</span><span>${esc(c.cat)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${c.aTener}</span></button>`;
+const filaIndice = (c, cls, actualId) => `<button class="${cls}" data-id="${c.id}" aria-current="${actualId === c.id}"><span class="e">${EMOJI[sinNum(c.cat)] || "📦"}</span><span>${esc(c.cat)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${c.equipos} ${c.equipos === 1 ? "banda" : "bandas"}</span></button>`;
 const filaSubir = (cls, actualId) => `<button class="${cls}" data-id="subir" aria-current="${actualId === "subir"}"><span class="e">＋</span><span>Subir documento</span></button>`;
 function abrirIndice(){
   document.getElementById("filas").innerHTML = filaSubir("fila") + cats.map(c => filaIndice(c, "fila")).join("");
@@ -645,7 +779,7 @@ async function leerYArmar(archivos){
   escribir("lab-reels:listos:doc", null);
   const categorias = [...new Set(d.items.map(reelDe))];
   subida.estado = "listo";
-  subida.resultado = {items: d.items.length, bandas: d.artistas.length, cats: categorias.length, dudosos: d.items.filter(i => i.porConfirmar).length, avisos: ext.avisos.length};
+  subida.resultado = {items: d.items.length, bandas: new Set(d.items.filter(i => !i.sinBanda).map(i => i.artistaId)).size, cats: categorias.length, dudosos: d.items.filter(i => i.porConfirmar).length, avisos: ext.avisos.length};
   pintar("subir");
   lluvia(categorias.map(c => EMOJI[sinNum(c)] || "📦"));
 }

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Planilla de backline</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#000; --surface:#121212; --surface2:#1a1a1a; --line:#333;
+  --ink:#fff; --ink2:#bdbdbd; --ink3:#8a8a8a;
+  --accent:#ff6a1f; --accent-ink:#000; --ok:#3fbf77; --warn:#ffa83a;
+  --display:"Barlow Condensed",system-ui,sans-serif; --body:"IBM Plex Sans",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 var(--body)}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:1100px;margin:0 auto;padding:calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 40px)}
+h1{font-family:var(--display);font-size:clamp(32px,7vw,48px);line-height:1;text-transform:uppercase;margin:0 0 6px;color:var(--accent)}
+.lead{color:var(--ink2);margin:0 0 18px;max-width:70ch}
+.lead b{color:var(--ink)}
+a{color:var(--accent)}
+
+/* Subir */
+.zona{border:2px dashed var(--line);border-radius:14px;padding:22px 16px;text-align:center;background:var(--surface);cursor:pointer;transition:border-color .15s,background .15s}
+.zona.encima{border-color:var(--accent);background:#2a1d0c}
+.zona p{margin:4px 0}
+.zona small{color:var(--ink3)}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface2);border-radius:999px;padding:8px 16px;font-weight:600;cursor:pointer}
+.btn.ac{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.5;cursor:default}
+#estado{margin:10px 0 0;color:var(--ink2);min-height:1.4em}
+#estado.mal{color:#ff5a55}
+.aviso{color:var(--warn)}
+
+/* Datos del encabezado */
+.datos{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:22px 0 12px}
+.datos label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink2)}
+.datos input,.datos select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.datos input:focus,.datos select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+.datos .falta input{border-color:var(--warn)}
+.barra{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:0 0 12px}
+.barra .nota{color:var(--ink3);font-size:13px}
+
+/* La planilla, como se ve en Excel / Google Sheets */
+.hoja-scroll{overflow:auto;border-radius:8px;background:#fff;max-height:75vh}
+table.xl{border-collapse:collapse;table-layout:fixed;width:880px;color:#000;font:13px/1.3 "Times New Roman",Times,serif;background:#fff}
+table.xl col.n{width:38px} table.xl col.q{width:70px} table.xl col.t{width:316px}
+table.xl th{background:#f8f9fa;color:#5f6368;font:500 11px/1 var(--body);border:1px solid #e0e0e0;padding:4px 2px;position:sticky;top:0;z-index:1}
+table.xl tbody th{position:sticky;left:0;top:auto}
+table.xl td{border:1px solid #000;padding:4px 6px;vertical-align:middle;word-wrap:break-word;min-height:22px}
+table.xl .titulo td{background:#434343;color:#fff;font-weight:700;font-size:26px;text-align:center;height:58px}
+table.xl .set td{background:#a4c2f4;font-weight:700;text-align:center}
+table.xl .cat td{height:36px}
+table.xl td.b{font-weight:700;text-align:center}
+table.xl td.estrellas{background:#939a28}
+table.xl td.enlace{color:#1155cc;text-decoration:underline;word-break:break-all;font-size:12px}
+table.xl .cab td{background:#efefef;font-weight:700}
+table.xl td.c{text-align:center}
+table.xl td[contenteditable]{cursor:text}
+table.xl td[contenteditable]:focus{outline:2px solid #1a73e8;outline-offset:-2px;background:#e8f0fe}
+table.xl tr.seccion td.req{text-transform:uppercase}
+table.xl td.prop:empty::before{content:"";}
+table.xl .nueva td{border-style:dashed;color:#777}
+.mas{margin-top:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Planilla de backline</h1>
+  <p class="lead">Sube el rider de la banda y sale el <b>Requerimiento</b> en el formato de siempre: <b>Cant | Requerimiento | Cant | Propuesta</b>. Revisa, corrige lo que haga falta, llena la <b>Propuesta</b> aquí o en el Excel, y descárgalo. Todo se lee en este dispositivo.</p>
+
+  <div class="zona" id="zona" tabindex="0" role="button" aria-label="Elegir el rider">
+    <p><b>Suelta aquí el rider</b> (PDF, foto, Word en PDF, Excel o correo)</p>
+    <p><small>o toca para elegirlo</small></p>
+    <input type="file" id="archivo" accept=".pdf,.eml,.txt,.xlsx,image/*,application/pdf,message/rfc822" hidden>
+  </div>
+  <p id="estado" role="status"></p>
+
+  <section id="resultado" hidden>
+    <div class="datos">
+      <label id="campo-banda">Banda <input id="banda" placeholder="Escribe el nombre de la banda"></label>
+      <label id="campo-cual" hidden>Banda del documento <select id="cual"></select></label>
+      <label>Escenario <input id="escenario" value="Stage 4"></label>
+      <label>Fecha <input id="fecha" type="date"></label>
+      <label>Set <input id="set" value="SET A"></label>
+      <label>Cat <select id="cat">
+        <option value="">—</option><option>★☆☆☆☆</option><option>★★☆☆☆</option><option>★★★☆☆</option><option>★★★★☆</option><option>★★★★★</option>
+      </select></label>
+      <label>Rider (enlace o nombre) <input id="rider"></label>
+    </div>
+    <div class="barra">
+      <button class="btn ac" id="descargar">⬇ Descargar Excel</button>
+      <span class="nota" id="resumen"></span>
+    </div>
+    <div class="hoja-scroll"><table class="xl" id="hoja"></table></div>
+    <button class="btn mas" id="agregar">＋ Agregar fila</button>
+  </section>
+</div>
+
+<script>
+/* El lector de PDF usa Map.getOrInsert(Computed), que solo traen los navegadores más nuevos. */
+for (const C of [Map, WeakMap]) {
+  if (!C.prototype.getOrInsertComputed) C.prototype.getOrInsertComputed = function(k, f){ if (!this.has(k)) this.set(k, f(k)); return this.get(k); };
+  if (!C.prototype.getOrInsert) C.prototype.getOrInsert = function(k, v){ if (!this.has(k)) this.set(k, v); return this.get(k); };
+}
+const LECTOR = new URL("../cordillera/lector/", location.href).href;   // el mismo lector de los reels
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
+
+let L = null, ext = null, traza = [], filas = [], nombreArchivo = "";
+
+function cargarLector(){
+  if (window.LectorBackline) return Promise.resolve(window.LectorBackline);
+  return new Promise((ok, mal) => {
+    const sc = document.createElement("script");
+    sc.src = LECTOR + "lector.js";
+    sc.onload = () => window.LectorBackline ? ok(window.LectorBackline) : mal(new Error("El lector no cargó."));
+    sc.onerror = () => mal(new Error("No se pudo cargar el lector."));
+    document.head.append(sc);
+  });
+}
+function estado(t, mal = false){ $("estado").textContent = t; $("estado").className = mal ? "mal" : ""; }
+
+/* ── Subir ── */
+const zona = $("zona"), input = $("archivo");
+zona.addEventListener("click", () => input.click());
+zona.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); input.click(); } });
+for (const ev of ["dragenter", "dragover"]) zona.addEventListener(ev, e => { e.preventDefault(); zona.classList.add("encima"); });
+for (const ev of ["dragleave", "drop"]) zona.addEventListener(ev, e => { e.preventDefault(); zona.classList.remove("encima"); });
+zona.addEventListener("drop", e => { const f = e.dataTransfer?.files?.[0]; if (f) leer(f); });
+for (const ev of ["dragover", "drop"]) window.addEventListener(ev, e => e.preventDefault());
+input.addEventListener("change", () => { const f = input.files?.[0]; input.value = ""; if (f) leer(f); });
+
+async function leer(archivo){
+  nombreArchivo = archivo.name;
+  estado(/^image\//.test(archivo.type) ? "Leyendo la foto con OCR… puede tardar" : "Leyendo el rider…");
+  try {
+    L = await cargarLector();
+    traza = [];
+    const r = await L.leerTodo([archivo], {rutas: {pdfWorker: LECTOR + "pdf.worker.min.mjs", ocr: LECTOR + "ocr/"}, base: null, traza,
+      alProgreso: (_n, e) => estado(e)});
+    ext = r.extraccion;
+    const error = r.archivos.find(a => a.error);
+    if (error) throw new Error(error.error);
+    if (!ext.items.length) { estado("Leí el documento pero no encontré la lista de backline. Si es una foto, que sea nítida y de cerca.", true); return; }
+  } catch (err) { estado("No se pudo leer: " + (err?.message || err), true); return; }
+
+  // Varias bandas (un Excel con varias): se elige cuál.
+  const bandas = [...new Set(ext.items.filter(i => !i.sinBanda).map(i => i.artista))];
+  $("campo-cual").hidden = bandas.length < 2;
+  $("cual").innerHTML = bandas.map(b => `<option>${esc(b)}</option>`).join("");
+  $("escenario").value = ext.escenarios[0] || $("escenario").value;
+  $("fecha").value = ext.dias[0]?.fecha || "";
+  $("rider").value = nombreArchivo;
+  elegirBanda(bandas[0]);
+  $("resultado").hidden = false;
+}
+
+function elegirBanda(b){
+  filas = L.filasDelRider(ext, traza, $("campo-cual").hidden ? undefined : b).map(f => ({...f, propuesta: {cantidad: "", texto: ""}}));
+  const sinNombre = !b || b === L.SIN_NOMBRE;
+  $("banda").value = sinNombre ? "" : b;
+  $("campo-banda").classList.toggle("falta", sinNombre);
+  const items = filas.filter(f => f.tipo === "item").length, secciones = filas.filter(f => f.tipo === "seccion").length;
+  estado(`Listo: ${items} ítems en ${secciones} secciones.` + (sinNombre ? " El nombre de la banda no está en el texto del rider: escríbelo arriba." : ""));
+  pintar();
+}
+$("cual").addEventListener("change", e => elegirBanda(e.target.value));
+
+/* ── La planilla ── */
+const COLS = `<colgroup><col class="n"><col class="q"><col class="t"><col class="q"><col class="t"></colgroup>`;
+function datos(){
+  return {escenario: $("escenario").value.trim(), fecha: $("fecha").value, banda: $("banda").value.trim(), set: $("set").value.trim() || "SET A",
+    cat: $("cat").value, rider: $("rider").value.trim()};
+}
+function pintar(){
+  const d = datos(), f = L.fechaPlanilla(d.fecha), n = k => `<th>${k}</th>`;
+  const linea = [d.banda, d.escenario ? `Backline ${d.escenario}` : "", f.corta].filter(Boolean).join(" | ");
+  let html = COLS + `<thead><tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr></thead><tbody>
+    <tr class="titulo">${n(1)}<td colspan="2">${esc(d.escenario)}</td><td colspan="2">${esc(f.larga)}</td></tr>
+    <tr>${n(2)}<td></td><td>${esc(linea)}</td><td></td><td></td></tr>
+    <tr class="set">${n(3)}<td colspan="4">${esc(d.set)}</td></tr>
+    <tr class="cat">${n(4)}<td class="b">Cat:</td><td class="estrellas">${esc(d.cat)}</td><td class="b">Rider:</td><td class="enlace">${esc(d.rider)}</td></tr>
+    <tr class="cab">${n(5)}<td class="c">Cant</td><td>Requerimiento</td><td class="c">Cant</td><td>Propuesta</td></tr>`;
+  filas.forEach((fila, k) => {
+    html += `<tr class="${fila.tipo}" data-k="${k}">${n(6 + k)}
+      <td class="c" contenteditable data-campo="cantidad">${fila.tipo === "item" ? esc(L.cantidadPlanilla(fila.cantidad)) : ""}</td>
+      <td class="req" contenteditable data-campo="texto">${esc(fila.texto)}</td>
+      <td class="c prop" contenteditable data-campo="pcant">${esc(fila.propuesta.cantidad)}</td>
+      <td class="prop" contenteditable data-campo="ptexto">${esc(fila.propuesta.texto)}</td></tr>`;
+  });
+  $("hoja").innerHTML = html + "</tbody>";
+  $("resumen").textContent = `${filas.filter(f => f.tipo === "item").length} ítems · edita cualquier celda del requerimiento o de la propuesta`;
+}
+// Lo que se escribe en la hoja queda en las filas (sin volver a pintar, para no perder el cursor).
+$("hoja").addEventListener("input", e => {
+  const td = e.target.closest("td[data-campo]"), tr = td?.closest("tr[data-k]");
+  if (!tr) return;
+  const fila = filas[+tr.dataset.k], v = td.textContent.trim();
+  if (td.dataset.campo === "texto") fila.texto = v;
+  if (td.dataset.campo === "pcant") fila.propuesta.cantidad = v;
+  if (td.dataset.campo === "ptexto") fila.propuesta.texto = v;
+  if (td.dataset.campo === "cantidad") {
+    const q = v.match(/\d+/);
+    fila.cantidad = q ? +q[0] : null;
+    fila.tipo = q ? "item" : (fila.tipo === "item" ? "nota" : fila.tipo);
+  }
+});
+for (const id of ["banda", "escenario", "fecha", "set", "cat", "rider"]) $(id).addEventListener("input", () => {
+  if (id === "banda") $("campo-banda").classList.toggle("falta", !$("banda").value.trim());
+  pintar();
+});
+$("agregar").addEventListener("click", () => {
+  filas.push({tipo: "nota", cantidad: null, texto: "", propuesta: {cantidad: "", texto: ""}});
+  pintar();
+  $("hoja").querySelector(`tr[data-k="${filas.length - 1}"] td.req`)?.focus();
+});
+
+/* ── Descargar ── */
+$("descargar").addEventListener("click", async () => {
+  const d = datos();
+  if (!d.banda) { $("banda").focus(); estado("Escribe el nombre de la banda antes de descargar.", true); return; }
+  const listas = filas.filter(f => f.texto || f.propuesta.texto || f.propuesta.cantidad);
+  const bytes = await L.planillaXlsx({...d, filas: listas});
+  const url = URL.createObjectURL(new Blob([bytes], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+  const a = Object.assign(document.createElement("a"), {href: url, download: `Backline ${d.escenario} - ${d.banda}.xlsx`.replace(/[\\/:*?"<>|]/g, " ")});
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  estado("Descargado. Ábrelo en Excel o súbelo a Google Sheets.");
+});
+</script>
+</body>
+</html>

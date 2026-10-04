@@ -26,7 +26,8 @@ histórico: su contenido ya está aquí (`cordillera/` y `prototipos/estado/`).
 |---|---|
 | `lab-reels/` | **Lo más reciente.** El backline como reels (ver abajo). |
 | `cordillera/` | Lista de chequeo ESC 2 Cordillera 2026 con "Subir documento". Trae el lector empaquetado en `cordillera/lector/` (lo usan también los reels). |
-| `extractor/` | Build (Vite) del extractor: suelta un documento y sale el listado. Sus `data/` y `muestras/` sirven de ejemplo. |
+| `planilla/` | **Del rider a la planilla de backline** en el formato de OML (Stage \| fecha, SET A, Cat / Rider, Cant \| Requerimiento \| Cant \| Propuesta): se sube el rider, sale el Requerimiento, se edita y se descarga el .xlsx. El nombre de la banda casi nunca está en el texto (va en el logo): la página lo pide. |
+| `extractor/` | Build (Vite) del extractor: suelta un documento y sale el listado. Sus `data/` y `muestras/` sirven de ejemplo. `texto.html` («Así lo leí»): el texto tal como se leyó, sin interpretar, y un Excel dibujado como en Excel al lado. |
 | `demo-listado/` | Del listado del PDF al backline organizado (Cordillera 2024). |
 | `reconocimiento-3d/` | Cámara + MobileNet que reconoce un equipo y lo muestra como holograma 3D (Three.js). |
 | `produccion-31-julio/` | La app que se usó en producción el 31 de julio (Firestore del proyecto `backline-2797d`, `functions/`). |
@@ -74,7 +75,17 @@ Piezas, en `lector/src/lectura/` de la rama `extractor`:
   Escenario, Cables y energía, DJ, Otro).
 - Pruebas: `tests/riders.test.ts` tiene riders de prueba inventados
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
-  con Chromium). Hay 93 pruebas en verde.
+  con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
+  de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
+  inglés). Hay 126 pruebas en verde.
+- En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
+  `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
+  `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
+  (la planilla .xlsx). Los riders reales van en `lector/riders-reales/`, que no se sube.
+- Reglas que no se deben perder: un correo o teléfono nunca es ítem (ni llega a la
+  planilla); si el rider tiene sección de backline, lo leído antes y fuera de toda
+  sección (tarima, wifi, consolas) se quita; el hardware de batería es Batería;
+  en la planilla no entran párrafos del contrato ("deberá…", transporte, hotel).
 
 Trabajar el lector:
 ```bash
@@ -158,6 +169,14 @@ están el resumen y cada banda. Todo usa CSS scroll-snap.
   tarima. Un solo lienzo WebGL pasa al reel visible.
 - El holograma se arma con el listado (`receta.js`): si dice 4 bases de platillo,
   salen 4; lo que no diga sale del formato de siempre de una batería.
+- **Lo que importa son las bandas** (lo pidió el usuario): la portada dice cuántas
+  bandas y cuántas por día; los totales por referencia ("4 kick") quedan de fondo,
+  detrás de "Totales de fondo". La ficha de cada banda se lee como el rider: sus
+  secciones completas y en orden; lo de otro reel, tenue. Un listado sin banda
+  (`sinBanda` del lector) no sale como banda, pero sí en los totales.
+- En un Excel "Cant | Requerimiento | Cant | Propuesta" (OML), cada ficha tiene el botón
+  **Pide vs propuesta** con las dos columnas en el orden de la hoja y el total de cada
+  lado. Se compara por total, no fila por fila: en los Excel reales no van alineadas.
 - En PC hay índice lateral y flechas para el mouse; en el celular nada de eso.
 - Lleva un reemplazo de `Map.getOrInsertComputed`, porque pdf.js lo necesita en
   navegadores no tan nuevos.
