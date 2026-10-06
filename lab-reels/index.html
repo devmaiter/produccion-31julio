@@ -777,7 +777,6 @@ function htmlBanda(b, i, total){
     return `
       <section class="slide banda seccion-slide">
         ${htmlHolo(`${id}|${j}`, s.items)}
-        <p class="sub" style="margin:0">${esc(b.nombre)} · ${j + 1} de ${conSecciones.length}</p>
         <h3>${esc(s.grupo || "Sin sección")}</h3>
         ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
         ${htmlFicha({secciones: [{grupo: "", items: s.items}], items: s.items}, null)}
@@ -800,7 +799,7 @@ function htmlBanda(b, i, total){
       ${detalle}
       <section class="slide banda">
         <h3>Fotos y rider</h3>
-        <p class="sub">${esc(b.nombre)}${V.puede.planilla && b.items.length ? `<button class="ir-planilla" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button>` : ""}</p>
+        ${V.puede.planilla && b.items.length ? `<p class="sub"><button class="ir-planilla" style="margin:0" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button></p>` : ""}
         ${htmlFotos(b)}
         ${htmlTarjeta(b)}
       </section>
