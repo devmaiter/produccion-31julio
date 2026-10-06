@@ -78,7 +78,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 126 pruebas en verde.
+  inglés). Hay 172 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -94,9 +94,12 @@ Piezas, en `lector/src/lectura/`:
   "alfombra para batería": una cosa puede tener varios nombres), atriles, sillas y bancos de
   músicos, pedales de efectos (guitarra, o bajo si lo dice), parches (ítem de batería),
   cuerdas de repuesto, baquetas, instrumento spare (suma) y afinadores.
-- No: risers y sobretarimas (`NUNCA_BACKLINE` en `categorias.ts`).
-- Sin definir todavía: pedestales de micrófono, cajas directas, cables de instrumento,
-  corriente en tarima. Preguntarle al usuario antes de decidir.
+- No: risers y sobretarimas, pedestales de micrófono, cajas directas (DI), cables y la
+  corriente en tarima (extensiones, multitomas, regletas, UPS). Confirmado el 2026-10-05;
+  vive en `noEsBackline` de `categorias.ts`. Un "pedestal" que dice de qué instrumento es
+  ("pedestal para platillo") o que está en la sección de batería o percusión sí es backline;
+  "DI" a secas solo cuenta en mayúscula.
+- Cabezal + caja ("Ampeg SVT Classic + 8x10") son dos piezas.
 - Lo que la banda trae va marcado ("lo trae la banda"); "la banda lleva X pero necesitamos
   Y" son dos piezas. Varias opciones para lo mismo ("Ampeg SVT / Fender Rumble o Aguilar")
   son una sola pieza.

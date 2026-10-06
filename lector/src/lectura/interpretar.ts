@@ -10,7 +10,7 @@
  *   - encabezados: de grupo ("DRUMS", "Bass") o de artista ("LOS RAYOS")
  * Lo que no entiende no lo inventa: lo devuelve en avisos para revisarlo.
  */
-import { CAJA_AMPLI, categorizar, NUNCA_BACKLINE } from "../dominio/categorias";
+import { CAJA_AMPLI, categorizar, noEsBackline } from "../dominio/categorias";
 import type { Categoria, PaqueteEvento } from "../dominio/entidades";
 import { separarCantidad } from "../dominio/lista";
 import type { Documento, Linea } from "./documento";
@@ -489,7 +489,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
       if (NO_BACKLINE.test(descripcion) && categorizar(principal ?? descripcion) === "Otro") return true; // radios, pilas, cinta: se lee pero no es backline
       if (CONSUMIBLE.test(descripcion)) return true; // "ORANGE GAFFER TAPE": la marca de un ampli no lo vuelve backline
-      if (NUNCA_BACKLINE.test(descripcion)) return true; // risers y sobretarimas: se piden con el backline pero no lo son
+      if (noEsBackline(descripcion, grupo)) return true; // risers, pedestales de mic, DI, cables y corriente: se piden con el backline pero no lo son
       // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
       // (salvo lo que la banda dice que trae: "Gaita hembra" también cuenta).
       const loTraeLaBanda = proveedorActual === "ARTISTA" && !proveedor && descripcion.split(" ").length <= 4 && !/[.?!]$/.test(t);
@@ -632,11 +632,6 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
   }
 }
 
-/* Renglones que el documento partió en dos:
- *   - un paréntesis que se cierra abajo: "TOMS 10” (Remo" + "Pinstripe)"
- *   - una frase que sigue en minúscula: "Cada equipo deberá…" + "condiciones de…"
- *   - una lista corrida: "4 Boom Stand 3" + "Snare Stand 1 Hi" + "Hat Stand 1 Kick"
- *     → "4 Boom Stand", "3 Snare Stand", "1 Hi Hat Stand", "1 Kick …" */
 /** "1 Ampeg SVT Classic + 8x10" → ["1 Ampeg SVT Classic", "1 Caja 8x10"]; null si no es cabezal + caja. */
 export function cabezalYCaja(t: string): string[] | null {
   if (!t.includes("+")) return null;
@@ -651,6 +646,11 @@ export function cabezalYCaja(t: string): string[] | null {
   return partes.map(p => `${cant} ${/^[\d\s x×"”]+$/i.test(p) ? `Caja ${p}` : p}`);
 }
 
+/* Renglones que el documento partió en dos:
+ *   - un paréntesis que se cierra abajo: "TOMS 10” (Remo" + "Pinstripe)"
+ *   - una frase que sigue en minúscula: "Cada equipo deberá…" + "condiciones de…"
+ *   - una lista corrida: "4 Boom Stand 3" + "Snare Stand 1 Hi" + "Hat Stand 1 Kick"
+ *     → "4 Boom Stand", "3 Snare Stand", "1 Hi Hat Stand", "1 Kick …" */
 /** Un renglón que termina en preposición, conjunción o coma sigue en el próximo. */
 const COLGADO = /(\b(para|de|del|con|sin|y|e|o|u|la|el|los|las|en|por|tipo|for|of|with|and|or|the|to)|,)$/i;
 

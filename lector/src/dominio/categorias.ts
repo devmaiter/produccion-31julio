@@ -41,12 +41,27 @@ const HARDWARE = /\b(stands?|soportes?|bases?|sillas?|banquetas?|asientos?|thron
 
 /** Lo que nunca es backline aunque venga con el backline (lo definió el usuario): risers y sobretarimas,
  *  pedestales de micrófono, cajas directas, cables y la corriente en tarima. */
-export const NUNCA_BACKLINE = new RegExp([
+const NUNCA_BACKLINE = new RegExp([
   "\\b(risers?|drum ?risers?|sobre ?-?tarimas?|sobretarimas?|stage ?dex|plataformas?)\\b",
-  "\\bpedestal(es)?\\b|\\bpies? de micr[oó]fonos?|\\bmic(rophone)? stands?\\b|\\bstands? (de |para )?(micr[oó]fonos?|mics?)\\b|\\bjirafas?\\b",
-  "\\bcajas? directas?|\\bdirect ?box(es)?\\b|\\bdi ?box(es)?\\b|\\bd\\.i\\.|\\bDI\\b",
-  "\\bcables?\\b|\\bcableado\\b|\\bextensi[oó]n(es)?\\b|\\bregletas?\\b|\\bmultitomas?\\b|\\bpower ?strips?\\b|\\btransformador(es)?\\b|\\bconvertidor(es)?\\b|\\bups\\b",
+  "\\bpies? de micr[oó]fonos?|\\bmic(rophone)? stands?\\b|\\bstands? (de |para )?(micr[oó]fonos?|mics?)\\b|\\bjirafas?\\b",
+  "\\bcajas? directas?|\\bdirect ?box(es)?\\b|\\bdi ?box(es)?\\b|\\bd\\.i\\.",
+  "\\bcables?\\b|\\bcableado\\b|\\bregletas?\\b|\\bmultitomas?\\b|\\bpower ?strips?\\b|\\btransformador(es)?\\b|\\bconvertidor(es)?\\b|\\bups\\b",
 ].join("|"), "i");
+/** "DI" a secas solo en mayúscula: "di la vuelta" es texto. */
+const DI = /\bDIs?\b/;
+/** "Pedestal" o "extensión" a secas son de micrófono o de corriente, salvo que digan de qué instrumento son
+ *  ("pedestal para platillo", "extensión para pedal de bombo"). Un pedestal en la sección de batería o
+ *  percusión es hardware de esa sección; una extensión en la sección del bajo sigue siendo corriente. */
+const PEDESTAL = /\bpedestal(es)?\b/i;
+const EXTENSION = /\bextensi[oó]n(es)?\b/i;
+const DE_INSTRUMENTO = /\b(platillos?|cymbals?|crash|ride|china|splash|hi-?hats?|redoblantes?|snares?|toms?|bombos?|kick|bater[ií]as?|drums?|percusi[oó]n|percussion|congas?|timbal(es)?|bong[oó]s?|teclados?|keyboards?|keys|guitarras?|guitars?|bajos?|bass|pedal(es)?|atriles?)\b/i;
+
+export function noEsBackline(texto: string, grupo?: string | null): boolean {
+  if (NUNCA_BACKLINE.test(texto) || DI.test(texto)) return true;
+  if (DE_INSTRUMENTO.test(texto)) return false;
+  if (PEDESTAL.test(texto)) return !(grupo && (SECCION_BATERIA.test(grupo) || SECCION_PERCUSION.test(grupo)));
+  return EXTENSION.test(texto);
+}
 
 /** "Ampeg SVT Classic + 8x10": la caja de un ampli (para separarla del cabezal). */
 export const CAJA_AMPLI = /\b(\d{1,2}\s*[x×]\s*(10|12|15)\b|cabinets?|\bcab\b|cajas?\b|bafles?|810e?|412|410|212|115)/i;

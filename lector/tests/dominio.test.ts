@@ -1,5 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { categorizar, parsearLista, propietarioDe, referenciaDe, separarCantidad } from "../src/dominio";
+import { categorizar, noEsBackline, parsearLista, propietarioDe, referenciaDe, separarCantidad } from "../src/dominio";
+
+describe("no es backline", () => {
+  it.each([
+    ["Drum riser 2x2", null, true],
+    ["Pedestal", null, true],
+    ["Mic stand", null, true],
+    ["Jirafa", null, true],
+    ["Caja directa", null, true],
+    ["DI activa", null, true],
+    ["Cable de instrumento", null, true],
+    ["Extensión eléctrica", null, true],
+    ["Pedestal para platillo", null, false],
+    ["Pedestales", "Drums", false],
+    ["Extensión para pedal de bombo", null, false],
+    ["Di la vuelta a la tarima", null, false],
+    ["Fender Twin Reverb", null, false],
+  ])("%s (%s) → %s", (texto, grupo, esperado) => {
+    expect(noEsBackline(texto, grupo)).toBe(esperado);
+  });
+});
 
 describe("categorizar", () => {
   it.each([

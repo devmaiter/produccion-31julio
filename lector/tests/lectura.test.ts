@@ -96,6 +96,31 @@ Quedo atento, gracias.`)], { anio: 2026 });
     const e = interpretar([{ nombre: "foto.jpg", tipo: "imagen", avisos: [], lineas: [{ texto: "Snare stand   2   CN", confianza: 55 }] }], { artista: "X", fecha: "2026-01-01" });
     expect(e.items[0]).toMatchObject({ dudoso: true, nota: "lectura dudosa (55%)" });
   });
+
+  it("pedestales de mic, cajas directas, cables y corriente no son backline; el pedestal de un platillo sí", () => {
+    const e = interpretar([texto(`VOCES
+3 Pedestales
+2 Mic stand boom
+BAJO
+1 Caja directa
+4 Cables de instrumento
+2 Extensiones
+1 Multitoma
+DRUMS
+2 Pedestales boom para crash
+1 Extensión para pedal de bombo
+4 Pedestales`)], { artista: "Los Rayos", fecha: "2026-11-14" });
+    expect(e.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual([
+      "2 Pedestales boom para crash", "1 Extensión para pedal de bombo", "4 Pedestales",
+    ]);
+  });
+
+  it("cabezal + caja son dos piezas", () => {
+    const e = interpretar([texto("BAJO\n1 Ampeg SVT Classic + 8x10\nGUITARRA\n2 Fender Twin + pedalera")], { artista: "Los Rayos", fecha: "2026-11-14" });
+    expect(e.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual([
+      "1 Ampeg SVT Classic", "1 Caja 8x10", "2 Fender Twin + pedalera",
+    ]);
+  });
 });
 
 describe("PDF", () => {
