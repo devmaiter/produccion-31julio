@@ -61,6 +61,11 @@ Piezas, en `lector/src/lectura/`:
     camerinos, catering, hotel, transporte y radios no.
   - **La banda:** "RIDER TÉCNICO" o "TECHNICAL RIDER" + nombre fija la banda de
     todo el documento.
+    Si debajo no está el nombre (va en el logo), se busca: el nombre en MAYÚSCULAS
+    repetido tras "para/de/por"; el nombre en mayúsculas y minúsculas que las frases
+    repiten ("el show de Los Amigos Invisibles"), con 2 veces si está en la web o el
+    correo del documento y 3 si no; o quien firma ("Att: Paula Pera") si su nombre está
+    en el correo. Las palabras del contrato ("El Artista", "El Contratante") no cuentan.
   - **Renglones partidos y listas corridas.**
   - **Páginas repetidas:** un bloque igual a uno anterior se lee una vez.
   - **Unidades:** "16 CH" o "4 RETORNOS" no son cantidades.
@@ -78,7 +83,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 172 pruebas en verde.
+  inglés). Hay 175 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`

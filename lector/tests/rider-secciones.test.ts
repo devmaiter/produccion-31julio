@@ -96,6 +96,24 @@ describe("rider de gira en inglés", () => {
   it("'TOUR 2026' no es el nombre de la banda", () => {
     expect(e.artistas).toEqual([SIN_NOMBRE]);
   });
+  it("el nombre que el rider repite en sus frases, en mayúsculas y minúsculas, es la banda", () => {
+    const texto = RIDER_TOUR.replace("TOUR 2026", "TOUR 2026\nwww.losrayosmusica.com\nLos sobre escenarios son de uso exclusivo de Los Rayos y por ningún motivo se comparten.\n" +
+      "Los Rayos no se presentarán sin haber realizado el soundcheck.\nEl Contratante debe garantizar el show de Los Rayos y El Artista lo confirmará.");
+    const r = interpretar([{ nombre: "rider.pdf", tipo: "pdf", lineas: lineasDeTexto(texto), avisos: [] }]);
+    expect(r.artistas).toEqual(["Los Rayos"]);
+  });
+  it("quien firma es la banda si su nombre está en el correo del documento", () => {
+    const conFirma = (firma: string) => interpretar([{ nombre: "rider.pdf", tipo: "pdf", avisos: [],
+      lineas: lineasDeTexto(RIDER.replace("Management: Fulana de Tal", "Management: Fulana de Tal\nlosrayosyelfin@gmail.com") + "\nGracias\n" + firma) }]).artistas;
+    expect(conFirma("Att: Los Rayos")).toEqual(["Los Rayos"]);
+    expect(conFirma("Atentamente,\nLos Rayos")).toEqual(["Los Rayos"]);
+    expect(conFirma("Att: Fulana de Tal")).toEqual([SIN_NOMBRE]);   // firma alguien que no está en el correo
+  });
+  it("'El Contratante' y 'El Artista' repetidos no son la banda", () => {
+    const texto = RIDER_TOUR.replace("TOUR 2026", "TOUR 2026\nEl Contratante proveerá el backline.\nEl Artista y El Contratante firman.\nEl Contratante paga.\nEl Artista llega.\nEl Artista toca.");
+    const r = interpretar([{ nombre: "rider.pdf", tipo: "pdf", lineas: lineasDeTexto(texto), avisos: [] }]);
+    expect(r.artistas).toEqual([SIN_NOMBRE]);
+  });
   it("lo de antes del backline (tarima, wifi, monitores) y los datos de contacto no son ítems", () => {
     expect(e.items[0]!.descripcion).toBe("DRUM RUG");
     expect(traza.find(r => r.texto.includes("@"))?.etiqueta).not.toBe("item");

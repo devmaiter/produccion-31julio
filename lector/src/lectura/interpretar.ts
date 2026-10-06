@@ -766,7 +766,55 @@ export function nombreRepetido(lineas: ReadonlyArray<{ texto: string }>): string
     }
   }
   const [mejor] = [...cuenta].sort((a, b) => b[1] - a[1] || b[0].length - a[0].length);
-  return mejor && mejor[1] >= 2 ? mejor[0] : null;
+  if (mejor && mejor[1] >= 2) return mejor[0];
+  return nombreEnElTexto(lineas);
+}
+
+/** Palabras de contrato y de rider que van con mayúscula sin ser el nombre de la banda. */
+const GENERICO = new Set(("el la los las the rider tecnico technical artista artist contratante contratista promotor promoter productor produccion " +
+  "production manager management equipo equipos audio video sonido sound iluminacion luces lighting lights escenario stage backline nota notas " +
+  "informacion datos festival evento show tour gira prueba soundcheck monitores monitor consola sistema power input output list plot camerino " +
+  "camerinos catering hotel transporte set pagina page anexo cliente organizacion organizador musicos band banda grupo agrupacion hospitality").split(" "));
+
+/** El nombre de la banda escrito en mayúsculas y minúsculas que el rider repite en sus frases:
+ *  "el show de Los Amigos Invisibles", "Los Amigos Invisibles no se presentarán…". Si la página web
+ *  o el correo del documento lo contienen (www.amigosinvisibles.com), con dos veces basta; si no,
+ *  tiene que repetirse tres. Las palabras del contrato ("El Artista", "El Contratante") no cuentan. */
+export function nombreEnElTexto(lineas: ReadonlyArray<{ texto: string }>): string | null {
+  const PAL = "\\p{Lu}[\\p{Ll}'’]+";
+  const re = new RegExp(`${PAL}(?:\\s+(?:(?:y|e|&|de|del|of|and)\\s+)?${PAL}){1,4}`, "gu");
+  const webs = new Set<string>();
+  for (const l of lineas) {
+    for (const m of l.texto.matchAll(/([\w.-]+)@([\w-]+)\.|(?:www\.|https?:\/\/)([\w-]+)\./gi)) {
+      for (const h of [m[1], m[3], m[2] && !/^(gmail|hotmail|yahoo|outlook|live|icloud|msn|me)$/i.test(m[2]) ? m[2] : undefined]) if (h) webs.add(sinTildes(h).toLowerCase().replace(/[^a-z]/g, ""));
+    }
+  }
+  const claveNombre = (n: string) => sinTildes(n.replace(/^(los|las|la|el|the)\s+/i, "")).toLowerCase().replace(/[^a-z]/g, "");
+  const enLaWeb = (n: string) => claveNombre(n).length >= 5 && [...webs].some(w => w.includes(claveNombre(n)));
+  // "Att: Paula Pera" al final del rider y el correo paulapera…@: quien firma es la banda. Sin esa
+  // coincidencia no se toma (suele firmar el productor o el mánager).
+  const FIRMA = /^(att|atte|atentamente|cordialmente|saludos|regards|best regards|sincerely)\b[.:,]*\s*(.*)$/i;
+  for (let i = 0; i < lineas.length; i++) {
+    const m = lineas[i]!.texto.trim().match(FIRMA);
+    if (!m) continue;
+    const nombre = (m[2] || lineas[i + 1]?.texto || "").split(/\s*[,|–—]\s*|\s+-\s+/)[0]!.trim();
+    if (/^\p{Lu}/u.test(nombre) && /^[\p{L}' .&]+$/u.test(nombre) && nombre.split(/\s+/).length <= 5 && enLaWeb(nombre)) return nombre;
+  }
+  const cuenta = new Map<string, number>();
+  for (const l of lineas) {
+    if (l.texto === l.texto.toUpperCase()) continue;
+    const enEsteRenglon = new Set<string>();
+    for (const m of l.texto.matchAll(re)) {
+      const palabras = m[0].split(/\s+/);
+      if (palabras.every(p => GENERICO.has(sinTildes(p).toLowerCase()) || /^(y|e|&|de|del|of|and)$/i.test(p))) continue;
+      enEsteRenglon.add(m[0]);
+    }
+    for (const n of enEsteRenglon) cuenta.set(n, (cuenta.get(n) ?? 0) + 1);
+  }
+  const [mejor] = [...cuenta]
+    .filter(([n, c]) => c >= (enLaWeb(n) ? 2 : 3))
+    .sort((a, b) => Number(enLaWeb(b[0])) - Number(enLaWeb(a[0])) || b[1] - a[1] || b[0].length - a[0].length);
+  return mejor ? mejor[0] : null;
 }
 
 /* Riders que repiten una página entera (la misma tabla de batería en la página 3 y en la 4):
