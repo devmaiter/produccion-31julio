@@ -19,6 +19,7 @@ npm run dev          # elm reactor en http://localhost:8000 → abrir index.html
 | `src/Backline/Entidades.elm` | El modelo: `Categoria`, `Propietario`, `TipoDia`, `TipoBloque` como tipos cerrados; `Evento`, `Escenario`, `Dia`, `Artista`, `Bloque`, `ItemBackline`, `StagePlot`, `Verificacion`, `PaqueteEvento` |
 | `src/Backline/Json.elm` | Decodificadores y codificadores estrictos del JSON del lector: fechas `AAAA-MM-DD`, horas `HH:MM`, ids, cantidades no negativas; un campo opcional con el tipo equivocado es un error |
 | `src/Backline/Extraccion.elm` | Lo que devuelve el lector al leer un archivo, antes de integrarlo |
+| `src/Backline/Tablero.elm` | El estado de los reels: perfil admin/empleado, modo normal/festival, búsqueda, filtros, fotos por banda y permisos. `src/Tablero.elm` lo expone por ports y se compila a `lab-reels/tablero.js` |
 | `src/Main.elm` | Arranque: recibe los eventos como flags y muestra un resumen (sin diseño aún) |
 | `tests/JsonTest.elm` | Pruebas; `tests/Fixtures.elm` se genera desde `data/` con `npm run fixtures` |
 | `data/` | Copia de los eventos que produce el lector (`lector/data/`), para las pruebas |

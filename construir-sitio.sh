@@ -6,6 +6,7 @@
 #                                            lo usan Cordillera, los reels y la planilla)
 #   extractor-fuente/  código del extractor → extractor/ (su build)
 #   demo-listado/      pagina.html + datos → index.html y publicar.html
+#   app/               núcleo en Elm (Tablero.elm) → lab-reels/tablero.js
 #
 # La app del 31 de julio vive en produccion-31-julio/ y no se toca aquí.
 # Uso: ./construir-sitio.sh   (en main) y luego commit + push.
@@ -17,6 +18,7 @@ ln -sfn ../../lector/ocr extractor-fuente/public/ocr   # el extractor publica es
 (cd extractor-fuente && npm install && npm run build:cordillera -- ../cordillera/lector && npm run build)
 rm -rf extractor && cp -rL extractor-fuente/dist extractor
 node demo-listado/construir.mjs
+(cd app && npm install && npx elm make src/Tablero.elm --optimize --output=../lab-reels/tablero.js)   # el núcleo en Elm de los reels
 
 # Bytes de control crudos dentro de cadenas de los scripts minificados → \xNN (igual para JS).
 python3 - <<'PY'

@@ -234,6 +234,26 @@ $("descargar").addEventListener("click", async () => {
   setTimeout(() => URL.revokeObjectURL(url), 5000);
   estado("Descargado. Ábrelo en Excel o súbelo a Google Sheets.");
 });
+
+/* ── Desde los reels: el admin abre la planilla de una banda ya leída (con lo que haya corregido). ── */
+async function desdeReels(){
+  let p = null;
+  try { p = JSON.parse(localStorage.getItem("planilla:desde-reels")); } catch {}
+  if (!p?.filas?.length) { estado("No llegó la banda desde los reels. Sube el rider aquí.", true); return; }
+  estado("Abriendo la banda de los reels…");
+  try { L = await cargarLector(); } catch (err) { estado("No se pudo cargar: " + (err?.message || err), true); return; }
+  filas = p.filas.map(f => ({...f, propuesta: {cantidad: "", texto: ""}}));
+  $("campo-cual").hidden = true;
+  $("banda").value = p.banda || "";
+  $("campo-banda").classList.toggle("falta", !p.banda);
+  $("fecha").value = p.fecha || "";
+  $("rider").value = nombreArchivo = p.rider || "";
+  $("resultado").hidden = false;
+  const items = filas.filter(f => f.tipo === "item").length, secciones = filas.filter(f => f.tipo === "seccion").length;
+  estado(`Desde los reels: ${items} ítems en ${secciones} secciones.` + (p.banda ? "" : " Escribe el nombre de la banda arriba."));
+  pintar();
+}
+if (new URLSearchParams(location.search).get("desde") === "reels") desdeReels();
 </script>
 </body>
 </html>

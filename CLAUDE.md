@@ -165,6 +165,22 @@ prueba (que el % suba sin romper los riders anteriores).
 
 ## `lab-reels/`
 
+**Perfiles y modos (2026-10-05).** El estado vive en Elm: `app/src/Backline/Tablero.elm`
+(pruebas en `app/tests/TableroTest.elm`), compilado a `lab-reels/tablero.js` por
+`construir-sitio.sh`. Elm guarda documento, perfil, modo, búsqueda, filtros y fotos, y
+decide los permisos; la página solo dibuja lo que recibe por el port `vista` y guarda
+lo que llega por `guardar` (`localStorage` `lab-reels:tablero`).
+- **Admin y empleado** (por ahora un toggle arriba; el login viene después): los dos
+  suben riders con la misma herramienta, buscan, filtran y toman fotos de las bandas.
+  **Solo el admin**: modo festival, Pide vs propuesta, editar o quitar ítems (tocar el
+  ítem) y "Planilla .xlsx" (abre `planilla/?desde=reels` con la banda ya editada).
+- **Modo normal** (el de siempre, y el único del empleado): una pantalla por banda con
+  todo su rider como viene, sus fotos ("Tomar foto" / "Subir foto", como en la app del
+  31 de julio) y nada de "1 bandas". El listado sin banda va al final, aparte.
+- **Modo festival** (lo elige el admin en Filtros): los reels por categoría de abajo.
+- Las fotos quedan en el dispositivo (IndexedDB `backline-fotos`), achicadas a 1600 px;
+  todavía no se comparten entre celulares.
+
 Una pantalla por categoría, que se cambia deslizando arriba y abajo; a los lados
 están el resumen y cada banda. Todo usa CSS scroll-snap.
 - Al abrir sale el logo de Circuito Naranja con glitch, como TikTok. Las guías de

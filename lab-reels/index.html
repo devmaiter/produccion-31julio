@@ -16,7 +16,7 @@
   --accent:#ff6a1f; --accent-ink:#000; --ok:#3fbf77; --warn:#ffa83a;
   --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
   --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
-  --gx:18px;
+  --gx:18px; --barra:54px;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -33,13 +33,13 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* Carrusel horizontal dentro del reel */
 .slides{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none}
 .slides::-webkit-scrollbar{display:none}
-.slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;padding:calc(env(safe-area-inset-top) + 64px) 76px calc(env(safe-area-inset-bottom) + 34px) var(--gx);display:flex;flex-direction:column;overflow:hidden}
+.slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;padding:calc(env(safe-area-inset-top) + var(--barra) + 58px) 76px calc(env(safe-area-inset-bottom) + 34px) var(--gx);display:flex;flex-direction:column;overflow:hidden}
 
 /* Barra de progreso tipo historias */
-.prog{position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + 10px);left:12px;right:12px;display:flex;gap:4px;pointer-events:none}
+.prog{position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + var(--barra) + 6px);left:12px;right:12px;display:flex;gap:4px;pointer-events:none}
 .prog i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}
 .prog i.on{background:var(--ink)}
-.cab{position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + 22px);left:16px;right:16px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);pointer-events:none}
+.cab{position:absolute;z-index:3;top:calc(env(safe-area-inset-top) + var(--barra) + 18px);left:16px;right:16px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink2);pointer-events:none}
 .cab b{font-family:var(--display);font-size:18px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink)}
 .cab .n{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink3)}
 
@@ -76,7 +76,7 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 
 /* Totales de fondo: detrás de un botón en la portada, encima de ella */
 .ver-totales{align-self:flex-start;margin-top:14px;font-size:13px;color:var(--ink3);text-decoration:underline;text-underline-offset:3px}
-.totales{position:absolute;inset:calc(env(safe-area-inset-top) + 56px) 76px calc(env(safe-area-inset-bottom) + 24px) var(--gx);display:flex;flex-direction:column;background:rgba(0,0,0,.92);backdrop-filter:blur(8px);border-radius:14px;padding:14px;z-index:4}
+.totales{position:absolute;inset:calc(env(safe-area-inset-top) + var(--barra) + 50px) 76px calc(env(safe-area-inset-bottom) + 24px) var(--gx);display:flex;flex-direction:column;background:rgba(0,0,0,.92);backdrop-filter:blur(8px);border-radius:14px;padding:14px;z-index:4}
 .totales .cerrar{align-self:flex-end;font-size:13px;color:var(--ink2);margin-bottom:6px}
 
 /* La banda como viene en el rider: sus secciones en orden; lo de otra categoría, tenue */
@@ -253,6 +253,41 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .guia.toque-g .dedo{top:30px;animation:toque 1.2s ease-in-out infinite}
 @keyframes toque{0%,40%,80%,100%{transform:translateX(-50%) scale(1)}20%,60%{transform:translateX(-50%) scale(.82)}}
 @media (prefers-reduced-motion:reduce){.orbe::before,.orbe::after,.orbe .anillo,.orbe .nucleo,.flotan span,.hojita::after,.logo,.logo::before,.logo::after,.mano *{animation:none!important}}
+
+/* ── Barra de arriba: perfil, buscador y filtros (los dos perfiles buscan y filtran) ── */
+.tope{position:fixed;z-index:7;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;padding:calc(env(safe-area-inset-top) + 8px) 10px 8px;display:flex;gap:8px;align-items:center;background:linear-gradient(rgba(0,0,0,.9),rgba(0,0,0,.65));backdrop-filter:blur(8px)}
+.perfil{flex:none;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.perfil.admin{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.buscar{flex:1;min-width:0;height:36px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 14px;font:inherit;font-size:16px}
+.buscar:focus{outline:none;border-color:var(--accent)}
+.filtrar{flex:none;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--ink2);white-space:nowrap}
+.filtrar.on{border-color:var(--accent);color:var(--accent)}
+.filtrar .fest{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.hoja .et{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:14px 0 6px}
+.hoja .chips{display:flex;flex-wrap:wrap;gap:8px}
+.hoja .chips button{font-size:14px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
+.hoja .chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.hoja .nota{font-size:13px;color:var(--ink3);margin:6px 0 0}
+.hoja .botones{justify-content:flex-start;margin-top:18px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{padding:7px 16px;font-size:14px;font-weight:600;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+/* El editor de un ítem (solo el admin) */
+.editor label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--ink2);margin:10px 0 0}
+.editor input,.editor select{height:42px;border-radius:10px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);padding:0 12px;font:inherit;font-size:16px}
+.editor .peligro{border-color:var(--warn);color:var(--warn)}
+.rider li.editable{cursor:pointer}
+.rider li.editable .t::after{content:"✎";margin-left:8px;color:var(--ink3);font-size:13px}
+/* Modo normal: una pantalla por banda, con sus fotos */
+.fotos-banda{margin:0 0 12px}
+.fila-fotos{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
+.fila-fotos:empty{display:none}
+.botones-foto{display:flex;gap:8px;margin-top:8px}
+.botones-foto button{font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
+.ir-planilla{font-size:13px;font-weight:600;padding:3px 10px;margin-left:6px;border-radius:999px;border:1px solid var(--accent);color:var(--accent)}
+.visor .borrar-foto{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 20px);left:50%;transform:translateX(-50%);padding:8px 16px;border-radius:999px;background:rgba(0,0,0,.7);border:1px solid var(--warn);color:var(--warn);font-weight:600}
+.vacio-busqueda .slide{align-items:center;justify-content:center;text-align:center;gap:14px}
 </style>
 </head>
 <body>
@@ -261,8 +296,26 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 <nav class="lado" id="lado" aria-label="Categorías"></nav>
 <div class="flechas-v"><button id="sube" aria-label="Categoría anterior">↑</button><button id="baja" aria-label="Categoría siguiente">↓</button></div>
 <div class="hoja" id="indice" hidden><div class="panel" role="dialog" aria-label="Índice"><h4>Categorías</h4><div id="filas"></div></div></div>
-<div class="visor" id="visor" hidden><img alt=""></div>
+<div class="visor" id="visor" hidden><img alt=""><button class="borrar-foto" hidden>Borrar esta foto</button></div>
+<header class="tope" id="barra">
+  <button class="perfil" id="perfil" title="Cambiar de perfil">Empleado</button>
+  <input class="buscar" id="buscar" type="search" placeholder="Buscar equipo o banda" aria-label="Buscar equipo o banda" autocomplete="off">
+  <button class="filtrar" id="filtrar" aria-haspopup="dialog">Filtros</button>
+</header>
+<div class="hoja" id="filtros" hidden><div class="panel" role="dialog" aria-label="Filtros" id="panel-filtros"></div></div>
+<div class="hoja" id="editor" hidden>
+  <form class="panel editor" role="dialog" aria-label="Editar ítem">
+    <h4>Editar ítem</h4>
+    <label>Cantidad <input name="cantidad" type="number" min="1" step="1" inputmode="numeric" required></label>
+    <label>Equipo <input name="referencia" required autocomplete="off"></label>
+    <label>Categoría <select name="categoria"></select></label>
+    <div class="botones"><button class="btn" type="submit">Guardar</button><button class="btn sec" type="button" data-acc="cancelar">Cancelar</button><button class="btn sec peligro" type="button" data-acc="quitar">Quitar ítem</button></div>
+  </form>
+</div>
+<input type="file" id="foto-camara" hidden accept="image/*" capture="environment">
+<input type="file" id="foto-galeria" hidden accept="image/*" multiple>
 
+<script src="tablero.js"></script>
 <script>
 /* El lector de PDF usa Map.getOrInsert(Computed), que solo traen los navegadores más nuevos. */
 for (const C of [Map, WeakMap]) {
@@ -288,14 +341,40 @@ function aviso(t){
   document.body.append(a); setTimeout(() => a.remove(), 1800);
 }
 
-/* ── El documento que subió la persona, guardado en el dispositivo. Sin documento solo está el reel de subir. ── */
-let doc = leer("lab-reels:doc", null);        // {nombre, archivos, cuando, datos}
+/* ── El estado vive en el núcleo en Elm (app/src/Backline/Tablero.elm): el documento, el perfil
+   (admin o empleado), el modo (normal o festival), la búsqueda, los filtros y las fotos de cada banda.
+   Elm decide qué puede hacer cada perfil y devuelve la vista; aquí solo se dibuja y se guarda. ── */
+function estadoGuardado(){
+  const t = leer("lab-reels:tablero", null);
+  if (t) return t;
+  // Lo que se subió antes de que existiera el núcleo: se trae tal cual.
+  const viejo = leer("lab-reels:doc", null);
+  return viejo ? {doc: viejo} : null;
+}
+const tablero = Elm.Tablero.init({flags: estadoGuardado()});
+let V = null;                 // la última vista que mandó Elm
+let arrancado = false;
+let destinoPendiente = null;  // a qué reel ir cuando llegue la próxima vista
+const enviar = m => tablero.ports.entrada.send(m);
+tablero.ports.guardar.subscribe(v => { escribir("lab-reels:tablero", v); escribir("lab-reels:doc", null); });
+tablero.ports.error.subscribe(e => console.warn("tablero:", e));
+tablero.ports.vista.subscribe(v => {
+  V = v;
+  pintarBarra();
+  if (!arrancado) return;   // la primera vista la pinta el arranque
+  const destino = destinoPendiente ?? (actual && document.getElementById(actual.id) ? actual.id : null);
+  destinoPendiente = null;
+  pintar(destino);
+  if (!document.getElementById("filtros").hidden) pintarFiltros();
+});
+
 let listos = new Set();
 const cargarListos = () => { listos = new Set(leer("lab-reels:listos:doc", [])); };
 const guardarListos = () => escribir("lab-reels:listos:doc", [...listos]);
 const VACIO = {artistas: [], dias: [], bloques: [], stagePlots: [], items: []};
-const datos = () => doc?.datos || VACIO;
-const titulo = () => doc ? doc.nombre : "Sube un documento para empezar";
+const datos = () => V?.doc?.datos || VACIO;
+const titulo = () => V?.doc ? V.doc.nombre : "Sube un documento para empezar";
+const festival = () => V?.modo === "festival";
 
 /* Siempre los mismos siete reels, en este orden. Se respeta cómo agrupa la banda: lo que
    pidió en el bloque del bajo (una mesa de percusión) se queda en Bajo, y los platillos del
@@ -441,14 +520,16 @@ function aDatos(ext){
 /* La ficha de una banda: como viene en el rider (sus secciones, en orden) y, si el Excel trae
    "Requerimiento | Propuesta", el botón para verlos lado a lado. */
 function htmlFicha(b, cat){
-  const item = x => `<li class="${reelDe(x) === cat ? "" : "otra"}"><span class="q">${x.cantidad}</span><span class="t">${esc(x.referencia)}
+  // Sin categoría (modo normal) se ve todo igual. El admin toca un ítem para editarlo.
+  const editable = V?.puede?.editar;
+  const item = x => `<li class="${!cat || reelDe(x) === cat ? "" : "otra"}${editable ? " editable" : ""}"${editable ? ` data-item="${esc(x.id)}"` : ""}><span class="q">${x.cantidad}</span><span class="t">${esc(x.referencia)}
         ${x.nota ? `<small>${esc(x.nota)}</small>` : x.grupo === undefined && x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
         ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
         ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span></li>`;
   const conTitulos = b.secciones.some(s => s.grupo);
   const rider = b.secciones.length
     ? b.secciones.map(s => `${conTitulos ? `<h4 class="seccion">${esc(s.grupo || "Sin sección")}</h4>` : ""}<ul class="lista">${s.items.map(item).join("")}</ul>`).join("")
-    : `<p class="sub">La propuesta no trae nada de ${esc(cat.toLowerCase())} para esta banda. Mira lo que pidió en "Pide vs propuesta".</p>`;
+    : `<p class="sub">La propuesta no trae nada${cat ? ` de ${esc(cat.toLowerCase())}` : ""} para esta banda. Mira lo que pidió en "Pide vs propuesta".</p>`;
   if (!b.cmp) return `<div class="rider">${rider}</div>`;
   // Sin nada propuesto en esta categoría, la ficha abre directo en la comparación.
   const abierta = !b.secciones.length;
@@ -481,7 +562,7 @@ const subida = {estado: "inicio", archivos: [], resultado: null, error: ""};
 function htmlSubir(){
   const s = subida;
   const flotan = QUIETO ? "" : `<div class="flotan" aria-hidden="true">${["📄","🧾","📸","📊","✉️","📄","🎸","🥁"].map((e,i) => `<span style="left:${8 + i*11.5}%;animation-delay:${(i*0.75).toFixed(2)}s">${e}</span>`).join("")}</div>`;
-  const pie = doc && s.estado !== "leyendo" ? `<div class="fuente">Tu documento: <b>${esc(doc.nombre)}</b> · ${doc.datos.items.length} ítems <button data-acc="borrar">Borrar</button></div>` : "";
+  const pie = V?.doc && s.estado !== "leyendo" ? `<div class="fuente">Tu documento: <b>${esc(V.doc.nombre)}</b> · ${V.doc.totalItems} ítems <button data-acc="borrar">Borrar</button></div>` : "";
   const lista = s.archivos.length ? `<ul class="archivos">${s.archivos.map(a => `<li class="${a.clase}"><span>${esc(a.nombre)}</span><span>${esc(a.estado)}</span></li>`).join("")}</ul>` : "";
   let cuerpo;
   if (s.estado === "leyendo") cuerpo = `
@@ -504,7 +585,7 @@ function htmlSubir(){
   } else cuerpo = `
       <button class="orbe" data-acc="elegir" aria-label="Elegir un documento"><span class="anillo"></span><span class="nucleo">+</span></button>
       <h2>Sube un <em>documento</em></h2>
-      <p class="sub">Rider en PDF, foto de la hoja, Excel del desglose o el correo. Sale un reel por cada categoría. Se lee en tu dispositivo, sin internet.</p>
+      <p class="sub">Rider en PDF, foto de la hoja, Excel del desglose o el correo. ${festival() ? "Sale un reel por cada categoría" : "Sale una pantalla por banda, con su backline como viene en el rider"}. Se lee en tu dispositivo, sin internet.</p>
       <div class="botones"><button class="btn" data-acc="elegir">Elegir archivo</button><button class="btn sec" data-acc="foto">Tomar foto</button><button class="btn sec" data-acc="muestra">Probar con un ejemplo</button></div>
       <a class="entrenar" href="../entrenar/">¿Quieres revisarlo renglón por renglón antes? Entrena el lector →</a>${lista}`;
   return `
@@ -564,6 +645,79 @@ function htmlReel(c, i, total){
   </article>`;
 }
 
+/* ── Modo normal: una pantalla por banda con todo su rider, como viene, y sus fotos.
+   Lo que el documento trae sin banda (un listado general) va al final, aparte. ── */
+function armarBandas(d){
+  const art = Object.fromEntries(d.artistas.map(a => [a.id, a.nombre]));
+  const bandas = new Map();
+  const deLa = (id, sinBanda) => {
+    const k = sinBanda ? "sin-banda" : id;
+    if (!bandas.has(k)) bandas.set(k, {id: k, artistaId: sinBanda ? null : id, nombre: sinBanda ? "Listado general" : art[id] || id, items: [], secciones: []});
+    return bandas.get(k);
+  };
+  for (const it of d.items) {
+    const b = deLa(it.artistaId, it.sinBanda);
+    b.items.push(it);
+    const g = it.grupo || "";
+    let s = b.secciones.find(x => x.grupo === g);
+    if (!s) b.secciones.push(s = {grupo: g, items: []});
+    s.items.push(it);
+  }
+  // Pide vs propuesta (solo le llega al admin): toda la hoja de la banda, con el total de cada lado.
+  for (const c of d.comparaciones || []) {
+    const b = deLa(c.artistaId, false), piezas = l => l ? (l.cantidad ?? 1) : 0;
+    b.cmp = [...(b.cmp || []), ...c.filas];
+    b.pide = (b.pide || 0) + c.filas.reduce((s, f) => s + piezas(f.pide), 0);
+    b.propone = (b.propone || 0) + c.filas.reduce((s, f) => s + piezas(f.propone), 0);
+  }
+  return [...bandas.values()].sort((a, b) => (a.id === "sin-banda") - (b.id === "sin-banda"));
+}
+
+function htmlFotos(b){
+  if (!b.artistaId) return "";
+  const fotos = V.fotos[b.artistaId] || [];
+  return `
+      <div class="fotos-banda">
+        <div class="fila-fotos">${fotos.map(f => `<img data-foto="${esc(f)}" data-banda="${esc(b.artistaId)}" alt="Foto de ${esc(b.nombre)}">`).join("")}</div>
+        <div class="botones-foto"><button data-acc="tomar-foto" data-banda="${esc(b.artistaId)}">📷 Tomar foto</button><button data-acc="subir-foto" data-banda="${esc(b.artistaId)}">🖼 Subir foto</button>${fotos.length ? `<span class="sub" style="margin:0;align-self:center">${fotos.length} ${fotos.length === 1 ? "foto" : "fotos"}</span>` : ""}</div>
+      </div>`;
+}
+
+function htmlBanda(b, i, total){
+  const piezas = b.items.reduce((s, x) => s + x.cantidad, 0), dudosos = b.items.filter(x => x.porConfirmar).length;
+  return `
+  <article class="reel" id="${esc(idBanda(b))}" style="--h:20" data-n="1" aria-label="${esc(b.nombre)}">
+    <div class="cab"><b>${esc(b.nombre)}</b><span class="n">${i+1}/${total}</span></div>
+    <div class="slides"><section class="slide banda">
+      <h3>${esc(b.nombre)}</h3>
+      <p class="sub">${piezas} ${piezas === 1 ? "pieza" : "piezas"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}${V.puede.planilla && b.items.length ? `<button class="ir-planilla" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button>` : ""}</p>
+      ${htmlFotos(b)}
+      ${htmlFicha(b, null)}
+    </section></div>
+    <div class="riel">
+      <button class="listo" aria-pressed="${listos.has(idBanda(b))}"><span class="ic">✓</span><span>Listo</span></button>
+      <button class="compartir"><span class="ic">↗</span><span>Enviar</span></button>
+      <button class="ver-indice"><span class="ic">☰</span><span>Índice</span></button>
+      <button class="ir-subir"><span class="ic">＋</span><span>Subir</span></button>
+    </div>
+    <div class="corazon" aria-hidden="true">✅</div>
+  </article>`;
+}
+const idBanda = b => "banda-" + slug(b.id);
+
+function htmlNada(){
+  const t = V.filtro.texto.trim();
+  return `
+  <article class="reel vacio-busqueda" id="nada" data-n="1" aria-label="Sin resultados" style="--h:0">
+    <div class="slides"><section class="slide">
+      <div class="encontre" aria-hidden="true"><strong>0</strong></div>
+      <h2 style="font-family:var(--display);text-transform:uppercase;margin:0">No encontré ${t ? `«${esc(t)}»` : "nada con esos filtros"}</h2>
+      <p class="sub">Busca con otra palabra o quita los filtros.</p>
+      <div class="botones"><button class="btn" data-acc="limpiar">Quitar filtros</button></div>
+    </section></div>
+  </article>`;
+}
+
 function contar(el){
   if (!el || !el.dataset.to) return;
   const to = +el.dataset.to; if (QUIETO) return;
@@ -593,12 +747,25 @@ document.addEventListener("visibilitychange", () => {
 
 /* ── Feed ── */
 const feed = document.getElementById("feed");
-let cats = [], reels = [], actual = null, io = null;
+let cats = [], entradas = [], reels = [], actual = null, io = null;
 
 function pintar(destino){
   cargarListos();
-  cats = armar(datos());
-  feed.innerHTML = htmlSubir() + cats.map((c,i) => htmlReel(c, i, cats.length)).join("");
+  const d = datos();
+  if (festival()) {
+    cats = armar(d);
+    entradas = cats.map(c => ({id: c.id, e: EMOJI[sinNum(c.cat)] || "📦", nombre: c.cat, x: `${c.equipos} ${c.equipos === 1 ? "banda" : "bandas"}`}));
+  } else {
+    const bs = armarBandas(d);
+    cats = [];
+    entradas = bs.map(b => { const n = b.items.reduce((s, x) => s + x.cantidad, 0); return {id: idBanda(b), e: b.artistaId ? "🎤" : "📋", nombre: b.nombre, x: `${n} ${n === 1 ? "pieza" : "piezas"}`, b}; });
+  }
+  const nada = V?.doc && V.hayFiltro && !V.encontrados;
+  feed.innerHTML = htmlSubir() + (nada ? htmlNada()
+    : festival() ? cats.map((c,i) => htmlReel(c, i, cats.length)).join("")
+    : entradas.map((x, i) => htmlBanda(x.b, i, entradas.length)).join(""));
+  feed.setAttribute("aria-label", festival() ? "Backline por categoría" : "Backline por banda");
+  cargarFotos();
   reels = [...feed.querySelectorAll(".reel")];
   actual = reels[0];
   io?.disconnect();
@@ -660,7 +827,14 @@ feed.addEventListener("click", async e => {
   if (acc === "foto") return document.getElementById("camara").click();
   if (acc === "muestra") return probarMuestra();
   if (acc === "otro") { subida.estado = "inicio"; subida.archivos = []; return pintarSubir(); }
-  if (acc === "borrar") { doc = null; escribir("lab-reels:doc", null); escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; return pintar("subir"); }
+  if (acc === "borrar") { escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; destinoPendiente = "subir"; return enviar({tipo: "borrar"}); }
+  if (acc === "limpiar") { document.getElementById("buscar").value = ""; destinoPendiente = "subir"; return enviar({tipo: "limpiar"}); }
+  if (acc === "tomar-foto" || acc === "subir-foto") { fotoDe = e.target.closest("[data-banda]").dataset.banda; return document.getElementById(acc === "tomar-foto" ? "foto-camara" : "foto-galeria").click(); }
+  if (acc === "planilla") return abrirPlanilla(e.target.closest("[data-banda]").dataset.banda);
+  const foto = e.target.closest("img[data-foto]");
+  if (foto) return verFoto(foto);
+  const li = e.target.closest("li[data-item]");
+  if (li && V.puede.editar) return abrirEditor(li.dataset.item);
   if (acc === "ver") return reels[1]?.scrollIntoView({behavior: "smooth"});
   const vt = e.target.closest(".ver-totales, .totales .cerrar");
   if (vt) {
@@ -687,20 +861,33 @@ feed.addEventListener("click", async e => {
   const p = e.target.closest(".pasar");
   if (p) return mover[p.classList.contains("sig") ? "ArrowRight" : "ArrowLeft"](r);
   const img = e.target.closest(".plot");
-  if (img) { const v = document.getElementById("visor"); v.querySelector("img").src = img.src; v.hidden = false; }
+  if (img) { const v = document.getElementById("visor"); v.querySelector("img").src = img.src; v.querySelector(".borrar-foto").hidden = true; v.hidden = false; }
 });
 feed.addEventListener("change", e => {
   if (e.target.matches("#archivo, #camara")) { const fs = [...e.target.files]; e.target.value = ""; subirArchivos(fs); }
 });
 // Doble toque en cualquier parte = listo, igual que el "me gusta".
 feed.addEventListener("dblclick", e => { if (!e.target.closest(".riel, .pasar, .subir, .ver-cmp, .ver-totales, .totales")) marcar(e.target.closest(".reel"), true); });
-document.getElementById("visor").addEventListener("click", e => e.currentTarget.hidden = true);
+document.getElementById("visor").addEventListener("click", e => {
+  const v = e.currentTarget, b = v.querySelector(".borrar-foto");
+  if (e.target === b) {
+    // Dos toques para borrar: el primero pregunta.
+    if (!b.dataset.seguro) { b.dataset.seguro = "1"; b.textContent = "¿Seguro? Toca otra vez para borrar"; return; }
+    const {foto, banda} = b.dataset;
+    idb("readwrite", st => st.delete(foto)).catch(() => {});
+    urlsFotos.delete(foto);
+    enviar({tipo: "quitar-foto", banda, foto});
+    aviso("Foto borrada");
+  }
+  v.hidden = true;
+});
 
 const indice = document.getElementById("indice");
-const filaIndice = (c, cls, actualId) => `<button class="${cls}" data-id="${c.id}" aria-current="${actualId === c.id}"><span class="e">${EMOJI[sinNum(c.cat)] || "📦"}</span><span>${esc(c.cat)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${c.equipos} ${c.equipos === 1 ? "banda" : "bandas"}</span></button>`;
+const filaIndice = (c, cls, actualId) => `<button class="${cls}" data-id="${esc(c.id)}" aria-current="${actualId === c.id}"><span class="e">${c.e}</span><span>${esc(c.nombre)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${esc(c.x)}</span></button>`;
 const filaSubir = (cls, actualId) => `<button class="${cls}" data-id="subir" aria-current="${actualId === "subir"}"><span class="e">＋</span><span>Subir documento</span></button>`;
 function abrirIndice(){
-  document.getElementById("filas").innerHTML = filaSubir("fila") + cats.map(c => filaIndice(c, "fila")).join("");
+  indice.querySelector("h4").textContent = festival() ? "Categorías" : "Bandas";
+  document.getElementById("filas").innerHTML = filaSubir("fila") + entradas.map(c => filaIndice(c, "fila")).join("");
   indice.hidden = false;
 }
 indice.addEventListener("click", e => {
@@ -719,11 +906,167 @@ document.getElementById("baja").addEventListener("click", () => mover.ArrowDown(
 // Índice fijo a la izquierda en PC.
 const lado = document.getElementById("lado");
 function pintarLado(){
-  lado.innerHTML = `<h1>Backline en reels</h1><p>${esc(titulo())}</p>` + filaSubir("", actual?.id) + cats.map(c => filaIndice(c, "", actual?.id)).join("");
+  lado.innerHTML = `<h1>Backline en reels</h1><p>${esc(titulo())}</p>` + filaSubir("", actual?.id) + entradas.map(c => filaIndice(c, "", actual?.id)).join("");
   document.getElementById("sube").disabled = actual === reels[0];
   document.getElementById("baja").disabled = actual === reels[reels.length - 1];
 }
 lado.addEventListener("click", e => { const b = e.target.closest("button"); if (b) document.getElementById(b.dataset.id).scrollIntoView({behavior: "smooth"}); });
+
+/* ── Barra de arriba: perfil, buscador y filtros ── */
+const $b = id => document.getElementById(id);
+function pintarBarra(){
+  if (!V) return;
+  const p = $b("perfil"), admin = V.perfil === "admin";
+  p.textContent = admin ? "Admin" : "Empleado";
+  p.classList.toggle("admin", admin);
+  p.setAttribute("aria-label", `Perfil: ${p.textContent}. Toca para cambiar`);
+  if (document.activeElement !== $b("buscar")) $b("buscar").value = V.filtro.texto;
+  const n = (V.filtro.banda ? 1 : 0) + (V.filtro.categoria ? 1 : 0);
+  const f = $b("filtrar");
+  f.innerHTML = `Filtros${n ? ` · ${n}` : ""}${festival() ? '<span class="fest">Festival</span>' : ""}`;
+  f.classList.toggle("on", n > 0);
+}
+$b("perfil").addEventListener("click", () => {
+  enviar({tipo: "perfil", perfil: V.perfil === "admin" ? "empleado" : "admin"});
+  aviso(V.perfil === "admin" ? "Ahora eres admin" : "Ahora eres empleado");
+});
+let tecleo = null;
+$b("buscar").addEventListener("input", e => {
+  clearTimeout(tecleo);
+  // Sin esperar a que termine de escribir no se redibuja en cada letra.
+  tecleo = setTimeout(() => { destinoPendiente = reels[1] ? "subir" : null; enviar({tipo: "buscar", texto: e.target.value}); if (reels[1]) reels[1].scrollIntoView(); }, 250);
+});
+$b("buscar").addEventListener("keydown", e => { if (e.key === "Enter") { e.target.blur(); setTimeout(() => reels[1]?.scrollIntoView({behavior: "smooth"}), 300); } });
+$b("filtrar").addEventListener("click", () => { pintarFiltros(); $b("filtros").hidden = false; });
+
+function pintarFiltros(){
+  const o = V.opciones, f = V.filtro;
+  const chip = (attr, v, txt, on) => `<button data-${attr}="${esc(v ?? "")}" aria-pressed="${on}">${txt}</button>`;
+  $b("panel-filtros").innerHTML = `
+    <h4>Filtros</h4>
+    ${V.puede.festival ? `
+      <p class="et">Vista</p>
+      <div class="seg" role="group" aria-label="Vista">${chip("modo", "normal", "Normal", V.modo === "normal")}${chip("modo", "festival", "Festival", V.modo === "festival")}</div>
+      <p class="nota">Normal: cada banda con su backline como viene en el rider. Festival: varias bandas, un reel por categoría, conteo por día y totales de fondo.</p>` : ""}
+    ${o.bandas.length > 1 ? `<p class="et">Banda</p><div class="chips">${chip("banda", "", "Todas", !f.banda)}${o.bandas.map(b => chip("banda", b.id, `${esc(b.nombre)} · ${b.n}`, f.banda === b.id)).join("")}</div>` : ""}
+    ${o.categorias.length ? `<p class="et">Categoría</p><div class="chips">${chip("categoria", "", "Todas", !f.categoria)}${o.categorias.map(c => chip("categoria", c.nombre, `${esc(c.nombre)} · ${c.n}`, f.categoria === c.nombre)).join("")}</div>` : `<p class="nota">Sube un documento para filtrar por banda y categoría.</p>`}
+    <div class="botones"><button class="btn" data-cerrar>Ver ${V.encontrados} ${V.encontrados === 1 ? "ítem" : "ítems"}</button>${V.hayFiltro ? '<button class="btn sec" data-limpiar>Quitar filtros</button>' : ""}</div>`;
+}
+$b("filtros").addEventListener("click", e => {
+  const t = e.target.closest("button");
+  if (!t) { if (e.target === e.currentTarget) e.currentTarget.hidden = true; return; }
+  destinoPendiente = "subir";
+  if (t.dataset.modo !== undefined) return enviar({tipo: "modo", modo: t.dataset.modo});
+  if (t.dataset.banda !== undefined) return enviar({tipo: "banda", banda: t.dataset.banda || null});
+  if (t.dataset.categoria !== undefined) return enviar({tipo: "categoria", categoria: t.dataset.categoria || null});
+  if (t.hasAttribute("data-limpiar")) { $b("buscar").value = ""; return enviar({tipo: "limpiar"}); }
+  if (t.hasAttribute("data-cerrar")) { e.currentTarget.hidden = true; reels[1]?.scrollIntoView({behavior: "smooth"}); }
+});
+
+/* ── Fotos de las bandas: la imagen queda en este dispositivo (IndexedDB) y el núcleo guarda de qué banda es. ── */
+const fotosDB = new Promise((ok, mal) => {
+  try {
+    const r = indexedDB.open("backline-fotos", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("fotos");
+    r.onsuccess = () => ok(r.result); r.onerror = () => mal(r.error);
+  } catch (err) { mal(err); }
+});
+fotosDB.catch(() => {});
+async function idb(modo, accion){
+  const db = await fotosDB;
+  return new Promise((ok, mal) => {
+    const tx = db.transaction("fotos", modo), q = accion(tx.objectStore("fotos"));
+    tx.oncomplete = () => ok(q?.result); tx.onerror = () => mal(tx.error);
+  });
+}
+const urlsFotos = new Map();
+async function cargarFotos(){
+  for (const img of feed.querySelectorAll("img[data-foto]")) {
+    const id = img.dataset.foto;
+    if (!urlsFotos.has(id)) {
+      const blob = await idb("readonly", st => st.get(id)).catch(() => null);
+      if (blob) urlsFotos.set(id, URL.createObjectURL(blob));
+    }
+    if (urlsFotos.has(id)) img.src = urlsFotos.get(id); else img.alt = "Foto no está en este dispositivo";
+  }
+}
+// Una foto del celular pesa varios MB: se achica a 1600 px antes de guardarla.
+async function achicar(archivo){
+  try {
+    const bmp = await createImageBitmap(archivo), k = Math.min(1, 1600 / Math.max(bmp.width, bmp.height));
+    const c = Object.assign(document.createElement("canvas"), {width: Math.round(bmp.width * k), height: Math.round(bmp.height * k)});
+    c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+    return await new Promise(ok => c.toBlob(b => ok(b || archivo), "image/jpeg", .82));
+  } catch { return archivo; }
+}
+let fotoDe = null;
+for (const id of ["foto-camara", "foto-galeria"]) $b(id).addEventListener("change", async e => {
+  const archivos = [...e.target.files], banda = fotoDe;
+  e.target.value = ""; fotoDe = null;
+  if (!banda || !archivos.length) return;
+  let n = 0;
+  for (const a of archivos) {
+    const foto = "f-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+    const blob = await achicar(a);   // antes de abrir la transacción: IndexedDB no espera promesas adentro
+    try { await idb("readwrite", st => st.put(blob, foto)); } catch { continue; }
+    n++;
+    enviar({tipo: "foto", banda, foto});
+  }
+  aviso(n ? (n === 1 ? "Foto guardada" : `${n} fotos guardadas`) : "No se pudo guardar la foto en este dispositivo");
+});
+function verFoto(img){
+  const v = $b("visor"), b = v.querySelector(".borrar-foto");
+  if (!img.src) return;
+  v.querySelector("img").src = img.src;
+  b.hidden = false; b.textContent = "Borrar esta foto"; delete b.dataset.seguro;
+  b.dataset.foto = img.dataset.foto; b.dataset.banda = img.dataset.banda;
+  v.hidden = false;
+}
+
+/* ── Editar un ítem (solo el admin; el núcleo no acepta la edición de un empleado) ── */
+const editor = $b("editor"), form = editor.querySelector("form");
+let editando = null;
+function abrirEditor(id){
+  const it = datos().items.find(x => x.id === id); if (!it) return;
+  editando = it;
+  const cats = [...new Set([...ORDEN, "Otro", it.categoria])];
+  form.categoria.innerHTML = cats.map(c => `<option${c === it.categoria ? " selected" : ""}>${esc(c)}</option>`).join("");
+  form.cantidad.value = it.cantidad; form.referencia.value = it.referencia;
+  const q = form.querySelector('[data-acc="quitar"]'); q.textContent = "Quitar ítem"; delete q.dataset.seguro;
+  editor.hidden = false;
+  form.referencia.focus();
+}
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  const cantidad = Math.round(+form.cantidad.value);
+  if (!(cantidad >= 1) || !form.referencia.value.trim()) return aviso("Pon una cantidad y el nombre del equipo");
+  enviar({tipo: "editar", id: editando.id, cantidad, referencia: form.referencia.value, categoria: form.categoria.value});
+  editor.hidden = true; aviso("Guardado");
+});
+editor.addEventListener("click", e => {
+  const acc = e.target.closest("[data-acc]")?.dataset.acc;
+  if (e.target === editor || acc === "cancelar") return editor.hidden = true;
+  if (acc === "quitar") {
+    const q = e.target.closest("[data-acc]");
+    if (!q.dataset.seguro) { q.dataset.seguro = "1"; q.textContent = "¿Seguro? Toca otra vez"; return; }
+    enviar({tipo: "quitar-item", id: editando.id});
+    editor.hidden = true; aviso("Ítem quitado");
+  }
+});
+
+/* ── Planilla .xlsx (solo el admin): la banda como va, con lo que se haya editado ── */
+function abrirPlanilla(id){
+  const b = armarBandas(datos()).find(x => x.id === id); if (!b) return;
+  const mayuscula = t => t.charAt(0).toLocaleUpperCase("es") + t.slice(1);
+  const filas = [];
+  for (const s of b.secciones) {
+    if (s.grupo) filas.push({tipo: "seccion", cantidad: null, texto: s.grupo.replace(/[\s:·|–—-]+$/, "").toUpperCase()});
+    for (const x of s.items) filas.push({tipo: "item", cantidad: x.cantidad, texto: mayuscula(x.referencia) + (x.propietario?.tipo === "tercero" ? " (lo trae la banda)" : "")});
+  }
+  const fecha = (b.items.find(x => /^d-\d{4}-\d{2}-\d{2}$/.test(x.diaId))?.diaId || "").slice(2);
+  escribir("planilla:desde-reels", {banda: b.artistaId ? b.nombre : "", rider: V.doc?.nombre || "", fecha, filas});
+  window.open("../planilla/?desde=reels", "_blank") || (location.href = "../planilla/?desde=reels");
+}
 
 /* ── Leer con el lector (el mismo de la lista de Cordillera) ── */
 let lectorCargando = null;
@@ -776,13 +1119,12 @@ async function leerYArmar(archivos){
   }
   const d = aDatos(ext);
   const nombre = archivos.length === 1 ? archivos[0].name.replace(/\.[^.]+$/, "") : archivos.length + " archivos";
-  doc = {nombre, archivos: archivos.map(f => f.name), cuando: new Date().toISOString(), datos: d};
-  escribir("lab-reels:doc", doc);
   escribir("lab-reels:listos:doc", null);
   const categorias = [...new Set(d.items.map(reelDe))];
   subida.estado = "listo";
   subida.resultado = {items: d.items.length, bandas: new Set(d.items.filter(i => !i.sinBanda).map(i => i.artistaId)).size, cats: categorias.length, dudosos: d.items.filter(i => i.porConfirmar).length, avisos: ext.avisos.length};
-  pintar("subir");
+  destinoPendiente = "subir";
+  enviar({tipo: "cargar", doc: {nombre, archivos: archivos.map(f => f.name), cuando: new Date().toISOString(), datos: d}});
   lluvia(categorias.map(c => EMOJI[sinNum(c)] || "📦"));
 }
 
@@ -822,7 +1164,8 @@ function guia(clave, tipo, texto, sub){
 }
 function guiaAlLlegar(r){
   if (document.querySelector(".splash:not(.fuera)")) return;
-  if (r.id === "subir") cats.length && guia("arriba", "arriba-g", PC ? "Baja para ver cada categoría" : "Desliza hacia arriba", PC ? "Con la rueda del mouse, ↓ o los botones de la derecha" : "Cada pantalla es una categoría: Batería, Platillos, Bases…");
+  if (r.id === "subir") entradas.length && guia("arriba", "arriba-g", PC ? (festival() ? "Baja para ver cada categoría" : "Baja para ver cada banda") : "Desliza hacia arriba", PC ? "Con la rueda del mouse, ↓ o los botones de la derecha" : festival() ? "Cada pantalla es una categoría: Batería, Platillos, Bases…" : "Cada pantalla es una banda, con su backline como viene en el rider");
+  else if (!festival()) return;
   else if (!vistos.has("lado")) setTimeout(() => actual === r && guia("lado", "lado-g", PC ? "Pasa con ›" : "Desliza a la izquierda", "Ahí está lo que hay que tener y cada banda con su plano"), 1400);
   else setTimeout(() => actual === r && guia("toque", "toque-g", "Doble toque = listo", "Marca la categoría cuando esté revisada"), 1400);
 }
@@ -840,7 +1183,14 @@ function splash(){
 /* ── Arranque ── */
 splash().then(() => { if (actual) guiaAlLlegar(actual); });
 if (location.hash === "#intro") history.replaceState(null, "", location.pathname);
-pintar(location.hash.slice(1));
+// Los filtros no se guardan: se arranca sin ellos, y así llega la primera vista.
+enviar({tipo: "limpiar"});
+(function arrancar(){
+  if (!V) return setTimeout(arrancar, 20);
+  arrancado = true;
+  pintarBarra();
+  pintar(location.hash.slice(1));
+})();
 </script>
 </body>
 </html>
