@@ -125,7 +125,7 @@ describe("rider de gira en inglés", () => {
       "1 DRUM RUG [Drums·Batería]",
       "1 KICK 22” X 18” WITH NEW DRUMHEAD [Drums·Batería]",
       "2 SNARE DRUM 14” X 5” [Drums·Batería]",
-      "2 STANDS [Drums·Batería]",
+      "2 STANDS PARA SNARE DRUM 14” X 5” [Drums·Batería]",
       "1 AMPEG 8 X 10“ ENCLOSURE [Bass·Ampli bajo]",
       "1 MEINL CH27 CORTINA 27 BARRAS [Percussion (Meinl Professional Series)·Percusión]",
       "2 ROLAND JC 120 JAZZ CHORUS [Guitar·Ampli guitarra]",
@@ -144,9 +144,9 @@ LOS RAYOS
 3.1.-DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM, PEARL MASTER CUSTOM
 1 KICK 24”
 1 SNARE 14”
-3.2.- ELECTRIC GUITAR CAMELO
+3.2.- ELECTRIC GUITAR TOMAS
 2 AMPLIFICADORES MARSHALL JCM 900
-3.3.-KEYBOARDS JUAN: SUJETO A MODIFICACION
+3.3.-KEYBOARDS ANA: SUJETO A MODIFICACION
 1 PIANO RHODES
 4. SOUNDCHECK
 1 hora de prueba
@@ -161,8 +161,8 @@ describe("rider con capítulos numerados", () => {
   it("el número del capítulo no es cantidad y las opciones de batería no son ítems", () => {
     expect(e.items.map(i => `${i.cantidad} ${i.descripcion} [${i.grupo}]`)).toEqual([
       "1 KICK 24” [Drums]", "1 SNARE 14” [Drums]",
-      "2 AMPLIFICADORES MARSHALL JCM 900 [Electric Guitar Camelo]",
-      "1 PIANO RHODES [Keyboards Juan]",
+      "2 AMPLIFICADORES MARSHALL JCM 900 [Electric Guitar Tomas]",
+      "1 PIANO RHODES [Keyboards Ana]",
     ]);
   });
   it("las opciones de la banda quedan como información del grupo", () => {
@@ -187,6 +187,26 @@ describe("rider con capítulos numerados", () => {
   it("'• PEDAL PARA BOMBO' dentro de DRUMS es un ítem, no un subtítulo", () => {
     const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\n3. BACKLINE\n3.1.-DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM\n• KICK 24”\n• PEDAL PARA BOMBO\n• 5 CYMBALS STANDS") }]);
     expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 KICK 24”", "1 PEDAL PARA BOMBO", "5 CYMBALS STANDS"]);
+  });
+  it("'NORD STAGE 2 MODEL …' es un teclado y los stands 'WITH 2 STANDS' dicen de qué son", () => {
+    const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nDRUMS\n2 SNARE DRUM 14” X 5” WITH 2 STANDS\nKEYBOARD\n1 NORD STAGE 2 MODEL SW73 OR HA76") }]);
+    expect(r.items.map(i => `${i.cantidad} ${i.descripcion} [${i.categoria}]`)).toEqual([
+      "2 SNARE DRUM 14” X 5” [Batería]", "2 STANDS PARA SNARE DRUM 14” X 5” [Batería]", "1 NORD STAGE 2 MODEL SW73 OR HA76 [Teclado]",
+    ]);
+  });
+  it("'7. STAGE REQUIREMENTS' (cables, boom stands de mic) no es backline; solo el capítulo '8. BACKLINE'", () => {
+    const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto(`TECHNICAL RIDER
+LOS RAYOS
+7. STAGE REQUIREMENTS
+● Cabling & Stands:
+- 40x XLR Cables
+- 11x Boom Stands
+- 1x Table for stage rack / monitor world
+8. BACKLINE
+● 1x Keyboard Stands
+● 1x DS840 Drum Throne (round seat)
+● 1x Table (2m x 1m) for Playback station`) }]);
+    expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 Keyboard Stands", "1 DS840 Drum Throne (round seat)", "1 Table (2m x 1m) for Playback station"]);
   });
   it("'1. DW COLLECTOR' en un rider sin capítulos sigue siendo una opción numerada", () => {
     const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nDRUMS\nOPCIONES EN ORDEN DE PRIORIDAD\n1. SONOR PRO LITE\n2. DW COLLECTOR\n1 KICK 22") }]);

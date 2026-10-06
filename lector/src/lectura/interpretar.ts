@@ -97,7 +97,7 @@ const PROVEEDOR_SUELTO = /^(cn|oml|backline( cop)?|propio|banda)$/i;
  * que no son backline; dentro de ellas no se leen ítems. */
 const SECCION_BACKLINE = /^(backline|back line|instrumentos|requerimientos? de backline|equipos? de backline|listado de backline|lista de backline)\b/i;
 const SECCION_AUDIO = /^(input(s| list)?|mixers?( de monitores?)?|mezcladoras?|requerimientos? de (sala|audio|sonido)|amplificaci[oó]n de sala|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|monitor world|mezclas?( de monitores)?|iem|in ?ears?|pa\b|p\.\s?a\.?|sistema de (sonido|pa)|sonido|audio|foh|front of house|consolas?|control (foh|monitor(es|s)?)|microfon[ií]a|micr[oó]fonos|microphones?|mic (list|packages?)|stands? de mic(r[oó]fonos?)?|mic stands?|microphone stands?|cue monitor|arreglo principal|(sub ?)?snakes?|multipares?|wireless|inal[aá]mbricos|rf\b)/i;
-const SECCION_OTRA = /^(stage$|avisos?( importantes?)?$|stage plot|planta de escenario|ground support|stage ?hands|power( generators)?|generadores?|moving heads|follow ?spots?|fx$|efectos|led screens?|pantallas led|pronters|prompters?|teleprompters?|quick change|accesorios (artista|ballet|mariachi|staff|producci[oó]n)|alimentos|bebidas|comida|cena|iluminaci[oó]n|planta de iluminaci[oó]n|lighting|luces|lista de materiales|video|pantallas|screens?|led\b|catering|camerinos?|camarines?|dressing ?rooms?|hospitality|alimentaci[oó]n|comidas?|bebidas|hotel(es)?|hospedaje|alojamiento|estad[ií]a|transporte|traslados?|viajes?|vuelos?|seguridad|security|contactos?|contact|comunicaci[oó]n|prensa|grabaci[oó]n|fotograf[ií]a|merch(andising)?|pagos?|contrato|rigging|estructura|energ[ií]a el[eé]ctrica|planta el[eé]ctrica|generador(es)?|radios?|handies|walkie|motorola|intercom|backstage|pre-?show|after-?show|medidas|dimensiones|especiales|control\b|barricada|vallas?|credenciales|acreditaciones|invitaciones|guest ?list)/i;
+const SECCION_OTRA = /^(stage$|stage requirements?|stage needs|requerimientos? de (escenario|tarima)|requisitos de (escenario|tarima)|avisos?( importantes?)?$|stage plot|planta de escenario|ground support|stage ?hands|power( generators)?|generadores?|moving heads|follow ?spots?|fx$|efectos|led screens?|pantallas led|pronters|prompters?|teleprompters?|quick change|accesorios (artista|ballet|mariachi|staff|producci[oó]n)|alimentos|bebidas|comida|cena|iluminaci[oó]n|planta de iluminaci[oó]n|lighting|luces|lista de materiales|video|pantallas|screens?|led\b|catering|camerinos?|camarines?|dressing ?rooms?|hospitality|alimentaci[oó]n|comidas?|bebidas|hotel(es)?|hospedaje|alojamiento|estad[ií]a|transporte|traslados?|viajes?|vuelos?|seguridad|security|contactos?|contact|comunicaci[oó]n|prensa|grabaci[oó]n|fotograf[ií]a|merch(andising)?|pagos?|contrato|rigging|estructura|energ[ií]a el[eé]ctrica|planta el[eé]ctrica|generador(es)?|radios?|handies|walkie|motorola|intercom|backstage|pre-?show|after-?show|medidas|dimensiones|especiales|control\b|barricada|vallas?|credenciales|acreditaciones|invitaciones|guest ?list)/i;
 /* Lo que no es backline aunque aparezca con cantidad dentro de la lista. */
 const NO_BACKLINE = /\b(handies?|radios?|walkie|motorola|pilas?|cintas?|gaf+er|toallas?|agua|hielo|bebidas?|personas|habitaci[oó]n(es)?|suburban|vans?|guardias?|sillones?|espejos?|percheros?|(sub ?)?snakes?|multipar(es)?|retornos?|returns|canales|channels|pronters?|prompters?|iems?|in ?-?ears?|cuñas?|wedges?|sidefills?|subwoofers?)\b/i;
 /* Renglón de input list: canal, instrumento y micrófono ("27  SNARE 2  SM 57  SHORT BOOM"). */
@@ -161,7 +161,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     let proveedorActual: string | null = null;
     // "Sustituciones aceptables:", "Guitarras spare", "Opción 2 …" → lo que sigue es alternativa, no suma.
     let modoAlternativa = false;
-    // Dentro de un grupo ("DRUMS/BATERIA - CLAUDIO MAFFIA"), los subtítulos ("OPCIONES", "STANDS",
+    // Dentro de un grupo ("DRUMS/BATERIA - FULANO DE TAL"), los subtítulos ("OPCIONES", "STANDS",
     // "Type/Tipo", "Accesorios") no abren otro grupo. Después de "OPCIONES EN ORDEN DE PRIORIDAD",
     // "1. … 2. … 3. …" es un ranking: solo la 1 cuenta. Después de "PARCHES", lo que sigue es nota.
     let familiaGrupo: string | null = null, listaOpciones = false, ranking = false, enParches = false, itemsDelSubgrupo = 0;
@@ -171,15 +171,20 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     };
     // En qué sección del rider va la lectura: "fuera" = audio, luces, catering…; ahí no se leen ítems.
     let seccion: "neutra" | "backline" | "audio" | "otra" = "neutra";
-    // "RIDER TÉCNICO / DREAD MAR I 2026": el rider es de una sola banda y su nombre ya no cambia.
+    // "RIDER TÉCNICO / LOS RAYOS 2026": el rider es de una sola banda y su nombre ya no cambia.
     let artistaFijo = !!ctx.artista, esperarArtista = false;
     const sinInterpretar: string[] = [];
     // Un rider escrito todo en mayúsculas no distingue encabezados de ítems por las mayúsculas.
     const conLetras = doc.lineas.filter(l => letras(l.texto) >= 3);
     const docEnMayusculas = conLetras.length > 0 && conLetras.filter(l => l.texto === l.texto.toUpperCase()).length / conLetras.length > 0.5;
     // Un rider con capítulos numerados ("3. BACKLINE", "3.1.- DRUMS"): los números de los títulos no son cantidades.
-    const conCapitulos = doc.lineas.some(l => /^\s*\d{1,2}\s*\.\s*\d{1,2}\s*\.?\s*-?\s*\p{L}/u.test(l.texto));
-    let capituloBackline: number | null = null;
+    // También "7. STAGE REQUIREMENTS" … "8. BACKLINE": capítulos de un nivel, si uno de ellos es el backline.
+    const capituloDeBackline = doc.lineas.map(l => l.texto.trim().match(/^(\d{1,2})\s*\.\s*[-–]?\s*(\p{L}[^.]*)$/u))
+      .find(m => m && SECCION_BACKLINE.test(m[2]!.replace(/[\s:·|–—-]+$/, "")));
+    const conCapitulos = !!capituloDeBackline || doc.lineas.some(l => /^\s*\d{1,2}\s*\.\s*\d{1,2}\s*\.?\s*-?\s*\p{L}/u.test(l.texto));
+    // Con el número del capítulo del backline sabido desde el principio, lo de otros capítulos queda
+    // fuera aunque venga antes ("7. STAGE REQUIREMENTS" con sus boom stands de micrófono).
+    let capituloBackline: number | null = capituloDeBackline ? Number(capituloDeBackline[1]) : null;
 
     if (doc.asunto) tituloEvento(doc.asunto);
 
@@ -208,9 +213,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
           // "5.1 TARIMA" dentro del capítulo 5 (escenario): tampoco vuelve al backline.
           const terminaAqui = seccion !== "otra" && seccion !== "audio";
           seccion = "otra"; ponerGrupo(null);
-          anotar(terminaAqui ? "seccion" : "no-backline", terminaAqui ? `capítulo ${cap.numero} del rider: termina el backline (capítulo ${capituloBackline})` : `capítulo ${cap.numero} del rider, no es el del backline`); continue;
+          anotar(terminaAqui ? "seccion" : "no-backline", `capítulo ${cap.numero} del rider: el backline es el capítulo ${capituloBackline}`); continue;
         }
-        // "3.3.- ELECTRIC GUITAR CAMELO": capítulo con el instrumento y el músico, sin dos puntos.
+        // "3.3.- ELECTRIC GUITAR TOMÁS": capítulo con el instrumento y el músico, sin dos puntos.
         if (seccion !== "audio" && seccion !== "otra" && !/:/.test(texto) && esTituloDeInstrumento(texto.replace(/[\s:·|–—-]+$/, ""))) {
           ponerGrupo(nombrePropio(texto.replace(/[\s:·|–—-]+$/, ""))); modoAlternativa = false;
           anotar("grupo", "capítulo del instrumento"); continue;
@@ -387,7 +392,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
 
     /* ---- reglas, en el orden en que se prueban ---- */
 
-    /** "RIDER TÉCNICO" y en el renglón siguiente "DREAD MAR I 2026": esa es la banda de todo el documento. */
+    /** "RIDER TÉCNICO" y en el renglón siguiente "LOS RAYOS 2026": esa es la banda de todo el documento. */
     function riderDe(t: string): boolean {
       if (artistaFijo) return false;
       const m = t.match(/^(?:rider(?:\s+t[eé]cnico)?|technical\s+rider|tech\s+rider)(?:\s+(?:de|del|of|-|–|:))?\s*(.*)$/i);
@@ -769,7 +774,7 @@ function otraFamilia(t: string): boolean {
   const f = familiaDe(t);
   return !!f && f !== "bateria" && !/^(cymbals?|stands?|soportes?|hardware|pedal|kick|amps?|amplificador|cabinets?|cajas?|instrument|options?|opciones?)/i.test(t);
 }
-/** "DRUMS/BATERIA * - CLAUDIO MAFFIA", "GTR/GUITARRA 1 - MAIKEL DE LUNA CAMPOS": instrumento y quién lo toca.
+/** "DRUMS/BATERIA * - FULANO DE TAL", "GTR/GUITARRA 1 - ANA PÉREZ": instrumento y quién lo toca.
  *  Devuelve el instrumento ("DRUMS/BATERIA", "GTR/GUITARRA 1"). */
 export function grupoConMusico(t: string): string | null {
   const m = t.match(/^(.{2,40}?)\s*\*?\s+[-–—]\s+(\p{Lu}[\p{L}'’".]*(?:\s+\p{Lu}[\p{L}'’".]*){0,4})$/u);
@@ -795,7 +800,7 @@ export function capituloDe(t: string, conCapitulos: boolean): { numero: number; 
   return { numero: Number(uno[1]), titulo };
 }
 
-/** "DRUMS", "ELECTRIC GUITAR CAMELO", "KEYBOARDS JUAN GABRIEL": empieza por el instrumento y lo demás
+/** "DRUMS", "ELECTRIC GUITAR TOMÁS", "KEYBOARDS ANA": empieza por el instrumento y lo demás
  *  (hasta tres palabras) es el músico. */
 export function esTituloDeInstrumento(titulo: string): boolean {
   if (/\d/.test(titulo) || titulo.length > 50) return false;
@@ -805,7 +810,7 @@ export function esTituloDeInstrumento(titulo: string): boolean {
 }
 
 /** "DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM, PEARL MASTER CUSTOM" → el título y las opciones;
- *  "KEYBOARDS JUAN GABRIEL: SUJETO A MODIFICACIÓN" → el título y la nota. Sin cantidad adelante. */
+ *  "KEYBOARDS ANA: SUJETO A MODIFICACIÓN" → el título y la nota. Sin cantidad adelante. */
 export function tituloConNota(t: string): { titulo: string; nota: string; opciones: string[] } | null {
   const m = t.match(/^([^:\d][^:]{1,50}?)\s*:\s*(\S.*)$/);
   if (!m) return null;
@@ -819,7 +824,7 @@ export function tituloConNota(t: string): { titulo: string; nota: string; opcion
 const SALUDO = /^(hola|hello|hi|buen[oa]s|bienvenid|welcome|estimad|dear|saludos|[ií]ndice|index|contenidos?|contents?|introducci[oó]n|presentaci[oó]n|informaci[oó]n( general)?)\b/i;
 
 /** El nombre en mayúsculas que el rider repite después de "para", "por", "de"…:
- *  "Sistemas In Ears para DIAMANTE ELÉCTRICO son", "Consola sugerida por DIAMANTE ELÉCTRICO".
+ *  "Sistemas In Ears para LUNA ROJA son", "Consola sugerida por LUNA ROJA".
  *  Hace falta que salga al menos dos veces. */
 export function nombreRepetido(lineas: ReadonlyArray<{ texto: string }>): string | null {
   const PAL = "[A-ZÁÉÍÓÚÑÜ][A-ZÁÉÍÓÚÑÜ'&.]*";
@@ -847,8 +852,8 @@ const GENERICO = new Set(("el la los las the rider tecnico technical artista art
   "camerinos catering hotel transporte set pagina page anexo cliente organizacion organizador musicos band banda grupo agrupacion hospitality").split(" "));
 
 /** El nombre de la banda escrito en mayúsculas y minúsculas que el rider repite en sus frases:
- *  "el show de Los Amigos Invisibles", "Los Amigos Invisibles no se presentarán…". Si la página web
- *  o el correo del documento lo contienen (www.amigosinvisibles.com), con dos veces basta; si no,
+ *  "el show de Los Rayos", "Los Rayos no se presentarán…". Si la página web
+ *  o el correo del documento lo contienen (www.losrayosmusica.com), con dos veces basta; si no,
  *  tiene que repetirse tres. Las palabras del contrato ("El Artista", "El Contratante") no cuentan. */
 export function nombreEnElTexto(lineas: ReadonlyArray<{ texto: string }>): string | null {
   const PAL = "\\p{Lu}[\\p{Ll}'’]+";
@@ -861,7 +866,7 @@ export function nombreEnElTexto(lineas: ReadonlyArray<{ texto: string }>): strin
   }
   const claveNombre = (n: string) => sinTildes(n.replace(/^(los|las|la|el|the)\s+/i, "")).toLowerCase().replace(/[^a-z]/g, "");
   const enLaWeb = (n: string) => claveNombre(n).length >= 5 && [...webs].some(w => w.includes(claveNombre(n)));
-  // "Att: Paula Pera" al final del rider y el correo paulapera…@: quien firma es la banda. Sin esa
+  // "Att: Ana Pérez" al final del rider y el correo anaperez…@: quien firma es la banda. Sin esa
   // coincidencia no se toma (suele firmar el productor o el mánager).
   const FIRMA = /^(att|atte|atentamente|cordialmente|saludos|regards|best regards|sincerely)\b[.:,]*\s*(.*)$/i;
   for (let i = 0; i < lineas.length; i++) {
@@ -941,6 +946,8 @@ function posicionesLista(t: string): number[] {
     if (/\/\s*$/.test(antes) || (/\p{Ll}/u.test(t) && /\b[A-Z]{2,4}\s+$/.test(antes))) continue;
     // "AMPEG SVT 4 PRO" en un renglón todo en mayúsculas: el 4 sigue siendo del modelo (SVT-4 PRO, un cabezal).
     if (/\b[A-Z]{2,4}\s+$/.test(antes) && MODELO_SUFIJO.test(m[2]!)) continue;
+    // "NORD STAGE 2 MODEL SW73 OR HA76": lo que sigue al número es el modelo, no otro ítem.
+    if (/^(model|modelo|version|versi[oó]n|series|serie|edition|edici[oó]n)$/i.test(m[2]!)) continue;
     // "YAMAHA MOTIF 8 XF": número y código corto del modelo (XF8) detrás del nombre del equipo. Los códigos
     // van sin vocales (XF, CS, MX); "2 STANDS 1 HI HAT" sí son dos ítems.
     if (/^[B-DF-HJ-NP-TV-Z]{1,3}$/.test(m[2]!) && /\b[A-ZÁÉÍÓÚÑ]{3,}\s+$/.test(antes)) continue;
@@ -952,7 +959,14 @@ const marcas = (x: string) => posicionesLista(x).length;
 function cortar(t: string): string[] {
   const pos = posicionesLista(t);
   if (pos.length < 2) return [t];
-  return [0, ...pos].filter((p, n, a) => n === 0 || p !== a[n - 1]).map((p, n, a) => t.slice(p, a[n + 1] ?? t.length).trim()).filter(Boolean);
+  const partes = [0, ...pos].filter((p, n, a) => n === 0 || p !== a[n - 1]).map((p, n, a) => t.slice(p, a[n + 1] ?? t.length).trim()).filter(Boolean);
+  // "2 SNARE DRUM 14” X 5” WITH 2 STANDS": los stands son del redoblante; que lo diga.
+  return partes.map((p, n) => {
+    const antes = partes[n - 1];
+    if (!antes || !/\s(with|w\/|con)$/i.test(antes) || p.split(/\s+/).length > 3 || !/\b(stands?|soportes?|bases?|holders?|clamps?)$/i.test(p)) return p;
+    const de = antes.replace(/^\d{1,3}\s+/, "").replace(/\s(with|w\/|con)$/i, "").trim();
+    return `${p} PARA ${de}`;
+  });
 }
 
 /** "Hardware: 2x soportes de caja, 1x soporte charles, 11x soportes…" → una línea por ítem. */

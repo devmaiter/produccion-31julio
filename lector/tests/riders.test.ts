@@ -78,7 +78,7 @@ describe("secciones del rider", () => {
 
   it("solo lee ítems en el backline; transporte, input list, radios y luces quedan fuera", () => {
     const e = interpretar([doc(`RIDER TÉCNICO
-DREAD MAR I 2026
+LOS RAYOS 2026
 TRANSPORTE
 1 SUBURBAN con Asientos de Capitan
 1 VAN para 15 personas (MÚSICOS)
@@ -112,7 +112,7 @@ MOTOROLA + EXTRAS
 6 Modelo EP450 / Accesorio RMN5029
 PLANTA DE ILUMINACION - LISTA DE MATERIALES
 30 CLAY PAKY, MYTHOS 2`)]);
-    expect(e.artistas).toEqual(["Dread Mar I"]);
+    expect(e.artistas).toEqual(["Los Rayos"]);
     expect(resumen(e)).toEqual([
       "1 Batería: BD 22",
       "2 Batería: TOMS 10” + holder float, 12” + holder float (Remo Pinstripe)",
@@ -131,7 +131,7 @@ PLANTA DE ILUMINACION - LISTA DE MATERIALES
 
   it("tabla PIEZA | MEDIDA | MARCA, páginas repetidas, snakes y opciones de teclado", () => {
     const e = interpretar([doc(`Technical Rider
-LOS TIGRES DEL NORTE 2026
+LA OTRA BANDA 2026
 P.A.
 12 MAIN PER SIDE   PANTHER MEYER
 8 SUBS PER SIDE   2100 LF MEYER
@@ -169,7 +169,7 @@ PRONTERS
 ALIMENTOS ARTISTA:
 16 ELECTROLIT SABOR DE COCO
 50 BOTELLAS DE AGUA PURIFICADA`)]);
-    expect(e.artistas).toEqual(["Los Tigres del Norte"]);
+    expect(e.artistas).toEqual(["La Otra Banda"]);
     expect(resumen(e)).toEqual([
       '2 Batería: KICK (22" x 20", DW, SERIE COLECTOR)',
       '2 Batería: SNARE (14" X 6", DW, SERIE COLECTOR)',
@@ -198,17 +198,17 @@ ALIMENTOS ARTISTA:
 HOLA
 En este documento encontraran nuestros contactos de producción.
 1. SONIDO
-- consola FOH DIAMANTE ELÉCTRICO:
--Consola OSM sugeridas por DIAMANTE ELÉCTRICO son:
-Sistemas In Ears para DIAMANTE ELÉCTRICO son:
+- consola FOH LUNA ROJA:
+-Consola OSM sugeridas por LUNA ROJA son:
+Sistemas In Ears para LUNA ROJA son:
 2. BACKLINE
 DRUMS:
 · 1 22” Bass drum
 ELECTRIC BASS / BASS GUITAR:
 · 1 Percussion table`)]);
-    expect(e.artistas).toEqual(["Diamante Eléctrico"]);
+    expect(e.artistas).toEqual(["Luna Roja"]);
     expect(e.items.map(i => [i.artista, i.grupo, i.descripcion])).toEqual([
-      ["Diamante Eléctrico", "Drums", "22” Bass drum"], ["Diamante Eléctrico", "Electric Bass / Bass Guitar", "Percussion table"]]);
+      ["Luna Roja", "Drums", "22” Bass drum"], ["Luna Roja", "Electric Bass / Bass Guitar", "Percussion table"]]);
   });
 
   it("cada instrumento con su músico es un grupo; sus subtítulos (opciones, stands, tipo, accesorios) no abren otro", () => {

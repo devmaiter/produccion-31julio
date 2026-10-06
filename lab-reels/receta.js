@@ -151,9 +151,10 @@ const ACCESORIO = {
 };
 function copiasDe(tipo, items) {
   let l = items.map(it => ({it, t: texto(it)})).filter(x => !ACCESORIO[tipo]?.test(x.t));
-  // "AMPEG SVT Classic" es el cabezal; lo que se dibuja son las cajas.
-  const cabezal = /(head|cabezal|\bsvt\b(?!.*(8 ?x ?10|810|cab)))/;
-  if (tipo === "bajo" && l.some(x => !cabezal.test(x.t))) l = l.filter(x => !cabezal.test(x.t));
+  // El cabezal ("head", o un ampli de bajo sin palabras de caja) no se dibuja: se dibujan las cajas.
+  const caja = /(\d ?x ?\d{2}|\b\d{3}e?\b|cab\b|cabinet|caja|cabina|enclosure|bafle|combo)/;
+  const cabezal = t => /(head|cabezal)/.test(t) || !caja.test(t);
+  if (tipo === "bajo" && l.some(x => !cabezal(x.t))) l = l.filter(x => !cabezal(x.t));
   return l.reduce((s, x) => s + cuantos(x.it, x.t), 0);
 }
 

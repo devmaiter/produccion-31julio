@@ -1,6 +1,6 @@
 /* Del rider a la planilla de backline (formato OML: Cant | Requerimiento | Cant | Propuesta).
  *
- *   npm run planilla -- rider.pdf --banda "Paula Pera" --escenario "Stage 4" --fecha 2026-09-12 [--salida planilla.xlsx]
+ *   npm run planilla -- rider.pdf --banda "Los Rayos" --escenario "Stage 4" --fecha 2026-09-12 [--salida planilla.xlsx]
  *
  * El Requerimiento sale del rider; la Propuesta queda vacía. Sin --salida escribe <rider>.xlsx al lado. */
 import { readFileSync, writeFileSync } from "node:fs";

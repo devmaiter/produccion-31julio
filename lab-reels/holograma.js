@@ -4,7 +4,7 @@
    permiten pocos contextos y doce reels con su propio WebGL se caerían en el celular. */
 import * as THREE from "../reconocimiento-3d/vendor/three.js";
 import { RoundedBoxGeometry } from "../reconocimiento-3d/vendor/three.js";
-import { receta } from "./receta.js";
+import { receta } from "./receta.js?v=3";
 
 const COLOR = 0xff7a2e;
 

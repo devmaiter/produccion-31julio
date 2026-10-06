@@ -63,8 +63,8 @@ Piezas, en `lector/src/lectura/`:
     todo el documento.
     Si debajo no está el nombre (va en el logo), se busca: el nombre en MAYÚSCULAS
     repetido tras "para/de/por"; el nombre en mayúsculas y minúsculas que las frases
-    repiten ("el show de Los Amigos Invisibles"), con 2 veces si está en la web o el
-    correo del documento y 3 si no; o quien firma ("Att: Paula Pera") si su nombre está
+    repiten ("el show de Los Rayos"), con 2 veces si está en la web o el
+    correo del documento y 3 si no; o quien firma ("Att: Ana Pérez") si su nombre está
     en el correo. Las palabras del contrato ("El Artista", "El Contratante") no cuentan.
   - **Renglones partidos y listas corridas.**
   - **Páginas repetidas:** un bloque igual a uno anterior se lee una vez.
@@ -74,7 +74,7 @@ Piezas, en `lector/src/lectura/`:
     no una cantidad. Otro capítulo ("4. SOUNDCHECK", "5. ESCENARIO") cierra el del backline.
   - **Opciones de la banda:** "DRUMS: DW, Yamaha, Pearl" es UNA batería; las marcas son
     información del grupo (no ítems). "TOMS 12, 14 y 16 O 16, 18" son 3 toms.
-  - **Grupos y subtítulos:** "DRUMS/BATERIA - CLAUDIO MAFFIA" (instrumento + músico)
+  - **Grupos y subtítulos:** "DRUMS/BATERIA - FULANO DE TAL" (instrumento + músico)
     abre un grupo; dentro, "OPCIONES", "STANDS", "Type/Tipo", "Accesorios",
     "CYMBALS SET"… son subtítulos y no abren otro. "OPCIONES EN ORDEN DE PRIORIDAD"
     + "1. … 2. …": solo la 1 suma (y si es solo una marca, es nota). "Sizes KD 22” -
@@ -124,12 +124,11 @@ En Windows (sin symlinks) los enlaces de `extractor-fuente/public/` quedan como
 archivos de texto: para el build hay que cambiarlos localmente por carpetas reales
 y no subir ese cambio.
 
-**Riders reales probados.** No están en el repo porque traen teléfonos y
-correos del equipo; no se suben:
-- Dread Mar I: pasó de 152 ítems con ~9 bien a 29, todos backline. De ~31
-  referencias no falta ninguna.
-- Los Tigres del Norte: pasó de 64 a 32. Repetía páginas, traía "SNAKE DE
-  12 CH", P.A. y catering. Solo falta "COW PIE".
+**Riders reales de prueba.** No están en el repo porque traen teléfonos y correos del
+equipo; no se suben. **El código y las pruebas no guardan nombres de bandas ni textos
+copiados de un rider real**: las reglas son generales y las pruebas usan riders
+inventados con la misma forma (bandas "Los Rayos", "Luna Roja"…). Los riders reales son
+para entrenar y medir, en la máquina del usuario.
 
 Aun así el usuario ve errores en cada rider nuevo: **las reglas no alcanzan**.
 

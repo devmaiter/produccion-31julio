@@ -742,8 +742,10 @@ function htmlFotos(b){
 const holoItems = new Map();
 function htmlHolo(clave, items){
   let cat = PRIORIDAD.find(c => items.some(x => x.categoria === c)) || "";
-  // Un ítem que es solo el cabezal ("AMPEG SVT 4 PRO", "head") se dibuja como cabezal, no como caja.
-  if (items.length === 1 && /^Ampli/.test(cat) && /(head|cabezal|\bsvt\b(?!.*(8 ?x ?10|810|cab)))/i.test(items[0].referencia)) cat = "Cabezal";
+  // Un ítem que es solo el cabezal se dibuja como cabezal, no como caja: dice "head"/"cabezal", o es un
+  // ampli de bajo sin ninguna palabra de caja (las cajas dicen 8x10, cabinet, caja, cabina…).
+  const CAJA = /(\d ?x ?\d{2}|\b\d{3}e?\b|cab\b|cabinet|caja|cabina|enclosure|bafle|combo)/i;
+  if (items.length === 1 && /^Ampli/.test(cat) && (/(head|cabezal)/i.test(items[0].referencia) || (cat === "Ampli bajo" && !CAJA.test(items[0].referencia)))) cat = "Cabezal";
   holoItems.set(clave, items.filter(x => (POR_HOLO[cat] || [cat]).includes(x.categoria)));
   return `<div class="holo" data-cat="${esc(cat)}" data-holo="${esc(clave)}"><div class="emoji" aria-hidden="true">${EMOJI[cat] || (cat === "Cabezal" ? "🔊" : "🎤")}</div></div>`;
 }
@@ -928,7 +930,7 @@ function contar(el){
 
 /* Holograma 3D de la rama de reconocimiento-3d en la portada. Si no hay WebGL se queda el emoji. */
 let holo3d = null;
-const holo3dListo = import("./holograma.js?v=2").then(m => holo3d = m).catch(() => null);
+const holo3dListo = import("./holograma.js?v=3").then(m => holo3d = m).catch(() => null);
 function holograma(r){
   holo3dListo.then(() => {
     // El de la pantalla que se ve: la portada o la sección a la que se deslizó.

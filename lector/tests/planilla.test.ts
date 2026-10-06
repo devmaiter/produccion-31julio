@@ -44,14 +44,14 @@ describe("planilla de backline (formato OML)", () => {
   });
 
   it("el .xlsx trae el encabezado, SET A, Cat / Rider, Cant | Requerimiento | Cant | Propuesta y la propuesta vacía", async () => {
-    const bytes = await planillaXlsx({ escenario: "Stage 4", fecha: "2026-09-12", banda: "Paula Pera", set: "SET A", cat: "★★☆☆☆", rider: "https://drive.google.com/x", filas });
+    const bytes = await planillaXlsx({ escenario: "Stage 4", fecha: "2026-09-12", banda: "Los Rayos", set: "SET A", cat: "★★☆☆☆", rider: "https://drive.google.com/x", filas });
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(Buffer.from(bytes) as never);
     const ws = wb.worksheets[0]!;
     const v = (ref: string) => { const x = ws.getCell(ref).value; return typeof x === "object" && x && "text" in x ? x.text : x; };
-    expect(ws.name).toBe("Paula Pera");
+    expect(ws.name).toBe("Los Rayos");
     expect(ws.model.merges).toEqual(["A1:B1", "C1:D1", "A3:D3"]);
-    expect([v("A1"), v("C1"), v("B2"), v("A3")]).toEqual(["Stage 4", "12/09/2026", "Paula Pera | Backline Stage 4 | 12/09", "SET A"]);
+    expect([v("A1"), v("C1"), v("B2"), v("A3")]).toEqual(["Stage 4", "12/09/2026", "Los Rayos | Backline Stage 4 | 12/09", "SET A"]);
     expect([v("A4"), v("B4"), v("C4"), v("D4")]).toEqual(["Cat:", "★★☆☆☆", "Rider:", "https://drive.google.com/x"]);
     expect([1, 2, 3, 4].map(c => ws.getRow(5).getCell(c).value)).toEqual(["Cant", "Requerimiento", "Cant", "Propuesta"]);
     expect([v("A8"), v("B8"), v("C8"), v("D8")]).toEqual(["01 x", "Bombo 22x18”", null, null]);

@@ -5,7 +5,7 @@
  *   01 x | Bombo 22"     | 1    | Bombo 22"
  *        | BAJO          |      | BAJO           ← fila sin cantidad y corta: grupo
  *
- * El nombre de la banda se busca encima del encabezado ("Kapanga | Backline
+ * El nombre de la banda se busca encima del encabezado ("Los Rayos | Backline
  * Stage 4 | 12/09"), igual que la fecha y el escenario. Cuando una banda trae
  * "Requerimiento" (lo que pide el rider) y "Propuesta" (lo que se le va a
  * poner), los ítems salen de la propuesta y el requerimiento queda como
