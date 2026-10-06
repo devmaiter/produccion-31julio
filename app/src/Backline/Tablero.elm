@@ -76,6 +76,7 @@ type alias Documento =
     , bloques : E.Value
     , stagePlots : E.Value
     , comparaciones : List Comparacion
+    , pedidos : E.Value
     , items : List Item
     }
 
@@ -379,6 +380,7 @@ datosJson doc items comparar f =
         , ( "bloques", doc.bloques )
         , ( "stagePlots", doc.stagePlots )
         , ( "items", E.list itemJson items )
+        , ( "pedidos", doc.pedidos )
         , ( "comparaciones"
           , if comparar then
                 doc.comparaciones
@@ -510,6 +512,7 @@ documentoJson d =
                 , ( "bloques", d.bloques )
                 , ( "stagePlots", d.stagePlots )
                 , ( "items", E.list itemJson d.items )
+                , ( "pedidos", d.pedidos )
                 , ( "comparaciones", E.list .valor d.comparaciones )
                 ]
           )
@@ -587,8 +590,8 @@ documentoDec =
 
 datosDec : D.Decoder (String -> List String -> String -> Documento)
 datosDec =
-    D.map6
-        (\artistas dias bloques plots comps items nombre archivos cuando ->
+    D.succeed
+        (\artistas dias bloques plots comps pedidos items nombre archivos cuando ->
             { nombre = nombre
             , archivos = archivos
             , cuando = cuando
@@ -597,15 +600,17 @@ datosDec =
             , bloques = bloques
             , stagePlots = plots
             , comparaciones = comps
+            , pedidos = pedidos
             , items = items
             }
         )
-        (opcional "artistas" (D.list (D.map2 (\id n -> { id = id, nombre = n }) (D.field "id" D.string) (D.field "nombre" D.string))) [])
-        (listaCruda "dias")
-        (listaCruda "bloques")
-        (listaCruda "stagePlots")
-        (opcional "comparaciones" (D.list comparacionDec) [])
-        (D.field "items" (D.list itemDec))
+        |> con (opcional "artistas" (D.list (D.map2 (\id n -> { id = id, nombre = n }) (D.field "id" D.string) (D.field "nombre" D.string))) [])
+        |> con (listaCruda "dias")
+        |> con (listaCruda "bloques")
+        |> con (listaCruda "stagePlots")
+        |> con (opcional "comparaciones" (D.list comparacionDec) [])
+        |> con (listaCruda "pedidos")
+        |> con (D.field "items" (D.list itemDec))
 
 
 comparacionDec : D.Decoder Comparacion

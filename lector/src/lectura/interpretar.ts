@@ -177,6 +177,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     // Un rider escrito todo en mayúsculas no distingue encabezados de ítems por las mayúsculas.
     const conLetras = doc.lineas.filter(l => letras(l.texto) >= 3);
     const docEnMayusculas = conLetras.length > 0 && conLetras.filter(l => l.texto === l.texto.toUpperCase()).length / conLetras.length > 0.5;
+    // Un rider con capítulos numerados ("3. BACKLINE", "3.1.- DRUMS"): los números de los títulos no son cantidades.
+    const conCapitulos = doc.lineas.some(l => /^\s*\d{1,2}\s*\.\s*\d{1,2}\s*\.?\s*-?\s*\p{L}/u.test(l.texto));
+    let capituloBackline: number | null = null;
 
     if (doc.asunto) tituloEvento(doc.asunto);
 
@@ -186,13 +189,42 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     const siguenCanales = (n: number) => renglones.slice(n + 1, n + 5).filter(x => CANAL.test(x.texto) || (/^\d{1,2}\s+\S/.test(x.texto.trim()) && MIC.test(x.texto))).length >= 2;
     for (let n = 0; n < renglones.length; n++) {
       const l = renglones[n]!;
-      const texto = limpiar(l.texto);
+      const original = limpiar(l.texto);
+      let texto = original;
       if (!texto || letras(texto) + (texto.match(/\d/g) ?? []).length < 2) continue;
       const anotar = (etiqueta: Etiqueta, motivo: string, item: number | null = null) => {
         ultimaEtiqueta = etiqueta;
-        ctx.traza?.push({ documento: doc.nombre, texto, etiqueta, motivo, seccion, grupo, item });
+        ctx.traza?.push({ documento: doc.nombre, texto: original, etiqueta, motivo, seccion, grupo, item });
       };
       if (riderDe(texto)) { anotar("banda", "nombre del rider"); continue; }
+      // "3.1.- DRUMS", "5.1 TARIMA", "4. SOUNDCHECK": el número del capítulo del rider, no una cantidad.
+      const cap = capituloDe(texto, conCapitulos && !listaOpciones);
+      if (cap) {
+        texto = cap.titulo;
+        const sec0 = seccionDe(cap.titulo);
+        if (sec0?.tipo === "backline" && SECCION_BACKLINE.test(cap.titulo)) capituloBackline = cap.numero;
+        // Otro capítulo del rider ("4. SOUNDCHECK", "5. ESCENARIO") termina el del backline.
+        else if (capituloBackline !== null && cap.numero !== capituloBackline) {
+          // "5.1 TARIMA" dentro del capítulo 5 (escenario): tampoco vuelve al backline.
+          const terminaAqui = seccion !== "otra" && seccion !== "audio";
+          seccion = "otra"; ponerGrupo(null);
+          anotar(terminaAqui ? "seccion" : "no-backline", terminaAqui ? `capítulo ${cap.numero} del rider: termina el backline (capítulo ${capituloBackline})` : `capítulo ${cap.numero} del rider, no es el del backline`); continue;
+        }
+        // "3.3.- ELECTRIC GUITAR CAMELO": capítulo con el instrumento y el músico, sin dos puntos.
+        if (seccion !== "audio" && seccion !== "otra" && !/:/.test(texto) && esTituloDeInstrumento(texto.replace(/[\s:·|–—-]+$/, ""))) {
+          ponerGrupo(nombrePropio(texto.replace(/[\s:·|–—-]+$/, ""))); modoAlternativa = false;
+          anotar("grupo", "capítulo del instrumento"); continue;
+        }
+      }
+      // "DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM, PEARL MASTER CUSTOM": el título del instrumento con las
+      // opciones de la banda. Es una sola batería (sus piezas vienen debajo); las marcas son información, no ítems.
+      const conNota = seccion === "audio" || seccion === "otra" ? null : tituloConNota(texto);
+      if (conNota) {
+        ponerGrupo(nombrePropio(conNota.titulo)); modoAlternativa = false;
+        if (seccion === "neutra" && capituloBackline !== null) seccion = "backline";
+        anotar("grupo", conNota.opciones.length > 1 ? `título con opciones de la banda: ${conNota.opciones.join(" · ")}` : `título con nota: ${conNota.nota}`);
+        continue;
+      }
       if (seccion !== "audio" && seccion !== "otra") {
         const sinColaS = texto.replace(/[\s:·|–—-]+$/, "");
         const conMusico = grupoConMusico(sinColaS);
@@ -433,6 +465,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       }
       let descripcion: string, cantidad: number, proveedor: string | null = null, explicita = false;
       let principal: string | null = null; // la descripción sin las notas de otras columnas
+      // "HI-HAT STAND DE   3   PATAS": el pedazo termina en "de", así que lo que sigue es la misma frase
+      // (de 3 patas), no una columna de cantidad y otra de proveedor.
+      if (cols.some((c, i) => i < cols.length - 1 && /\s(de|del|con|para|a|of|with|for)$/i.test(c))) { t = cols.join(" "); cols = [t]; }
 
       if (cols.length >= 2 && /^(x\s*)?\d{1,3}(\s*x)?$/i.test(cols[0]!) && letras(cols[1]!) >= 2) {
         // "1 | Bombo 22" | Parche frontal sin logo": tabla con la cantidad primero.
@@ -460,7 +495,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         // el número del medio es del modelo y lo último no es un proveedor.
         const junta = /^\d{1,3}\s*\p{L}/u.test(t) ? null : t.match(/^(.+?\p{L}.*?)\s+(\d{1,3})\s+(CN|OML|BACKLINE(?: COP)?|[A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ]{1,15}(?: [A-ZÁÉÍÓÚÑ]{2,15})?)$/u);
         const conCat = t.match(/^([\p{L}][\p{L}\s/&]{1,40}):\s*(.+)$/u); // "Platillos: 1 ride, 2 crash"
-        if (junta && letras(junta[1]!) >= 3) {
+        if (junta && letras(junta[1]!) >= 3 && !/\s(de|del|con|para|a|of|with|for)$/i.test(junta[1]!)) {
           descripcion = junta[1]!; cantidad = +junta[2]!; proveedor = junta[3]!; explicita = true;
         } else {
           const cuerpo = conCat && categorizar(conCat[1]!) !== "Otro" ? conCat[2]! : t;
@@ -480,9 +515,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       const palabras = descripcion.replace(/\([^)]*\)/g, " ").split(/\s+/).filter(w => letras(w) > 0).length;
       const deFrase = /\b(debe|deber[aá]n?|deben|estar|est[eé]n|ser[aá]n?|tener|tengan|cada|todos?|todas?|necesitamos|requerimos|solicitamos|favor|que|cuando|must|should|will|please|each|every)\b/i;
       if (!explicita && opcion === null && palabras > 8 && (deFrase.test(descripcion) || !/\d/.test(descripcion))) return false;
-      // "TOMS 10”, 12”" son dos toms.
+      // "TOMS 10”, 12”" son dos toms. "TOMS 12”, 14” Y 16” O 16” 18”": tres; lo que va después de "O" es la alternativa.
       if (!explicita && /^toms?\b/i.test(descripcion)) {
-        const medidas = descripcion.match(/\b\d{1,2}\s*(?:["”″]|pulg)/g) ?? [];
+        const medidas = descripcion.split(/\s+(?:o|or|u)\s+/i)[0]!.match(/\b\d{1,2}\s*(?:["”″]|pulg)/g) ?? [];
         if (medidas.length >= 2) cantidad = medidas.length;
       }
       if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.length > (explicita || opcion !== null ? 140 : 90)) return false;
@@ -743,6 +778,40 @@ export function grupoConMusico(t: string): string | null {
   if (/\d/.test(sinNumero)) return null;
   if (!sinNumero.split(/\s*\/\s*/).every(p => GRUPOS.test(p) || /^gtr$/i.test(p) || familiaDe(p))) return null;
   return instrumento;
+}
+
+/** "3.1.- DRUMS: …", "5.1 TARIMA": número de capítulo (dos niveles) y su título. "4. SOUNDCHECK" (un nivel)
+ *  solo cuenta en un rider con capítulos y si lo que sigue es un título en mayúsculas, porque "1. DW" también
+ *  puede ser la primera de unas opciones. */
+export function capituloDe(t: string, conCapitulos: boolean): { numero: number; titulo: string } | null {
+  const dos = t.match(/^(\d{1,2})\s*\.\s*\d{1,2}\s*\.?\s*[-–]?\s*(?=\p{L})(.*)$/u);
+  if (dos) return { numero: Number(dos[1]), titulo: dos[2]!.trim() };
+  if (!conCapitulos) return null;
+  const uno = t.match(/^(\d{1,2})\s*\.\s*[-–]?\s*(?=\p{L})(.*)$/u);
+  if (!uno) return null;
+  const titulo = uno[2]!.trim();
+  if (titulo !== titulo.toUpperCase() || /\d/.test(titulo) || titulo.split(/\s+/).length > 8) return null;
+  return { numero: Number(uno[1]), titulo };
+}
+
+/** "DRUMS", "ELECTRIC GUITAR CAMELO", "KEYBOARDS JUAN GABRIEL": empieza por el instrumento y lo demás
+ *  (hasta tres palabras) es el músico. */
+export function esTituloDeInstrumento(titulo: string): boolean {
+  if (/\d/.test(titulo) || titulo.length > 50) return false;
+  const palabras = sinTildes(titulo).toLowerCase().split(/[\s/&+,()-]+/).filter(Boolean);
+  const k = palabras.findIndex(p => !PALABRAS_TITULO.has(p) && !CONECTORES_TITULO.has(p));
+  return GRUPOS.test(titulo) || esTituloGenerico(titulo) || (k > 0 && palabras.length - k <= 3 && !palabras.slice(0, k).every(p => CONECTORES_TITULO.has(p)));
+}
+
+/** "DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM, PEARL MASTER CUSTOM" → el título y las opciones;
+ *  "KEYBOARDS JUAN GABRIEL: SUJETO A MODIFICACIÓN" → el título y la nota. Sin cantidad adelante. */
+export function tituloConNota(t: string): { titulo: string; nota: string; opciones: string[] } | null {
+  const m = t.match(/^([^:\d][^:]{1,50}?)\s*:\s*(\S.*)$/);
+  if (!m) return null;
+  const titulo = m[1]!.trim(), nota = m[2]!.trim().replace(/[.;]$/, "");
+  if (!esTituloDeInstrumento(titulo) || /^\d/.test(nota)) return null;
+  const opciones = nota.split(/\s*(?:,|\/|\s+o\s+|\s+or\s+|\s+u\s+)\s*/i).map(o => o.trim()).filter(o => letras(o) >= 2);
+  return { titulo, nota, opciones };
 }
 
 /* Lo que sigue a "RIDER TÉCNICO" cuando el nombre de la banda es un logo: saludos e índices, no bandas. */

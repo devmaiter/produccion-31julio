@@ -70,6 +70,10 @@ Piezas, en `lector/src/lectura/`:
   - **Páginas repetidas:** un bloque igual a uno anterior se lee una vez.
   - **Unidades:** "16 CH" o "4 RETORNOS" no son cantidades.
   - **Opciones:** "OPCIÓN #2" es alternativa y no suma.
+  - **Capítulos numerados:** "3.1.- DRUMS" o "5.1 TARIMA" llevan el número del capítulo,
+    no una cantidad. Otro capítulo ("4. SOUNDCHECK", "5. ESCENARIO") cierra el del backline.
+  - **Opciones de la banda:** "DRUMS: DW, Yamaha, Pearl" es UNA batería; las marcas son
+    información del grupo (no ítems). "TOMS 12, 14 y 16 O 16, 18" son 3 toms.
   - **Grupos y subtítulos:** "DRUMS/BATERIA - CLAUDIO MAFFIA" (instrumento + músico)
     abre un grupo; dentro, "OPCIONES", "STANDS", "Type/Tipo", "Accesorios",
     "CYMBALS SET"… son subtítulos y no abren otro. "OPCIONES EN ORDEN DE PRIORIDAD"
@@ -83,7 +87,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 175 pruebas en verde.
+  inglés). Hay 180 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -182,6 +186,10 @@ lo que llega por `guardar` (`localStorage` `lab-reels:tablero`).
 - **Modo normal** (el de siempre, y el único del empleado): una pantalla por banda con
   todo su rider como viene, sus fotos ("Tomar foto" / "Subir foto", como en la app del
   31 de julio) y nada de "1 bandas". El listado sin banda va al final, aparte.
+- **La tarjeta se da vuelta** ("Ver lo que pidió la banda"): de frente el listado; atrás el
+  rider como viene (renglones de su backline, de la traza del lector, sin correos ni
+  teléfonos), con qué quedó de cada renglón en el listado, las opciones de marca y lo que
+  no va tachado con el motivo. Viene en `datos.pedidos` (solo con un documento a la vez).
 - **Modo festival** (lo elige el admin en Filtros): los reels por categoría de abajo.
 - Las fotos quedan en el dispositivo (IndexedDB `backline-fotos`), achicadas a 1600 px;
   todavía no se comparten entre celulares.

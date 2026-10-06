@@ -152,6 +152,37 @@ suite =
                     in
                     Expect.equal ( vuelto.perfil, vuelto.modo, ( vuelto.fotos, Maybe.map (.items >> List.length) vuelto.doc, vuelto.filtro.texto ) )
                         ( Admin, Festival, ( m.fotos, Just 3, "" ) )
+            , test "lo que pidió la banda llega a la vista y se guarda tal cual" <|
+                \_ ->
+                    let
+                        pedidos =
+                            E.list identity [ E.object [ ( "artistaId", E.string "los-rayos" ), ( "renglones", E.list E.string [ "DRUMS: DW, YAMAHA" ] ) ] ]
+
+                        m =
+                            conRider Admin
+                                |> T.update
+                                    (Cargar
+                                        { nombre = "r"
+                                        , archivos = []
+                                        , cuando = ""
+                                        , artistas = []
+                                        , dias = E.list identity []
+                                        , bloques = E.list identity []
+                                        , stagePlots = E.list identity []
+                                        , comparaciones = []
+                                        , pedidos = pedidos
+                                        , items = []
+                                        }
+                                    )
+
+                        vuelto =
+                            T.decodificarEstado (T.guardable m)
+                    in
+                    Expect.equal
+                        ( campo [ "doc", "datos", "pedidos" ] D.value m |> Result.map (E.encode 0)
+                        , Maybe.map (.pedidos >> E.encode 0) vuelto.doc
+                        )
+                        ( Ok (E.encode 0 pedidos), Just (E.encode 0 pedidos) )
             , test "algo dañado en el dispositivo arranca de cero" <|
                 \_ -> T.decodificarEstado (E.string "basura") |> .perfil |> Expect.equal Empleado
             , test "un mensaje desconocido no se acepta" <|

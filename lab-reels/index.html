@@ -288,6 +288,24 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .origen b{color:var(--ink2);font-weight:600}
 .origen button{font-size:12px;padding:1px 9px;margin-left:4px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
 .origen button[data-seguro]{border-color:var(--warn);color:var(--warn)}
+/* La tarjeta que se da vuelta: listado de frente, lo que pidió la banda atrás */
+.tarjeta{flex:1;min-height:0;display:flex;flex-direction:column}
+.voltear{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 12px;margin:0 0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:var(--ink2)}
+.voltear[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#000}
+.caras{flex:1;min-height:0;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.3,1)}
+.tarjeta.vuelta .caras{transform:rotateY(180deg)}
+.cara{position:absolute;inset:0;display:flex;flex-direction:column;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cara.dorso{transform:rotateY(180deg);background:rgba(255,255,255,.04);border-radius:12px;padding:10px 12px}
+.resumen-pide{font-size:12px;color:var(--ink3);margin:0 0 8px}
+.opciones{font-size:13px;color:var(--ink2);margin:4px 0 2px;padding:6px 10px;border-left:3px solid var(--accent);background:rgba(255,106,31,.08);border-radius:0 8px 8px 0}
+.opciones b{color:var(--ink)}
+ul.lista li.pide{flex-direction:column;gap:2px;padding:8px 0}
+li.pide .t{font-size:14px}
+li.pide .va{font-size:12px;color:var(--ok);font-weight:600}
+li.pide .va.no{color:var(--ink3);font-weight:400}
+li.pide.fuera .t{text-decoration:line-through;color:var(--ink3)}
+li.pide.nota .t{color:var(--ink3);font-style:italic}
+@media (prefers-reduced-motion:reduce){.caras{transition:none}}
 .vacio-busqueda .slide{align-items:center;justify-content:center;text-align:center;gap:14px}
 </style>
 </head>
@@ -485,7 +503,7 @@ function armar(d){
 }
 
 /* Lo que devuelve el lector → el mismo formato de datos que Cordillera, para armar los reels. */
-function aDatos(ext){
+function aDatos(ext, traza){
   // Los reels son por banda: lo que el lector marcó como listado general (la hoja no dice de qué
   // banda es) no sale como si fuera una banda, pero sí entra en los totales de fondo.
   // Si el documento no trae ninguna banda, el listado se muestra como ficha.
@@ -515,7 +533,35 @@ function aDatos(ext){
     artistas.set(id, artistas.get(id) || nombre);
     return {artistaId: id, diaId: c.fecha ? "d-" + c.fecha : "d-doc", hoja: c.hoja, filas: c.filas};
   });
-  return {artistas: [...artistas].map(([id, nombre]) => ({id, nombre})), dias, bloques: [], stagePlots: [], items, comparaciones};
+  return {artistas: [...artistas].map(([id, nombre]) => ({id, nombre})), dias, bloques: [], stagePlots: [], items, comparaciones,
+    pedidos: pedidosDe(ext, traza, fuente, items)};
+}
+
+/* Lo que pidió cada banda, tal como viene en el rider: los renglones de su backline en orden, con lo
+   que el lector hizo de cada uno (ítem del listado, título con opciones, nota o "no es backline").
+   Así se ve aparte lo que pidió la banda y lo que quedó en el listado. Solo con un documento:
+   con varios, los números de ítem de la traza son de cada archivo. */
+const PRIVADO = /@|\+?\d[\d\s().-]{7,}\d|\bwww\.|https?:/i;
+function pedidosDe(ext, traza, fuente, items){
+  if (!traza?.length || new Set(traza.map(r => r.documento)).size !== 1) return [];
+  const idDe = new Map(fuente.map((it, n) => [ext.items.indexOf(it), items[n]]));
+  const porBanda = new Map(), antes = [];
+  let banda = null;
+  const poner = (b, r) => { if (!porBanda.has(b)) porBanda.set(b, []); porBanda.get(b).push(r); };
+  for (const r of traza) {
+    const enBackline = r.seccion === "backline" || ["item", "grupo"].includes(r.etiqueta) || (r.seccion === "neutra" && r.grupo);
+    if (!enBackline || PRIVADO.test(r.texto) || r.etiqueta === "banda") continue;
+    const it = r.item !== null && r.item !== undefined ? idDe.get(r.item) : null;
+    const tipo = it ? "item" : ["grupo", "seccion"].includes(r.etiqueta) ? "grupo" : r.etiqueta === "no-backline" ? "fuera" : r.etiqueta === "item" ? "alternativa" : "nota";
+    const opciones = tipo === "grupo" && /opciones de la banda: /.test(r.motivo) ? r.motivo.replace(/^.*opciones de la banda: /, "").split(" · ") : null;
+    const renglon = {texto: r.texto, tipo, ...(it ? {itemId: it.id} : {}), ...(opciones ? {opciones} : {}), ...(tipo === "fuera" ? {motivo: r.motivo} : {})};
+    if (it && !it.sinBanda) {
+      if (banda === null) antes.splice(0).forEach(x => poner(it.artistaId, x));
+      banda = it.artistaId;
+    }
+    if (banda === null) antes.push(renglon); else poner(banda, renglon);
+  }
+  return [...porBanda].map(([artistaId, renglones]) => ({artistaId, renglones}));
 }
 
 /* La ficha de una banda: como viene en el rider (sus secciones, en orden) y, si el Excel trae
@@ -695,7 +741,7 @@ function htmlBanda(b, i, total){
       ${htmlOrigen()}
       <p class="sub">${piezas} ${piezas === 1 ? "pieza" : "piezas"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}${V.puede.planilla && b.items.length ? `<button class="ir-planilla" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button>` : ""}</p>
       ${htmlFotos(b)}
-      ${htmlFicha(b, null)}
+      ${htmlTarjeta(b)}
     </section></div>
     <div class="riel">
       <button class="listo" aria-pressed="${listos.has(idBanda(b))}"><span class="ic">✓</span><span>Listo</span></button>
@@ -707,6 +753,45 @@ function htmlBanda(b, i, total){
   </article>`;
 }
 const idBanda = b => "banda-" + slug(b.id);
+
+/* La tarjeta de la banda se da vuelta: de frente, el listado (lo que quedó); atrás, lo que pidió la banda,
+   como viene en el rider, con qué pasó con cada renglón. Las opciones de marca son información, no piezas. */
+function htmlTarjeta(b){
+  const pedido = b.artistaId && (datos().pedidos || []).find(p => p.artistaId === b.artistaId);
+  if (!pedido?.renglones?.length) return htmlFicha(b, null);
+  const enListado = new Map(datos().items.map(x => [x.id, x]));
+  const n = pedido.renglones.filter(r => r.tipo === "item").length;
+  const quedaron = pedido.renglones.filter(r => r.tipo === "item" && enListado.has(r.itemId)).length;
+  const fila = r => {
+    if (r.tipo === "grupo") return `<h4 class="seccion">${esc(r.texto)}</h4>${r.opciones ? `<p class="opciones">Opciones de la banda: <b>${r.opciones.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}`;
+    if (r.tipo === "item") {
+      const x = enListado.get(r.itemId);
+      return `<li class="pide"><span class="t">${esc(r.texto)}</span><span class="va${x ? "" : " no"}">${x ? `→ ${x.cantidad} × ${esc(x.referencia)}` : "→ quitado del listado"}</span></li>`;
+    }
+    if (r.tipo === "fuera") return `<li class="pide fuera"><span class="t">${esc(r.texto)}</span><span class="va no">no va: ${esc(r.motivo || "no es backline")}</span></li>`;
+    if (r.tipo === "alternativa") return `<li class="pide nota"><span class="t">${esc(r.texto)}</span><span class="va no">alternativa, no suma</span></li>`;
+    return `<li class="pide nota"><span class="t">${esc(r.texto)}</span></li>`;
+  };
+  // Las secciones del rider abren y cierran su propia lista.
+  let html = "", abierta = false;
+  for (const r of pedido.renglones) {
+    if (r.tipo === "grupo") { if (abierta) html += "</ul>"; abierta = false; html += fila(r); continue; }
+    if (!abierta) { html += '<ul class="lista">'; abierta = true; }
+    html += fila(r);
+  }
+  if (abierta) html += "</ul>";
+  return `
+      <div class="tarjeta">
+        <button class="voltear" aria-pressed="false"><span>⇄</span> <span class="lbl">Ver lo que pidió la banda</span></button>
+        <div class="caras">
+          <div class="cara frente">${htmlFicha(b, null)}</div>
+          <div class="cara dorso" aria-hidden="true">
+            <p class="resumen-pide">Así viene en el rider. ${n} ${n === 1 ? "renglón pide equipo" : "renglones piden equipo"}; ${quedaron} ${quedaron === 1 ? "quedó" : "quedaron"} en el listado.</p>
+            <div class="rider">${html}</div>
+          </div>
+        </div>
+      </div>`;
+}
 
 /* De qué documento sale lo que se ve y cuándo se subió en este celular, para que no aparezca
    una banda sin saber de dónde. */
@@ -862,6 +947,14 @@ feed.addEventListener("click", async e => {
     const p = vt.closest(".portada"), abrir = vt.classList.contains("ver-totales");
     p.querySelector(".totales").hidden = !abrir;
     p.querySelector(".ver-totales").setAttribute("aria-expanded", abrir);
+    return;
+  }
+  const vo = e.target.closest(".voltear");
+  if (vo) {
+    const t = vo.closest(".tarjeta"), atras = !t.classList.contains("vuelta");
+    t.classList.toggle("vuelta", atras); vo.setAttribute("aria-pressed", atras);
+    vo.querySelector(".lbl").textContent = atras ? "Ver el listado" : "Ver lo que pidió la banda";
+    t.querySelector(".frente").setAttribute("aria-hidden", atras); t.querySelector(".dorso").setAttribute("aria-hidden", !atras);
     return;
   }
   const vc = e.target.closest(".ver-cmp");
@@ -1121,9 +1214,10 @@ async function subirArchivos(archivos){
 
 async function leerYArmar(archivos){
   let r;
+  const traza = [];   // lo que el lector decidió de cada renglón: sirve para mostrar lo que pidió la banda
   {
     const L = await cargarLector();
-    r = await L.leerTodo(archivos, {rutas: {pdfWorker: LECTOR + "pdf.worker.min.mjs", ocr: LECTOR + "ocr/"}, base: null,
+    r = await L.leerTodo(archivos, {rutas: {pdfWorker: LECTOR + "pdf.worker.min.mjs", ocr: LECTOR + "ocr/"}, base: null, traza,
       alProgreso: (nombre, estado) => {
         const a = subida.archivos.find(x => x.nombre === nombre); if (!a) return;
         a.estado = estado; a.clase = /^error/.test(estado) ? "err" : /ítem/.test(estado) ? "ok" : "";
@@ -1138,7 +1232,7 @@ async function leerYArmar(archivos){
       errores.length ? "El lector no pudo abrir el archivo." : "Leí el documento pero no vi una lista de equipos (cantidad y descripción). Si es una foto, que sea nítida y de cerca; si es un PDF escaneado, prueba con una foto de la hoja.",
       [...errores, ...ext.avisos]);
   }
-  const d = aDatos(ext);
+  const d = aDatos(ext, traza);
   const nombre = archivos.length === 1 ? archivos[0].name.replace(/\.[^.]+$/, "") : archivos.length + " archivos";
   escribir("lab-reels:listos:doc", null);
   const categorias = [...new Set(d.items.map(reelDe))];

@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.aT.ao === region.a6.ao)
+	if (region.aU.ao === region.a7.ao)
 	{
-		return 'on line ' + region.aT.ao;
+		return 'on line ' + region.aU.ao;
 	}
-	return 'on lines ' + region.aT.ao + ' through ' + region.a6.ao;
+	return 'on lines ' + region.aU.ao + ' through ' + region.a7.ao;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.b8,
-		impl.cB,
-		impl.cw,
+		impl.b9,
+		impl.cC,
+		impl.cx,
 		function() { return function() {} }
 	);
 });
@@ -2971,7 +2971,7 @@ var $elm$json$Json$Decode$dict = function (decoder) {
 };
 var $author$project$Backline$Tablero$Comparacion = F2(
 	function (artistaId, valor) {
-		return {S: artistaId, aX: valor};
+		return {S: artistaId, aY: valor};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$map2 = _Json_map2;
@@ -2982,6 +2982,7 @@ var $author$project$Backline$Tablero$comparacionDec = A3(
 	$author$project$Backline$Tablero$Comparacion,
 	A2($elm$json$Json$Decode$field, 'artistaId', $elm$json$Json$Decode$string),
 	$elm$json$Json$Decode$value);
+var $author$project$Backline$Tablero$con = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $author$project$Backline$Tablero$Item = function (id) {
 	return function (diaId) {
 		return function (artistaId) {
@@ -2994,7 +2995,7 @@ var $author$project$Backline$Tablero$Item = function (id) {
 									return function (propietario) {
 										return function (porConfirmar) {
 											return function (sinBanda) {
-												return {S: artistaId, ab: cantidad, o: categoria, ac: descripcion, a4: diaId, aK: grupo, r: id, aO: nota, aQ: porConfirmar, bt: propietario, Q: referencia, bB: sinBanda};
+												return {S: artistaId, ab: cantidad, o: categoria, ac: descripcion, a5: diaId, aL: grupo, r: id, aP: nota, aR: porConfirmar, bu: propietario, Q: referencia, bC: sinBanda};
 											};
 										};
 									};
@@ -3008,7 +3009,6 @@ var $author$project$Backline$Tablero$Item = function (id) {
 	};
 };
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
-var $author$project$Backline$Tablero$con = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -3112,38 +3112,68 @@ var $author$project$Backline$Tablero$listaCruda = function (nombre) {
 		$elm$json$Json$Decode$value,
 		A2($elm$json$Json$Encode$list, $elm$core$Basics$identity, _List_Nil));
 };
-var $elm$json$Json$Decode$map6 = _Json_map6;
-var $author$project$Backline$Tablero$datosDec = A7(
-	$elm$json$Json$Decode$map6,
-	F9(
-		function (artistas, dias, bloques, plots, comps, items, nombre, archivos, cuando) {
-			return {aH: archivos, aa: artistas, av: bloques, aw: comps, ax: cuando, ay: dias, M: items, I: nombre, aE: plots};
-		}),
-	A3(
-		$author$project$Backline$Tablero$opcional,
-		'artistas',
-		$elm$json$Json$Decode$list(
-			A3(
-				$elm$json$Json$Decode$map2,
-				F2(
-					function (id, n) {
-						return {r: id, I: n};
-					}),
-				A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
-				A2($elm$json$Json$Decode$field, 'nombre', $elm$json$Json$Decode$string))),
-		_List_Nil),
-	$author$project$Backline$Tablero$listaCruda('dias'),
-	$author$project$Backline$Tablero$listaCruda('bloques'),
-	$author$project$Backline$Tablero$listaCruda('stagePlots'),
-	A3(
-		$author$project$Backline$Tablero$opcional,
-		'comparaciones',
-		$elm$json$Json$Decode$list($author$project$Backline$Tablero$comparacionDec),
-		_List_Nil),
+var $author$project$Backline$Tablero$datosDec = A2(
+	$author$project$Backline$Tablero$con,
 	A2(
 		$elm$json$Json$Decode$field,
 		'items',
-		$elm$json$Json$Decode$list($author$project$Backline$Tablero$itemDec)));
+		$elm$json$Json$Decode$list($author$project$Backline$Tablero$itemDec)),
+	A2(
+		$author$project$Backline$Tablero$con,
+		$author$project$Backline$Tablero$listaCruda('pedidos'),
+		A2(
+			$author$project$Backline$Tablero$con,
+			A3(
+				$author$project$Backline$Tablero$opcional,
+				'comparaciones',
+				$elm$json$Json$Decode$list($author$project$Backline$Tablero$comparacionDec),
+				_List_Nil),
+			A2(
+				$author$project$Backline$Tablero$con,
+				$author$project$Backline$Tablero$listaCruda('stagePlots'),
+				A2(
+					$author$project$Backline$Tablero$con,
+					$author$project$Backline$Tablero$listaCruda('bloques'),
+					A2(
+						$author$project$Backline$Tablero$con,
+						$author$project$Backline$Tablero$listaCruda('dias'),
+						A2(
+							$author$project$Backline$Tablero$con,
+							A3(
+								$author$project$Backline$Tablero$opcional,
+								'artistas',
+								$elm$json$Json$Decode$list(
+									A3(
+										$elm$json$Json$Decode$map2,
+										F2(
+											function (id, n) {
+												return {r: id, I: n};
+											}),
+										A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
+										A2($elm$json$Json$Decode$field, 'nombre', $elm$json$Json$Decode$string))),
+								_List_Nil),
+							$elm$json$Json$Decode$succeed(
+								function (artistas) {
+									return function (dias) {
+										return function (bloques) {
+											return function (plots) {
+												return function (comps) {
+													return function (pedidos) {
+														return function (items) {
+															return function (nombre) {
+																return function (archivos) {
+																	return function (cuando) {
+																		return {aI: archivos, aa: artistas, av: bloques, aw: comps, ax: cuando, ay: dias, M: items, I: nombre, aB: pedidos, aF: plots};
+																	};
+																};
+															};
+														};
+													};
+												};
+											};
+										};
+									};
+								}))))))));
 var $elm$json$Json$Decode$map4 = _Json_map4;
 var $author$project$Backline$Tablero$documentoDec = A5(
 	$elm$json$Json$Decode$map4,
@@ -3422,7 +3452,7 @@ var $author$project$Backline$Tablero$itemJson = function (i) {
 					$elm$json$Json$Encode$string(i.r)),
 					_Utils_Tuple2(
 					'diaId',
-					$elm$json$Json$Encode$string(i.a4)),
+					$elm$json$Json$Encode$string(i.a5)),
 					_Utils_Tuple2(
 					'artistaId',
 					$elm$json$Json$Encode$string(i.S)),
@@ -3434,7 +3464,7 @@ var $author$project$Backline$Tablero$itemJson = function (i) {
 					$elm$json$Json$Encode$string(i.o)),
 					_Utils_Tuple2(
 					'grupo',
-					$elm$json$Json$Encode$string(i.aK)),
+					$elm$json$Json$Encode$string(i.aL)),
 					_Utils_Tuple2(
 					'referencia',
 					$elm$json$Json$Encode$string(i.Q)),
@@ -3446,13 +3476,13 @@ var $author$project$Backline$Tablero$itemJson = function (i) {
 					A2(
 						$elm$core$Maybe$withDefault,
 						$elm$json$Json$Encode$null,
-						A2($elm$core$Maybe$map, $elm$json$Json$Encode$string, i.aO))),
-					_Utils_Tuple2('propietario', i.bt),
+						A2($elm$core$Maybe$map, $elm$json$Json$Encode$string, i.aP))),
+					_Utils_Tuple2('propietario', i.bu),
 					_Utils_Tuple2(
 					'porConfirmar',
-					$elm$json$Json$Encode$bool(i.aQ))
+					$elm$json$Json$Encode$bool(i.aR))
 				]),
-			i.bB ? _List_fromArray(
+			i.bC ? _List_fromArray(
 				[
 					_Utils_Tuple2(
 					'sinBanda',
@@ -3468,7 +3498,7 @@ var $author$project$Backline$Tablero$documentoJson = function (d) {
 				$elm$json$Json$Encode$string(d.I)),
 				_Utils_Tuple2(
 				'archivos',
-				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, d.aH)),
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, d.aI)),
 				_Utils_Tuple2(
 				'cuando',
 				$elm$json$Json$Encode$string(d.ax)),
@@ -3496,16 +3526,17 @@ var $author$project$Backline$Tablero$documentoJson = function (d) {
 								d.aa)),
 							_Utils_Tuple2('dias', d.ay),
 							_Utils_Tuple2('bloques', d.av),
-							_Utils_Tuple2('stagePlots', d.aE),
+							_Utils_Tuple2('stagePlots', d.aF),
 							_Utils_Tuple2(
 							'items',
 							A2($elm$json$Json$Encode$list, $author$project$Backline$Tablero$itemJson, d.M)),
+							_Utils_Tuple2('pedidos', d.aB),
 							_Utils_Tuple2(
 							'comparaciones',
 							A2(
 								$elm$json$Json$Encode$list,
 								function ($) {
-									return $.aX;
+									return $.aY;
 								},
 								d.aw))
 						])))
@@ -3615,7 +3646,7 @@ var $author$project$Backline$Tablero$editar = F2(
 					ab: e.ab,
 					o: e.o,
 					ac: _Utils_eq(i.ac, i.Q) ? ref : i.ac,
-					aQ: false,
+					aR: false,
 					Q: ref
 				});
 		}
@@ -4257,16 +4288,17 @@ var $author$project$Backline$Tablero$datosJson = F4(
 						doc.aa)),
 					_Utils_Tuple2('dias', doc.ay),
 					_Utils_Tuple2('bloques', doc.av),
-					_Utils_Tuple2('stagePlots', doc.aE),
+					_Utils_Tuple2('stagePlots', doc.aF),
 					_Utils_Tuple2(
 					'items',
 					A2($elm$json$Json$Encode$list, $author$project$Backline$Tablero$itemJson, items)),
+					_Utils_Tuple2('pedidos', doc.aB),
 					_Utils_Tuple2(
 					'comparaciones',
 					comparar ? A2(
 						$elm$json$Json$Encode$list,
 						function ($) {
-							return $.aX;
+							return $.aY;
 						},
 						A2(
 							$elm$core$List$filter,
@@ -4502,8 +4534,8 @@ var $author$project$Backline$Tablero$pasa = F3(
 					[
 						i.Q,
 						i.ac,
-						A2($elm$core$Maybe$withDefault, '', i.aO),
-						i.aK,
+						A2($elm$core$Maybe$withDefault, '', i.aP),
+						i.aL,
 						i.o,
 						A2($author$project$Backline$Tablero$nombreBanda, doc, i.S)
 					])));
@@ -4649,16 +4681,16 @@ var $author$project$Tablero$update = F2(
 var $elm$core$Platform$worker = _Platform_worker;
 var $author$project$Tablero$main = $elm$core$Platform$worker(
 	{
-		b8: function (guardado) {
+		b9: function (guardado) {
 			var m = $author$project$Backline$Tablero$decodificarEstado(guardado);
 			return _Utils_Tuple2(
 				m,
 				$author$project$Tablero$vista(
 					$author$project$Backline$Tablero$vista(m)));
 		},
-		cw: function (_v0) {
+		cx: function (_v0) {
 			return $author$project$Tablero$entrada($elm$core$Basics$identity);
 		},
-		cB: $author$project$Tablero$update
+		cC: $author$project$Tablero$update
 	});
 _Platform_export({'Tablero':{'init':$author$project$Tablero$main($elm$json$Json$Decode$value)(0)}});}(this));

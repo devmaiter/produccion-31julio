@@ -133,3 +133,51 @@ describe("rider de gira en inglés", () => {
     ]);
   });
 });
+
+/* Un rider con capítulos numerados (forma de un rider real, inventado aquí): "3.1.-" es el número del
+ * capítulo, no una cantidad, y "DRUMS: DW, YAMAHA, PEARL" son las opciones de una sola batería. */
+const RIDER_CAPITULOS = `RIDER TÉCNICO
+LOS RAYOS
+2. AUDIO
+2.1 CONSOLA DIGITAL
+3. BACKLINE
+3.1.-DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM, PEARL MASTER CUSTOM
+1 KICK 24”
+1 SNARE 14”
+3.2.- ELECTRIC GUITAR CAMELO
+2 AMPLIFICADORES MARSHALL JCM 900
+3.3.-KEYBOARDS JUAN: SUJETO A MODIFICACION
+1 PIANO RHODES
+4. SOUNDCHECK
+1 hora de prueba
+5. ESCENARIO
+5.1 TARIMA
+3 ESCALERA DE ACCESO CON PASAMANOS`;
+
+describe("rider con capítulos numerados", () => {
+  const traza: RenglonLeido[] = [];
+  const e = interpretar([{ nombre: "rider.pdf", tipo: "pdf", lineas: lineasDeTexto(RIDER_CAPITULOS), avisos: [] }], { traza });
+
+  it("el número del capítulo no es cantidad y las opciones de batería no son ítems", () => {
+    expect(e.items.map(i => `${i.cantidad} ${i.descripcion} [${i.grupo}]`)).toEqual([
+      "1 KICK 24” [Drums]", "1 SNARE 14” [Drums]",
+      "2 AMPLIFICADORES MARSHALL JCM 900 [Electric Guitar Camelo]",
+      "1 PIANO RHODES [Keyboards Juan]",
+    ]);
+  });
+  it("las opciones de la banda quedan como información del grupo", () => {
+    expect(traza.find(r => r.texto.startsWith("3.1"))).toMatchObject({ etiqueta: "grupo", motivo: expect.stringContaining("DW COLLECTOR · YAMAHA STAGE CUSTOM · PEARL MASTER CUSTOM") });
+  });
+  it("otro capítulo (soundcheck, escenario) termina el backline, aunque diga TARIMA", () => {
+    expect(traza.find(r => r.texto === "4. SOUNDCHECK")?.etiqueta).toBe("seccion");
+    expect(traza.find(r => r.texto === "5.1 TARIMA")?.etiqueta).not.toBe("grupo");
+  });
+  it("'DE   3   PATAS' no es cantidad, y los toms después de 'O' son la alternativa", () => {
+    const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nDRUMS\nHI-HAT STAND DE   3   PATAS\nTOMS 12”, 14” Y 16” O 16” 18”") }]);
+    expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 HI-HAT STAND DE 3 PATAS", "3 TOMS 12”, 14” Y 16” O 16” 18”"]);
+  });
+  it("'1. DW COLLECTOR' en un rider sin capítulos sigue siendo una opción numerada", () => {
+    const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nDRUMS\nOPCIONES EN ORDEN DE PRIORIDAD\n1. SONOR PRO LITE\n2. DW COLLECTOR\n1 KICK 22") }]);
+    expect(r.items.map(i => i.descripcion)).toEqual(["KICK 22"]);
+  });
+});
