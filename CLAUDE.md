@@ -183,8 +183,11 @@ lo que llega por `guardar` (`localStorage` `lab-reels:tablero`).
   suben riders con la misma herramienta, buscan, filtran y toman fotos de las bandas.
   **Solo el admin**: modo festival, Pide vs propuesta, editar o quitar ítems (tocar el
   ítem) y "Planilla .xlsx" (abre `planilla/?desde=reels` con la banda ya editada).
-- **Modo normal** (el de siempre, y el único del empleado): una pantalla por banda con
-  todo su rider como viene, sus fotos ("Tomar foto" / "Subir foto", como en la app del
+- **Modo normal** (el de siempre, y el único del empleado): una pantalla por banda al
+  estilo reels (2026-10-05): portada con el holograma y el listado ahí mismo (compacto, por
+  secciones, entrando ítem por ítem); deslizando, una pantalla por sección del rider con su
+  holograma, las opciones de marca y el detalle; al final, fotos y la tarjeta. Antes era
+  una sola pantalla con todo su rider como viene, sus fotos ("Tomar foto" / "Subir foto", como en la app del
   31 de julio) y nada de "1 bandas". El listado sin banda va al final, aparte.
 - **La tarjeta se da vuelta** ("Ver lo que pidió la banda"): de frente el listado; atrás el
   rider como viene (renglones de su backline, de la traza del lector, sin correos ni

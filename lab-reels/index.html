@@ -288,6 +288,21 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .origen b{color:var(--ink2);font-weight:600}
 .origen button{font-size:12px;padding:1px 9px;margin-left:4px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
 .origen button[data-seguro]{border-color:var(--warn);color:var(--warn)}
+/* Modo normal al estilo reels: holograma arriba y el listado ahí mismo, entrando ítem por ítem */
+.portada-banda .holo{flex:1 1 auto;min-height:20vh}
+.portada-banda h2{font-size:clamp(34px,10vw,60px)}
+.vivo{list-style:none;margin:0;padding:0 2px 0 0;max-height:38vh;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));column-gap:14px;align-content:start;font-size:13px;line-height:1.3;mask-image:linear-gradient(#000 85%,transparent);scrollbar-width:none}
+.vivo::-webkit-scrollbar{display:none}
+.vivo li{padding:3px 0;color:var(--ink2);opacity:0;transform:translateY(8px);min-width:0;overflow-wrap:anywhere}
+.vivo li.tit{grid-column:1/-1}
+.vivo li b{font-family:var(--display);font-size:17px;color:var(--accent);margin-right:4px;font-variant-numeric:tabular-nums}
+.vivo li.tit{font-family:var(--display);font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);padding-top:8px;break-after:avoid}
+.vivo li.tit:first-child{padding-top:0}
+.vivo li.dudoso{color:var(--warn)}
+.reel.visto .vivo li{animation:entra-item .35s ease-out forwards;animation-delay:calc(min(var(--i),30) * 45ms + .2s)}
+@keyframes entra-item{to{opacity:1;transform:none}}
+.seccion-slide .holo{flex:0 0 28vh;margin-bottom:4px}
+@media (prefers-reduced-motion:reduce){.vivo li{opacity:1;transform:none}.reel.visto .vivo li{animation:none}}
 /* La tarjeta que se da vuelta: listado de frente, lo que pidió la banda atrás */
 .tarjeta{flex:1;min-height:0;display:flex;flex-direction:column}
 .voltear{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 12px;margin:0 0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:var(--ink2)}
@@ -731,18 +746,67 @@ function htmlFotos(b){
       </div>`;
 }
 
+/* El holograma que le toca a un grupo de ítems: el del equipo principal que haya (batería antes que
+   platillos, ampli antes que bases…). Sin modelo 3D queda el emoji. */
+const holoItems = new Map();
+function htmlHolo(clave, items){
+  const cat = PRIORIDAD.find(c => items.some(x => x.categoria === c)) || "";
+  holoItems.set(clave, items.filter(x => (POR_HOLO[cat] || [cat]).includes(x.categoria)));
+  return `<div class="holo" data-cat="${esc(cat)}" data-holo="${esc(clave)}"><div class="emoji" aria-hidden="true">${EMOJI[cat] || "🎤"}</div></div>`;
+}
+const POR_HOLO = {"Batería": ["Batería", "Platillos"]};
+const sinTildes = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+// "3.1.-DRUMS: DW, YAMAHA" → "drums", como queda el grupo de los ítems ("Drums").
+const nombreDeGrupo = t => sinTildes(String(t).replace(/^\d{1,2}\s*\.\s*(?:\d{1,2}\s*\.?)?\s*[-–]?\s*/, "").split(":")[0].replace(/[\s:·|–—-]+$/, ""));
+
+/* Modo normal, al estilo reels: la portada con el holograma y el listado ahí mismo (compacto, por
+   secciones, entrando uno a uno); deslizando, una pantalla por sección del rider con su holograma y el
+   detalle; al final, las fotos y la tarjeta con lo que pidió la banda. */
 function htmlBanda(b, i, total){
   const piezas = b.items.reduce((s, x) => s + x.cantidad, 0), dudosos = b.items.filter(x => x.porConfirmar).length;
+  const id = idBanda(b);
+  const pedido = b.artistaId && (datos().pedidos || []).find(p => p.artistaId === b.artistaId);
+  const opcionesDe = g => pedido?.renglones.find(r => r.tipo === "grupo" && r.opciones && nombreDeGrupo(r.texto) === sinTildes(g))?.opciones;
+  let k = 0;
+  const vivo = b.secciones.map(s => `
+        ${b.secciones.length > 1 || s.grupo ? `<li class="tit" style="--i:${k++}">${esc(s.grupo || "Sin sección")}</li>` : ""}
+        ${s.items.map(x => `<li style="--i:${k++}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(x.referencia)}</li>`).join("")}`).join("");
+  const conSecciones = b.secciones.filter(s => s.items.length);
+  const detalle = conSecciones.map((s, j) => {
+    const op = s.grupo && opcionesDe(s.grupo);
+    return `
+      <section class="slide banda seccion-slide">
+        ${htmlHolo(`${id}|${j}`, s.items)}
+        <p class="sub" style="margin:0">${esc(b.nombre)} · ${j + 1} de ${conSecciones.length}</p>
+        <h3>${esc(s.grupo || "Sin sección")}</h3>
+        ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
+        ${htmlFicha({secciones: [{grupo: "", items: s.items}], items: s.items}, null)}
+      </section>`;
+  }).join("");
+  const n = 2 + conSecciones.length;
   return `
-  <article class="reel" id="${esc(idBanda(b))}" style="--h:20" data-n="1" aria-label="${esc(b.nombre)}">
+  <article class="reel" id="${esc(id)}" style="--h:20" data-n="${n}" aria-label="${esc(b.nombre)}">
+    <div class="prog">${"<i></i>".repeat(n)}</div>
     <div class="cab"><b>${esc(b.nombre)}</b><span class="n">${i+1}/${total}</span></div>
-    <div class="slides"><section class="slide banda">
-      <h3>${esc(b.nombre)}</h3>
-      ${htmlOrigen()}
-      <p class="sub">${piezas} ${piezas === 1 ? "pieza" : "piezas"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}${V.puede.planilla && b.items.length ? `<button class="ir-planilla" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button>` : ""}</p>
-      ${htmlFotos(b)}
-      ${htmlTarjeta(b)}
-    </section></div>
+    <div class="slides">
+      <section class="slide portada portada-banda">
+        ${htmlHolo(`${id}|todo`, b.items)}
+        ${htmlOrigen()}
+        <h2>${esc(b.nombre)}</h2>
+        <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${conSecciones.length} ${conSecciones.length === 1 ? "sección" : "secciones"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
+        <ul class="vivo">${vivo}</ul>
+        <p class="pista">${PC ? "Pasa con › para ver cada sección" : "Desliza para ver cada sección"} <span class="flecha">→</span></p>
+      </section>
+      ${detalle}
+      <section class="slide banda">
+        <h3>Fotos y rider</h3>
+        <p class="sub">${esc(b.nombre)}${V.puede.planilla && b.items.length ? `<button class="ir-planilla" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button>` : ""}</p>
+        ${htmlFotos(b)}
+        ${htmlTarjeta(b)}
+      </section>
+    </div>
+    <button class="pasar ant" aria-label="Anterior" disabled>‹</button>
+    <button class="pasar sig" aria-label="Siguiente">›</button>
     <div class="riel">
       <button class="listo" aria-pressed="${listos.has(idBanda(b))}"><span class="ic">✓</span><span>Listo</span></button>
       <button class="compartir"><span class="ic">↗</span><span>Enviar</span></button>
@@ -833,10 +897,13 @@ let holo3d = null;
 const holo3dListo = import("./holograma.js").then(m => holo3d = m).catch(() => null);
 function holograma(r){
   holo3dListo.then(() => {
-    const h = r.querySelector(".holo"), tipo = h && holo3d?.MODELO[h.dataset.cat];
+    // El de la pantalla que se ve: la portada o la sección a la que se deslizó.
+    const s = r.querySelector(".slides"), slides = s ? [...s.children] : [];
+    const visible = slides[s ? Math.round(s.scrollLeft / Math.max(1, s.clientWidth)) : 0];
+    const h = visible?.querySelector(".holo"), tipo = h && holo3d?.MODELO[h.dataset.cat];
     if (!tipo) { holo3d?.pausar(); return; }
     try {
-      if (!holo3d.mostrar(h, tipo, cats.find(c => c.id === r.id)?.items, h.dataset.cat)) return;
+      if (!holo3d.mostrar(h, tipo, holoItems.get(h.dataset.holo) ?? cats.find(c => c.id === r.id)?.items, h.dataset.cat)) return;
       document.querySelectorAll(".holo.con3d").forEach(x => x !== h && x.classList.remove("con3d"));
       h.classList.add("con3d");
     } catch { holo3d = null; }
@@ -853,6 +920,7 @@ let cats = [], entradas = [], reels = [], actual = null, io = null;
 
 function pintar(destino){
   cargarListos();
+  holoItems.clear();
   const d = datos();
   if (festival()) {
     cats = armar(d);
@@ -885,10 +953,13 @@ function pintar(destino){
     const s = r.querySelector(".slides"), marcas = r.querySelectorAll(".prog i");
     const ant = r.querySelector(".pasar.ant"), sig = r.querySelector(".pasar.sig");
     if (!ant) continue;
+    let antes = 0;
     const progreso = () => {
       const k = Math.round(s.scrollLeft / s.clientWidth);
       marcas.forEach((m,j) => m.classList.toggle("on", j <= k));
       ant.disabled = k === 0; sig.disabled = k >= marcas.length - 1;
+      // Al llegar a otra pantalla, el holograma se pasa a la suya.
+      if (k !== antes) { antes = k; if (r === actual) holograma(r); }
     };
     s.addEventListener("scroll", progreso, {passive: true}); progreso();
   }
@@ -1265,9 +1336,8 @@ function guia(clave, tipo, texto, sub){
 function guiaAlLlegar(r){
   if (document.querySelector(".splash:not(.fuera)")) return;
   if (r.id === "subir") entradas.length && guia("arriba", "arriba-g", PC ? (festival() ? "Baja para ver cada categoría" : "Baja para ver cada banda") : "Desliza hacia arriba", PC ? "Con la rueda del mouse, ↓ o los botones de la derecha" : festival() ? "Cada pantalla es una categoría: Batería, Platillos, Bases…" : "Cada pantalla es una banda, con su backline como viene en el rider");
-  else if (!festival()) return;
-  else if (!vistos.has("lado")) setTimeout(() => actual === r && guia("lado", "lado-g", PC ? "Pasa con ›" : "Desliza a la izquierda", "Ahí está lo que hay que tener y cada banda con su plano"), 1400);
-  else setTimeout(() => actual === r && guia("toque", "toque-g", "Doble toque = listo", "Marca la categoría cuando esté revisada"), 1400);
+  else if (!vistos.has("lado")) setTimeout(() => actual === r && guia("lado", "lado-g", PC ? "Pasa con ›" : "Desliza a la izquierda", festival() ? "Ahí está lo que hay que tener y cada banda con su plano" : "Ahí está cada sección en detalle, las fotos y lo que pidió la banda"), 1400);
+  else setTimeout(() => actual === r && guia("toque", "toque-g", "Doble toque = listo", festival() ? "Marca la categoría cuando esté revisada" : "Marca la banda cuando esté revisada"), 1400);
 }
 function splash(){
   return new Promise(ok => {
