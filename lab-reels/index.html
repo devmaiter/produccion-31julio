@@ -291,6 +291,7 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 /* Modo normal al estilo reels: holograma arriba y el listado ahí mismo, entrando ítem por ítem */
 .portada-banda .holo{flex:1 1 auto;min-height:20vh}
 .portada-banda h2{font-size:clamp(34px,10vw,60px)}
+.portada h2.largo{font-size:clamp(26px,7vw,40px)}
 .vivo{list-style:none;margin:0;padding:0 2px 0 0;max-height:38vh;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));column-gap:14px;align-content:start;font-size:13px;line-height:1.3;mask-image:linear-gradient(#000 85%,transparent);scrollbar-width:none}
 .vivo::-webkit-scrollbar{display:none}
 .vivo li{padding:3px 0;color:var(--ink2);opacity:0;transform:translateY(8px);min-width:0;overflow-wrap:anywhere}
@@ -577,7 +578,8 @@ function pedidosDe(ext, traza, fuente, items){
 function htmlFicha(b, cat){
   // Sin categoría (modo normal) se ve todo igual. El admin toca un ítem para editarlo.
   const editable = V?.puede?.editar;
-  const item = x => `<li class="${!cat || reelDe(x) === cat ? "" : "otra"}${editable ? " editable" : ""}"${editable ? ` data-item="${esc(x.id)}"` : ""}><span class="q">${x.cantidad}</span><span class="t">${esc(x.referencia)}
+  const item = x => `<li class="${!cat || reelDe(x) === cat ? "" : "otra"}${editable ? " editable" : ""}"${editable ? ` data-item="${esc(x.id)}"` : ""}><span class="q">${x.cantidad}</span><span class="t">${esc(corto(x.referencia))}
+        ${corto(x.referencia) !== x.referencia ? `<small class="modelo">${esc((x.referencia.match(/\(([^)]*)\)/g) || []).map(p => p.slice(1, -1)).join(" · "))}</small>` : ""}
         ${x.nota ? `<small>${esc(x.nota)}</small>` : x.grupo === undefined && x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
         ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
         ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span></li>`;
@@ -767,6 +769,8 @@ const riel = id => `
 const pasar = `
     <button class="pasar ant" aria-label="Anterior" disabled>‹</button>
     <button class="pasar sig" aria-label="Siguiente">›</button>`;
+// En los listados compactos va el equipo; las opciones entre paréntesis quedan para el detalle.
+const corto = t => String(t).replace(/\s*\([^)]*\)/g, "").trim() || t;
 const piezasDe = items => items.reduce((s, x) => s + x.cantidad, 0);
 const conSeccionesDe = b => b.secciones.filter(s => s.items.length);
 const idSeccion = (b, j) => `${idBanda(b)}-s${j + 1}`;
@@ -789,7 +793,7 @@ function htmlBanda(b){
   let k = 0;
   const vivo = b.secciones.map(s => `
         ${b.secciones.length > 1 || s.grupo ? `<li class="tit" style="--i:${k++}">${esc(s.grupo || "Sin sección")}</li>` : ""}
-        ${s.items.map(x => `<li style="--i:${k++}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(x.referencia)}</li>`).join("")}`).join("");
+        ${s.items.map(x => `<li style="--i:${k++}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(corto(x.referencia))}</li>`).join("")}`).join("");
   return `
   <article class="reel" id="${esc(id)}" style="--h:20" data-n="2" aria-label="${esc(b.nombre)}">
     <div class="prog"><i></i><i></i></div>
@@ -798,7 +802,7 @@ function htmlBanda(b){
       <section class="slide portada portada-banda">
         ${htmlHolo(`${id}|todo`, b.items)}
         ${htmlOrigen()}
-        <h2>${esc(b.nombre)}</h2>
+        <h2${b.nombre.length > 18 ? ' class="largo"' : ""}>${esc(b.nombre)}</h2>
         <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${secs.length} ${secs.length === 1 ? "sección" : "secciones"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
         <ul class="vivo">${vivo}</ul>
         <p class="pista">${secs.length ? (PC ? "Baja con ↓ para ir sección por sección" : "Desliza hacia arriba para ir sección por sección") : ""}</p>
@@ -831,7 +835,7 @@ function htmlSeccion(b, s, j, total){
     <div class="slides">
       <section class="slide portada seccion-portada">
         ${htmlHolo(`${id}|todo`, s.items)}
-        <h2>${esc(titulo)}</h2>
+        <h2${titulo.length > 18 ? ' class="largo"' : ""}>${esc(titulo)}</h2>
         <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${s.items.length} ${s.items.length === 1 ? "ítem" : "ítems"}</p>
         ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
         <p class="chips-pieza">${cats.map(c => `<span class="chip">${esc(c)}</span>`).join("")}${trae ? `<span class="chip ter">${trae} lo trae la banda</span>` : ""}${dudosos ? `<span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
