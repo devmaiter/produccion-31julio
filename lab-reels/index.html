@@ -301,8 +301,15 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .vivo li.dudoso{color:var(--warn)}
 .reel.visto .vivo li{animation:entra-item .35s ease-out forwards;animation-delay:calc(min(var(--i),30) * 45ms + .2s)}
 @keyframes entra-item{to{opacity:1;transform:none}}
-.seccion-slide .holo{flex:0 0 28vh;margin-bottom:4px}
 @media (prefers-reduced-motion:reduce){.vivo li{opacity:1;transform:none}.reel.visto .vivo li{animation:none}}
+/* Cada ítem en grande, a los lados de su sección */
+.slide.pieza{justify-content:flex-end}
+.slide.pieza .holo{flex:1 1 auto;min-height:24vh}
+.slide.pieza h3{font-size:clamp(26px,8vw,40px);overflow-wrap:anywhere}
+.chips-pieza{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.editar-pieza{align-self:flex-start;font-size:16px;padding:7px 16px}
+.seccion-portada .holo{flex:1 1 auto;min-height:22vh}
+.sub-fila{padding-left:28px!important;font-size:.92em}
 /* La tarjeta que se da vuelta: listado de frente, lo que pidió la banda atrás */
 .tarjeta{flex:1;min-height:0;display:flex;flex-direction:column}
 .voltear{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 12px;margin:0 0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:var(--ink2)}
@@ -750,53 +757,68 @@ function htmlFotos(b){
    platillos, ampli antes que bases…). Sin modelo 3D queda el emoji. */
 const holoItems = new Map();
 function htmlHolo(clave, items){
-  const cat = PRIORIDAD.find(c => items.some(x => x.categoria === c)) || "";
+  let cat = PRIORIDAD.find(c => items.some(x => x.categoria === c)) || "";
+  // Un ítem que es solo el cabezal ("AMPEG SVT 4 PRO", "head") se dibuja como cabezal, no como caja.
+  if (items.length === 1 && /^Ampli/.test(cat) && /(head|cabezal|\bsvt\b(?!.*(8 ?x ?10|810|cab)))/i.test(items[0].referencia)) cat = "Cabezal";
   holoItems.set(clave, items.filter(x => (POR_HOLO[cat] || [cat]).includes(x.categoria)));
-  return `<div class="holo" data-cat="${esc(cat)}" data-holo="${esc(clave)}"><div class="emoji" aria-hidden="true">${EMOJI[cat] || "🎤"}</div></div>`;
+  return `<div class="holo" data-cat="${esc(cat)}" data-holo="${esc(clave)}"><div class="emoji" aria-hidden="true">${EMOJI[cat] || (cat === "Cabezal" ? "🔊" : "🎤")}</div></div>`;
 }
 const POR_HOLO = {"Batería": ["Batería", "Platillos"]};
 const sinTildes = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 // "3.1.-DRUMS: DW, YAMAHA" → "drums", como queda el grupo de los ítems ("Drums").
 const nombreDeGrupo = t => sinTildes(String(t).replace(/^\d{1,2}\s*\.\s*(?:\d{1,2}\s*\.?)?\s*[-–]?\s*/, "").split(":")[0].replace(/[\s:·|–—-]+$/, ""));
 
-/* Modo normal, al estilo reels: la portada con el holograma y el listado ahí mismo (compacto, por
-   secciones, entrando uno a uno); deslizando, una pantalla por sección del rider con su holograma y el
-   detalle; al final, las fotos y la tarjeta con lo que pidió la banda. */
-function htmlBanda(b, i, total){
-  const piezas = b.items.reduce((s, x) => s + x.cantidad, 0), dudosos = b.items.filter(x => x.porConfirmar).length;
-  const id = idBanda(b);
-  const pedido = b.artistaId && (datos().pedidos || []).find(p => p.artistaId === b.artistaId);
-  const opcionesDe = g => pedido?.renglones.find(r => r.tipo === "grupo" && r.opciones && nombreDeGrupo(r.texto) === sinTildes(g))?.opciones;
+/* Modo normal, al estilo reels (lo pidió el usuario): hacia abajo se pasa de sección en sección y a los
+   lados, ítem por ítem. Primero la portada de la banda (holograma y el listado ahí mismo, compacto y
+   entrando uno a uno) con sus fotos y lo que pidió la banda a los lados; después una pantalla por
+   sección del rider: su portada (holograma, opciones de marca y resumen) y cada ítem en grande. */
+const riel = id => `
+    <div class="riel">
+      <button class="listo" aria-pressed="${listos.has(id)}"><span class="ic">✓</span><span>Listo</span></button>
+      <button class="compartir"><span class="ic">↗</span><span>Enviar</span></button>
+      <button class="ver-indice"><span class="ic">☰</span><span>Índice</span></button>
+      <button class="ir-subir"><span class="ic">＋</span><span>Subir</span></button>
+    </div>
+    <div class="corazon" aria-hidden="true">✅</div>`;
+const pasar = `
+    <button class="pasar ant" aria-label="Anterior" disabled>‹</button>
+    <button class="pasar sig" aria-label="Siguiente">›</button>`;
+const piezasDe = items => items.reduce((s, x) => s + x.cantidad, 0);
+const conSeccionesDe = b => b.secciones.filter(s => s.items.length);
+const idSeccion = (b, j) => `${idBanda(b)}-s${j + 1}`;
+
+/* Las pantallas de una banda en modo normal, para el feed y el índice. */
+function pantallasBanda(b){
+  const secs = conSeccionesDe(b), piezas = piezasDe(b.items);
+  return [
+    {id: idBanda(b), e: b.artistaId ? "🎤" : "📋", nombre: b.nombre, x: `${piezas} ${piezas === 1 ? "pieza" : "piezas"}`, html: () => htmlBanda(b)},
+    ...secs.map((s, j) => {
+      const p = piezasDe(s.items);
+      return {id: idSeccion(b, j), e: EMOJI[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] || "·", nombre: `${s.grupo || "Sin sección"}`, sub: true, x: `${p} ${p === 1 ? "pieza" : "piezas"}`, html: () => htmlSeccion(b, s, j, secs.length)};
+    }),
+  ];
+}
+
+function htmlBanda(b){
+  const piezas = piezasDe(b.items), dudosos = b.items.filter(x => x.porConfirmar).length, id = idBanda(b);
+  const secs = conSeccionesDe(b);
   let k = 0;
   const vivo = b.secciones.map(s => `
         ${b.secciones.length > 1 || s.grupo ? `<li class="tit" style="--i:${k++}">${esc(s.grupo || "Sin sección")}</li>` : ""}
         ${s.items.map(x => `<li style="--i:${k++}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(x.referencia)}</li>`).join("")}`).join("");
-  const conSecciones = b.secciones.filter(s => s.items.length);
-  const detalle = conSecciones.map((s, j) => {
-    const op = s.grupo && opcionesDe(s.grupo);
-    return `
-      <section class="slide banda seccion-slide">
-        ${htmlHolo(`${id}|${j}`, s.items)}
-        <h3>${esc(s.grupo || "Sin sección")}</h3>
-        ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
-        ${htmlFicha({secciones: [{grupo: "", items: s.items}], items: s.items}, null)}
-      </section>`;
-  }).join("");
-  const n = 2 + conSecciones.length;
   return `
-  <article class="reel" id="${esc(id)}" style="--h:20" data-n="${n}" aria-label="${esc(b.nombre)}">
-    <div class="prog">${"<i></i>".repeat(n)}</div>
-    <div class="cab"><b>${esc(b.nombre)}</b><span class="n">${i+1}/${total}</span></div>
+  <article class="reel" id="${esc(id)}" style="--h:20" data-n="2" aria-label="${esc(b.nombre)}">
+    <div class="prog"><i></i><i></i></div>
+    <div class="cab"><b>${esc(b.nombre)}</b></div>
     <div class="slides">
       <section class="slide portada portada-banda">
         ${htmlHolo(`${id}|todo`, b.items)}
         ${htmlOrigen()}
         <h2>${esc(b.nombre)}</h2>
-        <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${conSecciones.length} ${conSecciones.length === 1 ? "sección" : "secciones"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
+        <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${secs.length} ${secs.length === 1 ? "sección" : "secciones"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
         <ul class="vivo">${vivo}</ul>
-        <p class="pista">${PC ? "Pasa con › para ver cada sección" : "Desliza para ver cada sección"} <span class="flecha">→</span></p>
+        <p class="pista">${secs.length ? (PC ? "Baja con ↓ para ir sección por sección" : "Desliza hacia arriba para ir sección por sección") : ""}</p>
       </section>
-      ${detalle}
       <section class="slide banda">
         <h3>Fotos y rider</h3>
         ${V.puede.planilla && b.items.length ? `<p class="sub"><button class="ir-planilla" style="margin:0" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button></p>` : ""}
@@ -804,15 +826,43 @@ function htmlBanda(b, i, total){
         ${htmlTarjeta(b)}
       </section>
     </div>
-    <button class="pasar ant" aria-label="Anterior" disabled>‹</button>
-    <button class="pasar sig" aria-label="Siguiente">›</button>
-    <div class="riel">
-      <button class="listo" aria-pressed="${listos.has(idBanda(b))}"><span class="ic">✓</span><span>Listo</span></button>
-      <button class="compartir"><span class="ic">↗</span><span>Enviar</span></button>
-      <button class="ver-indice"><span class="ic">☰</span><span>Índice</span></button>
-      <button class="ir-subir"><span class="ic">＋</span><span>Subir</span></button>
+    ${pasar}
+    ${riel(id)}
+  </article>`;
+}
+
+/* Una sección del rider: su portada y, a los lados, cada ítem en grande. */
+function htmlSeccion(b, s, j, total){
+  const id = idSeccion(b, j), clave = `${id}|`;
+  const pedido = b.artistaId && (datos().pedidos || []).find(p => p.artistaId === b.artistaId);
+  const op = s.grupo && pedido?.renglones.find(r => r.tipo === "grupo" && r.opciones && nombreDeGrupo(r.texto) === sinTildes(s.grupo))?.opciones;
+  const piezas = piezasDe(s.items), n = 1 + s.items.length;
+  const item = (x, m) => `
+      <section class="slide pieza">
+        ${htmlHolo(clave + m, [x])}
+        <div class="big"><strong>${x.cantidad}</strong><span>${m + 1} de ${s.items.length}</span></div>
+        <h3>${esc(x.referencia)}</h3>
+        ${x.nota ? `<p class="sub">${esc(x.nota)}</p>` : ""}
+        <p class="chips-pieza"><span class="chip">${esc(x.categoria)}</span>${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}${x.porConfirmar ? '<span class="chip warn">Por confirmar</span>' : ""}</p>
+        ${V.puede.editar ? `<button class="btn sec editar-pieza" data-item="${esc(x.id)}">Editar</button>` : ""}
+      </section>`;
+  return `
+  <article class="reel" id="${esc(id)}" style="--h:${HUE[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] ?? 20}" data-n="${n}" aria-label="${esc(s.grupo || "Sin sección")} · ${esc(b.nombre)}">
+    <div class="prog">${"<i></i>".repeat(n)}</div>
+    <div class="cab"><b>${esc(s.grupo || "Sin sección")}</b><span class="n">${esc(b.nombre)} · ${j + 1}/${total}</span></div>
+    <div class="slides">
+      <section class="slide portada seccion-portada">
+        ${htmlHolo(clave + "todo", s.items)}
+        <h2>${esc(s.grupo || "Sin sección")}</h2>
+        <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${s.items.length} ${s.items.length === 1 ? "ítem" : "ítems"}</p>
+        ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
+        <ul class="vivo">${s.items.map((x, m) => `<li style="--i:${m}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(x.referencia)}</li>`).join("")}</ul>
+        <p class="pista">${PC ? "Pasa con › para ver ítem por ítem" : "Desliza para ver ítem por ítem"} <span class="flecha">→</span></p>
+      </section>
+      ${s.items.map(item).join("")}
     </div>
-    <div class="corazon" aria-hidden="true">✅</div>
+    ${pasar}
+    ${riel(id)}
   </article>`;
 }
 const idBanda = b => "banda-" + slug(b.id);
@@ -893,7 +943,7 @@ function contar(el){
 
 /* Holograma 3D de la rama de reconocimiento-3d en la portada. Si no hay WebGL se queda el emoji. */
 let holo3d = null;
-const holo3dListo = import("./holograma.js").then(m => holo3d = m).catch(() => null);
+const holo3dListo = import("./holograma.js?v=2").then(m => holo3d = m).catch(() => null);
 function holograma(r){
   holo3dListo.then(() => {
     // El de la pantalla que se ve: la portada o la sección a la que se deslizó.
@@ -927,12 +977,12 @@ function pintar(destino){
   } else {
     const bs = armarBandas(d);
     cats = [];
-    entradas = bs.map(b => { const n = b.items.reduce((s, x) => s + x.cantidad, 0); return {id: idBanda(b), e: b.artistaId ? "🎤" : "📋", nombre: b.nombre, x: `${n} ${n === 1 ? "pieza" : "piezas"}`, b}; });
+    entradas = bs.flatMap(pantallasBanda);
   }
   const nada = V?.doc && V.hayFiltro && !V.encontrados;
   feed.innerHTML = htmlSubir() + (nada ? htmlNada()
     : festival() ? cats.map((c,i) => htmlReel(c, i, cats.length)).join("")
-    : entradas.map((x, i) => htmlBanda(x.b, i, entradas.length)).join(""));
+    : entradas.map(x => x.html()).join(""));
   feed.setAttribute("aria-label", festival() ? "Backline por categoría" : "Backline por banda");
   cargarFotos();
   reels = [...feed.querySelectorAll(".reel")];
@@ -1009,7 +1059,7 @@ feed.addEventListener("click", async e => {
   if (acc === "planilla") return abrirPlanilla(e.target.closest("[data-banda]").dataset.banda);
   const foto = e.target.closest("img[data-foto]");
   if (foto) return verFoto(foto);
-  const li = e.target.closest("li[data-item]");
+  const li = e.target.closest("[data-item]");
   if (li && V.puede.editar) return abrirEditor(li.dataset.item);
   if (acc === "ver") return reels[1]?.scrollIntoView({behavior: "smooth"});
   const vt = e.target.closest(".ver-totales, .totales .cerrar");
@@ -1067,7 +1117,7 @@ document.getElementById("visor").addEventListener("click", e => {
 });
 
 const indice = document.getElementById("indice");
-const filaIndice = (c, cls, actualId) => `<button class="${cls}" data-id="${esc(c.id)}" aria-current="${actualId === c.id}"><span class="e">${c.e}</span><span>${esc(c.nombre)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${esc(c.x)}</span></button>`;
+const filaIndice = (c, cls, actualId) => `<button class="${cls}${c.sub ? " sub-fila" : ""}" data-id="${esc(c.id)}" aria-current="${actualId === c.id}"><span class="e">${c.e}</span><span>${esc(c.nombre)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${esc(c.x)}</span></button>`;
 const filaSubir = (cls, actualId) => `<button class="${cls}" data-id="subir" aria-current="${actualId === "subir"}"><span class="e">＋</span><span>Subir documento</span></button>`;
 function abrirIndice(){
   indice.querySelector("h4").textContent = festival() ? "Categorías" : "Bandas";

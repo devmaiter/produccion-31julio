@@ -190,6 +190,13 @@ const CONSTRUIR = {
     perillas(g, 9, -.26, .065, .46, .155);
     pieza(g, caja(.2, .025, .05, .01), 0, .575, 0);
   },
+  // Solo el cabezal (Ampeg SVT, "head"): la caja de perillas sin parlantes, sobre una base corta.
+  cabezal(g) {
+    pieza(g, caja(.72, .26, .36, .025), 0, .5, 0);
+    pieza(g, caja(.64, .13, .01, .004), 0, .5, .185);
+    perillas(g, 10, -.27, .06, .5, .192, .014);
+    pieza(g, caja(.6, .36, .36, .02), 0, .18, 0);
+  },
   bajo(g) {
     pieza(g, caja(.62, 1.22, .42, .03), 0, .65, 0);
     for (let f = 0; f < 4; f++) for (const x of [-.145, .145]) cono(g, .115, x, .24 + f * .27, .215);
@@ -310,7 +317,7 @@ for (const t of ["teclado", "amp", "bajo", "guitarra"]) {
 
 export const MODELO = {
   "Batería": "bateria", "Platillos": "platillos", "Percusión": "percusion", "Teclado": "teclado",
-  "Ampli bajo": "bajo", "Ampli guitarra": "amp", "Guitarra": "guitarra", "Bajo": "guitarra", "Bases": "base",
+  "Ampli bajo": "bajo", "Ampli guitarra": "amp", "Cabezal": "cabezal", "Guitarra": "guitarra", "Bajo": "guitarra", "Bases": "base",
 };
 
 let renderer, scene, camera, giro, actual = null, t0 = 0, corriendo = false;

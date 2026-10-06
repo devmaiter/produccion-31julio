@@ -87,7 +87,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 180 pruebas en verde.
+  inglés). Hay 182 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -183,12 +183,12 @@ lo que llega por `guardar` (`localStorage` `lab-reels:tablero`).
   suben riders con la misma herramienta, buscan, filtran y toman fotos de las bandas.
   **Solo el admin**: modo festival, Pide vs propuesta, editar o quitar ítems (tocar el
   ítem) y "Planilla .xlsx" (abre `planilla/?desde=reels` con la banda ya editada).
-- **Modo normal** (el de siempre, y el único del empleado): una pantalla por banda al
-  estilo reels (2026-10-05): portada con el holograma y el listado ahí mismo (compacto, por
-  secciones, entrando ítem por ítem); deslizando, una pantalla por sección del rider con su
-  holograma, las opciones de marca y el detalle; al final, fotos y la tarjeta. Antes era
-  una sola pantalla con todo su rider como viene, sus fotos ("Tomar foto" / "Subir foto", como en la app del
-  31 de julio) y nada de "1 bandas". El listado sin banda va al final, aparte.
+- **Modo normal** (el de siempre, y el único del empleado), al estilo reels: **hacia abajo,
+  sección por sección; a los lados, ítem por ítem** (lo pidió el usuario). Primero la portada
+  de la banda (holograma y el listado ahí mismo, entrando uno a uno) con fotos y "lo que pidió
+  la banda" a los lados; luego una pantalla por sección del rider (holograma, opciones de
+  marca, resumen) y a los lados cada ítem en grande con su holograma. Un ítem que es solo el
+  cabezal (SVT, head) se dibuja como cabezal. El nombre de la banda va solo en la cabecera.
 - **La tarjeta se da vuelta** ("Ver lo que pidió la banda"): de frente el listado; atrás el
   rider como viene (renglones de su backline, de la traza del lector, sin correos ni
   teléfonos), con qué quedó de cada renglón en el listado, las opciones de marca y lo que

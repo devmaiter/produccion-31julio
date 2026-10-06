@@ -504,7 +504,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
           if (conCat && cuerpo !== t) descripcion = `${conCat[1]}: ${descripcion}`;
         }
       }
-      descripcion = descripcion.replace(/^[\s•·*-]+/, "").replace(/[\s:,;.·|–—-]+$/, "").trim()
+      descripcion = descripcion.replace(/^[\s•·*-]+/, "").replace(/[\s:,;.·•●▪|–—-]+$/, "").trim()
         // "2 (dos) Fender Hot Rod…": la cantidad escrita en letras ya está en el número.
         .replace(/^\((?:uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|one|two|three|four|five|six|seven|eight|nine|ten)\)\s*/i, "")
         // "2 SNARE DRUM 14” X 5” WITH" (lo que sigue quedó en otro ítem): sin la palabra colgando.
@@ -928,7 +928,9 @@ function variosGrupos(t: string): string | null {
  * ni "88 keys" (minúscula o medida), ni "16 CH" / "4 RETORNOS" (unidades). */
 const MARCA_LISTA = /(?:^|\s)((?:[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]*))/gu;
 // "8 X 10" es una medida, no otra cantidad.
-const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft|x)$/i;
+const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft|x|voltios|volts?|vatios|watts?|amperios|amps?)$/i;
+/** Lo que sigue al número de un modelo: "SVT 4 PRO", "JCM 2000 DSL", "MK II". */
+const MODELO_SUFIJO = /^(pro|plus|classic|mk\w*|ii|iii|iv|xl|xt|se|ce|ex|hd|deluxe|custom|reverb|series|dsl|tsl|vr)$/i;
 function posicionesLista(t: string): number[] {
   const pos: number[] = [];
   for (const m of t.matchAll(MARCA_LISTA)) {
@@ -936,6 +938,11 @@ function posicionesLista(t: string): number[] {
     const antes = t.slice(0, m.index! + m[0].length - m[1]!.length);
     // "1 Fan / 1 Ventilador": la traducción, no otro ítem. "AMPEG SVT 3 Pro": el 3 es del modelo.
     if (/\/\s*$/.test(antes) || (/\p{Ll}/u.test(t) && /\b[A-Z]{2,4}\s+$/.test(antes))) continue;
+    // "AMPEG SVT 4 PRO" en un renglón todo en mayúsculas: el 4 sigue siendo del modelo (SVT-4 PRO, un cabezal).
+    if (/\b[A-Z]{2,4}\s+$/.test(antes) && MODELO_SUFIJO.test(m[2]!)) continue;
+    // "YAMAHA MOTIF 8 XF": número y código corto del modelo (XF8) detrás del nombre del equipo. Los códigos
+    // van sin vocales (XF, CS, MX); "2 STANDS 1 HI HAT" sí son dos ítems.
+    if (/^[B-DF-HJ-NP-TV-Z]{1,3}$/.test(m[2]!) && /\b[A-ZÁÉÍÓÚÑ]{3,}\s+$/.test(antes)) continue;
     pos.push(m.index! + m[0].length - m[1]!.length);
   }
   return pos;
