@@ -302,22 +302,9 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .reel.visto .vivo li{animation:entra-item .35s ease-out forwards;animation-delay:calc(min(var(--i),30) * 45ms + .2s)}
 @keyframes entra-item{to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.vivo li{opacity:1;transform:none}.reel.visto .vivo li{animation:none}}
-/* Cada ítem en grande, a los lados de su sección */
-.slide.pieza{justify-content:flex-end}
-.slide.pieza .holo{flex:1 1 auto;min-height:24vh}
-.slide.pieza h3{font-size:clamp(26px,8vw,40px);overflow-wrap:anywhere}
 .chips-pieza{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
-.editar-pieza{align-self:flex-start;font-size:16px;padding:7px 16px}
 .seccion-portada .holo{flex:1 1 auto;min-height:22vh}
 .sub-fila{padding-left:28px!important;font-size:.92em}
-/* La tarjeta que se da vuelta: listado de frente, lo que pidió la banda atrás */
-.tarjeta{flex:1;min-height:0;display:flex;flex-direction:column}
-.voltear{align-self:flex-start;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:5px 12px;margin:0 0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25);color:var(--ink2)}
-.voltear[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#000}
-.caras{flex:1;min-height:0;position:relative;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.3,1)}
-.tarjeta.vuelta .caras{transform:rotateY(180deg)}
-.cara{position:absolute;inset:0;display:flex;flex-direction:column;backface-visibility:hidden;-webkit-backface-visibility:hidden}
-.cara.dorso{transform:rotateY(180deg);background:rgba(255,255,255,.04);border-radius:12px;padding:10px 12px}
 .resumen-pide{font-size:12px;color:var(--ink3);margin:0 0 8px}
 .opciones{font-size:13px;color:var(--ink2);margin:4px 0 2px;padding:6px 10px;border-left:3px solid var(--accent);background:rgba(255,106,31,.08);border-radius:0 8px 8px 0}
 .opciones b{color:var(--ink)}
@@ -327,7 +314,6 @@ li.pide .va{font-size:12px;color:var(--ok);font-weight:600}
 li.pide .va.no{color:var(--ink3);font-weight:400}
 li.pide.fuera .t{text-decoration:line-through;color:var(--ink3)}
 li.pide.nota .t{color:var(--ink3);font-style:italic}
-@media (prefers-reduced-motion:reduce){.caras{transition:none}}
 .vacio-busqueda .slide{align-items:center;justify-content:center;text-align:center;gap:14px}
 </style>
 </head>
@@ -707,8 +693,6 @@ function htmlReel(c, i, total){
     <button class="pasar sig" aria-label="Siguiente">›</button>
     <div class="riel">
       <button class="listo" aria-pressed="${listos.has(c.id)}"><span class="ic">✓</span><span>Listo</span></button>
-      <button class="compartir"><span class="ic">↗</span><span>Enviar</span></button>
-      <button class="ver-indice"><span class="ic">☰</span><span>Índice</span></button>
       <button class="ir-subir"><span class="ic">＋</span><span>Subir</span></button>
     </div>
     <div class="corazon" aria-hidden="true">✅</div>
@@ -768,15 +752,13 @@ const sinTildes = t => String(t || "").normalize("NFD").replace(/[̀-ͯ]/g, "").
 // "3.1.-DRUMS: DW, YAMAHA" → "drums", como queda el grupo de los ítems ("Drums").
 const nombreDeGrupo = t => sinTildes(String(t).replace(/^\d{1,2}\s*\.\s*(?:\d{1,2}\s*\.?)?\s*[-–]?\s*/, "").split(":")[0].replace(/[\s:·|–—-]+$/, ""));
 
-/* Modo normal, al estilo reels (lo pidió el usuario): hacia abajo se pasa de sección en sección y a los
-   lados, ítem por ítem. Primero la portada de la banda (holograma y el listado ahí mismo, compacto y
-   entrando uno a uno) con sus fotos y lo que pidió la banda a los lados; después una pantalla por
-   sección del rider: su portada (holograma, opciones de marca y resumen) y cada ítem en grande. */
+/* Modo normal, al estilo reels (lo pidió el usuario): hacia abajo se pasa de sección en sección. Primero
+   la portada de la banda (holograma y el listado ahí mismo, compacto y entrando uno a uno) con sus
+   fotos al lado; después una pantalla por sección del rider con, a los lados, solo su información,
+   lo que está en el listado y lo que pidió la banda. */
 const riel = id => `
     <div class="riel">
       <button class="listo" aria-pressed="${listos.has(id)}"><span class="ic">✓</span><span>Listo</span></button>
-      <button class="compartir"><span class="ic">↗</span><span>Enviar</span></button>
-      <button class="ver-indice"><span class="ic">☰</span><span>Índice</span></button>
       <button class="ir-subir"><span class="ic">＋</span><span>Subir</span></button>
     </div>
     <div class="corazon" aria-hidden="true">✅</div>`;
@@ -820,10 +802,9 @@ function htmlBanda(b){
         <p class="pista">${secs.length ? (PC ? "Baja con ↓ para ir sección por sección" : "Desliza hacia arriba para ir sección por sección") : ""}</p>
       </section>
       <section class="slide banda">
-        <h3>Fotos y rider</h3>
+        <h3>Fotos</h3>
         ${V.puede.planilla && b.items.length ? `<p class="sub"><button class="ir-planilla" style="margin:0" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button></p>` : ""}
         ${htmlFotos(b)}
-        ${htmlTarjeta(b)}
       </section>
     </div>
     ${pasar}
@@ -831,35 +812,38 @@ function htmlBanda(b){
   </article>`;
 }
 
-/* Una sección del rider: su portada y, a los lados, cada ítem en grande. */
+/* Una sección del rider es una pantalla del reel (hacia abajo). A los lados, solo tres: la
+   información (holograma, opciones de marca, resumen), lo que está en el listado y lo que pidió la
+   banda (lo pidió el usuario). */
 function htmlSeccion(b, s, j, total){
-  const id = idSeccion(b, j), clave = `${id}|`;
-  const pedido = b.artistaId && (datos().pedidos || []).find(p => p.artistaId === b.artistaId);
-  const op = s.grupo && pedido?.renglones.find(r => r.tipo === "grupo" && r.opciones && nombreDeGrupo(r.texto) === sinTildes(s.grupo))?.opciones;
-  const piezas = piezasDe(s.items), n = 1 + s.items.length;
-  const item = (x, m) => `
-      <section class="slide pieza">
-        ${htmlHolo(clave + m, [x])}
-        <div class="big"><strong>${x.cantidad}</strong><span>${m + 1} de ${s.items.length}</span></div>
-        <h3>${esc(x.referencia)}</h3>
-        ${x.nota ? `<p class="sub">${esc(x.nota)}</p>` : ""}
-        <p class="chips-pieza"><span class="chip">${esc(x.categoria)}</span>${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}${x.porConfirmar ? '<span class="chip warn">Por confirmar</span>' : ""}</p>
-        ${V.puede.editar ? `<button class="btn sec editar-pieza" data-item="${esc(x.id)}">Editar</button>` : ""}
-      </section>`;
+  const id = idSeccion(b, j), titulo = s.grupo || "Sin sección";
+  const pide = pedidoDeSeccion(b, s);
+  const op = pide.find(r => r.tipo === "grupo" && r.opciones)?.opciones;
+  const piezas = piezasDe(s.items), dudosos = s.items.filter(x => x.porConfirmar).length;
+  const trae = s.items.filter(x => x.propietario?.tipo === "tercero").length;
+  const cats = [...new Set(s.items.map(x => x.categoria))];
   return `
-  <article class="reel" id="${esc(id)}" style="--h:${HUE[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] ?? 20}" data-n="${n}" aria-label="${esc(s.grupo || "Sin sección")} · ${esc(b.nombre)}">
-    <div class="prog">${"<i></i>".repeat(n)}</div>
-    <div class="cab"><b>${esc(s.grupo || "Sin sección")}</b><span class="n">${esc(b.nombre)} · ${j + 1}/${total}</span></div>
+  <article class="reel" id="${esc(id)}" style="--h:${HUE[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] ?? 20}" data-n="3" aria-label="${esc(titulo)} · ${esc(b.nombre)}">
+    <div class="prog"><i></i><i></i><i></i></div>
+    <div class="cab"><b>${esc(titulo)}</b><span class="n">${esc(b.nombre)} · ${j + 1}/${total}</span></div>
     <div class="slides">
       <section class="slide portada seccion-portada">
-        ${htmlHolo(clave + "todo", s.items)}
-        <h2>${esc(s.grupo || "Sin sección")}</h2>
+        ${htmlHolo(`${id}|todo`, s.items)}
+        <h2>${esc(titulo)}</h2>
         <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${s.items.length} ${s.items.length === 1 ? "ítem" : "ítems"}</p>
         ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
-        <ul class="vivo">${s.items.map((x, m) => `<li style="--i:${m}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(x.referencia)}</li>`).join("")}</ul>
-        <p class="pista">${PC ? "Pasa con › para ver ítem por ítem" : "Desliza para ver ítem por ítem"} <span class="flecha">→</span></p>
+        <p class="chips-pieza">${cats.map(c => `<span class="chip">${esc(c)}</span>`).join("")}${trae ? `<span class="chip ter">${trae} lo trae la banda</span>` : ""}${dudosos ? `<span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
+        <p class="pista">${PC ? "Pasa con › para ver el listado y lo que pidió la banda" : "Desliza para ver el listado y lo que pidió la banda"} <span class="flecha">→</span></p>
       </section>
-      ${s.items.map(item).join("")}
+      <section class="slide banda">
+        <h3>En el listado</h3>
+        <p class="sub">${esc(titulo)}${V.puede.editar ? " · toca un ítem para editarlo" : ""}</p>
+        ${htmlFicha({secciones: [{grupo: "", items: s.items}], items: s.items}, null)}
+      </section>
+      <section class="slide banda">
+        <h3>Lo que pidió la banda</h3>
+        ${pide.length ? htmlPedido(pide) : `<p class="sub">No está el texto del rider de esta sección. Vuelve a subir el documento para verlo.</p>`}
+      </section>
     </div>
     ${pasar}
     ${riel(id)}
@@ -867,14 +851,10 @@ function htmlSeccion(b, s, j, total){
 }
 const idBanda = b => "banda-" + slug(b.id);
 
-/* La tarjeta de la banda se da vuelta: de frente, el listado (lo que quedó); atrás, lo que pidió la banda,
-   como viene en el rider, con qué pasó con cada renglón. Las opciones de marca son información, no piezas. */
-function htmlTarjeta(b){
-  const pedido = b.artistaId && (datos().pedidos || []).find(p => p.artistaId === b.artistaId);
-  if (!pedido?.renglones?.length) return htmlFicha(b, null);
+/* Lo que pidió la banda, como viene en el rider: cada renglón con lo que quedó de él en el listado,
+   las opciones de marca y lo que no va (tachado, con el motivo). */
+function htmlPedido(renglones){
   const enListado = new Map(datos().items.map(x => [x.id, x]));
-  const n = pedido.renglones.filter(r => r.tipo === "item").length;
-  const quedaron = pedido.renglones.filter(r => r.tipo === "item" && enListado.has(r.itemId)).length;
   const fila = r => {
     if (r.tipo === "grupo") return `<h4 class="seccion">${esc(r.texto)}</h4>${r.opciones ? `<p class="opciones">Opciones de la banda: <b>${r.opciones.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}`;
     if (r.tipo === "item") {
@@ -887,23 +867,28 @@ function htmlTarjeta(b){
   };
   // Las secciones del rider abren y cierran su propia lista.
   let html = "", abierta = false;
-  for (const r of pedido.renglones) {
+  for (const r of renglones) {
     if (r.tipo === "grupo") { if (abierta) html += "</ul>"; abierta = false; html += fila(r); continue; }
     if (!abierta) { html += '<ul class="lista">'; abierta = true; }
     html += fila(r);
   }
   if (abierta) html += "</ul>";
-  return `
-      <div class="tarjeta">
-        <button class="voltear" aria-pressed="false"><span>⇄</span> <span class="lbl">Ver lo que pidió la banda</span></button>
-        <div class="caras">
-          <div class="cara frente">${htmlFicha(b, null)}</div>
-          <div class="cara dorso" aria-hidden="true">
-            <p class="resumen-pide">Así viene en el rider. ${n} ${n === 1 ? "renglón pide equipo" : "renglones piden equipo"}; ${quedaron} ${quedaron === 1 ? "quedó" : "quedaron"} en el listado.</p>
-            <div class="rider">${html}</div>
-          </div>
-        </div>
-      </div>`;
+  const n = renglones.filter(r => r.tipo === "item").length, quedaron = renglones.filter(r => r.tipo === "item" && enListado.has(r.itemId)).length;
+  return `<p class="resumen-pide">Así viene en el rider. ${n} ${n === 1 ? "renglón pide equipo" : "renglones piden equipo"}; ${quedaron} ${quedaron === 1 ? "quedó" : "quedaron"} en el listado.</p>
+        <div class="rider">${html}</div>`;
+}
+
+/* Los renglones del rider que son de una sección: el bloque que empieza en su título, o el que tiene
+   sus ítems. Lo de antes del primer título ("3. BACKLINE") no es de ninguna. */
+function pedidoDeSeccion(b, s){
+  const pedido = b.artistaId && (datos().pedidos || []).find(p => p.artistaId === b.artistaId);
+  if (!pedido?.renglones?.length) return [];
+  const ids = new Set(s.items.map(x => x.id)), bloques = [];
+  for (const r of pedido.renglones) {
+    if (r.tipo === "grupo") bloques.push([r]);
+    else if (bloques.length) bloques.at(-1).push(r);
+  }
+  return bloques.filter(bl => nombreDeGrupo(bl[0].texto) === sinTildes(s.grupo) || bl.some(r => ids.has(r.itemId))).flat();
 }
 
 /* De qué documento sale lo que se ve y cuándo se subió en este celular, para que no aparezca
@@ -1067,14 +1052,6 @@ feed.addEventListener("click", async e => {
     const p = vt.closest(".portada"), abrir = vt.classList.contains("ver-totales");
     p.querySelector(".totales").hidden = !abrir;
     p.querySelector(".ver-totales").setAttribute("aria-expanded", abrir);
-    return;
-  }
-  const vo = e.target.closest(".voltear");
-  if (vo) {
-    const t = vo.closest(".tarjeta"), atras = !t.classList.contains("vuelta");
-    t.classList.toggle("vuelta", atras); vo.setAttribute("aria-pressed", atras);
-    vo.querySelector(".lbl").textContent = atras ? "Ver el listado" : "Ver lo que pidió la banda";
-    t.querySelector(".frente").setAttribute("aria-hidden", atras); t.querySelector(".dorso").setAttribute("aria-hidden", !atras);
     return;
   }
   const vc = e.target.closest(".ver-cmp");

@@ -184,6 +184,10 @@ describe("rider con capítulos numerados", () => {
     const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nKEYS\n• 1 YAMAHA MOTIF 8 XF Y MOTIF XF 7\nMISCELANEOS\n• 10 PILAS 9 VOLTIOS\n• 2 VENTILADORES") }]);
     expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 YAMAHA MOTIF 8 XF Y MOTIF XF 7", "2 VENTILADORES"]);
   });
+  it("'• PEDAL PARA BOMBO' dentro de DRUMS es un ítem, no un subtítulo", () => {
+    const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\n3. BACKLINE\n3.1.-DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM\n• KICK 24”\n• PEDAL PARA BOMBO\n• 5 CYMBALS STANDS") }]);
+    expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 KICK 24”", "1 PEDAL PARA BOMBO", "5 CYMBALS STANDS"]);
+  });
   it("'1. DW COLLECTOR' en un rider sin capítulos sigue siendo una opción numerada", () => {
     const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nDRUMS\nOPCIONES EN ORDEN DE PRIORIDAD\n1. SONOR PRO LITE\n2. DW COLLECTOR\n1 KICK 22") }]);
     expect(r.items.map(i => i.descripcion)).toEqual(["KICK 22"]);

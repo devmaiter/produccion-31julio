@@ -231,7 +231,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         if (conMusico) { ponerGrupo(nombrePropio(conMusico)); modoAlternativa = false; seccion = "backline"; anotar("grupo", "instrumento y músico"); continue; }
         // "Amplificadores de bajo" después de "Baterías" nombra otro instrumento: no es subtítulo, es otra sección.
         const otroInstrumento = !!familiaDe(sinColaS) && familiaDe(sinColaS) !== familiaGrupo;
-        if (grupo && esSubtitulo(sinColaS) && !otraFamilia(sinColaS) && !otroInstrumento) {
+        // "• PEDAL PARA BOMBO": con viñeta es un ítem de la lista, no un subtítulo.
+        if (grupo && esSubtitulo(sinColaS) && !otraFamilia(sinColaS) && !otroInstrumento && !/^\s*[•●▪◦]/.test(l.texto)) {
           listaOpciones = false; ranking = false; enParches = false; modoAlternativa = false;
           if (/\b(options?|opciones?|opci[oó]n)\b/i.test(sinColaS) && !/^no\b/i.test(sinColaS)) {
             listaOpciones = true; ranking = /prioridad|priority/i.test(sinColaS);
@@ -758,7 +759,7 @@ const FAMILIAS: ReadonlyArray<readonly [string, RegExp]> = [
 export function familiaDe(t: string): string | null {
   return FAMILIAS.find(([, re]) => re.test(t))?.[0] ?? null;
 }
-const SUBTITULO = /^(no\s+(hay\s+)?)?(options?|opciones?|opci[oó]n)\b|^(type|tipo)s?\b|^(accessor|accesor)|^parches|^(drum\s+)?heads?\b|^(stands?|soportes?)\b|^(amps?|amplificador(es)?|amplificaci[oó]n)\b|^(cabinets?|cajas?)\b|^instrument|^sizes?\b|^medidas|^marcas?\b|^brands?\b|^configuraci|^set ?up\b|^(cymbals?\s+set|set\s+de\s+platos)|^hardware\b|^(kick\s+drum\s+)?pedal/i;
+const SUBTITULO = /^(no\s+(hay\s+)?)?(options?|opciones?|opci[oó]n)\b|^(type|tipo)s?\b|^(accessor|accesor)|^parches|^(drum\s+)?heads?\b|^(stands?|soportes?)\b|^(amps?|amplificador(es)?|amplificaci[oó]n)\b|^(cabinets?|cajas?)\b|^instrument|^sizes?\b|^medidas|^marcas?\b|^brands?\b|^configuraci|^set ?up\b|^(cymbals?\s+set|set\s+de\s+platos)|^hardware\b|^(kick\s+drum\s+)?pedal(es|s)?$/i;
 /** "OPTIONS/OPCIONES EN ORDEN DE PRIORIDAD", "Type/ Tipo": subtítulo corto, sin cantidades. */
 function esSubtitulo(t: string): boolean {
   return SUBTITULO.test(t) && !/\d/.test(t) && t.split(/\s+/).length <= 9 && !/[.?!]$/.test(t);

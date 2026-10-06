@@ -87,7 +87,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 182 pruebas en verde.
+  inglés). Hay 183 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -184,15 +184,13 @@ lo que llega por `guardar` (`localStorage` `lab-reels:tablero`).
   **Solo el admin**: modo festival, Pide vs propuesta, editar o quitar ítems (tocar el
   ítem) y "Planilla .xlsx" (abre `planilla/?desde=reels` con la banda ya editada).
 - **Modo normal** (el de siempre, y el único del empleado), al estilo reels: **hacia abajo,
-  sección por sección; a los lados, ítem por ítem** (lo pidió el usuario). Primero la portada
-  de la banda (holograma y el listado ahí mismo, entrando uno a uno) con fotos y "lo que pidió
-  la banda" a los lados; luego una pantalla por sección del rider (holograma, opciones de
-  marca, resumen) y a los lados cada ítem en grande con su holograma. Un ítem que es solo el
-  cabezal (SVT, head) se dibuja como cabezal. El nombre de la banda va solo en la cabecera.
-- **La tarjeta se da vuelta** ("Ver lo que pidió la banda"): de frente el listado; atrás el
-  rider como viene (renglones de su backline, de la traza del lector, sin correos ni
-  teléfonos), con qué quedó de cada renglón en el listado, las opciones de marca y lo que
-  no va tachado con el motivo. Viene en `datos.pedidos` (solo con un documento a la vez).
+  sección por sección** (lo pidió el usuario). Primero la portada de la banda (holograma y el
+  listado ahí mismo, entrando uno a uno) con sus fotos al lado; luego una pantalla por sección
+  del rider y, a los lados, **solo tres**: información (holograma, opciones de marca, resumen),
+  "En el listado" (el admin edita ahí) y "Lo que pidió la banda" (los renglones del rider de
+  esa sección, de `datos.pedidos`, con qué quedó de cada uno). Sin botones de Índice ni Enviar.
+  Un ítem que es solo el cabezal (SVT, head) se dibuja como cabezal. El nombre de la banda va
+  solo en la cabecera.
 - **Modo festival** (lo elige el admin en Filtros): los reels por categoría de abajo.
 - Las fotos quedan en el dispositivo (IndexedDB `backline-fotos`), achicadas a 1600 px;
   todavía no se comparten entre celulares.
