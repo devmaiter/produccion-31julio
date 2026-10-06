@@ -359,6 +359,7 @@ vista m =
                     E.object
                         [ ( "nombre", E.string doc.nombre )
                         , ( "totalItems", E.int (List.length doc.items) )
+                        , ( "cuando", E.string doc.cuando )
                         , ( "datos", datosJson doc items (admin Comparar) m.filtro )
                         ]
           )

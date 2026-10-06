@@ -94,6 +94,11 @@ suite =
                         , campo [ "doc", "datos", "comparaciones" ] (D.list D.value) (conRider Empleado) |> Result.map List.length
                         )
                         ( Ok 1, Ok 0 )
+            , test "la vista dice de qué documento viene y cuándo se subió" <|
+                \_ ->
+                    conRider Empleado
+                        |> campo [ "doc" ] (D.map2 Tuple.pair (D.field "nombre" D.string) (D.field "cuando" D.string))
+                        |> Expect.equal (Ok ( "Rider Los Rayos", "2026-10-05" ))
             , test "la vista dice qué puede hacer cada perfil" <|
                 \_ ->
                     Expect.equal

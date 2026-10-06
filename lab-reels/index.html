@@ -214,11 +214,8 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .hojita i:nth-child(odd){width:60%}
 .hojita::after{content:"";position:absolute;left:0;right:0;height:36px;background:linear-gradient(transparent,rgba(255,106,31,.75),transparent);animation:barre 1.3s ease-in-out infinite alternate}
 @keyframes barre{from{top:-36px}to{top:170px}}
-/* Listo: número grande y lluvia de emojis de las categorías encontradas */
+/* Listo: número grande */
 .encontre strong{display:block;font-family:var(--display);font-size:clamp(90px,30vw,140px);line-height:.85;color:var(--accent)}
-.lluvia{position:fixed;inset:0;pointer-events:none;z-index:20;overflow:hidden}
-.lluvia span{position:absolute;top:-50px;font-size:34px;animation:cae 1.8s cubic-bezier(.3,.6,.5,1) forwards}
-@keyframes cae{to{transform:translateY(115dvh) rotate(var(--r));}}
 
 /* ── Primera vez: logo con glitch y la mano que enseña a deslizar, como al abrir TikTok ── */
 .splash{position:fixed;inset:0;z-index:30;background:#000;display:grid;place-items:center;transition:opacity .45s}
@@ -287,6 +284,10 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .botones-foto button{font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
 .ir-planilla{font-size:13px;font-weight:600;padding:3px 10px;margin-left:6px;border-radius:999px;border:1px solid var(--accent);color:var(--accent)}
 .visor .borrar-foto{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 20px);left:50%;transform:translateX(-50%);padding:8px 16px;border-radius:999px;background:rgba(0,0,0,.7);border:1px solid var(--warn);color:var(--warn);font-weight:600}
+.origen{font-size:12px;color:var(--ink3);margin:0 0 6px;overflow-wrap:anywhere}
+.origen b{color:var(--ink2);font-weight:600}
+.origen button{font-size:12px;padding:1px 9px;margin-left:4px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
+.origen button[data-seguro]{border-color:var(--warn);color:var(--warn)}
 .vacio-busqueda .slide{align-items:center;justify-content:center;text-align:center;gap:14px}
 </style>
 </head>
@@ -620,6 +621,7 @@ function htmlReel(c, i, total){
     <div class="slides">
       <section class="slide portada">
         <div class="holo" data-cat="${esc(c.holo)}"><div class="emoji" aria-hidden="true">${EMOJI[sinNum(c.cat)] || "📦"}</div></div>
+        ${htmlOrigen()}
         <h2>${esc(c.cat)}</h2>
         <div class="big"><strong data-to="${c.equipos}">${c.equipos}</strong><span>${c.equipos === 1 ? "banda" : "bandas"}</span></div>
         <div class="dias">${dias}${c.dudosos ? `<span class="chip warn">${c.dudosos} por confirmar</span>` : ""}</div>
@@ -690,6 +692,7 @@ function htmlBanda(b, i, total){
     <div class="cab"><b>${esc(b.nombre)}</b><span class="n">${i+1}/${total}</span></div>
     <div class="slides"><section class="slide banda">
       <h3>${esc(b.nombre)}</h3>
+      ${htmlOrigen()}
       <p class="sub">${piezas} ${piezas === 1 ? "pieza" : "piezas"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}${V.puede.planilla && b.items.length ? `<button class="ir-planilla" data-acc="planilla" data-banda="${esc(b.id)}">Planilla .xlsx</button>` : ""}</p>
       ${htmlFotos(b)}
       ${htmlFicha(b, null)}
@@ -704,6 +707,20 @@ function htmlBanda(b, i, total){
   </article>`;
 }
 const idBanda = b => "banda-" + slug(b.id);
+
+/* De qué documento sale lo que se ve y cuándo se subió en este celular, para que no aparezca
+   una banda sin saber de dónde. */
+function cuandoSeSubio(iso){
+  const f = new Date(iso); if (isNaN(f)) return "";
+  const hora = f.toLocaleTimeString("es", {hour: "numeric", minute: "2-digit"});
+  const dias = Math.round((new Date().setHours(0,0,0,0) - new Date(f).setHours(0,0,0,0)) / 864e5);
+  return dias === 0 ? `hoy ${hora}` : dias === 1 ? `ayer ${hora}` : `${f.toLocaleDateString("es", {day: "numeric", month: "short"})} ${hora}`;
+}
+function htmlOrigen(){
+  if (!V?.doc) return "";
+  const c = cuandoSeSubio(V.doc.cuando);
+  return `<p class="origen">Del documento <b>${esc(V.doc.nombre)}</b>${c ? ` · subido ${esc(c)}` : ""} <button data-acc="borrar">Borrar</button></p>`;
+}
 
 function htmlNada(){
   const t = V.filtro.texto.trim();
@@ -827,7 +844,11 @@ feed.addEventListener("click", async e => {
   if (acc === "foto") return document.getElementById("camara").click();
   if (acc === "muestra") return probarMuestra();
   if (acc === "otro") { subida.estado = "inicio"; subida.archivos = []; return pintarSubir(); }
-  if (acc === "borrar") { escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; destinoPendiente = "subir"; return enviar({tipo: "borrar"}); }
+  if (acc === "borrar") {
+    // Dos toques: el botón está en cada pantalla y se puede tocar sin querer.
+    const btn = e.target.closest("[data-acc]");
+    if (!btn.dataset.seguro) { btn.dataset.seguro = "1"; btn.textContent = "¿Borrar el documento? Toca otra vez"; return; }
+    escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; destinoPendiente = "subir"; return enviar({tipo: "borrar"}); }
   if (acc === "limpiar") { document.getElementById("buscar").value = ""; destinoPendiente = "subir"; return enviar({tipo: "limpiar"}); }
   if (acc === "tomar-foto" || acc === "subir-foto") { fotoDe = e.target.closest("[data-banda]").dataset.banda; return document.getElementById(acc === "tomar-foto" ? "foto-camara" : "foto-galeria").click(); }
   if (acc === "planilla") return abrirPlanilla(e.target.closest("[data-banda]").dataset.banda);
@@ -1125,7 +1146,6 @@ async function leerYArmar(archivos){
   subida.resultado = {items: d.items.length, bandas: new Set(d.items.filter(i => !i.sinBanda).map(i => i.artistaId)).size, cats: categorias.length, dudosos: d.items.filter(i => i.porConfirmar).length, avisos: ext.avisos.length};
   destinoPendiente = "subir";
   enviar({tipo: "cargar", doc: {nombre, archivos: archivos.map(f => f.name), cuando: new Date().toISOString(), datos: d}});
-  lluvia(categorias.map(c => EMOJI[sinNum(c)] || "📦"));
 }
 
 async function probarMuestra(){
@@ -1133,20 +1153,6 @@ async function probarMuestra(){
     const b = await (await fetch(MUESTRA)).blob();
     subirArchivos([new File([b], "hoja-backline.pdf", {type: "application/pdf"})]);
   } catch { aviso("No pude abrir el ejemplo"); }
-}
-
-function lluvia(emojis){
-  if (QUIETO || !emojis.length) return;
-  const l = document.createElement("div"); l.className = "lluvia"; l.setAttribute("aria-hidden", "true");
-  for (let i = 0; i < 36; i++) {
-    const s = document.createElement("span");
-    s.textContent = emojis[i % emojis.length];
-    s.style.left = Math.random() * 96 + "%";
-    s.style.animationDelay = (Math.random() * .6).toFixed(2) + "s";
-    s.style.setProperty("--r", (Math.random() * 540 - 270).toFixed(0) + "deg");
-    l.append(s);
-  }
-  document.body.append(l); setTimeout(() => l.remove(), 2800);
 }
 
 /* ── Al abrir: el logo de Circuito Naranja con glitch, siempre, como TikTok. La mano que enseña cada gesto sale una sola vez. ── */

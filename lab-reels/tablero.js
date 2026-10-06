@@ -3117,7 +3117,7 @@ var $author$project$Backline$Tablero$datosDec = A7(
 	$elm$json$Json$Decode$map6,
 	F9(
 		function (artistas, dias, bloques, plots, comps, items, nombre, archivos, cuando) {
-			return {aG: archivos, aa: artistas, av: bloques, aw: comps, aH: cuando, ax: dias, M: items, I: nombre, aD: plots};
+			return {aH: archivos, aa: artistas, av: bloques, aw: comps, ax: cuando, ay: dias, M: items, I: nombre, aE: plots};
 		}),
 	A3(
 		$author$project$Backline$Tablero$opcional,
@@ -3468,10 +3468,10 @@ var $author$project$Backline$Tablero$documentoJson = function (d) {
 				$elm$json$Json$Encode$string(d.I)),
 				_Utils_Tuple2(
 				'archivos',
-				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, d.aG)),
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, d.aH)),
 				_Utils_Tuple2(
 				'cuando',
-				$elm$json$Json$Encode$string(d.aH)),
+				$elm$json$Json$Encode$string(d.ax)),
 				_Utils_Tuple2(
 				'datos',
 				$elm$json$Json$Encode$object(
@@ -3494,9 +3494,9 @@ var $author$project$Backline$Tablero$documentoJson = function (d) {
 											]));
 								},
 								d.aa)),
-							_Utils_Tuple2('dias', d.ax),
+							_Utils_Tuple2('dias', d.ay),
 							_Utils_Tuple2('bloques', d.av),
-							_Utils_Tuple2('stagePlots', d.aD),
+							_Utils_Tuple2('stagePlots', d.aE),
 							_Utils_Tuple2(
 							'items',
 							A2($elm$json$Json$Encode$list, $author$project$Backline$Tablero$itemJson, d.M)),
@@ -4255,9 +4255,9 @@ var $author$project$Backline$Tablero$datosJson = F4(
 									]));
 						},
 						doc.aa)),
-					_Utils_Tuple2('dias', doc.ax),
+					_Utils_Tuple2('dias', doc.ay),
 					_Utils_Tuple2('bloques', doc.av),
-					_Utils_Tuple2('stagePlots', doc.aD),
+					_Utils_Tuple2('stagePlots', doc.aE),
 					_Utils_Tuple2(
 					'items',
 					A2($elm$json$Json$Encode$list, $author$project$Backline$Tablero$itemJson, items)),
@@ -4583,6 +4583,9 @@ var $author$project$Backline$Tablero$vista = function (m) {
 									'totalItems',
 									$elm$json$Json$Encode$int(
 										$elm$core$List$length(doc.M))),
+									_Utils_Tuple2(
+									'cuando',
+									$elm$json$Json$Encode$string(doc.ax)),
 									_Utils_Tuple2(
 									'datos',
 									A4(
