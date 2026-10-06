@@ -83,6 +83,9 @@ export function enColumnas(filas: Fila[]): string[] {
   const out: string[] = [];
   let i = 0;
   while (i < filas.length) {
+    // Una tabla con fila de títulos ("FAMILY | TYPE | MODEL | NOTES") se lee fila por fila, aunque
+    // una celda ocupe dos renglones: no son columnas de texto corrido.
+    if (esCabecera(filas[i]!)) { i = leerTabla(filas, i, out); continue; }
     if (!multi[i]) { out.push(unir(filas[i]!)); i++; continue; }
     // La zona sigue mientras no haya más de 3 renglones seguidos de una sola columna.
     let fin = i;
@@ -124,6 +127,68 @@ export function enColumnas(filas: Fila[]): string[] {
     i = fin + 1;
   }
   return out.map(t => t.trim()).filter(Boolean);
+}
+
+/* ── Tablas con fila de títulos ── */
+const TITULO_COLUMNA = /^(family|familia|type|tipo|model|modelo|notes?|notas?|qty|cant(idad)?\.?|items?|descripci[oó]n|description|equipo|equipment|marca|brand|observaci[oó]n(es)?|obs\.?|comments?|comentarios?|proveedor|provider|referencia)$/i;
+function esCabecera(f: Fila): boolean {
+  // "FAMILY TYPE" puede venir junto en un trozo: cuenta cada palabra.
+  const palabras = f.segs.map(s => s.texto.trim().split(/\s+/));
+  return f.segs.length >= 2 && palabras.every(p => p.every(w => TITULO_COLUMNA.test(w))) && palabras.flat().length >= 3;
+}
+
+/** Lee la tabla que empieza en la fila de títulos `i` y devuelve dónde sigue el documento. Cada fila
+ *  de la tabla es la que trae la cantidad; los trozos sin cantidad que quedan justo arriba o abajo
+ *  (una celda de dos renglones) son de la fila más cercana. Un trozo solo en la primera columna
+ *  ("DRUM", "KEYBOARDS") es el título de la sección. Termina en un renglón que no cae en las columnas. */
+function leerTabla(filas: Fila[], i: number, out: string[]): number {
+  const anclas = filas[i]!.segs.map(s => s.x), alto = filas[i]!.alto, tol = Math.max(8, alto);
+  const columna = (x: number) => { let c = -1; anclas.forEach((a, k) => { if (a <= x + tol) c = k; }); return c; };
+  // Cae en una columna si empieza en ella o un poco a su derecha ("1 Kcik 22" bajo FAMILY TYPE); un título
+  // centrado ("FULANO GEAR") cae en la mitad derecha de una columna y termina la tabla.
+  const enColumna = (x: number) => {
+    const c = columna(x);
+    if (c < 0) return anclas[0]! - x <= tol * 1.5;
+    const ancho = c + 1 < anclas.length ? anclas[c + 1]! - anclas[c]! : alto * 8;
+    return x - anclas[c]! < ancho * 0.5;   // en la mitad izquierda de su columna
+  };
+  const CANT = /^(\d{1,3})(?:\s+|$)/;
+  let k = i + 1;
+  const bloque: Fila[] = [];
+  const volcar = () => {
+    const conCant = bloque.filter(f => CANT.test(f.segs[0]!.texto) && columna(f.segs[0]!.x) <= 1);
+    if (!conCant.length) { bloque.forEach(f => out.push(f.segs.map(s => s.texto).join("   "))); bloque.length = 0; return; }
+    const de = new Map<Fila, Fila[]>(conCant.map(f => [f, [f]]));
+    for (const f of bloque) {
+      if (de.has(f)) continue;
+      const cerca = conCant.reduce((m, g) => Math.abs(g.y - f.y) < Math.abs(m.y - f.y) ? g : m);
+      if (Math.abs(cerca.y - f.y) <= Math.max(cerca.alto, f.alto) * 2) de.get(cerca)!.push(f);
+    }
+    for (const fila of conCant) {
+      const partes = de.get(fila)!.sort((a, b) => b.y - a.y);
+      const celdas: string[][] = anclas.map(() => []);
+      let cant = "";
+      for (const f of partes) for (const s of f.segs) {
+        let t = s.texto;
+        if (f === fila && s === fila.segs[0]) { const m = t.match(CANT)!; cant = m[1]!; t = t.slice(m[0].length); }
+        if (t) celdas[Math.max(0, columna(s.x))]!.push(t);
+      }
+      const texto = celdas.map(c => c.join(" ").trim()).filter(Boolean);
+      out.push([`${cant} ${texto[0] ?? ""}`.trim(), ...texto.slice(1)].join("   "));
+    }
+    bloque.length = 0;
+  };
+  for (; k < filas.length; k++) {
+    const f = filas[k]!;
+    if (esCabecera(f)) { volcar(); continue; }
+    if (!f.segs.every(s => enColumna(s.x))) break;
+    // "DRUM", "KEYBOARDS": justo al comienzo de la primera columna y sin cantidad ("Stereo Volume", un poco
+    // más adentro, es la mitad de arriba de una celda).
+    if (f.segs.length === 1 && Math.abs(f.segs[0]!.x - anclas[0]!) <= tol && !CANT.test(f.segs[0]!.texto)) { volcar(); out.push(f.segs[0]!.texto); continue; }
+    bloque.push(f);
+  }
+  volcar();
+  return k;
 }
 
 /** x donde empiezan las columnas: inicios de trozos de texto corrido que se repiten. */

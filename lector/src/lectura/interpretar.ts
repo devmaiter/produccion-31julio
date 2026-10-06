@@ -56,7 +56,7 @@ const PALABRAS_TITULO = new Set(("bateria baterias drum drums kit kits hardware 
   "bajo bajos bass basses guitarra guitarras guitar guitars electrica electricas electrico electricos electric acustica acusticas acoustic " +
   "amplificador amplificadores amp amps ampli amplis teclado teclados keys keyboard keyboards piano pianos synth synths " +
   "sintetizador sintetizadores adicional adicionales extra extras otros varios misc miscelaneos accesorios vientos brass horns cuerdas " +
-  "strings dj backline").split(" "));
+  "strings dj backline sax saxo saxofon saxofones saxophone trompeta trumpet trombon trombone flauta flute").split(" "));
 const CONECTORES_TITULO = new Set(["de", "del", "y", "e", "para", "la", "las", "el", "los", "and", "for", "the", "of"]);
 export function esTituloGenerico(t: string): boolean {
   const s = t.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[\s:·|–—-]+$/, "");
@@ -202,6 +202,13 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         ctx.traza?.push({ documento: doc.nombre, texto: original, etiqueta, motivo, seccion, grupo, item });
       };
       if (riderDe(texto)) { anotar("banda", "nombre del rider"); continue; }
+      // Sin "RIDER TÉCNICO": "LOS RAYOS FEATURING ANA PÉREZ - GIRA 2026 (COLOMBIA)" de primer renglón y debajo
+      // "Backline a proveer…": el título es la banda (sin lo de después del guion ni lo de entre paréntesis).
+      if (!artistaFijo && !artista && n === 0 && texto === texto.toUpperCase() && letras(texto) >= 4 && texto.split(/\s+/).length <= 16
+        && /\b(backline|rider|technical|t[eé]cnico)\b/i.test(renglones[1]?.texto ?? "")) {
+        const nombre = texto.split(/\s+[-–—|]\s+/)[0]!.replace(/\([^)]*\)/g, "").trim();
+        if (letras(nombre) >= 3) { fijar(nombre); anotar("banda", "título del documento"); continue; }
+      }
       // "3.1.- DRUMS", "5.1 TARIMA", "4. SOUNDCHECK": el número del capítulo del rider, no una cantidad.
       const cap = capituloDe(texto, conCapitulos && !listaOpciones);
       if (cap) {
@@ -255,7 +262,13 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         const comoGrupo = sec.tipo === "backline" && GRUPOS.test(texto.replace(/[\s:·|–—-]+$/, "")) && !SECCION_BACKLINE.test(texto);
         // "DRUMS" dentro del input list es un grupo de canales, no el backline.
         if (!(comoGrupo && seccion === "audio" && siguenCanales(n))) { seccion = sec.tipo; ponerGrupo(null); modoAlternativa = false; }
-        if (sec.tipo === "backline" && !comoGrupo) { anotar("seccion", "empieza el backline"); continue; }
+        if (sec.tipo === "backline" && !comoGrupo) {
+          // Empieza el backline de un rider (PDF o foto) y no se sabe de qué banda es: el nombre del archivo
+          // ("LOS RAYOS - BACKLINE 2026.pdf") si el texto también lo nombra; si no, sin nombre. Sin esto se
+          // perdía el listado entero.
+          if (!artista && !conocidos.size && (doc.tipo === "pdf" || doc.tipo === "imagen")) fijar(nombreDelArchivo(doc.nombre, renglones) ?? SIN_NOMBRE);
+          anotar("seccion", "empieza el backline"); continue;
+        }
         if (sec.tipo !== "backline") { anotar("seccion", sec.tipo === "audio" ? "empieza una sección de audio (no es backline)" : "empieza una sección que no es backline"); continue; }
       }
       if (seccion === "audio" || seccion === "otra") {
@@ -361,6 +374,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (!ctx.fecha && diaDeLinea(texto)) { anotar("dia", "fecha"); continue; }
       if (lineaEscenario(texto)) { anotar("escenario", "nombre del escenario"); continue; }
       const artistaPrevio = artista;
+      // "FULANO DE TAL GEAR", "EQUIPO DE FULANA": el equipo de un músico, no el nombre de la banda.
+      if (/^[\p{L} .'-]{3,40}\s+(gear|equipment|rig)$|^(equipo|backline) de [\p{L} .'-]{3,40}$/iu.test(texto) && texto.split(/\s+/).length <= 6) { anotar("nota", "equipo de un músico"); continue; }
       if (encabezado(texto)) { anotar(artista !== artistaPrevio ? "banda" : "grupo", artista !== artistaPrevio ? "título que parece nombre de banda" : "título de grupo"); continue; }
       if (!ext.evento && tituloEvento(texto)) { anotar("evento", "nombre del evento"); continue; }
       anotar("sin-interpretar", "no lo entendí");
@@ -462,7 +477,10 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       // "CONGA HI | QUINTO | LP559X | CLASIC": tabla sin cantidad cuya primera columna es el equipo;
       // el resto son medida, marca y modelo.
       const primera = cols.length >= 2 ? separarCantidad(cols[0]!) : null;
-      if (primera && !cols.some((c, i) => i > 0 && (/^(x\s*)?\d{1,3}(\s*x)?$/i.test(c) || PROVEEDOR_SUELTO.test(c) || /^(cn|oml|artista|producci[oó]n)$/i.test(c))) && categorizar(primera.descripcion) !== "Otro" && letras(primera.descripcion) >= 3) {
+      if (primera && !cols.some((c, i) => i > 0 && (/^(x\s*)?\d{1,3}(\s*x)?$/i.test(c) || PROVEEDOR_SUELTO.test(c) || /^(cn|oml|artista|producci[oó]n)$/i.test(c)))
+        // Con cantidad y tres columnas o más ("1 Kcik 22” | modelos | notas") es una fila de tabla aunque el
+        // equipo venga mal escrito o sea genérico ("Percussion").
+        && (categorizar(primera.descripcion) !== "Otro" || (cols.length >= 3 && primera.descripcion !== cols[0])) && letras(primera.descripcion) >= 3) {
         t = `${cols[0]} (${cols.slice(1).join(", ")})`; cols = [t];
       }
       // "Fender  Deville 2x12": dos espacios de más no son columnas si ninguna es cantidad ni proveedor.
@@ -526,7 +544,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         const medidas = descripcion.split(/\s+(?:o|or|u)\s+/i)[0]!.match(/\b\d{1,2}\s*(?:["”″]|pulg)/g) ?? [];
         if (medidas.length >= 2) cantidad = medidas.length;
       }
-      if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.length > (explicita || opcion !== null ? 140 : 90)) return false;
+      if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.replace(/\s*\([^)]*\)/g, "").length > (explicita || opcion !== null ? 140 : 90)) return false; // las opciones entre paréntesis no cuentan
       const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
       if (NO_BACKLINE.test(descripcion) && categorizar(principal ?? descripcion) === "Otro") return true; // radios, pilas, cinta: se lee pero no es backline
       if (CONSUMIBLE.test(descripcion)) return true; // "ORANGE GAFFER TAPE": la marca de un ampli no lo vuelve backline
@@ -644,6 +662,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
   return ext;
 
   function registrarArtista(nombre: string): string {
+    nombre = nombre.replace(/^[\s•·*\-–]+/, "").trim();   // "· LOS RAYOS": sin la viñeta
     const k = clave(nombre);
     const ya = conocidos.get(k) ?? ext.artistas.find(a => clave(a) === k);
     const n = ya ?? nombrePropio(nombre);
@@ -706,7 +725,9 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
     const t = actual.texto.trim();
     // Lista corrida: "1 Bombo 22" 1 Redoblante" + "14" 2 Toms 10" y 12" 1" + "Tom de piso 16"…",
     // o "4 Boom Stand 3" + "Snare Stand 1 Hi" + "Hat Stand 1 Kick". Se junta todo y se corta en cada cantidad.
-    const colgando = (x: string) => /\s\d{1,2}(\s+\p{Lu}\p{L}*)?$/u.test(x.trim());
+    // "Plato efecto Zildjian k 16" no cuelga: el 16 es la medida (platillo o tambor en el renglón y 10 o más).
+    const medida = (x: string) => /\b(crash|ride|splash|china|hi-?hats?|hit hats?|platos?|platillos?|cymbals?|toms?|bombo|kick|snare|tambor|redoblante|zildjian|sabian|paiste|meinl)\b/i.test(x) && /\s(1\d|2\d)$/.test(x.trim());
+    const colgando = (x: string) => /\s\d{1,2}(\s+\p{Lu}\p{L}*)?$/u.test(x.trim()) && !medida(x);
     if (!/\s{3}/.test(t) && (marcas(t) >= 2 || (/^\d{1,2}\s+\p{Lu}/u.test(t) && colgando(t)))) {
       let j = i;
       while (j + 1 < lineas.length) {
@@ -845,6 +866,16 @@ export function nombreRepetido(lineas: ReadonlyArray<{ texto: string }>): string
   return nombreEnElTexto(lineas);
 }
 
+/** "LOS RAYOS - BACKLINE 2026.pdf" → "Los Rayos", si el texto del documento también lo nombra. */
+export function nombreDelArchivo(archivo: string, lineas: ReadonlyArray<{ texto: string }>): string | null {
+  const partes = archivo.replace(/\.[a-z0-9]{2,4}$/i, "").split(/\s+[-–—_]\s+|_/)
+    .map(p => p.replace(/\b(rider|t[eé]cnico|technical|backline|tech|v\d+|(19|20)\d\d)\b/gi, "").replace(/\([^)]*\)/g, "").trim())
+    .filter(p => letras(p) >= 3);
+  const texto = sinTildes(lineas.map(l => l.texto).join(" ")).toLowerCase();
+  const nombre = partes.find(p => texto.includes(sinTildes(p).toLowerCase()));
+  return nombre ? nombrePropio(nombre) : null;
+}
+
 /** Palabras de contrato y de rider que van con mayúscula sin ser el nombre de la banda. */
 const GENERICO = new Set(("el la los las the rider tecnico technical artista artist contratante contratista promotor promoter productor produccion " +
   "production manager management equipo equipos audio video sonido sound iluminacion luces lighting lights escenario stage backline nota notas " +
@@ -932,7 +963,7 @@ function variosGrupos(t: string): string | null {
 /** Cantidades seguidas de un nombre con mayúscula: "1 Bombo", "2 Toms" (no "3 head" ni "88 keys"). */
 /* Cantidad (1 a 24) seguida de un nombre con mayúscula: "1 Bombo", "2 Toms". No cuenta "3 head"
  * ni "88 keys" (minúscula o medida), ni "16 CH" / "4 RETORNOS" (unidades). */
-const MARCA_LISTA = /(?:^|\s)((?:[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]*))/gu;
+const MARCA_LISTA = /(?:^|\s)((?:0?[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]*))/gu;
 // "8 X 10" es una medida, no otra cantidad.
 const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft|x|voltios|volts?|vatios|watts?|amperios|amps?)$/i;
 /** Lo que sigue al número de un modelo: "SVT 4 PRO", "JCM 2000 DSL", "MK II". */
@@ -941,6 +972,8 @@ function posicionesLista(t: string): number[] {
   const pos: number[] = [];
   for (const m of t.matchAll(MARCA_LISTA)) {
     if (UNIDADES.test(m[2]!)) continue;
+    // "Crash 14 Zildjian", "Ride 20 Zildjian": el número después del tipo de platillo o tambor es la medida.
+    if (/\b(crash|ride|splash|china|hi-?hats?|hit hats?|platos?|platillos?|toms?|bombo|kick|snare|tambor|redoblante|floor)\s+$/i.test(t.slice(0, m.index! + m[0].length - m[1]!.length))) continue;
     const antes = t.slice(0, m.index! + m[0].length - m[1]!.length);
     // "1 Fan / 1 Ventilador": la traducción, no otro ítem. "AMPEG SVT 3 Pro": el 3 es del modelo.
     if (/\/\s*$/.test(antes) || (/\p{Ll}/u.test(t) && /\b[A-Z]{2,4}\s+$/.test(antes))) continue;

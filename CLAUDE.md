@@ -80,6 +80,13 @@ Piezas, en `lector/src/lectura/`:
     + "1. … 2. …": solo la 1 suma (y si es solo una marca, es nota). "Sizes KD 22” -
     Rack Toms 8”-10”-12” - …" sale pieza por pieza. "1 Fan / 1 Ventilador" es uno.
   - **Respaldo:** si no sale nada, relee sin secciones y marca todo "para revisar".
+  - **Tablas con fila de títulos** (pdf.ts, `leerTabla`): "FAMILY TYPE | MODEL | NOTES",
+    "Cant | Equipo | Marca"… se leen fila por fila aunque una celda ocupe dos renglones
+    (la fila es la que trae la cantidad; lo de arriba o abajo es de la más cercana). Un
+    trozo solo al comienzo de la primera columna ("DRUM") es la sección.
+  - **La banda sin "RIDER TÉCNICO":** el título del primer renglón si debajo habla de
+    backline; o el nombre del archivo si el texto también lo nombra; si no, sin nombre,
+    pero el listado no se pierde. "FULANO GEAR" es el equipo de un músico, no una banda.
 - `../dominio/categorias.ts`: categoría por palabras clave (Batería, Platillos,
   Percusión, Teclado, Ampli bajo, Ampli guitarra, Guitarra, Bajo, Bases,
   Escenario, Cables y energía, DJ, Otro).
@@ -87,7 +94,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 183 pruebas en verde.
+  inglés). Hay 191 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
