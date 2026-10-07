@@ -37,8 +37,8 @@ describe("tabla con fila de títulos en un PDF", () => {
     expect(e.artistas).toEqual(["Los Rayos Featuring Ana Pérez"]);
     expect(e.items.map(i => `${i.cantidad} ${i.descripcion} [${i.grupo}]`)).toEqual([
       "1 Kick 22” (Marca Uno / Marca Dos / Marca Tres, SERIE UNO / SERIE DOS / SERIE TRES) [Drum]",
-      "1 Cymbals (Ride 20” Modelo A, MARCA X) [Drum]",
-      "1 Cymbals (Crash 16” Modelo B, MARCA X) [Drum]",
+      "1 Ride 20” Modelo A [Drum]",
+      "1 Crash 16” Modelo B [Drum]",
       "1 Stereo Volume Pedal (Marca Uno, Marca Dos, IN/OUT) [Drum]",
     ]);
   });

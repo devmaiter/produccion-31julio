@@ -23,7 +23,8 @@ describe("riders completos en PDF", () => {
     expect(e.artistas).toEqual(["The Night Owls"]);
     expect(resumen(e)).toEqual([
       '1 Batería: Kick drum 22" with Remo Powerstroke 3 head',
-      '2 Batería: Rack toms 10" and 12"',
+      '1 Batería: Rack toms 10"',
+      '1 Batería: Rack toms 12"',
       '1 Batería: Floor tom 16"',
       '2 Batería: Snare drums 14" x 6.5"',
       "4 Batería: Cymbal boom stands",
@@ -61,7 +62,8 @@ describe("riders completos en PDF", () => {
     expect(resumen(e)).toEqual([
       '1 Batería: Bombo 22"',
       '1 Batería: Redoblante 14"',
-      '2 Batería: Toms 10" y 12"',
+      '1 Batería: Toms 10"',
+      '1 Batería: Toms 12"',
       '1 Batería: Tom de piso 16"',
       "1 Batería: Silla de batería",
       "1 Batería: Tapete",
@@ -218,7 +220,7 @@ ELECTRIC BASS / BASS GUITAR:
     expect(grupos).toEqual(["Drums/bateria", "Bass/bajo", "Gtr/guitarra 1"]);
     const cuenta = e.items.filter(i => !i.nota?.includes("no suma")).map(i => `${i.cantidad} ${i.descripcion}`);
     // "Sizes KD 22” - Rack Toms 8” - 10”- 12” - …" sale pieza por pieza.
-    expect(cuenta.slice(0, 4)).toEqual(["1 KD 22”", "3 Rack Toms 8” - 10”- 12”", "1 Floor tom 16”", "1 Snare 14” x 6”"]);
+    expect(cuenta.slice(0, 6)).toEqual(["1 KD 22”", "1 Rack Toms 8”", "1 Rack Toms 10”", "1 Rack Toms 12”", "1 Floor tom 16”", "1 Snare 14” x 6”"]);
     // "1. SONOR PRO LITE 2. DW…" son marcas preferidas, no tres baterías; "(dos) SNARE STANDS" son 2.
     expect(cuenta).not.toContain("2 DW COLLECTOR SERIES");
     expect(cuenta).toContain("2 SNARE STANDS");

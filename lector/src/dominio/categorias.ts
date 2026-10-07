@@ -46,7 +46,9 @@ const NUNCA_BACKLINE = new RegExp([
   "\\bpies? de micr[oó]fonos?|\\bmic(rophone)? stands?\\b|\\bstands? (de |para )?(micr[oó]fonos?|mics?)\\b|\\bjirafas?\\b",
   "\\bcajas? directas?|\\bdirect ?box(es)?\\b|\\bdi ?box(es)?\\b|\\bd\\.i\\.",
   "\\bcables?\\b|\\bcableado\\b|\\bregletas?\\b|\\bmultitomas?\\b|\\bpower ?strips?\\b|\\btransformador(es)?\\b|\\bconvertidor(es)?\\b|\\bups\\b",
-].join("|"), "i");
+  // Escenografía (plantas, lámparas, sofás, la sala): la piden con el backline, pero en la planilla no va.
+  "\\bplantas?\\b|\\bl[aá]mparas?\\b(?!\\s+(de|para)\\s+atril)|\\bsof[aá]s?(?!\\p{L})|\\bsets? de sala\\b|\\bsala (para|de) \\d|\\bmesas? (de )?(centro|caf[eé]|coffee)(?!\\p{L})|\\bcoffee tables?\\b|\\btapetes? persas?\\b|\\bcojines\\b|\\bescenograf[ií]a\\b|\\bdecoraci[oó]n\\b",
+].join("|"), "iu");
 /** "DI" a secas solo en mayúscula: "di la vuelta" es texto. */
 const DI = /\bDIs?\b/;
 /** "Pedestal" o "extensión" a secas son de micrófono o de corriente, salvo que digan de qué instrumento son

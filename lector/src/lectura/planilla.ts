@@ -47,6 +47,13 @@ export function filasDelRider(ext: Extraccion, traza?: readonly RenglonLeido[], 
       const it = r.item !== null ? ext.items[r.item] : undefined;
       if (r.etiqueta === "item" && it) {
         if (artista && it.artista !== artista) continue;
+        // "OPCIONES EN ORDEN DE PRIORIDAD": las alternativas son la misma pieza; van en la fila de la
+        // preferida, "Ampeg SVT 450 / Aguilar DB751 / …" (así lo escribe la planilla).
+        if (it.nota?.includes("alternativa aceptada")) {
+          let k = filas.length - 1;
+          while (k >= 0 && filas[k]!.tipo === "nota") k--;
+          if (k >= 0 && filas[k]!.tipo === "item") { filas[k]!.texto = `${filas[k]!.texto.replace(/[\s/]+$/, "")} / ${it.descripcion}`; continue; }
+        }
         // Lo que la banda dice que trae va marcado: producción no tiene que conseguirlo.
         filas.push({ tipo: "item", cantidad: it.cantidad, texto: mayuscula(it.descripcion) + (it.proveedor === "ARTISTA" ? " (lo trae la banda)" : "") });
         dentro = true;

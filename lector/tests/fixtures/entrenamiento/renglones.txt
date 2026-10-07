@@ -1,0 +1,236 @@
+# Entrenamiento del lector: renglones de backline y lo que debe salir de cada uno.
+# Todo es inventado (sin bandas ni textos de riders reales); las formas son las que aparecen en los riders.
+#
+#   ## nombre del caso      empieza un caso
+#   texto                   lo que trae el rider, tal cual (renglones partidos incluidos)
+#   => 2 | Crash 16"        una pieza que debe salir: cantidad | descripción
+#   => (nada)               el renglón no es backline: no debe salir nada
+#
+# Se compara de izquierda a derecha y de arriba abajo: mismas piezas, en el mismo orden,
+# con la misma cantidad y las mismas palabras (sin importar mayúsculas ni tildes).
+
+## varias medidas en un renglón: una pieza por medida
+DRUMS
+• TOMS 10", 12" Y 14"
+=> 1 | TOMS 10"
+=> 1 | TOMS 12"
+=> 1 | TOMS 14"
+
+## la cantidad se reparte entre las medidas y lo que sigue es otra pieza
+CYMBALS
+• 2 CRASH DE 16" Y 18", RIDE 20"
+=> 1 | CRASH 16"
+=> 1 | CRASH 18"
+=> 1 | RIDE 20"
+
+## set de platos con marca, en un renglón partido
+DRUMS
+• SET DE PLATOS: SABIAN AAX: 1 CHINA 16", 1 SPLASH DE
+8", HIHAT 15"
+=> 1 | CHINA 16"
+=> 1 | SPLASH 8"
+=> 1 | HIHAT 15"
+
+## dos piezas unidas con "y un"
+DRUMS
+• 1 SNARE 14" X 6" Y UN PICCOLO 13"
+=> 1 | SNARE 14" X 6"
+=> 1 | PICCOLO 13"
+
+## dos modelos de teclado unidos con "y"
+KEYBOARDS
+• 1 KORG KRONOS 88 Y KORG KRONOS 61
+=> 1 | KORG KRONOS 88
+=> 1 | KORG KRONOS 61
+
+## el número de cuerdas es parte del instrumento
+BASS
+01 Bajo Fender Precision 5 Strings
+=> 1 | Bajo Fender Precision 5 Strings
+
+## el número de cuerdas en español
+BAJO
+1 Bajo eléctrico de 6 cuerdas
+=> 1 | Bajo eléctrico de 6 cuerdas
+
+## la cantidad repetida (columna de cantidad + la del texto)
+DRUMS
+4 4 Cymbal Stands
+=> 4 | Cymbal Stands
+
+## viñetas en un solo renglón, con un punto suelto en vez de viñeta
+DRUMS
+· 1 Snare stand · 1 Drum throne . 1 Hi-hat stand · 2 Kick pedal
+=> 1 | Snare stand
+=> 1 | Drum throne
+=> 1 | Hi-hat stand
+=> 2 | Kick pedal
+
+## todo el bloque en un renglón con viñetas
+PERCUSSION
+· 1 Conga set with stand · 1 Djembe with stand · 1 Bongo with stand · 1 Percussion table · 4 Cymbal stands with boom · 1 Shaker set
+=> 1 | Conga set with stand
+=> 1 | Djembe with stand
+=> 1 | Bongo with stand
+=> 1 | Percussion table
+=> 4 | Cymbal stands with boom
+=> 1 | Shaker set
+
+## tapete con medidas (y una O que debería ser cero)
+DRUMS
+• TAPETE 2.50 X 2.5O
+=> 1 | TAPETE 2.50 X 2.50
+
+## escenografía: no es backline
+EXTRAS
+10 PLANTAS ALTAS TIPO PALMA O SIMILAR
+3 LAMPARAS DE PIE CON PANTALLA
+1 SOFÁ DE TRES PUESTOS
+1 MESA DE CENTRO BAJA
+=> (nada)
+
+## nota de cierre: no es una pieza
+MISCELANEOS
+• 3 SILLAS ALTAS
+NOTA: FAVOR CONFIRMAR EL LISTADO DE BACKLINE CON ANTICIPACIÓN.
+=> 3 | SILLAS ALTAS
+
+## varias piezas con cantidad separadas por comas
+GUITARS
+2 guitar stands, 1 keyboard stand, 1 bench
+=> 2 | guitar stands
+=> 1 | keyboard stand
+=> 1 | bench
+
+## cabezal + caja: dos piezas
+BASS
+1 Ampeg SVT-3 Pro + caja Ampeg 8x10
+=> 1 | Ampeg SVT-3 Pro
+=> 1 | caja Ampeg 8x10
+
+## opciones de un mismo equipo: una sola pieza
+GUITARS
+1 Fender Twin Reverb o Fender Hot Rod Deluxe
+=> 1 | Fender Twin Reverb o Fender Hot Rod Deluxe
+
+## dos medidas con cantidad 2
+DRUMS
+2 TOMS AÉREOS 10" Y 12"
+=> 1 | TOMS AÉREOS 10"
+=> 1 | TOMS AÉREOS 12"
+
+## medida con opción: una sola pieza
+DRUMS
+1 TOM DE PISO 14" O 16"
+=> 1 | TOM DE PISO 14" O 16"
+
+## platillos sin cantidad separados por comas
+CYMBALS
+HI HAT 14", CRASH 16", CRASH 18", RIDE 21"
+=> 1 | HI HAT 14"
+=> 1 | CRASH 16"
+=> 1 | CRASH 18"
+=> 1 | RIDE 21"
+
+## punto y coma entre piezas
+PERCUSIÓN
+1 conga; 1 tumba; 1 quinto
+=> 1 | conga
+=> 1 | tumba
+=> 1 | quinto
+
+## cantidad, medidas y viñetas, todo en una línea larga
+DRUMS
+· 1 22" Bass drum · 1 14" Floor tom · 1 16" Floor tom · 1 14" Snare drum 14" x 6.5 · 3 Stands for snare drums · 1 Music stand
+=> 1 | 22" Bass drum
+=> 1 | 14" Floor tom
+=> 1 | 16" Floor tom
+=> 1 | 14" Snare drum 14" x 6.5
+=> 3 | Stands for snare drums
+=> 1 | Music stand
+
+## tabla: la marca va en otra columna y no se pega al ítem
+DRUM
+1 Kick 22"        Gretsch Renown / Ludwig Classic        Gretsch Renown / Ludwig Classic
+1 Tom 12"         Gretsch Renown / Ludwig Classic        Gretsch Renown / Ludwig Classic
+=> 1 | Kick 22"
+=> 1 | Tom 12"
+
+## platillos en tabla: "Cymbals" es la familia, la pieza está en la otra columna
+CYMBALS
+1 Cymbals        Ride 22" dark        MEINL BYZANCE
+1 Cymbals        Crash 18" thin       MEINL BYZANCE
+=> 1 | Ride 22" dark
+=> 1 | Crash 18" thin
+
+## viñeta redonda y pulgadas escritas con dos comillas simples
+BATERÍA
+○ Bombo 20’’
+○ 4 bases de platillo con Boom
+=> 1 | Bombo 20’’
+=> 4 | bases de platillo con Boom
+
+## la cantidad y luego las medidas separadas por espacios
+BATERÍA
+○ 3 Toms: 8’’ 10’’ 14’’
+=> 1 | Toms 8’’
+=> 1 | Toms 10’’
+=> 1 | Toms 14’’
+
+## luces y efectos después del backline no son backline
+2 stands de guitarra
+Luminarias Fijas:
+18 Strobe LED
+Luminarias Móviles:
+12 Wash Beam (Modo 1)
+SFX
+4 Fan Seguidores:
+=> 2 | stands de guitarra
+
+## el input list de otro capítulo no reabre el backline
+1. INFORMACIÓN
+7. INPUT LIST
+VOCES
+32   Voz principal   Beta 58A   Boom
+33   Coro   SM58s   Boom
+10. BACKLINE
+10.1 Batería
+1 Bombo 22"
+=> 1 | Bombo 22"
+
+## medidas separadas por guiones
+DRUMS
+3 Rack Toms 8” - 10”- 12”
+=> 1 | Rack Toms 8”
+=> 1 | Rack Toms 10”
+=> 1 | Rack Toms 12”
+
+## lista numerada: el número es el orden, no la cantidad
+KEYBOARDS
+NO OPTIONS / NO HAY OPCIONES
+1. Yamaha Reface CS
+2. Roland Juno DS - 61
+3. Novation Launchkey 49 - Controlador MIDI 49 teclas
+=> 1 | Yamaha Reface CS
+=> 1 | Roland Juno DS - 61
+=> 1 | Novation Launchkey 49 - Controlador MIDI 49 teclas
+
+## una etiqueta antes de la viñeta no es parte de la pieza
+CYMBALS SET
+Type/ Tipo • 1 HIHAT DE 14” (Top y bottom)
+=> 1 | HIHAT 14” (Top y bottom)
+
+## tarimas y risers no son backline, ni lo que viene debajo
+DRUMS
+1 Bombo 22"
+TARIMAS
+2 Tarimas de 2 x 2 mts para teclados
+1 Riser de batería
+=> 1 | Bombo 22"
+
+## un amplificador con marca es una pieza, no un subtítulo
+GUITARRAS
+Amplificador Fender Twin Reverb o similar
+4 Stands para guitarra acústica
+=> 1 | Amplificador Fender Twin Reverb o similar
+=> 4 | Stands para guitarra acústica

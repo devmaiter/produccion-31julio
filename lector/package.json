@@ -13,7 +13,9 @@
     "importar": "tsx scripts/importar-prototipos.ts",
     "texto": "tsx scripts/texto.ts",
     "traza": "tsx scripts/traza.ts",
-    "planilla": "tsx scripts/planilla.ts"
+    "planilla": "tsx scripts/planilla.ts",
+    "entrenar": "tsx scripts/entrenar.ts",
+    "comparar": "tsx scripts/comparar.ts"
   },
   "dependencies": {
     "@tesseract.js-data/eng": "^1.0.0",

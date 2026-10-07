@@ -87,6 +87,34 @@ Piezas, en `lector/src/lectura/`:
   - **La banda sin "RIDER TÉCNICO":** el título del primer renglón si debajo habla de
     backline; o el nombre del archivo si el texto también lo nombra; si no, sin nombre,
     pero el listado no se pierde. "FULANO GEAR" es el equipo de un músico, no una banda.
+- `cortar.ts` (**el cortador**, 2026-10-06): lee cada renglón de izquierda a derecha y decide dónde
+  empieza cada pieza. Así lo escribe la planilla del usuario (Excel OML):
+  - "TOMS 10”, 12” Y 14”" son 3 filas; "2 CRASH DE 16” Y 18”, RIDE 20”" son crash 16, crash 18 y ride.
+  - "1 SNARE … Y UN PICCOLO" y "MOTIF 8 XF Y MOTIF XF 7" son 2 piezas.
+  - "3 Toms: 8’’ 10’’ 14’’" y "3 Rack Toms 8” - 10”- 12”" dan una fila por medida.
+  - "· 1 … · 1 …" y "; " separan piezas; "Type/ Tipo • 1 HIHAT…" pierde la etiqueta.
+  - Lo que va después de "O" es alternativa y no se corta. "Djembe y su base" es una pieza.
+  - Una tabla con columnas (3 espacios o más) no pasa por el cortador.
+- **Entrenamiento** (`tests/fixtures/entrenamiento/renglones.txt`): casos inventados, cada uno con los
+  renglones del rider y `=> cantidad | pieza` de lo que debe salir. `npm run entrenar` da el % de
+  acierto y `tests/entrenamiento.test.ts` convierte cada caso en prueba. Cuando un rider real falla,
+  se agrega su forma ahí (con texto inventado) y se corrige hasta que vuelva al 100 %.
+- Otras reglas de 2026-10-06/07:
+  - "2.50 X 2.50" es una medida, no una hora. "4 4 Cymbal Stands" es una cantidad repetida, y "2.4O" es "2.40".
+  - "5 Strings" y "6 cuerdas" son parte del instrumento.
+  - En una tabla, lo que se repite en varias filas (la marca) es del grupo, y "Cymbals | Ride 22”" es la pieza de al lado.
+  - Con capítulos numerados, un "Guitarras:" o un "VOCES" de otro capítulo no reabre el backline.
+  - "Luminarias", "SFX", "Seguidores" y "TARIMAS" son secciones que no son backline.
+  - "1. Roland… 2. Roland…" es una lista numerada: cada uno vale 1. "Amplificador Fender…" es pieza, no subtítulo.
+  - En la planilla, las opciones en orden de prioridad van en la fila de la preferida: "Ampeg … / Aguilar …".
+- `../dominio/bateria.ts` (**qué lleva una batería**, 2026-10-07): el usuario escribe el rider como
+  quiera ("KD 22”", "Kick 22x18", "03 x Toms 10/12/16" o un tom por fila, "Kcik"), pero una batería
+  siempre son las mismas piezas. Reconoce bombo, redoblante, tom, tom de piso, hi-hat, crash, ride,
+  china, splash, sus bases, pedal, silla y alfombra, y su medida. También en inglés, con errores de
+  dedo y con la profundidad primero. Así se comparan baterías **pieza por pieza, no por filas**: no se le
+  pregunta al usuario cómo partir filas.
+  `npm run comparar -- planilla.xlsx "Banda" rider.pdf` compara la batería del rider con la columna de
+  esa banda en la planilla OML. Al 2026-10-07, 9 de 10 bandas reales coinciden al 100 % y la otra al 97 %.
 - `../dominio/categorias.ts`: categoría por palabras clave (Batería, Platillos,
   Percusión, Teclado, Ampli bajo, Ampli guitarra, Guitarra, Bajo, Bases,
   Escenario, Cables y energía, DJ, Otro).
@@ -94,7 +122,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 191 pruebas en verde.
+  inglés). Hay 231 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -110,7 +138,8 @@ Piezas, en `lector/src/lectura/`:
   "alfombra para batería": una cosa puede tener varios nombres), atriles, sillas y bancos de
   músicos, pedales de efectos (guitarra, o bajo si lo dice), parches (ítem de batería),
   cuerdas de repuesto, baquetas, instrumento spare (suma) y afinadores.
-- No: risers y sobretarimas, pedestales de micrófono, cajas directas (DI), cables y la
+- No: escenografía (plantas, lámparas, sofás, sala, tapetes persas; así lo deja el Excel del usuario),
+  risers, tarimas y sobretarimas, pedestales de micrófono, cajas directas (DI), cables y la
   corriente en tarima (extensiones, multitomas, regletas, UPS). Confirmado el 2026-10-05;
   vive en `noEsBackline` de `categorias.ts`. Un "pedestal" que dice de qué instrumento es
   ("pedestal para platillo") o que está en la sección de batería o percusión sí es backline;

@@ -174,15 +174,15 @@ describe("rider con capítulos numerados", () => {
   });
   it("'DE   3   PATAS' no es cantidad, y los toms después de 'O' son la alternativa", () => {
     const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nDRUMS\nHI-HAT STAND DE   3   PATAS\nTOMS 12”, 14” Y 16” O 16” 18”") }]);
-    expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 HI-HAT STAND DE 3 PATAS", "3 TOMS 12”, 14” Y 16” O 16” 18”"]);
+    expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 HI-HAT STAND DE 3 PATAS", "1 TOMS 12”", "1 TOMS 14”", "1 TOMS 16” O 16” 18”"]);
   });
   it("'AMPEG SVT 4 PRO CON 4 CABINAS' es un cabezal y sus cajas, no 4 'PRO'", () => {
     const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nBASS\n• 1 AMPLIFICADOR AMPEG SVT 4 PRO CON 4 CABINAS 8X10,") }]);
     expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 AMPLIFICADOR AMPEG SVT 4 PRO", "4 CABINAS 8X10"]);
   });
-  it("'MOTIF 8 XF Y MOTIF XF 7' es un teclado y '9 VOLTIOS' no es otra cantidad", () => {
+  it("'MOTIF 8 XF Y MOTIF XF 7' son dos teclados (como en la planilla) y '9 VOLTIOS' no es otra cantidad", () => {
     const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nKEYS\n• 1 YAMAHA MOTIF 8 XF Y MOTIF XF 7\nMISCELANEOS\n• 10 PILAS 9 VOLTIOS\n• 2 VENTILADORES") }]);
-    expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 YAMAHA MOTIF 8 XF Y MOTIF XF 7", "2 VENTILADORES"]);
+    expect(r.items.map(i => `${i.cantidad} ${i.descripcion}`)).toEqual(["1 YAMAHA MOTIF 8 XF", "1 MOTIF XF 7", "2 VENTILADORES"]);
   });
   it("'• PEDAL PARA BOMBO' dentro de DRUMS es un ítem, no un subtítulo", () => {
     const r = interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto("RIDER TÉCNICO\nLOS RAYOS\n3. BACKLINE\n3.1.-DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM\n• KICK 24”\n• PEDAL PARA BOMBO\n• 5 CYMBALS STANDS") }]);

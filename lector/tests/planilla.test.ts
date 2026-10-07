@@ -69,6 +69,14 @@ describe("planilla de backline (formato OML)", () => {
     expect(filasDelRider(e).map(f => `${cantidadPlanilla(f.cantidad)}|${f.texto}`)).toEqual(["|DRUMS", "01 x|Kick 22"]);
   });
 
+  it("las opciones en orden de prioridad van en una sola fila, como en la planilla", () => {
+    const t: RenglonLeido[] = [];
+    const texto = "RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\nBASS/BAJO - ANA PÉREZ\nOPTIONS/OPCIONES AMPS EN ORDEN DE PRIORIDAD\n1 AMPEG SVT 450/SVT Classic/\n2 AGUILAR DB751\n3 MARKBASS LITTLE MARK\nINSTRUMENTOS\n1 Bajo Fender Precision";
+    const e = interpretar([{ nombre: "r.pdf", tipo: "pdf", lineas: lineasDeTexto(texto), avisos: [] }], { traza: t });
+    expect(filasDelRider(e, t).filter(f => f.tipo === "item").map(f => `${cantidadPlanilla(f.cantidad)}|${f.texto}`))
+      .toEqual(["01 x|AMPEG SVT 450/SVT Classic / AGUILAR DB751 / MARKBASS LITTLE MARK", "01 x|Bajo Fender Precision"]);
+  });
+
   it("lo que la banda trae va marcado en la planilla", () => {
     const t: RenglonLeido[] = [];
     const e = interpretar([{ nombre: "r.pdf", tipo: "pdf", lineas: lineasDeTexto("RIDER TÉCNICO\nNELDA\nBACKLINE\nPERCUSIÓN\nLa agrupación lleva:\n1 Tambora tradicional\nEl festival suministra:\n1 Soporte para tambora"), avisos: [] }], { traza: t });
