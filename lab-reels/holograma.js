@@ -315,7 +315,21 @@ for (const t of ["teclado", "amp", "bajo", "guitarra"]) {
   };
 }
 
+/* La tarima de la entrada: una banda armada con la batería atrás, el teclado a un lado y los amplis
+   al otro, cada uno ubicado según su tamaño (no se adivinan medidas). */
+CONSTRUIR.tarima = g => {
+  const armar = (tipo, ry = 0) => { const p = new THREE.Group(); CONSTRUIR[tipo](p); p.rotation.y = ry; const b = new THREE.Box3().setFromObject(p); return {p, b, tam: b.getSize(new THREE.Vector3())}; };
+  const poner = ({p, b}, x, z) => { const c = b.getCenter(new THREE.Vector3()); p.position.set(x - c.x, -b.min.y, z - c.z); g.add(p); };
+  const bat = armar("bateria"), tec = armar("teclado", .45), amp = armar("amp", -.45), baj = armar("bajo", .3);
+  const sep = .25;
+  poner(bat, 0, -bat.tam.z / 2);
+  poner(tec, -(bat.tam.x / 2 + tec.tam.x / 2 + sep), tec.tam.z / 2);
+  poner(amp, bat.tam.x / 2 + amp.tam.x / 2 + sep, amp.tam.z / 2);
+  poner(baj, -(bat.tam.x / 4), bat.tam.z / 2 + baj.tam.z / 2 + sep);
+};
+
 export const MODELO = {
+  "Tarima": "tarima",
   "Batería": "bateria", "Platillos": "platillos", "Percusión": "percusion", "Teclado": "teclado",
   "Ampli bajo": "bajo", "Ampli guitarra": "amp", "Cabezal": "cabezal", "Guitarra": "guitarra", "Bajo": "guitarra", "Bases": "base",
 };

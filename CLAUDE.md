@@ -209,6 +209,27 @@ prueba (que el % suba sin romper los riders anteriores).
 
 ## `lab-reels/`
 
+**Lo nuevo (2026-10-07), y manda sobre lo de abajo si chocan:**
+- **Entrada.** El saludo se escribe solo, letra por letra, y después se borra: va según la hora, nombra el
+  evento del día y el cierre cambia en cada visita. Al final quedan dos recuadros con íconos de línea,
+  «Subir rider» y «Tomar foto». Mientras se lee el documento sale el escáner (hoja + línea naranja), y al
+  terminar, el holograma de la «tarima» (`holograma.js`). Si ya hay un rider, o si hoy hay un evento del
+  cronograma con riders, no hay entrada: saludo corto y directo a los reels.
+- **A la derecha de cada reel solo va «›».** No hay Listo, Subir, doble toque ni conteos bajo el título;
+  solo las etiquetas de categoría. Las ayudas salen solo la primera vez.
+- **El listado se ve como Excel** (blanco, cuadrícula, Cant | Requerimiento).
+- **Todo se toca:** una pieza abre una hoja desde abajo con el renglón del rider, su sección y la
+  misma categoría en otras bandas (`abrirDetalle`). El admin edita desde ahí.
+- **Dos espacios** (en Elm, `Espacio`): **Evento** (oficial, viene del cronograma; el empleado lo ve
+  con candado y no lo cambia) y **Mis pruebas** (el escritorio propio; lo que el empleado sube a mano cae
+  ahí). La regla es `puedeEscribir` en `Tablero.elm`.
+- **`cronograma/`** (admin): el mes con los eventos, escenarios, bandas por día con su rider
+  (falta / recibido / revisado) y el contra-rider. Se guarda en el dispositivo por ahora. «Ver en reels»
+  abre `lab-reels/?rider=…&evento=…`.
+- **El plan del servidor** está en `docs/modelo-de-datos.md`: tablas, llaves y permisos.
+- Para revisar en celular se usa una página local con varios iframes de 390×844 lado a lado
+  (`_celular.html`, no se sube).
+
 **Perfiles y modos (2026-10-05).** El estado vive en Elm: `app/src/Backline/Tablero.elm`
 (pruebas en `app/tests/TableroTest.elm`), compilado a `lab-reels/tablero.js` por
 `construir-sitio.sh`. Elm guarda documento, perfil, modo, búsqueda, filtros y fotos, y

@@ -1,6 +1,6 @@
 module TableroTest exposing (suite)
 
-import Backline.Tablero as T exposing (Modo(..), Msg(..), Perfil(..))
+import Backline.Tablero as T exposing (Espacio(..), Modo(..), Msg(..), Perfil(..))
 import Dict
 import Expect
 import Json.Decode as D
@@ -40,6 +40,13 @@ conRider perfil =
     T.update (CambiarPerfil perfil) T.inicial |> enviar riderJson
 
 
+{-| El mismo rider, pero como backline del evento (llega del cronograma).
+-}
+conEvento : Perfil -> T.Model
+conEvento perfil =
+    T.update (CambiarPerfil perfil) T.inicial |> enviar (String.replace "\"tipo\": \"cargar\"" "\"tipo\": \"cargar-evento\"" riderJson)
+
+
 refs : T.Model -> List String
 refs m =
     T.visibles m |> List.map .referencia
@@ -62,13 +69,20 @@ suite =
                 \_ -> conRider Admin |> T.update (CambiarModo Festival) |> T.modoEfectivo |> Expect.equal Festival
             , test "si el admin pasa a empleado, ve el modo normal" <|
                 \_ -> conRider Admin |> T.update (CambiarModo Festival) |> T.update (CambiarPerfil Empleado) |> T.modoEfectivo |> Expect.equal Normal
-            , test "el empleado no edita ni borra ítems" <|
+            , test "en el evento, el empleado no edita ni borra ítems" <|
                 \_ ->
-                    conRider Empleado
+                    conEvento Empleado
                         |> T.update (EditarItem { id = "doc-0", cantidad = 3, referencia = "Otra cosa", categoria = "Otro" })
                         |> T.update (BorrarItem "doc-1")
                         |> refs
                         |> Expect.equal [ "Bombo 22\"", "Ampeg SVT Classic", "Redoblante" ]
+            , test "en Mis pruebas el empleado sí edita y borra" <|
+                \_ ->
+                    conRider Empleado
+                        |> T.update (EditarItem { id = "doc-0", cantidad = 3, referencia = "Bombo 24\"", categoria = "Batería" })
+                        |> T.update (BorrarItem "doc-1")
+                        |> refs
+                        |> Expect.equal [ "Bombo 24\"", "Redoblante" ]
             , test "el admin edita: la pieza queda confirmada" <|
                 \_ ->
                     conRider Admin
@@ -99,11 +113,37 @@ suite =
                     conRider Empleado
                         |> campo [ "doc" ] (D.map2 Tuple.pair (D.field "nombre" D.string) (D.field "cuando" D.string))
                         |> Expect.equal (Ok ( "Rider Los Rayos", "2026-10-05" ))
-            , test "la vista dice qué puede hacer cada perfil" <|
+            , test "la vista dice qué puede hacer cada perfil en el evento" <|
                 \_ ->
                     Expect.equal
-                        ( campo [ "puede", "editar" ] D.bool (conRider Admin), campo [ "puede", "editar" ] D.bool (conRider Empleado) )
+                        ( campo [ "puede", "editar" ] D.bool (conEvento Admin), campo [ "puede", "editar" ] D.bool (conEvento Empleado) )
                         ( Ok True, Ok False )
+            ]
+        , describe "el evento y Mis pruebas"
+            [ test "lo que sube el empleado va a sus pruebas y el evento queda igual" <|
+                \_ ->
+                    let
+                        m =
+                            conEvento Empleado
+                                |> enviar """{ "tipo": "cargar", "doc": { "nombre": "Mi prueba", "datos": { "items": [ { "id": "p-0", "artistaId": "x", "referencia": "Conga" } ] } } }"""
+                    in
+                    Expect.equal
+                        ( m.espacio, refs m, T.update (CambiarEspacio Evento) m |> refs |> List.length )
+                        ( Pruebas, [ "Conga" ], 3 )
+            , test "el empleado no borra el documento del evento" <|
+                \_ -> conEvento Empleado |> T.update Borrar |> refs |> List.length |> Expect.equal 3
+            , test "el admin en el evento sube y cambia el del evento" <|
+                \_ ->
+                    conEvento Admin
+                        |> enviar """{ "tipo": "cargar", "doc": { "nombre": "Nuevo", "datos": { "items": [ { "id": "n-0", "artistaId": "x", "referencia": "Timbal" } ] } } }"""
+                        |> (\m -> ( m.espacio, refs m ))
+                        |> Expect.equal ( Evento, [ "Timbal" ] )
+            , test "la vista dice en qué espacio se está y qué hay en cada uno" <|
+                \_ ->
+                    conEvento Empleado
+                        |> enviar """{ "tipo": "espacio", "espacio": "pruebas" }"""
+                        |> campo [] (D.map3 (\e ev pr -> ( e, ev, pr )) (D.field "espacio" D.string) (D.at [ "hay", "evento" ] D.bool) (D.at [ "hay", "pruebas" ] D.bool))
+                        |> Expect.equal (Ok ( "pruebas", True, False ))
             ]
         , describe "buscador y filtros (los dos perfiles)"
             [ test "busca sin importar tildes ni mayúsculas" <|
@@ -150,7 +190,7 @@ suite =
                         vuelto =
                             T.decodificarEstado (T.guardable m)
                     in
-                    Expect.equal ( vuelto.perfil, vuelto.modo, ( vuelto.fotos, Maybe.map (.items >> List.length) vuelto.doc, vuelto.filtro.texto ) )
+                    Expect.equal ( vuelto.perfil, vuelto.modo, ( vuelto.fotos, Maybe.map (.items >> List.length) (T.docActual vuelto), vuelto.filtro.texto ) )
                         ( Admin, Festival, ( m.fotos, Just 3, "" ) )
             , test "lo que pidió la banda llega a la vista y se guarda tal cual" <|
                 \_ ->
@@ -180,9 +220,25 @@ suite =
                     in
                     Expect.equal
                         ( campo [ "doc", "datos", "pedidos" ] D.value m |> Result.map (E.encode 0)
-                        , Maybe.map (.pedidos >> E.encode 0) vuelto.doc
+                        , Maybe.map (.pedidos >> E.encode 0) (T.docActual vuelto)
                         )
                         ( Ok (E.encode 0 pedidos), Just (E.encode 0 pedidos) )
+            , test "el evento y Mis pruebas se guardan por separado" <|
+                \_ ->
+                    let
+                        vuelto =
+                            conEvento Empleado
+                                |> enviar """{ "tipo": "cargar", "doc": { "nombre": "Mi prueba", "datos": { "items": [ { "id": "p-0", "artistaId": "x", "referencia": "Conga" } ] } } }"""
+                                |> T.guardable
+                                |> T.decodificarEstado
+                    in
+                    Expect.equal ( vuelto.espacio, Maybe.map .nombre vuelto.evento, Maybe.map .nombre vuelto.pruebas ) ( Pruebas, Just "Rider Los Rayos", Just "Mi prueba" )
+            , test "lo guardado antes de los espacios pasa a Mis pruebas" <|
+                \_ ->
+                    E.object [ ( "version", E.int 1 ), ( "doc", E.object [ ( "nombre", E.string "Viejo" ), ( "datos", E.object [ ( "items", E.list identity [] ) ] ) ] ) ]
+                        |> T.decodificarEstado
+                        |> (\m -> ( Maybe.map .nombre m.pruebas, m.evento == Nothing ))
+                        |> Expect.equal ( Just "Viejo", True )
             , test "algo dañado en el dispositivo arranca de cero" <|
                 \_ -> T.decodificarEstado (E.string "basura") |> .perfil |> Expect.equal Empleado
             , test "un mensaje desconocido no se acepta" <|

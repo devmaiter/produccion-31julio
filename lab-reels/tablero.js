@@ -600,11 +600,11 @@ function _Debug_crash_UNUSED(identifier, fact1, fact2, fact3, fact4)
 
 function _Debug_regionToString(region)
 {
-	if (region.aU.ao === region.a7.ao)
+	if (region.aW.aq === region.a9.aq)
 	{
-		return 'on line ' + region.aU.ao;
+		return 'on line ' + region.aW.aq;
 	}
-	return 'on lines ' + region.aU.ao + ' through ' + region.a7.ao;
+	return 'on lines ' + region.aW.aq + ' through ' + region.a9.aq;
 }
 
 
@@ -1857,9 +1857,9 @@ var _Platform_worker = F4(function(impl, flagDecoder, debugMetadata, args)
 	return _Platform_initialize(
 		flagDecoder,
 		args,
-		impl.b9,
-		impl.cC,
-		impl.cx,
+		impl.cb,
+		impl.cE,
+		impl.cz,
 		function() { return function() {} }
 	);
 });
@@ -2443,6 +2443,7 @@ var $author$project$Tablero$Llega = $elm$core$Basics$identity;
 var $author$project$Backline$Tablero$Empleado = 1;
 var $author$project$Backline$Tablero$Normal = 0;
 var $elm$core$Maybe$Nothing = {$: 1};
+var $author$project$Backline$Tablero$Pruebas = 1;
 var $elm$core$Basics$apR = F2(
 	function (x, f) {
 		return f(x);
@@ -2971,7 +2972,7 @@ var $elm$json$Json$Decode$dict = function (decoder) {
 };
 var $author$project$Backline$Tablero$Comparacion = F2(
 	function (artistaId, valor) {
-		return {S: artistaId, aY: valor};
+		return {U: artistaId, a_: valor};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$map2 = _Json_map2;
@@ -2995,7 +2996,7 @@ var $author$project$Backline$Tablero$Item = function (id) {
 									return function (propietario) {
 										return function (porConfirmar) {
 											return function (sinBanda) {
-												return {S: artistaId, ab: cantidad, o: categoria, ac: descripcion, a5: diaId, aL: grupo, r: id, aP: nota, aR: porConfirmar, bu: propietario, Q: referencia, bC: sinBanda};
+												return {U: artistaId, ad: cantidad, p: categoria, ae: descripcion, a7: diaId, aN: grupo, t: id, aR: nota, aT: porConfirmar, bw: propietario, S: referencia, bE: sinBanda};
 											};
 										};
 									};
@@ -3147,7 +3148,7 @@ var $author$project$Backline$Tablero$datosDec = A2(
 										$elm$json$Json$Decode$map2,
 										F2(
 											function (id, n) {
-												return {r: id, I: n};
+												return {t: id, K: n};
 											}),
 										A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
 										A2($elm$json$Json$Decode$field, 'nombre', $elm$json$Json$Decode$string))),
@@ -3163,7 +3164,7 @@ var $author$project$Backline$Tablero$datosDec = A2(
 															return function (nombre) {
 																return function (archivos) {
 																	return function (cuando) {
-																		return {aI: archivos, aa: artistas, av: bloques, aw: comps, ax: cuando, ay: dias, M: items, I: nombre, aB: pedidos, aF: plots};
+																		return {aK: archivos, ac: artistas, ax: bloques, ay: comps, az: cuando, aA: dias, O: items, K: nombre, aD: pedidos, aH: plots};
 																	};
 																};
 															};
@@ -3189,9 +3190,24 @@ var $author$project$Backline$Tablero$documentoDec = A5(
 		_List_Nil),
 	A3($author$project$Backline$Tablero$opcional, 'cuando', $elm$json$Json$Decode$string, ''),
 	A2($elm$json$Json$Decode$field, 'datos', $author$project$Backline$Tablero$datosDec));
-var $author$project$Backline$Tablero$Festival = 1;
+var $author$project$Backline$Tablero$Evento = 0;
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$fail = _Json_fail;
+var $author$project$Backline$Tablero$espacioDec = A2(
+	$elm$json$Json$Decode$andThen,
+	function (s) {
+		switch (s) {
+			case 'evento':
+				return $elm$json$Json$Decode$succeed(0);
+			case 'pruebas':
+				return $elm$json$Json$Decode$succeed(1);
+			default:
+				return $elm$json$Json$Decode$fail('espacio desconocido: ' + s);
+		}
+	},
+	$elm$json$Json$Decode$string);
+var $elm$core$Basics$ge = _Utils_ge;
+var $author$project$Backline$Tablero$Festival = 1;
 var $author$project$Backline$Tablero$modoDec = A2(
 	$elm$json$Json$Decode$andThen,
 	function (s) {
@@ -3227,7 +3243,7 @@ var $author$project$Backline$Tablero$perfilDec = A2(
 		}
 	},
 	$elm$json$Json$Decode$string);
-var $author$project$Backline$Tablero$sinFiltro = {L: $elm$core$Maybe$Nothing, o: $elm$core$Maybe$Nothing, ar: ''};
+var $author$project$Backline$Tablero$sinFiltro = {N: $elm$core$Maybe$Nothing, p: $elm$core$Maybe$Nothing, at: ''};
 var $elm$core$Result$withDefault = F2(
 	function (def, result) {
 		if (!result.$) {
@@ -3249,57 +3265,73 @@ var $author$project$Backline$Tablero$decodificarEstado = function (v) {
 					v));
 		});
 	return {
-		y: A3(
+		r: A3(campo, 'espacio', $author$project$Backline$Tablero$espacioDec, 1),
+		z: A3(
 			campo,
-			'doc',
+			'evento',
 			$elm$json$Json$Decode$nullable($author$project$Backline$Tablero$documentoDec),
 			$elm$core$Maybe$Nothing),
-		w: $author$project$Backline$Tablero$sinFiltro,
-		G: A3(
+		l: $author$project$Backline$Tablero$sinFiltro,
+		I: A3(
 			campo,
 			'fotos',
 			$elm$json$Json$Decode$dict(
 				$elm$json$Json$Decode$list($elm$json$Json$Decode$string)),
 			$elm$core$Dict$empty),
-		af: A3(campo, 'modo', $author$project$Backline$Tablero$modoDec, 0),
-		A: A3(campo, 'perfil', $author$project$Backline$Tablero$perfilDec, 1)
+		ah: A3(campo, 'modo', $author$project$Backline$Tablero$modoDec, 0),
+		B: A3(campo, 'perfil', $author$project$Backline$Tablero$perfilDec, 1),
+		G: (A3(campo, 'version', $elm$json$Json$Decode$int, 1) >= 2) ? A3(
+			campo,
+			'pruebas',
+			$elm$json$Json$Decode$nullable($author$project$Backline$Tablero$documentoDec),
+			$elm$core$Maybe$Nothing) : A3(
+			campo,
+			'doc',
+			$elm$json$Json$Decode$nullable($author$project$Backline$Tablero$documentoDec),
+			$elm$core$Maybe$Nothing)
 	};
 };
 var $author$project$Tablero$entrada = _Platform_incomingPort('entrada', $elm$json$Json$Decode$value);
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $author$project$Backline$Tablero$AgregarFoto = F2(
 	function (a, b) {
-		return {$: 10, a: a, b: b};
+		return {$: 12, a: a, b: b};
 	});
-var $author$project$Backline$Tablero$Borrar = {$: 1};
+var $author$project$Backline$Tablero$Borrar = {$: 3};
 var $author$project$Backline$Tablero$BorrarItem = function (a) {
-	return {$: 9, a: a};
+	return {$: 11, a: a};
 };
 var $author$project$Backline$Tablero$Buscar = function (a) {
-	return {$: 4, a: a};
+	return {$: 6, a: a};
+};
+var $author$project$Backline$Tablero$CambiarEspacio = function (a) {
+	return {$: 2, a: a};
 };
 var $author$project$Backline$Tablero$CambiarModo = function (a) {
-	return {$: 3, a: a};
+	return {$: 5, a: a};
 };
 var $author$project$Backline$Tablero$CambiarPerfil = function (a) {
-	return {$: 2, a: a};
+	return {$: 4, a: a};
 };
 var $author$project$Backline$Tablero$Cargar = function (a) {
 	return {$: 0, a: a};
 };
+var $author$project$Backline$Tablero$CargarEvento = function (a) {
+	return {$: 1, a: a};
+};
 var $author$project$Backline$Tablero$EditarItem = function (a) {
-	return {$: 8, a: a};
+	return {$: 10, a: a};
 };
 var $author$project$Backline$Tablero$FiltrarBanda = function (a) {
-	return {$: 5, a: a};
+	return {$: 7, a: a};
 };
 var $author$project$Backline$Tablero$FiltrarCategoria = function (a) {
-	return {$: 6, a: a};
+	return {$: 8, a: a};
 };
-var $author$project$Backline$Tablero$LimpiarFiltros = {$: 7};
+var $author$project$Backline$Tablero$LimpiarFiltros = {$: 9};
 var $author$project$Backline$Tablero$QuitarFoto = F2(
 	function (a, b) {
-		return {$: 11, a: a, b: b};
+		return {$: 13, a: a, b: b};
 	});
 var $author$project$Backline$Tablero$mensaje = function (tipo) {
 	var texto = A2($elm$json$Json$Decode$field, 'texto', $elm$json$Json$Decode$string);
@@ -3315,6 +3347,16 @@ var $author$project$Backline$Tablero$mensaje = function (tipo) {
 				$elm$json$Json$Decode$map,
 				$author$project$Backline$Tablero$Cargar,
 				A2($elm$json$Json$Decode$field, 'doc', $author$project$Backline$Tablero$documentoDec));
+		case 'cargar-evento':
+			return A2(
+				$elm$json$Json$Decode$map,
+				$author$project$Backline$Tablero$CargarEvento,
+				A2($elm$json$Json$Decode$field, 'doc', $author$project$Backline$Tablero$documentoDec));
+		case 'espacio':
+			return A2(
+				$elm$json$Json$Decode$map,
+				$author$project$Backline$Tablero$CambiarEspacio,
+				A2($elm$json$Json$Decode$field, 'espacio', $author$project$Backline$Tablero$espacioDec));
 		case 'borrar':
 			return $elm$json$Json$Decode$succeed($author$project$Backline$Tablero$Borrar);
 		case 'perfil':
@@ -3347,7 +3389,7 @@ var $author$project$Backline$Tablero$mensaje = function (tipo) {
 				F4(
 					function (id, q, r, c) {
 						return $author$project$Backline$Tablero$EditarItem(
-							{ab: q, o: c, r: id, Q: r});
+							{ad: q, p: c, t: id, S: r});
 					}),
 				A2($elm$json$Json$Decode$field, 'id', $elm$json$Json$Decode$string),
 				A2($elm$json$Json$Decode$field, 'cantidad', $elm$json$Json$Decode$int),
@@ -3449,40 +3491,40 @@ var $author$project$Backline$Tablero$itemJson = function (i) {
 				[
 					_Utils_Tuple2(
 					'id',
-					$elm$json$Json$Encode$string(i.r)),
+					$elm$json$Json$Encode$string(i.t)),
 					_Utils_Tuple2(
 					'diaId',
-					$elm$json$Json$Encode$string(i.a5)),
+					$elm$json$Json$Encode$string(i.a7)),
 					_Utils_Tuple2(
 					'artistaId',
-					$elm$json$Json$Encode$string(i.S)),
+					$elm$json$Json$Encode$string(i.U)),
 					_Utils_Tuple2(
 					'cantidad',
-					$elm$json$Json$Encode$int(i.ab)),
+					$elm$json$Json$Encode$int(i.ad)),
 					_Utils_Tuple2(
 					'categoria',
-					$elm$json$Json$Encode$string(i.o)),
+					$elm$json$Json$Encode$string(i.p)),
 					_Utils_Tuple2(
 					'grupo',
-					$elm$json$Json$Encode$string(i.aL)),
+					$elm$json$Json$Encode$string(i.aN)),
 					_Utils_Tuple2(
 					'referencia',
-					$elm$json$Json$Encode$string(i.Q)),
+					$elm$json$Json$Encode$string(i.S)),
 					_Utils_Tuple2(
 					'descripcion',
-					$elm$json$Json$Encode$string(i.ac)),
+					$elm$json$Json$Encode$string(i.ae)),
 					_Utils_Tuple2(
 					'nota',
 					A2(
 						$elm$core$Maybe$withDefault,
 						$elm$json$Json$Encode$null,
-						A2($elm$core$Maybe$map, $elm$json$Json$Encode$string, i.aP))),
-					_Utils_Tuple2('propietario', i.bu),
+						A2($elm$core$Maybe$map, $elm$json$Json$Encode$string, i.aR))),
+					_Utils_Tuple2('propietario', i.bw),
 					_Utils_Tuple2(
 					'porConfirmar',
-					$elm$json$Json$Encode$bool(i.aR))
+					$elm$json$Json$Encode$bool(i.aT))
 				]),
-			i.bC ? _List_fromArray(
+			i.bE ? _List_fromArray(
 				[
 					_Utils_Tuple2(
 					'sinBanda',
@@ -3495,13 +3537,13 @@ var $author$project$Backline$Tablero$documentoJson = function (d) {
 			[
 				_Utils_Tuple2(
 				'nombre',
-				$elm$json$Json$Encode$string(d.I)),
+				$elm$json$Json$Encode$string(d.K)),
 				_Utils_Tuple2(
 				'archivos',
-				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, d.aI)),
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$string, d.aK)),
 				_Utils_Tuple2(
 				'cuando',
-				$elm$json$Json$Encode$string(d.ax)),
+				$elm$json$Json$Encode$string(d.az)),
 				_Utils_Tuple2(
 				'datos',
 				$elm$json$Json$Encode$object(
@@ -3517,30 +3559,40 @@ var $author$project$Backline$Tablero$documentoJson = function (d) {
 											[
 												_Utils_Tuple2(
 												'id',
-												$elm$json$Json$Encode$string(a.r)),
+												$elm$json$Json$Encode$string(a.t)),
 												_Utils_Tuple2(
 												'nombre',
-												$elm$json$Json$Encode$string(a.I))
+												$elm$json$Json$Encode$string(a.K))
 											]));
 								},
-								d.aa)),
-							_Utils_Tuple2('dias', d.ay),
-							_Utils_Tuple2('bloques', d.av),
-							_Utils_Tuple2('stagePlots', d.aF),
+								d.ac)),
+							_Utils_Tuple2('dias', d.aA),
+							_Utils_Tuple2('bloques', d.ax),
+							_Utils_Tuple2('stagePlots', d.aH),
 							_Utils_Tuple2(
 							'items',
-							A2($elm$json$Json$Encode$list, $author$project$Backline$Tablero$itemJson, d.M)),
-							_Utils_Tuple2('pedidos', d.aB),
+							A2($elm$json$Json$Encode$list, $author$project$Backline$Tablero$itemJson, d.O)),
+							_Utils_Tuple2('pedidos', d.aD),
 							_Utils_Tuple2(
 							'comparaciones',
 							A2(
 								$elm$json$Json$Encode$list,
 								function ($) {
-									return $.aY;
+									return $.a_;
 								},
-								d.aw))
+								d.ay))
 						])))
 			]));
+};
+var $author$project$Backline$Tablero$espacioJson = function (e) {
+	return $elm$json$Json$Encode$string(
+		function () {
+			if (!e) {
+				return 'evento';
+			} else {
+				return 'pruebas';
+			}
+		}());
 };
 var $author$project$Backline$Tablero$modoJson = function (modo) {
 	return $elm$json$Json$Encode$string(
@@ -3568,30 +3620,38 @@ var $author$project$Backline$Tablero$guardable = function (m) {
 			[
 				_Utils_Tuple2(
 				'version',
-				$elm$json$Json$Encode$int(1)),
+				$elm$json$Json$Encode$int(2)),
 				_Utils_Tuple2(
 				'perfil',
-				$author$project$Backline$Tablero$perfilJson(m.A)),
+				$author$project$Backline$Tablero$perfilJson(m.B)),
 				_Utils_Tuple2(
 				'modo',
-				$author$project$Backline$Tablero$modoJson(m.af)),
+				$author$project$Backline$Tablero$modoJson(m.ah)),
 				_Utils_Tuple2(
-				'doc',
+				'espacio',
+				$author$project$Backline$Tablero$espacioJson(m.r)),
+				_Utils_Tuple2(
+				'evento',
 				A2(
 					$elm$core$Maybe$withDefault,
 					$elm$json$Json$Encode$null,
-					A2($elm$core$Maybe$map, $author$project$Backline$Tablero$documentoJson, m.y))),
+					A2($elm$core$Maybe$map, $author$project$Backline$Tablero$documentoJson, m.z))),
+				_Utils_Tuple2(
+				'pruebas',
+				A2(
+					$elm$core$Maybe$withDefault,
+					$elm$json$Json$Encode$null,
+					A2($elm$core$Maybe$map, $author$project$Backline$Tablero$documentoJson, m.G))),
 				_Utils_Tuple2(
 				'fotos',
 				A3(
 					$elm$json$Json$Encode$dict,
 					$elm$core$Basics$identity,
 					$elm$json$Json$Encode$list($elm$json$Json$Encode$string),
-					m.G))
+					m.I))
 			]));
 };
 var $author$project$Tablero$guardar = _Platform_outgoingPort('guardar', $elm$core$Basics$identity);
-var $author$project$Backline$Tablero$Editar = 1;
 var $author$project$Backline$Tablero$VerFestival = 0;
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
@@ -3612,42 +3672,50 @@ var $author$project$Backline$Tablero$conFiltro = F2(
 		return _Utils_update(
 			m,
 			{
-				w: f(m.w)
+				l: f(m.l)
 			});
 	});
 var $author$project$Backline$Tablero$conItems = F2(
 	function (f, m) {
-		return _Utils_update(
-			m,
-			{
-				y: A2(
-					$elm$core$Maybe$map,
-					function (d) {
-						return _Utils_update(
-							d,
-							{
-								M: f(d.M)
-							});
-					},
-					m.y)
+		var cambiar = $elm$core$Maybe$map(
+			function (d) {
+				return _Utils_update(
+					d,
+					{
+						O: f(d.O)
+					});
 			});
+		var _v0 = m.r;
+		if (!_v0) {
+			return _Utils_update(
+				m,
+				{
+					z: cambiar(m.z)
+				});
+		} else {
+			return _Utils_update(
+				m,
+				{
+					G: cambiar(m.G)
+				});
+		}
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm$core$String$trim = _String_trim;
 var $author$project$Backline$Tablero$editar = F2(
 	function (e, i) {
-		if (!_Utils_eq(i.r, e.r)) {
+		if (!_Utils_eq(i.t, e.t)) {
 			return i;
 		} else {
-			var ref = $elm$core$String$trim(e.Q);
+			var ref = $elm$core$String$trim(e.S);
 			return _Utils_update(
 				i,
 				{
-					ab: e.ab,
-					o: e.o,
-					ac: _Utils_eq(i.ac, i.Q) ? ref : i.ac,
-					aR: false,
-					Q: ref
+					ad: e.ad,
+					p: e.p,
+					ae: _Utils_eq(i.ae, i.S) ? ref : i.ae,
+					aT: false,
+					S: ref
 				});
 		}
 	});
@@ -3717,7 +3785,6 @@ var $elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var $elm$core$Basics$ge = _Utils_ge;
 var $elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -3742,10 +3809,14 @@ var $elm$core$List$isEmpty = function (xs) {
 var $author$project$Backline$Tablero$noVacia = function (l) {
 	return $elm$core$List$isEmpty(l) ? $elm$core$Maybe$Nothing : $elm$core$Maybe$Just(l);
 };
+var $elm$core$Basics$not = _Basics_not;
 var $author$project$Backline$Tablero$puede = F2(
 	function (perfil, _v0) {
 		return !perfil;
 	});
+var $author$project$Backline$Tablero$puedeEscribir = function (m) {
+	return (m.r === 1) || (!m.B);
+};
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -4155,83 +4226,114 @@ var $author$project$Backline$Tablero$update = F2(
 		switch (msg.$) {
 			case 0:
 				var doc = msg.a;
+				return ((!m.B) && (!m.r)) ? _Utils_update(
+					m,
+					{
+						z: $elm$core$Maybe$Just(doc),
+						l: $author$project$Backline$Tablero$sinFiltro
+					}) : _Utils_update(
+					m,
+					{
+						r: 1,
+						l: $author$project$Backline$Tablero$sinFiltro,
+						G: $elm$core$Maybe$Just(doc)
+					});
+			case 1:
+				var doc = msg.a;
 				return _Utils_update(
 					m,
 					{
-						y: $elm$core$Maybe$Just(doc),
-						w: $author$project$Backline$Tablero$sinFiltro
+						r: 0,
+						z: $elm$core$Maybe$Just(doc),
+						l: $author$project$Backline$Tablero$sinFiltro
 					});
-			case 1:
+			case 2:
+				var e = msg.a;
 				return _Utils_update(
 					m,
-					{y: $elm$core$Maybe$Nothing, w: $author$project$Backline$Tablero$sinFiltro});
-			case 2:
+					{r: e, l: $author$project$Backline$Tablero$sinFiltro});
+			case 3:
+				if (!$author$project$Backline$Tablero$puedeEscribir(m)) {
+					return m;
+				} else {
+					var _v1 = m.r;
+					if (!_v1) {
+						return _Utils_update(
+							m,
+							{z: $elm$core$Maybe$Nothing, l: $author$project$Backline$Tablero$sinFiltro});
+					} else {
+						return _Utils_update(
+							m,
+							{l: $author$project$Backline$Tablero$sinFiltro, G: $elm$core$Maybe$Nothing});
+					}
+				}
+			case 4:
 				var p = msg.a;
 				return _Utils_update(
 					m,
-					{A: p});
-			case 3:
+					{B: p});
+			case 5:
 				var modo = msg.a;
-				return A2($author$project$Backline$Tablero$puede, m.A, 0) ? _Utils_update(
+				return A2($author$project$Backline$Tablero$puede, m.B, 0) ? _Utils_update(
 					m,
-					{af: modo}) : m;
-			case 4:
+					{ah: modo}) : m;
+			case 6:
 				var t = msg.a;
 				return A2(
 					$author$project$Backline$Tablero$conFiltro,
 					function (f) {
 						return _Utils_update(
 							f,
-							{ar: t});
+							{at: t});
 					},
 					m);
-			case 5:
+			case 7:
 				var b = msg.a;
 				return A2(
 					$author$project$Backline$Tablero$conFiltro,
 					function (f) {
 						return _Utils_update(
 							f,
-							{L: b});
+							{N: b});
 					},
 					m);
-			case 6:
+			case 8:
 				var c = msg.a;
 				return A2(
 					$author$project$Backline$Tablero$conFiltro,
 					function (f) {
 						return _Utils_update(
 							f,
-							{o: c});
+							{p: c});
 					},
 					m);
-			case 7:
+			case 9:
 				return _Utils_update(
 					m,
-					{w: $author$project$Backline$Tablero$sinFiltro});
-			case 8:
+					{l: $author$project$Backline$Tablero$sinFiltro});
+			case 10:
 				var e = msg.a;
-				return (A2($author$project$Backline$Tablero$puede, m.A, 1) && ((e.ab >= 1) && ($elm$core$String$trim(e.Q) !== ''))) ? A2(
+				return ($author$project$Backline$Tablero$puedeEscribir(m) && ((e.ad >= 1) && ($elm$core$String$trim(e.S) !== ''))) ? A2(
 					$author$project$Backline$Tablero$conItems,
 					$elm$core$List$map(
 						$author$project$Backline$Tablero$editar(e)),
 					m) : m;
-			case 9:
+			case 11:
 				var id = msg.a;
-				return A2($author$project$Backline$Tablero$puede, m.A, 1) ? A2(
+				return $author$project$Backline$Tablero$puedeEscribir(m) ? A2(
 					$author$project$Backline$Tablero$conItems,
 					$elm$core$List$filter(
 						function (i) {
-							return !_Utils_eq(i.r, id);
+							return !_Utils_eq(i.t, id);
 						}),
 					m) : m;
-			case 10:
+			case 12:
 				var banda = msg.a;
 				var foto = msg.b;
 				return _Utils_update(
 					m,
 					{
-						G: A3(
+						I: A3(
 							$elm$core$Dict$update,
 							banda,
 							function (fs) {
@@ -4241,7 +4343,7 @@ var $author$project$Backline$Tablero$update = F2(
 										_List_fromArray(
 											[foto])));
 							},
-							m.G)
+							m.I)
 					});
 			default:
 				var banda = msg.a;
@@ -4249,7 +4351,7 @@ var $author$project$Backline$Tablero$update = F2(
 				return _Utils_update(
 					m,
 					{
-						G: A3(
+						I: A3(
 							$elm$core$Dict$update,
 							banda,
 							A2(
@@ -4258,7 +4360,7 @@ var $author$project$Backline$Tablero$update = F2(
 									$elm$core$List$filter(
 										$elm$core$Basics$neq(foto))),
 								$elm$core$Maybe$andThen($author$project$Backline$Tablero$noVacia)),
-							m.G)
+							m.I)
 					});
 		}
 	});
@@ -4279,63 +4381,71 @@ var $author$project$Backline$Tablero$datosJson = F4(
 									[
 										_Utils_Tuple2(
 										'id',
-										$elm$json$Json$Encode$string(a.r)),
+										$elm$json$Json$Encode$string(a.t)),
 										_Utils_Tuple2(
 										'nombre',
-										$elm$json$Json$Encode$string(a.I))
+										$elm$json$Json$Encode$string(a.K))
 									]));
 						},
-						doc.aa)),
-					_Utils_Tuple2('dias', doc.ay),
-					_Utils_Tuple2('bloques', doc.av),
-					_Utils_Tuple2('stagePlots', doc.aF),
+						doc.ac)),
+					_Utils_Tuple2('dias', doc.aA),
+					_Utils_Tuple2('bloques', doc.ax),
+					_Utils_Tuple2('stagePlots', doc.aH),
 					_Utils_Tuple2(
 					'items',
 					A2($elm$json$Json$Encode$list, $author$project$Backline$Tablero$itemJson, items)),
-					_Utils_Tuple2('pedidos', doc.aB),
+					_Utils_Tuple2('pedidos', doc.aD),
 					_Utils_Tuple2(
 					'comparaciones',
 					comparar ? A2(
 						$elm$json$Json$Encode$list,
 						function ($) {
-							return $.aY;
+							return $.a_;
 						},
 						A2(
 							$elm$core$List$filter,
 							function (c) {
-								return _Utils_eq(f.L, $elm$core$Maybe$Nothing) || _Utils_eq(
-									f.L,
-									$elm$core$Maybe$Just(c.S));
+								return _Utils_eq(f.N, $elm$core$Maybe$Nothing) || _Utils_eq(
+									f.N,
+									$elm$core$Maybe$Just(c.U));
 							},
-							doc.aw)) : A2($elm$json$Json$Encode$list, $elm$core$Basics$identity, _List_Nil))
+							doc.ay)) : A2($elm$json$Json$Encode$list, $elm$core$Basics$identity, _List_Nil))
 				]));
 	});
+var $author$project$Backline$Tablero$docActual = function (m) {
+	var _v0 = m.r;
+	if (!_v0) {
+		return m.z;
+	} else {
+		return m.G;
+	}
+};
 var $author$project$Backline$Tablero$filtroJson = function (f) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
 				'texto',
-				$elm$json$Json$Encode$string(f.ar)),
+				$elm$json$Json$Encode$string(f.at)),
 				_Utils_Tuple2(
 				'banda',
 				A2(
 					$elm$core$Maybe$withDefault,
 					$elm$json$Json$Encode$null,
-					A2($elm$core$Maybe$map, $elm$json$Json$Encode$string, f.L))),
+					A2($elm$core$Maybe$map, $elm$json$Json$Encode$string, f.N))),
 				_Utils_Tuple2(
 				'categoria',
 				A2(
 					$elm$core$Maybe$withDefault,
 					$elm$json$Json$Encode$null,
-					A2($elm$core$Maybe$map, $elm$json$Json$Encode$string, f.o)))
+					A2($elm$core$Maybe$map, $elm$json$Json$Encode$string, f.p)))
 			]));
 };
 var $author$project$Backline$Tablero$modoEfectivo = function (m) {
-	return A2($author$project$Backline$Tablero$puede, m.A, 0) ? m.af : 0;
+	return A2($author$project$Backline$Tablero$puede, m.B, 0) ? m.ah : 0;
 };
 var $author$project$Backline$Tablero$opciones = function (m) {
-	var _v0 = m.y;
+	var _v0 = $author$project$Backline$Tablero$docActual(m);
 	if (_v0.$ === 1) {
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
@@ -4372,15 +4482,15 @@ var $author$project$Backline$Tablero$opciones = function (m) {
 								$elm$core$Maybe$Just)));
 				},
 				$elm$core$Dict$empty,
-				doc.M);
+				doc.O);
 		};
 		var porBanda = contar(
 			function ($) {
-				return $.S;
+				return $.U;
 			});
 		var porCat = contar(
 			function ($) {
-				return $.o;
+				return $.p;
 			});
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
@@ -4395,22 +4505,22 @@ var $author$project$Backline$Tablero$opciones = function (m) {
 									[
 										_Utils_Tuple2(
 										'id',
-										$elm$json$Json$Encode$string(a.r)),
+										$elm$json$Json$Encode$string(a.t)),
 										_Utils_Tuple2(
 										'nombre',
-										$elm$json$Json$Encode$string(a.I)),
+										$elm$json$Json$Encode$string(a.K)),
 										_Utils_Tuple2(
 										'n',
 										$elm$json$Json$Encode$int(
-											A2(cuenta, porBanda, a.r)))
+											A2(cuenta, porBanda, a.t)))
 									]));
 						},
 						A2(
 							$elm$core$List$filter,
 							function (a) {
-								return A2(cuenta, porBanda, a.r) > 0;
+								return A2(cuenta, porBanda, a.t) > 0;
 							},
-							doc.aa))),
+							doc.ac))),
 					_Utils_Tuple2(
 					'categorias',
 					A2(
@@ -4459,7 +4569,6 @@ var $elm$core$Basics$composeL = F3(
 		return g(
 			f(x));
 	});
-var $elm$core$Basics$not = _Basics_not;
 var $elm$core$List$all = F2(
 	function (isOkay, list) {
 		return !A2(
@@ -4485,15 +4594,15 @@ var $author$project$Backline$Tablero$nombreBanda = F2(
 			A2(
 				$elm$core$Maybe$map,
 				function ($) {
-					return $.I;
+					return $.K;
 				},
 				$elm$core$List$head(
 					A2(
 						$elm$core$List$filter,
 						function (a) {
-							return _Utils_eq(a.r, id);
+							return _Utils_eq(a.t, id);
 						},
-						doc.aa))));
+						doc.ac))));
 	});
 var $elm$core$String$map = _String_map;
 var $author$project$Backline$Tablero$sinTilde = function (c) {
@@ -4525,52 +4634,52 @@ var $elm$core$String$words = _String_words;
 var $author$project$Backline$Tablero$pasa = F3(
 	function (f, doc, i) {
 		var palabras = $elm$core$String$words(
-			$author$project$Backline$Tablero$normalizar(f.ar));
+			$author$project$Backline$Tablero$normalizar(f.at));
 		var donde = $author$project$Backline$Tablero$normalizar(
 			A2(
 				$elm$core$String$join,
 				' ',
 				_List_fromArray(
 					[
-						i.Q,
-						i.ac,
-						A2($elm$core$Maybe$withDefault, '', i.aP),
-						i.aL,
-						i.o,
-						A2($author$project$Backline$Tablero$nombreBanda, doc, i.S)
+						i.S,
+						i.ae,
+						A2($elm$core$Maybe$withDefault, '', i.aR),
+						i.aN,
+						i.p,
+						A2($author$project$Backline$Tablero$nombreBanda, doc, i.U)
 					])));
 		return A2(
 			$elm$core$List$all,
 			function (p) {
 				return A2($elm$core$String$contains, p, donde);
 			},
-			palabras) && ((_Utils_eq(f.L, $elm$core$Maybe$Nothing) || _Utils_eq(
-			f.L,
-			$elm$core$Maybe$Just(i.S))) && (_Utils_eq(f.o, $elm$core$Maybe$Nothing) || _Utils_eq(
-			f.o,
-			$elm$core$Maybe$Just(i.o))));
+			palabras) && ((_Utils_eq(f.N, $elm$core$Maybe$Nothing) || _Utils_eq(
+			f.N,
+			$elm$core$Maybe$Just(i.U))) && (_Utils_eq(f.p, $elm$core$Maybe$Nothing) || _Utils_eq(
+			f.p,
+			$elm$core$Maybe$Just(i.p))));
 	});
 var $author$project$Backline$Tablero$visibles = function (m) {
-	var _v0 = m.y;
+	var _v0 = $author$project$Backline$Tablero$docActual(m);
 	if (_v0.$ === 1) {
 		return _List_Nil;
 	} else {
 		var doc = _v0.a;
 		return A2(
 			$elm$core$List$filter,
-			A2($author$project$Backline$Tablero$pasa, m.w, doc),
-			doc.M);
+			A2($author$project$Backline$Tablero$pasa, m.l, doc),
+			doc.O);
 	}
 };
 var $author$project$Backline$Tablero$vista = function (m) {
 	var items = $author$project$Backline$Tablero$visibles(m);
-	var admin = $author$project$Backline$Tablero$puede(m.A);
+	var admin = $author$project$Backline$Tablero$puede(m.B);
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
 				'perfil',
-				$author$project$Backline$Tablero$perfilJson(m.A)),
+				$author$project$Backline$Tablero$perfilJson(m.B)),
 				_Utils_Tuple2(
 				'modo',
 				$author$project$Backline$Tablero$modoJson(
@@ -4587,7 +4696,11 @@ var $author$project$Backline$Tablero$vista = function (m) {
 							_Utils_Tuple2(
 							'editar',
 							$elm$json$Json$Encode$bool(
-								admin(1))),
+								$author$project$Backline$Tablero$puedeEscribir(m))),
+							_Utils_Tuple2(
+							'borrar',
+							$elm$json$Json$Encode$bool(
+								$author$project$Backline$Tablero$puedeEscribir(m))),
 							_Utils_Tuple2(
 							'comparar',
 							$elm$json$Json$Encode$bool(
@@ -4598,9 +4711,26 @@ var $author$project$Backline$Tablero$vista = function (m) {
 								admin(3)))
 						]))),
 				_Utils_Tuple2(
+				'espacio',
+				$author$project$Backline$Tablero$espacioJson(m.r)),
+				_Utils_Tuple2(
+				'hay',
+				$elm$json$Json$Encode$object(
+					_List_fromArray(
+						[
+							_Utils_Tuple2(
+							'evento',
+							$elm$json$Json$Encode$bool(
+								!_Utils_eq(m.z, $elm$core$Maybe$Nothing))),
+							_Utils_Tuple2(
+							'pruebas',
+							$elm$json$Json$Encode$bool(
+								!_Utils_eq(m.G, $elm$core$Maybe$Nothing)))
+						]))),
+				_Utils_Tuple2(
 				'doc',
 				function () {
-					var _v0 = m.y;
+					var _v0 = $author$project$Backline$Tablero$docActual(m);
 					if (_v0.$ === 1) {
 						return $elm$json$Json$Encode$null;
 					} else {
@@ -4610,14 +4740,14 @@ var $author$project$Backline$Tablero$vista = function (m) {
 								[
 									_Utils_Tuple2(
 									'nombre',
-									$elm$json$Json$Encode$string(doc.I)),
+									$elm$json$Json$Encode$string(doc.K)),
 									_Utils_Tuple2(
 									'totalItems',
 									$elm$json$Json$Encode$int(
-										$elm$core$List$length(doc.M))),
+										$elm$core$List$length(doc.O))),
 									_Utils_Tuple2(
 									'cuando',
-									$elm$json$Json$Encode$string(doc.ax)),
+									$elm$json$Json$Encode$string(doc.az)),
 									_Utils_Tuple2(
 									'datos',
 									A4(
@@ -4625,17 +4755,17 @@ var $author$project$Backline$Tablero$vista = function (m) {
 										doc,
 										items,
 										admin(2),
-										m.w))
+										m.l))
 								]));
 					}
 				}()),
 				_Utils_Tuple2(
 				'filtro',
-				$author$project$Backline$Tablero$filtroJson(m.w)),
+				$author$project$Backline$Tablero$filtroJson(m.l)),
 				_Utils_Tuple2(
 				'hayFiltro',
 				$elm$json$Json$Encode$bool(
-					!_Utils_eq(m.w, $author$project$Backline$Tablero$sinFiltro))),
+					!_Utils_eq(m.l, $author$project$Backline$Tablero$sinFiltro))),
 				_Utils_Tuple2(
 				'encontrados',
 				$elm$json$Json$Encode$int(
@@ -4649,7 +4779,7 @@ var $author$project$Backline$Tablero$vista = function (m) {
 					$elm$json$Json$Encode$dict,
 					$elm$core$Basics$identity,
 					$elm$json$Json$Encode$list($elm$json$Json$Encode$string),
-					m.G))
+					m.I))
 			]));
 };
 var $author$project$Tablero$vista = _Platform_outgoingPort('vista', $elm$core$Basics$identity);
@@ -4681,16 +4811,16 @@ var $author$project$Tablero$update = F2(
 var $elm$core$Platform$worker = _Platform_worker;
 var $author$project$Tablero$main = $elm$core$Platform$worker(
 	{
-		b9: function (guardado) {
+		cb: function (guardado) {
 			var m = $author$project$Backline$Tablero$decodificarEstado(guardado);
 			return _Utils_Tuple2(
 				m,
 				$author$project$Tablero$vista(
 					$author$project$Backline$Tablero$vista(m)));
 		},
-		cx: function (_v0) {
+		cz: function (_v0) {
 			return $author$project$Tablero$entrada($elm$core$Basics$identity);
 		},
-		cC: $author$project$Tablero$update
+		cE: $author$project$Tablero$update
 	});
 _Platform_export({'Tablero':{'init':$author$project$Tablero$main($elm$json$Json$Decode$value)(0)}});}(this));

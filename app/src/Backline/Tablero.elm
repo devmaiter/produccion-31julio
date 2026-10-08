@@ -1,5 +1,6 @@
 module Backline.Tablero exposing
     ( Documento
+    , Espacio(..)
     , Filtro
     , Item
     , Model
@@ -9,11 +10,13 @@ module Backline.Tablero exposing
     , Permiso(..)
     , decodificarEstado
     , decodificarMsg
+    , docActual
     , guardable
     , inicial
     , modoEfectivo
     , normalizar
     , puede
+    , puedeEscribir
     , update
     , visibles
     , vista
@@ -22,7 +25,9 @@ module Backline.Tablero exposing
 {-| El tablero de backline: un solo estado para el admin y el empleado.
 
 Los dos suben riders con la misma herramienta, buscan y filtran, y toman fotos
-de las bandas. Solo el admin tiene el modo festival (varias bandas, totales de
+de las bandas. Hay dos espacios: el del evento (lo arma el admin; el empleado lo
+ve pero no lo puede dañar) y "Mis pruebas", el escritorio propio donde cualquiera
+sube, prueba y edita. Solo el admin tiene el modo festival (varias bandas, totales de
 fondo), "Pide vs propuesta", la edición de ítems y la planilla .xlsx. Los
 permisos se deciden aquí y no en la pantalla: un empleado que mande "editar"
 no cambia nada.
@@ -49,6 +54,15 @@ type Perfil
 type Modo
     = Normal
     | Festival
+
+
+{-| Dónde se trabaja: el backline del evento (oficial, sincronizado con el cronograma) o "Mis
+pruebas", el escritorio propio de cada quien (lo pidió el usuario: que el empleado pueda subir y
+probar todo sin dañar lo que armó el admin).
+-}
+type Espacio
+    = Evento
+    | Pruebas
 
 
 type alias Item =
@@ -97,7 +111,9 @@ type alias Filtro =
 type alias Model =
     { perfil : Perfil
     , modo : Modo
-    , doc : Maybe Documento
+    , espacio : Espacio
+    , evento : Maybe Documento
+    , pruebas : Maybe Documento
     , filtro : Filtro
     , fotos : Dict String (List String)
     }
@@ -105,7 +121,7 @@ type alias Model =
 
 inicial : Model
 inicial =
-    { perfil = Empleado, modo = Normal, doc = Nothing, filtro = sinFiltro, fotos = Dict.empty }
+    { perfil = Empleado, modo = Normal, espacio = Pruebas, evento = Nothing, pruebas = Nothing, filtro = sinFiltro, fotos = Dict.empty }
 
 
 sinFiltro : Filtro
@@ -115,6 +131,8 @@ sinFiltro =
 
 type Msg
     = Cargar Documento
+    | CargarEvento Documento
+    | CambiarEspacio Espacio
     | Borrar
     | CambiarPerfil Perfil
     | CambiarModo Modo
@@ -144,6 +162,25 @@ puede perfil _ =
     perfil == Admin
 
 
+{-| Editar, quitar ítems o borrar el documento: en "Mis pruebas" cualquiera; en el evento, solo el admin.
+-}
+puedeEscribir : Model -> Bool
+puedeEscribir m =
+    m.espacio == Pruebas || m.perfil == Admin
+
+
+{-| El documento del espacio en el que se está.
+-}
+docActual : Model -> Maybe Documento
+docActual m =
+    case m.espacio of
+        Evento ->
+            m.evento
+
+        Pruebas ->
+            m.pruebas
+
+
 {-| El empleado siempre ve el modo normal; el admin, el que eligió.
 -}
 modoEfectivo : Model -> Modo
@@ -163,12 +200,33 @@ update : Msg -> Model -> Model
 update msg m =
     case msg of
         Cargar doc ->
-            -- Un documento nuevo: filtros limpios, y las fotos de bandas que ya no están se quedan
-            -- guardadas (la banda puede volver con otro rider).
-            { m | doc = Just doc, filtro = sinFiltro }
+            -- Un documento subido a mano: filtros limpios, y las fotos de bandas que ya no están se
+            -- quedan guardadas (la banda puede volver con otro rider). El admin que está en el evento
+            -- lo cambia; cualquier otro lo prueba en su escritorio y el evento queda intacto.
+            if m.perfil == Admin && m.espacio == Evento then
+                { m | evento = Just doc, filtro = sinFiltro }
+
+            else
+                { m | pruebas = Just doc, espacio = Pruebas, filtro = sinFiltro }
+
+        CargarEvento doc ->
+            -- El evento sincronizado con el cronograma: llega igual para todos.
+            { m | evento = Just doc, espacio = Evento, filtro = sinFiltro }
+
+        CambiarEspacio e ->
+            { m | espacio = e, filtro = sinFiltro }
 
         Borrar ->
-            { m | doc = Nothing, filtro = sinFiltro }
+            if not (puedeEscribir m) then
+                m
+
+            else
+                case m.espacio of
+                    Evento ->
+                        { m | evento = Nothing, filtro = sinFiltro }
+
+                    Pruebas ->
+                        { m | pruebas = Nothing, filtro = sinFiltro }
 
         CambiarPerfil p ->
             { m | perfil = p }
@@ -193,14 +251,14 @@ update msg m =
             { m | filtro = sinFiltro }
 
         EditarItem e ->
-            if puede m.perfil Editar && e.cantidad >= 1 && String.trim e.referencia /= "" then
+            if puedeEscribir m && e.cantidad >= 1 && String.trim e.referencia /= "" then
                 conItems (List.map (editar e)) m
 
             else
                 m
 
         BorrarItem id ->
-            if puede m.perfil Editar then
+            if puedeEscribir m then
                 conItems (List.filter (\i -> i.id /= id)) m
 
             else
@@ -229,7 +287,16 @@ conFiltro f m =
 
 conItems : (List Item -> List Item) -> Model -> Model
 conItems f m =
-    { m | doc = Maybe.map (\d -> { d | items = f d.items }) m.doc }
+    let
+        cambiar =
+            Maybe.map (\d -> { d | items = f d.items })
+    in
+    case m.espacio of
+        Evento ->
+            { m | evento = cambiar m.evento }
+
+        Pruebas ->
+            { m | pruebas = cambiar m.pruebas }
 
 
 editar : { id : String, cantidad : Int, referencia : String, categoria : String } -> Item -> Item
@@ -300,7 +367,7 @@ su sección, su categoría o el nombre de su banda.
 -}
 visibles : Model -> List Item
 visibles m =
-    case m.doc of
+    case docActual m of
         Nothing ->
             []
 
@@ -346,13 +413,16 @@ vista m =
         , ( "puede"
           , E.object
                 [ ( "festival", E.bool (admin VerFestival) )
-                , ( "editar", E.bool (admin Editar) )
+                , ( "editar", E.bool (puedeEscribir m) )
+                , ( "borrar", E.bool (puedeEscribir m) )
                 , ( "comparar", E.bool (admin Comparar) )
                 , ( "planilla", E.bool (admin Planilla) )
                 ]
           )
+        , ( "espacio", espacioJson m.espacio )
+        , ( "hay", E.object [ ( "evento", E.bool (m.evento /= Nothing) ), ( "pruebas", E.bool (m.pruebas /= Nothing) ) ] )
         , ( "doc"
-          , case m.doc of
+          , case docActual m of
                 Nothing ->
                     E.null
 
@@ -397,7 +467,7 @@ datosJson doc items comparar f =
 -}
 opciones : Model -> E.Value
 opciones m =
-    case m.doc of
+    case docActual m of
         Nothing ->
             E.object [ ( "bandas", E.list identity [] ), ( "categorias", E.list identity [] ) ]
 
@@ -470,6 +540,18 @@ perfilJson p =
         )
 
 
+espacioJson : Espacio -> E.Value
+espacioJson e =
+    E.string
+        (case e of
+            Evento ->
+                "evento"
+
+            Pruebas ->
+                "pruebas"
+        )
+
+
 modoJson : Modo -> E.Value
 modoJson modo =
     E.string
@@ -486,15 +568,17 @@ modoJson modo =
 -- GUARDAR Y LEER (lo que JavaScript guarda en el dispositivo)
 
 
-{-| Lo que se guarda: perfil, modo elegido, documento (con lo que editó el admin) y fotos. Los filtros no.
+{-| Lo que se guarda: perfil, modo elegido, el espacio, los dos documentos (con lo editado) y fotos. Los filtros no.
 -}
 guardable : Model -> E.Value
 guardable m =
     E.object
-        [ ( "version", E.int 1 )
+        [ ( "version", E.int 2 )
         , ( "perfil", perfilJson m.perfil )
         , ( "modo", modoJson m.modo )
-        , ( "doc", Maybe.map documentoJson m.doc |> Maybe.withDefault E.null )
+        , ( "espacio", espacioJson m.espacio )
+        , ( "evento", Maybe.map documentoJson m.evento |> Maybe.withDefault E.null )
+        , ( "pruebas", Maybe.map documentoJson m.pruebas |> Maybe.withDefault E.null )
         , ( "fotos", E.dict identity (E.list E.string) m.fotos )
         ]
 
@@ -529,7 +613,16 @@ decodificarEstado v =
     in
     { perfil = campo "perfil" perfilDec Empleado
     , modo = campo "modo" modoDec Normal
-    , doc = campo "doc" (D.nullable documentoDec) Nothing
+    , espacio = campo "espacio" espacioDec Pruebas
+    , evento = campo "evento" (D.nullable documentoDec) Nothing
+
+    -- Lo guardado antes de los espacios (versión 1, un solo "doc") pasa a "Mis pruebas".
+    , pruebas =
+        if campo "version" D.int 1 >= 2 then
+            campo "pruebas" (D.nullable documentoDec) Nothing
+
+        else
+            campo "doc" (D.nullable documentoDec) Nothing
     , filtro = sinFiltro
     , fotos = campo "fotos" (D.dict (D.list D.string)) Dict.empty
     }
@@ -549,6 +642,23 @@ perfilDec =
 
                     _ ->
                         D.fail ("perfil desconocido: " ++ s)
+            )
+
+
+espacioDec : D.Decoder Espacio
+espacioDec =
+    D.string
+        |> D.andThen
+            (\s ->
+                case s of
+                    "evento" ->
+                        D.succeed Evento
+
+                    "pruebas" ->
+                        D.succeed Pruebas
+
+                    _ ->
+                        D.fail ("espacio desconocido: " ++ s)
             )
 
 
@@ -663,6 +773,12 @@ mensaje tipo =
     case tipo of
         "cargar" ->
             D.map Cargar (D.field "doc" documentoDec)
+
+        "cargar-evento" ->
+            D.map CargarEvento (D.field "doc" documentoDec)
+
+        "espacio" ->
+            D.map CambiarEspacio (D.field "espacio" espacioDec)
 
         "borrar" ->
             D.succeed Borrar

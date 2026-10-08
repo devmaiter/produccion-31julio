@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Cronograma · Backline</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* El cronograma del admin (2026-10-07): el mes en calendario, los eventos debajo y, al tocar uno, su hoja
+   con escenarios, días y bandas, el rider de cada banda y el contra-rider del proveedor. Por ahora todo
+   queda en este dispositivo (lo pidió el usuario: primero la interfaz, el servidor después). */
+:root{
+  --bg:#000; --surface:#121212; --surface2:#1a1a1a; --line:#2c2c2c;
+  --ink:#fff; --ink2:#d6d6d6; --ink3:#9a9a9a;
+  --accent:#ff6a1f; --accent-ink:#000; --ok:#3fbf77; --warn:#ffa83a; --info:#6fa8ff;
+  --display:"Barlow Condensed","Arial Narrow",Impact,sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font-family:var(--body);font-size:15px;line-height:1.4;-webkit-tap-highlight-color:transparent;min-height:100dvh;
+  background:radial-gradient(120% 50% at 50% 0%,#1d0d04 0%,#000 60%)}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;padding:0;cursor:pointer}
+.app{max-width:560px;margin:0 auto;padding-inline:16px;padding-block:calc(env(safe-area-inset-top) + 18px) calc(env(safe-area-inset-bottom) + 110px);display:flex;flex-direction:column;gap:20px}
+.tope{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.tope h1{font-family:var(--display);font-size:34px;line-height:1;text-transform:uppercase;letter-spacing:.02em;margin:0}
+.tope a{font-size:14px;font-weight:600;color:var(--ink2);text-decoration:none;padding:8px 14px;border:1px solid var(--line);border-radius:999px}
+.tope a:hover,.tope a:focus-visible{border-color:var(--ink2);outline:none}
+
+/* Mes */
+.mes{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.mes-cab{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.mes-cab h2{font-family:var(--display);font-size:26px;text-transform:uppercase;margin:0;letter-spacing:.02em}
+.mes-cab button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);font-size:18px;transition:background .15s}
+.mes-cab button:hover,.mes-cab button:focus-visible{background:var(--surface2);outline:none}
+.dias-sem,.grilla{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dias-sem span{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--ink3);text-align:center;padding-bottom:4px}
+.dia{position:relative;aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:6px;font-size:14px;font-variant-numeric:tabular-nums;color:var(--ink2);transition:background .15s,transform .15s}
+.dia.fuera{opacity:.25}
+.dia.hoy{color:#fff;font-weight:700;box-shadow:inset 0 0 0 1.5px var(--ink2)}
+.dia.con{background:rgba(255,106,31,.14);color:#fff;font-weight:600}
+.dia.con:active{transform:scale(.94)}
+.dia .marcas{position:absolute;left:5px;right:5px;bottom:6px;display:flex;flex-direction:column;gap:2px}
+.dia .marcas i{display:block;height:3px;border-radius:2px;background:var(--accent)}
+.dia .marcas i.b{background:var(--info)}.dia .marcas i.c{background:var(--ok)}
+
+/* Eventos del mes */
+.seccion-t{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:0}
+.eventos{display:flex;flex-direction:column;gap:12px}
+.evento{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;transition:transform .15s,border-color .15s}
+.evento:hover,.evento:focus-visible{border-color:#555;outline:none}
+.evento:active{transform:scale(.985)}
+.evento .fecha{grid-row:span 3;width:56px;border-radius:12px;background:var(--surface2);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0}
+.evento .fecha b{font-family:var(--display);font-size:28px;line-height:1}
+.evento .fecha span{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
+.evento h3{margin:0;font-family:var(--display);font-size:24px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;text-wrap:balance}
+.evento .donde{margin:0;font-size:14px;color:var(--ink2)}
+.progreso{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink2)}
+.progreso .barra{flex:1;height:6px;border-radius:3px;background:var(--surface2);overflow:hidden}
+.progreso .barra i{display:block;height:100%;background:var(--ok);border-radius:3px;transition:width .4s}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--ink2)}
+.chip.ej{color:var(--warn);border-color:rgba(255,168,58,.4)}
+.vacio{text-align:center;color:var(--ink2);padding:28px 16px;border:1px dashed var(--line);border-radius:18px}
+
+.nuevo{position:fixed;z-index:5;right:max(16px,calc(50% - 264px));bottom:calc(env(safe-area-inset-bottom) + 22px);display:flex;align-items:center;gap:8px;padding:14px 22px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:16px;box-shadow:0 10px 30px rgba(255,106,31,.35);transition:transform .15s}
+.nuevo:active{transform:scale(.95)}
+.nuevo:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* Hojas que suben desde abajo */
+.hoja{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+.hoja .panel{width:100%;max-width:560px;max-height:92dvh;overflow:auto;background:#0e0e0e;border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;padding:12px 18px calc(env(safe-area-inset-bottom) + 24px);animation:sube .34s cubic-bezier(.2,.9,.25,1.12);transition:transform .2s}
+@keyframes sube{from{transform:translateY(100%)}}
+.agarre{width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);margin:0 auto 14px}
+.panel h2{font-family:var(--display);font-size:32px;line-height:1;text-transform:uppercase;margin:0 0 4px;text-wrap:balance}
+.panel .donde{margin:0 0 12px;color:var(--ink2)}
+.acciones{display:flex;flex-wrap:wrap;gap:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;background:var(--surface2);border:1px solid var(--line);transition:background .15s,transform .15s}
+.btn:hover,.btn:focus-visible{background:#262626;outline:none}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.peligro{color:#ff8a80;border-color:rgba(255,138,128,.35)}
+.esc{margin-top:18px;border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:10px}
+.esc-cab{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.esc-cab h3{margin:0;font-family:var(--display);font-size:24px;text-transform:uppercase}
+.contra{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px}
+.contra b{display:block;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.dia-t{margin:6px 0 0;font-size:13px;font-weight:600;color:var(--ink2);text-transform:capitalize}
+.banda{display:grid;grid-template-columns:1fr auto;gap:8px 10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.banda .nombre{font-weight:700;font-size:16px;min-width:0;overflow-wrap:anywhere}
+.banda .archivo{grid-column:1/-1;font-size:13px;color:var(--ink3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.banda .acciones{grid-column:1/-1}
+.estado{font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;border:1px solid}
+.estado.falta{color:var(--warn);border-color:rgba(255,168,58,.45)}
+.estado.recibido{color:var(--info);border-color:rgba(111,168,255,.45)}
+.estado.revisado{color:var(--ok);border-color:rgba(63,191,119,.45)}
+.agregar{display:flex;gap:8px;flex-wrap:wrap}
+.agregar input,.agregar select{flex:1;min-width:0;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:15px}
+.agregar input:focus,.agregar select:focus,.campo input:focus{outline:2px solid var(--accent);outline-offset:1px}
+form.campos{display:flex;flex-direction:column;gap:14px}
+.campo{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--ink2)}
+.campo input{padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:16px;font-weight:400;color:var(--ink)}
+.fila2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nota{font-size:13px;color:var(--ink3);margin:0}
+.aviso{position:fixed;z-index:20;left:50%;bottom:calc(env(safe-area-inset-bottom) + 90px);transform:translateX(-50%);background:var(--ink);color:#000;padding:8px 16px;border-radius:999px;font-size:14px;font-weight:600}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="tope"><h1>Cronograma</h1><a href="../lab-reels/">Reels</a></div>
+  <section class="mes" aria-label="Calendario del mes">
+    <div class="mes-cab"><button id="antes" aria-label="Mes anterior">‹</button><h2 id="titulo-mes"></h2><button id="despues" aria-label="Mes siguiente">›</button></div>
+    <div class="dias-sem"><span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span></div>
+    <div class="grilla" id="grilla"></div>
+  </section>
+  <p class="seccion-t" id="titulo-lista">Eventos del mes</p>
+  <div class="eventos" id="eventos"></div>
+</main>
+<button class="nuevo" id="nuevo">＋ Evento</button>
+
+<div class="hoja" id="hoja-evento" hidden><div class="panel" role="dialog" aria-label="Evento"></div></div>
+<div class="hoja" id="hoja-form" hidden>
+  <div class="panel" role="dialog" aria-label="Nuevo evento">
+    <div class="agarre" aria-hidden="true"></div>
+    <h2 id="form-titulo">Nuevo evento</h2>
+    <form class="campos" id="form-evento">
+      <label class="campo">Nombre<input id="f-nombre" name="nombre" required placeholder="Festival de la ciudad"></label>
+      <div class="fila2">
+        <label class="campo">Desde<input id="f-desde" name="desde" type="date" required></label>
+        <label class="campo">Hasta<input id="f-hasta" name="hasta" type="date" required></label>
+      </div>
+      <label class="campo">Lugar<input id="f-lugar" name="lugar" placeholder="Parque, teatro, ciudad"></label>
+      <label class="campo">Escenarios<input id="f-escenarios" name="escenarios" placeholder="Stage 1, Stage 2"></label>
+      <p class="nota">Separa los escenarios con comas. Las bandas se agregan después, en cada escenario.</p>
+      <div class="acciones"><button class="btn pri" type="submit">Guardar</button><button class="btn" type="button" data-acc="cerrar-form">Cancelar</button></div>
+    </form>
+  </div>
+</div>
+<input type="file" id="archivo" hidden accept=".pdf,.xlsx,.xls,.csv,.txt,.eml,image/*">
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const leer = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } };
+const escribir = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const nuevoId = () => Math.random().toString(36).slice(2, 10);
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+const iso = f => `${f.getFullYear()}-${String(f.getMonth() + 1).padStart(2, "0")}-${String(f.getDate()).padStart(2, "0")}`;
+const fecha = s => { const [a, m, d] = s.split("-").map(Number); return new Date(a, m - 1, d); };
+const diasDe = ev => { const out = []; for (let f = fecha(ev.desde); f <= fecha(ev.hasta); f.setDate(f.getDate() + 1)) out.push(iso(f)); return out; };
+const largo = s => fecha(s).toLocaleDateString("es", {weekday: "long", day: "numeric", month: "short"});
+const rango = ev => ev.desde === ev.hasta ? largo(ev.desde) : `${fecha(ev.desde).getDate()}–${fecha(ev.hasta).getDate()} ${MESES[fecha(ev.hasta).getMonth()].slice(0, 3)}`;
+const aviso = t => { const a = document.createElement("div"); a.className = "aviso"; a.textContent = t; document.body.append(a); setTimeout(() => a.remove(), 1800); };
+
+/* Los riders se guardan en este dispositivo (IndexedDB), para abrirlos en los reels cuando se quiera. */
+const idb = (modo, fn) => new Promise((ok, mal) => {
+  const r = indexedDB.open("backline-riders", 1);
+  r.onupgradeneeded = () => r.result.createObjectStore("archivos");
+  r.onerror = () => mal(r.error);
+  r.onsuccess = () => { const tx = r.result.transaction("archivos", modo), q = fn(tx.objectStore("archivos")); tx.oncomplete = () => ok(q?.result); tx.onerror = () => mal(tx.error); };
+});
+
+/* Ejemplo con bandas inventadas, para que la pantalla no arranque vacía. Se puede borrar. */
+function ejemplo(){
+  const hoy = new Date(), a = hoy.getFullYear(), m = hoy.getMonth();
+  const d = n => iso(new Date(a, m, n));
+  const banda = (nombre, dia, estado = "falta") => ({id: nuevoId(), nombre, dia, estado, rider: estado === "falta" ? null : {nombre: `${nombre} - rider técnico.pdf`, archivoId: null}});
+  return [
+    {id: nuevoId(), ejemplo: true, nombre: "Festival de ejemplo", desde: d(17), hasta: d(18), lugar: "Parque central", escenarios: [
+      {id: nuevoId(), nombre: "Stage 1", contra: null, bandas: [banda("Los Rayos", d(17), "revisado"), banda("Luna Roja", d(17), "recibido"), banda("La Ola Sur", d(18))]},
+      {id: nuevoId(), nombre: "Stage 2", contra: {nombre: "Propuesta proveedor Stage 2.xlsx", archivoId: null}, bandas: [banda("Ana Pérez", d(17), "recibido"), banda("Cumbia del Valle", d(18))]},
+    ]},
+    {id: nuevoId(), ejemplo: true, nombre: "Concierto Los Rayos", desde: d(25), hasta: d(25), lugar: "Teatro municipal", escenarios: [
+      {id: nuevoId(), nombre: "Principal", contra: null, bandas: [banda("Los Rayos", d(25))]},
+    ]},
+  ];
+}
+let eventos = leer("cronograma:eventos", null) ?? ejemplo();
+const guardar = () => escribir("cronograma:eventos", eventos);
+guardar();
+let mesVisto = (() => { const h = new Date(); return new Date(h.getFullYear(), h.getMonth(), 1); })();
+
+const bandasDe = ev => ev.escenarios.flatMap(e => e.bandas);
+const listos = ev => bandasDe(ev).filter(b => b.estado !== "falta").length;
+
+function pintarMes(){
+  const a = mesVisto.getFullYear(), m = mesVisto.getMonth();
+  $("titulo-mes").textContent = `${MESES[m]} ${a}`;
+  const primero = new Date(a, m, 1), corrimiento = (primero.getDay() + 6) % 7, hoy = iso(new Date());
+  const delMes = eventos.filter(ev => diasDe(ev).some(x => x.startsWith(`${a}-${String(m + 1).padStart(2, "0")}`)));
+  const colores = ["", "b", "c"];
+  let html = "";
+  for (let k = 0; k < 42; k++) {
+    const f = new Date(a, m, 1 - corrimiento + k), s = iso(f);
+    const evs = eventos.filter(ev => s >= ev.desde && s <= ev.hasta);
+    html += `<button class="dia${f.getMonth() !== m ? " fuera" : ""}${s === hoy ? " hoy" : ""}${evs.length ? " con" : ""}" data-dia="${s}"${evs.length ? ` data-evento="${evs[0].id}" aria-label="${f.getDate()}: ${esc(evs.map(e => e.nombre).join(", "))}"` : ` aria-label="${f.getDate()}" tabindex="-1"`}>${f.getDate()}<span class="marcas">${evs.slice(0, 3).map(ev => `<i class="${colores[eventos.indexOf(ev) % 3]}"></i>`).join("")}</span></button>`;
+  }
+  $("grilla").innerHTML = html;
+  $("titulo-lista").textContent = delMes.length ? `Eventos de ${MESES[m]}` : `Sin eventos en ${MESES[m]}`;
+  $("eventos").innerHTML = delMes.length ? delMes.sort((x, y) => x.desde.localeCompare(y.desde)).map(ev => {
+    const total = bandasDe(ev).length, ok = listos(ev);
+    return `<button class="evento" data-evento="${ev.id}">
+      <span class="fecha"><b>${fecha(ev.desde).getDate()}</b><span>${MESES[fecha(ev.desde).getMonth()].slice(0, 3)}</span></span>
+      <h3>${esc(ev.nombre)}</h3>
+      <p class="donde">${esc(rango(ev))}${ev.lugar ? ` · ${esc(ev.lugar)}` : ""}${ev.ejemplo ? ` <span class="chip ej">Ejemplo</span>` : ""}</p>
+      <span class="progreso"><span class="barra"><i style="width:${total ? 100 * ok / total : 0}%"></i></span>${ok}/${total} riders</span>
+    </button>`;
+  }).join("") : `<p class="vacio">Toca «＋ Evento» para planear el primero de ${MESES[m]}.</p>`;
+}
+
+/* La hoja del evento: escenarios, días y bandas con su rider, y el contra-rider de cada escenario. */
+let abierto = null;
+const ESTADOS = {falta: "Falta rider", recibido: "Recibido", revisado: "Revisado"};
+function pintarEvento(){
+  const ev = eventos.find(e => e.id === abierto); if (!ev) return cerrar("hoja-evento");
+  const dias = diasDe(ev);
+  const html = ev.escenarios.map(e => `
+    <section class="esc" data-esc="${e.id}">
+      <div class="esc-cab"><h3>${esc(e.nombre)}</h3><span class="chip">${e.bandas.length} ${e.bandas.length === 1 ? "banda" : "bandas"}</span></div>
+      <div class="contra"><span><b>Contra-rider del proveedor</b>${e.contra ? esc(e.contra.nombre) : "Todavía no está"}</span>
+        <button class="btn" data-acc="subir-contra">${e.contra ? "Cambiar" : "Subir"}</button></div>
+      ${dias.map(dia => {
+        const bs = e.bandas.filter(b => b.dia === dia);
+        return bs.length ? `<p class="dia-t">${largo(dia)}</p>` + bs.map(b => `
+          <div class="banda" data-banda="${b.id}">
+            <span class="nombre">${esc(b.nombre)}</span>
+            <button class="estado ${b.estado}" data-acc="estado" title="Cambiar el estado">${ESTADOS[b.estado]}</button>
+            ${b.rider ? `<span class="archivo">📄 ${esc(b.rider.nombre)}</span>` : ""}
+            <div class="acciones">
+              <button class="btn${b.rider ? "" : " pri"}" data-acc="subir-rider">${b.rider ? "Cambiar rider" : "Subir rider"}</button>
+              ${b.rider ? `<button class="btn" data-acc="ver-reels">Ver en reels</button>` : ""}
+              <button class="btn peligro" data-acc="quitar-banda">Quitar</button>
+            </div>
+          </div>`).join("") : "";
+      }).join("")}
+      <form class="agregar" data-acc="agregar-banda">
+        <input name="nombre" placeholder="Nueva banda" required aria-label="Nombre de la banda">
+        <select name="dia" aria-label="Día">${dias.map(d => `<option value="${d}">${largo(d)}</option>`).join("")}</select>
+        <button class="btn" type="submit">Agregar</button>
+      </form>
+    </section>`).join("");
+  $("hoja-evento").querySelector(".panel").innerHTML = `
+    <div class="agarre" aria-hidden="true"></div>
+    <h2>${esc(ev.nombre)}</h2>
+    <p class="donde">${esc(rango(ev))}${ev.lugar ? ` · ${esc(ev.lugar)}` : ""}</p>
+    <div class="acciones"><button class="btn" data-acc="editar-evento">Editar</button><button class="btn peligro" data-acc="borrar-evento">Borrar evento</button></div>
+    ${html || `<p class="nota" style="margin-top:16px">Este evento no tiene escenarios. Edítalo para agregarlos.</p>`}
+    <form class="agregar" data-acc="agregar-esc" style="margin-top:18px">
+      <input name="nombre" placeholder="Nuevo escenario" required aria-label="Nombre del escenario">
+      <button class="btn" type="submit">Agregar escenario</button>
+    </form>`;
+}
+function abrirEvento(id){ abierto = id; pintarEvento(); $("hoja-evento").hidden = false; $("hoja-evento").querySelector(".panel").scrollTop = 0; }
+function cerrar(id){ $(id).hidden = true; }
+
+/* Subir un archivo: el rider de una banda o el contra-rider de un escenario. */
+let destino = null;
+$("archivo").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; if (!f || !destino) return;
+  const archivoId = nuevoId();
+  try { await idb("readwrite", st => st.put({blob: f, nombre: f.name, tipo: f.type, cuando: new Date().toISOString()}, archivoId)); } catch { aviso("No se pudo guardar el archivo en este dispositivo"); return; }
+  const ev = eventos.find(x => x.id === abierto), e2 = ev.escenarios.find(x => x.id === destino.esc);
+  if (destino.banda) { const b = e2.bandas.find(x => x.id === destino.banda); b.rider = {nombre: f.name, archivoId}; if (b.estado === "falta") b.estado = "recibido"; }
+  else e2.contra = {nombre: f.name, archivoId};
+  ev.ejemplo = false; guardar(); pintarEvento(); pintarMes(); aviso("Guardado");
+});
+
+$("hoja-evento").addEventListener("click", async e => {
+  if (e.target.id === "hoja-evento") return cerrar("hoja-evento");
+  const b = e.target.closest("[data-acc]"); if (!b || b.tagName === "FORM") return;
+  const ev = eventos.find(x => x.id === abierto);
+  const esc_ = e.target.closest("[data-esc]")?.dataset.esc, banda = e.target.closest("[data-banda]")?.dataset.banda;
+  const escena = ev.escenarios.find(x => x.id === esc_), bd = escena?.bandas.find(x => x.id === banda);
+  switch (b.dataset.acc) {
+    case "estado": { const orden = ["falta", "recibido", "revisado"]; bd.estado = orden[(orden.indexOf(bd.estado) + 1) % 3]; break; }
+    case "subir-rider": destino = {esc: esc_, banda}; return $("archivo").click();
+    case "subir-contra": destino = {esc: esc_, banda: null}; return $("archivo").click();
+    case "quitar-banda":
+      if (!b.dataset.seguro) { b.dataset.seguro = "1"; b.textContent = "¿Quitar? Toca otra vez"; return; }
+      escena.bandas = escena.bandas.filter(x => x.id !== banda); break;
+    case "ver-reels": {
+      if (!bd.rider?.archivoId) { aviso("Este rider es de ejemplo: sube uno de verdad"); return; }
+      const q = new URLSearchParams({rider: bd.rider.archivoId, evento: ev.nombre, banda: bd.nombre});
+      location.href = `../lab-reels/?${q}`; return;
+    }
+    case "editar-evento": return abrirForm(ev);
+    case "borrar-evento":
+      if (!b.dataset.seguro) { b.dataset.seguro = "1"; b.textContent = "¿Borrar? Toca otra vez"; return; }
+      eventos = eventos.filter(x => x.id !== ev.id); guardar(); cerrar("hoja-evento"); pintarMes(); return;
+    default: return;
+  }
+  guardar(); pintarEvento(); pintarMes();
+});
+$("hoja-evento").addEventListener("submit", e => {
+  e.preventDefault();
+  const f = e.target, ev = eventos.find(x => x.id === abierto), nombre = f.nombre.value.trim(); if (!nombre) return;
+  if (f.dataset.acc === "agregar-banda") ev.escenarios.find(x => x.id === f.closest("[data-esc]").dataset.esc).bandas.push({id: nuevoId(), nombre, dia: f.dia.value, estado: "falta", rider: null});
+  else ev.escenarios.push({id: nuevoId(), nombre, contra: null, bandas: []});
+  ev.ejemplo = false; guardar(); pintarEvento(); pintarMes();
+});
+
+/* Nuevo evento o editar uno. */
+let editando = null;
+function abrirForm(ev){
+  editando = ev || null;
+  $("form-titulo").textContent = ev ? "Editar evento" : "Nuevo evento";
+  const h = iso(new Date());
+  $("f-nombre").value = ev?.nombre ?? ""; $("f-desde").value = ev?.desde ?? h; $("f-hasta").value = ev?.hasta ?? h;
+  $("f-lugar").value = ev?.lugar ?? ""; $("f-escenarios").value = ev ? ev.escenarios.map(e => e.nombre).join(", ") : "";
+  $("hoja-form").hidden = false; $("f-nombre").focus();
+}
+$("form-evento").addEventListener("submit", e => {
+  e.preventDefault();
+  const desde = $("f-desde").value, hasta = $("f-hasta").value < desde ? desde : $("f-hasta").value;
+  const nombres = $("f-escenarios").value.split(",").map(x => x.trim()).filter(Boolean);
+  if (editando) {
+    Object.assign(editando, {nombre: $("f-nombre").value.trim(), desde, hasta, lugar: $("f-lugar").value.trim(), ejemplo: false});
+    // Los escenarios que siguen conservan sus bandas; los nuevos entran vacíos.
+    editando.escenarios = nombres.map(n => editando.escenarios.find(x => x.nombre === n) ?? {id: nuevoId(), nombre: n, contra: null, bandas: []});
+    for (const es of editando.escenarios) for (const b of es.bandas) if (b.dia < desde || b.dia > hasta) b.dia = desde;
+  } else {
+    const ev = {id: nuevoId(), nombre: $("f-nombre").value.trim(), desde, hasta, lugar: $("f-lugar").value.trim(), escenarios: nombres.map(n => ({id: nuevoId(), nombre: n, contra: null, bandas: []}))};
+    eventos.push(ev); mesVisto = new Date(fecha(desde).getFullYear(), fecha(desde).getMonth(), 1); editando = ev;
+  }
+  guardar(); cerrar("hoja-form"); pintarMes(); abrirEvento(editando.id);
+});
+$("hoja-form").addEventListener("click", e => { if (e.target.id === "hoja-form" || e.target.dataset.acc === "cerrar-form") cerrar("hoja-form"); });
+
+$("nuevo").addEventListener("click", () => abrirForm(null));
+$("antes").addEventListener("click", () => { mesVisto = new Date(mesVisto.getFullYear(), mesVisto.getMonth() - 1, 1); pintarMes(); });
+$("despues").addEventListener("click", () => { mesVisto = new Date(mesVisto.getFullYear(), mesVisto.getMonth() + 1, 1); pintarMes(); });
+document.addEventListener("click", e => { const t = e.target.closest(".evento, .dia.con"); if (t && !e.target.closest(".hoja")) abrirEvento(t.dataset.evento); });
+addEventListener("keydown", e => { if (e.key === "Escape") { cerrar("hoja-form"); cerrar("hoja-evento"); } });
+// Las hojas se cierran deslizándolas hacia abajo.
+for (const id of ["hoja-evento", "hoja-form"]) {
+  const panel = $(id).querySelector(".panel"); let y0 = null;
+  panel.addEventListener("touchstart", e => { y0 = panel.scrollTop <= 0 ? e.touches[0].clientY : null; }, {passive: true});
+  panel.addEventListener("touchmove", e => { if (y0 !== null) panel.style.transform = `translateY(${Math.max(0, e.touches[0].clientY - y0)}px)`; }, {passive: true});
+  panel.addEventListener("touchend", e => { if (y0 === null) return; const dy = e.changedTouches[0].clientY - y0; y0 = null; panel.style.transform = ""; if (dy > 90) cerrar(id); });
+}
+pintarMes();
+</script>
+</body>
+</html>

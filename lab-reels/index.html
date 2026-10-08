@@ -68,6 +68,24 @@ h3{font-family:var(--display);font-size:34px;font-weight:700;line-height:1;text-
 .sub{color:var(--ink2);font-size:14px;margin:0 0 14px}
 ul.lista{list-style:none;margin:0;padding:0;overflow-y:auto;overscroll-behavior:contain;flex:1;min-height:0;mask-image:linear-gradient(#000 88%,transparent)}
 ul.lista li{display:flex;gap:12px;align-items:baseline;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+/* "En el listado" se ve como la planilla de Excel: hoja blanca, letra oscura y cuadrícula, sin naranja
+   (lo pidió el usuario: el listado no debe competir con el resto). */
+.excel{background:#fff;color:#1f1f1f;border:1px solid #c8c8c8;border-radius:6px;overflow:hidden;font-family:Calibri,"Segoe UI",Arial,sans-serif}
+.excel .cab-xl,.excel ul.lista li{display:grid;grid-template-columns:58px 1fr;gap:0;align-items:stretch}
+.excel .cab-xl{background:#f3f3f3;border-bottom:1px solid #c8c8c8;font-size:12px;font-weight:700;color:#444}
+.excel .cab-xl span,.excel ul.lista li>span{padding:8px 10px}
+.excel .cab-xl span:first-child,.excel ul.lista li>.q{border-right:1px solid #d9d9d9}
+.excel .rider{max-height:none}
+.excel ul.lista{margin:0;padding:0}
+.excel ul.lista li{padding:0;border-bottom:1px solid #e3e3e3;background:#fff}
+.excel ul.lista li:nth-child(even){background:#fafafa}
+.excel ul.lista .q{font-family:inherit;font-size:15px;font-weight:600;color:#1f1f1f;text-align:right;min-width:0;line-height:1.3}
+.excel ul.lista .q::after{content:" x";font-weight:400;color:#777}
+.excel ul.lista .t{font-size:15px;line-height:1.3;color:#1f1f1f}
+.excel ul.lista small{color:#666}
+.excel .chip{background:#eef2f7;color:#333;border-color:#d4dbe5}
+.excel .chip.warn{background:#fff4e5;color:#8a4b00;border-color:#f3d2a6}
+.excel ul.lista li.editable{cursor:pointer}.excel ul.lista li.editable:hover{background:#eaf2ff}
 ul.lista .q{font-family:var(--display);font-size:28px;font-weight:700;color:var(--accent);min-width:2.2ch;text-align:right;line-height:1;font-variant-numeric:tabular-nums}
 ul.lista .t{min-width:0;flex:1}
 ul.lista .t small{display:block;color:var(--ink3);font-size:12px;margin-top:2px}
@@ -133,7 +151,30 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .hoja{position:fixed;inset:0;z-index:10;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
 .hoja .panel{width:100%;max-width:520px;max-height:80dvh;overflow:auto;background:var(--surface);border-radius:18px 18px 0 0;padding:16px 16px calc(env(safe-area-inset-bottom) + 16px)}
 .hoja h4{font-family:var(--display);font-size:24px;text-transform:uppercase;margin:0 0 8px;color:var(--accent)}
+/* La hoja de detalle sube desde abajo; todo lo que es una pieza se puede tocar. */
+.hoja .panel{animation:sube-hoja .34s cubic-bezier(.2,.9,.25,1.12)}
+@keyframes sube-hoja{from{transform:translateY(100%)}}
+.detalle{transition:transform .2s}
+.detalle .agarre{width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,.25);margin:0 auto 14px}
+.detalle .donde{margin:0;font-size:13px;color:var(--ink2)}
+.hoja h4.titulo-pieza{font-family:var(--display);font-size:32px;line-height:1;text-transform:none;color:var(--ink);margin:4px 0 6px}
+.titulo-pieza .cant{color:var(--accent)}
+.detalle .modelo{margin:0 0 6px;font-size:14px;color:var(--ink2)}
+.detalle .nota{margin:6px 0;font-size:14px;color:var(--ink2)}
+.detalle blockquote{margin:0;padding:10px 12px;border-left:3px solid var(--accent);background:rgba(255,255,255,.05);border-radius:6px;font-size:14px;line-height:1.4;color:var(--ink)}
+.detalle .piezas{display:flex;flex-wrap:wrap;gap:8px}
+.detalle .pieza{display:inline-flex;align-items:baseline;gap:6px;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:14px;color:var(--ink);text-align:left;transition:background .15s,transform .15s}
+.detalle .pieza:active{transform:scale(.96)}
+.detalle .pieza:hover,.detalle .pieza:focus-visible{background:rgba(255,255,255,.12);outline:none}
+.detalle .pieza b{color:var(--accent)}
+.detalle .pieza small{color:var(--ink3)}
+.detalle .botones{margin-top:18px;justify-content:flex-start}
+[data-item]{cursor:pointer}
+ul.lista li[data-item],.vivo li[data-item]{transition:background .15s,transform .15s}
+ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
+@media (prefers-reduced-motion:reduce){.hoja .panel{animation:none}}
 .hoja .fila{display:flex;align-items:center;gap:12px;width:100%;padding:12px 4px;border-bottom:1px solid var(--line);text-align:left}
+.hoja a.fila{color:inherit;text-decoration:none}
 .hoja .fila .e{font-size:24px}
 .hoja .fila .x{margin-left:auto;color:var(--ink3);font-variant-numeric:tabular-nums}
 .hoja .fila .ok{color:var(--ok);font-weight:700}
@@ -160,6 +201,11 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
   .pasar[disabled]{display:none}
   .reel .riel{right:12px}
 }
+@media (max-width:699px){
+  .pasar.sig{display:grid;place-items:center;position:absolute;z-index:4;right:12px;top:auto;bottom:calc(env(safe-area-inset-bottom) + 28px);margin-top:0;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);backdrop-filter:blur(6px);border:1px solid var(--line);font-size:22px;color:var(--ink)}
+  .pasar.sig[disabled]{display:none}
+  .pasar.ant{display:none}
+}
 @media (min-width:900px) and (hover:hover){
   .flechas-v{display:flex;flex-direction:column;gap:10px;position:fixed;z-index:6;top:50%;left:calc(50% + 260px + 20px);transform:translateY(-50%)}
   .flechas-v button{width:48px;height:48px;border-radius:50%;border:1px solid var(--line);background:var(--surface);font-size:20px;transition:background .15s,border-color .15s}
@@ -168,6 +214,8 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
   .lado{display:block;position:fixed;z-index:6;top:24px;bottom:120px;right:calc(50% + 260px + 24px);width:min(240px,calc(50vw - 300px));overflow-y:auto;scrollbar-width:thin}
   .lado h1{font-family:var(--display);font-size:26px;line-height:1;text-transform:uppercase;letter-spacing:.03em;color:var(--accent);margin:0 0 4px}
   .lado p{font-size:12px;color:var(--ink3);margin:0 0 14px}
+  .lado a{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;color:var(--ink2);text-decoration:none}
+  .lado a:hover,.lado a:focus-visible{background:var(--surface2);outline:none}
   .lado button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:8px;text-align:left;color:var(--ink2);transition:background .15s}
   .lado button:hover,.lado button:focus-visible{background:var(--surface2);outline:none}
   .lado button[aria-current="true"]{background:var(--surface);color:var(--ink);box-shadow:inset 3px 0 0 var(--accent)}
@@ -194,6 +242,84 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .subir h2{font-family:var(--display);font-weight:700;font-size:clamp(40px,12vw,64px);line-height:.9;text-transform:uppercase;margin:0;color:var(--ink);text-wrap:balance}
 .subir h2 em{font-style:normal;color:var(--accent)}
 .subir .sub{max-width:34ch;margin:0}
+/* Subir un documento como un reel que explica: tres escenas de 3 s que se repiten (9 s en total). */
+.tuto{position:relative;width:min(78vw,320px);height:min(42dvh,320px);flex:none}
+.tuto-prog{position:absolute;top:0;left:0;right:0;display:flex;gap:4px}
+.tuto-prog i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden;position:relative}
+.tuto-prog i::after{content:"";position:absolute;inset:0;background:#fff;transform-origin:left;transform:scaleX(0);animation:tuto-barra 9s linear infinite}
+.tuto-prog i:nth-child(2)::after{animation-delay:3s}.tuto-prog i:nth-child(3)::after{animation-delay:6s}
+@keyframes tuto-barra{0%{transform:scaleX(0)}33.3%{transform:scaleX(1)}33.4%,100%{transform:scaleX(0)}}
+.tuto-escena{position:absolute;inset:18px 0 0;display:grid;place-items:center;opacity:0;animation:tuto-escena 9s infinite}
+.tuto-escena.e2{animation-delay:3s}.tuto-escena.e3{animation-delay:6s}
+@keyframes tuto-escena{0%{opacity:0;transform:scale(.96)}4%,30%{opacity:1;transform:none}34%,100%{opacity:0}}
+/* 1 · El rider cae en la zona punteada. */
+.tuto-zona{width:62%;height:86%;border:2px dashed rgba(255,255,255,.35);border-radius:18px;display:grid;place-items:center}
+.tuto-papel{width:58%;aspect-ratio:3/4;background:#fff;border-radius:8px;box-shadow:0 18px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:9px;padding:16px 12px;position:relative;overflow:hidden}
+.tuto-papel i{display:block;height:5px;border-radius:3px;background:#d4d4d4}
+.tuto-papel i:nth-child(odd){width:72%}.tuto-papel i:nth-child(3n){width:48%}
+.e1 .tuto-papel{animation:tuto-cae 9s cubic-bezier(.3,1.4,.5,1) infinite}
+@keyframes tuto-cae{0%{transform:translateY(-120%) rotate(-8deg);opacity:0}8%{opacity:1}14%,100%{transform:none;opacity:1}}
+/* 2 · Una línea naranja lo lee y cada renglón se marca. */
+.e2 .tuto-papel{width:46%}
+.tuto-linea{position:absolute;left:22%;right:22%;top:12%;height:3px;border-radius:2px;background:var(--accent);box-shadow:0 0 18px 3px rgba(255,106,31,.7);animation:tuto-lee 3s ease-in-out infinite}
+@keyframes tuto-lee{0%{top:12%}50%{top:86%}100%{top:12%}}
+.tuto-papel.leido i{animation:tuto-renglon 3s ease-in-out infinite}
+.tuto-papel.leido i:nth-child(2){animation-delay:.2s}.tuto-papel.leido i:nth-child(3){animation-delay:.4s}.tuto-papel.leido i:nth-child(4){animation-delay:.6s}.tuto-papel.leido i:nth-child(5){animation-delay:.8s}.tuto-papel.leido i:nth-child(6){animation-delay:1s}.tuto-papel.leido i:nth-child(7){animation-delay:1.2s}
+@keyframes tuto-renglon{0%,100%{background:#d4d4d4}20%{background:var(--accent)}}
+/* 3 · Sale el backline como en la planilla. */
+.tuto-hoja{text-align:left;width:86%;background:#fff;color:#1f1f1f;border-radius:8px;overflow:hidden;font-family:Calibri,"Segoe UI",Arial,sans-serif;box-shadow:0 18px 40px rgba(0,0,0,.6)}
+.tuto-hoja p{margin:0;display:grid;grid-template-columns:48px 1fr;border-bottom:1px solid #e3e3e3;font-size:15px;opacity:0;animation:tuto-fila 9s infinite;animation-delay:calc(6.3s + var(--k) * .25s)}
+.tuto-hoja p b{padding:7px 8px;text-align:right;border-right:1px solid #d9d9d9;font-weight:600}
+.tuto-hoja p span{padding:7px 10px}
+@keyframes tuto-fila{0%{opacity:0;transform:translateX(-10px)}3%,29%{opacity:1;transform:none}33%,100%{opacity:0}}
+/* Los textos de cada escena, grandes y fáciles de leer. */
+.tuto-textos{position:relative;width:100%;max-width:340px;height:64px}
+.tuto-textos p{position:absolute;inset:0;margin:0;display:flex;align-items:center;justify-content:center;gap:12px;font-family:var(--body);font-size:22px;font-weight:700;line-height:1.2;color:#fff;opacity:0;animation:tuto-escena 9s infinite;text-wrap:balance}
+.tuto-textos p b{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#000;font-size:18px}
+.tuto-textos .t2{animation-delay:3s}.tuto-textos .t3{animation-delay:6s}
+/* Leyendo de verdad: solo la escena de la línea, sin pausa. */
+.tuto.leyendo .tuto-escena{display:none}
+.tuto.leyendo .tuto-escena.e2{display:grid;opacity:1;animation:none}
+.tuto.leyendo .tuto-linea{animation-duration:1.4s}
+@media (prefers-reduced-motion:reduce){
+  .tuto *,.tuto-textos p{animation:none!important}
+  .tuto-escena{display:none}.tuto-escena.e3{display:grid;opacity:1}.tuto-hoja p{opacity:1}
+  .tuto-textos p{position:static;opacity:1;font-size:16px;justify-content:flex-start}.tuto-textos{height:auto;display:grid;gap:8px}
+}
+/* La entrada: 1 escribiendo, 2 borrando, 3 solo los botones. */
+.subir .slide{position:relative}
+.intro{position:absolute;inset:0;padding:calc(env(safe-area-inset-top) + var(--barra) + 24px) 24px calc(env(safe-area-inset-bottom) + 28px);display:flex;flex-direction:column;justify-content:center;align-items:center}
+.intro-escribe{margin:0;max-width:340px;min-height:3.6em;font-family:var(--body);font-size:clamp(26px,7.4vw,34px);font-weight:700;line-height:1.2;color:#fff;text-align:left;transition:opacity .4s ease}
+.intro[data-fase="2"] .intro-escribe{opacity:0}
+.intro[data-fase="3"] .intro-escribe{display:none}
+.intro-escribe .cursor{display:inline-block;width:3px;height:1.05em;margin-left:3px;vertical-align:-.15em;background:var(--accent);animation:cursor 1s steps(1) infinite}
+@keyframes cursor{50%{opacity:0}}
+.intro-final{width:100%;max-width:380px;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .6s ease,transform .6s ease;position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom) + 36px);translate:-50% 0}
+.intro[data-fase="3"] .intro-final{opacity:1;transform:none;pointer-events:auto;position:static;translate:none}
+.acciones-subir{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.accion-subir{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px 16px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.04);text-align:left;transition:border-color .2s,background .2s,transform .15s}
+.accion-subir svg{width:34px;height:34px;margin-bottom:8px;fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s}
+.accion-subir.principal svg{stroke:var(--accent)}
+.accion-subir span{font-size:17px;font-weight:700;color:#fff}
+.accion-subir small{font-size:13px;color:var(--ink2)}
+.accion-subir:hover,.accion-subir:focus-visible{border-color:var(--accent);background:rgba(255,106,31,.08);outline:none}
+.accion-subir:hover svg,.accion-subir:focus-visible svg{stroke:var(--accent)}
+.accion-subir:active{transform:scale(.97)}
+/* Leyendo: el escáner es la espera, más grande. */
+.subir .tuto.leyendo{height:min(40dvh,300px)}
+/* Al terminar: el holograma presenta lo que se encontró, detrás del número. */
+.resultado-holo{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top) + var(--barra) + 6px);height:38%;display:flex;pointer-events:none;opacity:.9}
+.resultado-holo .holo{flex:1;margin:0;padding:0;height:100%}
+.subir .slide > .encontre{position:relative;z-index:1;margin-top:max(34dvh,250px)}
+@media (prefers-reduced-motion:reduce){.intro *{transition:none!important;animation:none!important}}
+.subir .slide{justify-content:flex-end;padding-bottom:calc(env(safe-area-inset-bottom) + 40px)}
+.subir .sub{color:var(--ink);font-size:16px;line-height:1.45;max-width:32ch}
+.cargado{width:100%;max-width:360px;margin-top:10px;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid var(--line);display:flex;flex-direction:column;gap:12px;text-align:left}
+.cargado p{margin:0;display:flex;flex-direction:column;gap:2px}
+.cargado .et{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
+.cargado b{font-size:18px;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cargado .cuando{font-size:14px;color:var(--ink2)}
+.cargado .botones{justify-content:flex-start}
 .entrenar{font-size:13px;color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor}
 .botones{display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
 .btn{font-family:var(--display);font-size:20px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:10px 18px;border-radius:999px;background:var(--accent);color:var(--accent-ink);transition:transform .12s}
@@ -254,6 +380,9 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 /* ── Barra de arriba: perfil, buscador y filtros (los dos perfiles buscan y filtran) ── */
 .tope{position:fixed;z-index:7;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:520px;padding:calc(env(safe-area-inset-top) + 8px) 10px 8px;display:flex;gap:8px;align-items:center;background:linear-gradient(rgba(0,0,0,.9),rgba(0,0,0,.65));backdrop-filter:blur(8px)}
 .perfil{flex:none;height:36px;padding:0 12px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.espacio{flex:none;height:36px;padding:0 12px;border-radius:999px;border:1px solid rgba(63,191,119,.55);font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ok);display:inline-flex;align-items:center;gap:6px}
+.espacio.pruebas{border:1px dashed var(--ink3);color:var(--ink2)}
+.espacio:focus-visible,.perfil:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .perfil.admin{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .buscar{flex:1;min-width:0;height:36px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0 14px;font:inherit;font-size:16px}
 .buscar:focus{outline:none;border-color:var(--accent)}
@@ -320,17 +449,19 @@ li.pide.nota .t{color:var(--ink3);font-style:italic}
 </head>
 <body>
 <main id="feed" aria-label="Backline por categoría"></main>
-<div class="teclas"><b>Lab reels.</b> En el celular se desliza. Aquí: <kbd>↑</kbd><kbd>↓</kbd> categoría, <kbd>←</kbd><kbd>→</kbd> banda, doble clic marca listo. Arriba de todo: ＋ subir un documento.</div>
+<div class="teclas" id="teclas"><b>Lab reels.</b> En el celular se desliza. Aquí: <kbd>↑</kbd><kbd>↓</kbd> sección, <kbd>←</kbd><kbd>→</kbd> a los lados. Arriba de todo: subir un documento.</div>
 <nav class="lado" id="lado" aria-label="Categorías"></nav>
 <div class="flechas-v"><button id="sube" aria-label="Categoría anterior">↑</button><button id="baja" aria-label="Categoría siguiente">↓</button></div>
 <div class="hoja" id="indice" hidden><div class="panel" role="dialog" aria-label="Índice"><h4>Categorías</h4><div id="filas"></div></div></div>
 <div class="visor" id="visor" hidden><img alt=""><button class="borrar-foto" hidden>Borrar esta foto</button></div>
 <header class="tope" id="barra">
   <button class="perfil" id="perfil" title="Cambiar de perfil">Empleado</button>
+  <button class="espacio" id="espacio" hidden>Evento</button>
   <input class="buscar" id="buscar" type="search" placeholder="Buscar equipo o banda" aria-label="Buscar equipo o banda" autocomplete="off">
   <button class="filtrar" id="filtrar" aria-haspopup="dialog">Filtros</button>
 </header>
 <div class="hoja" id="filtros" hidden><div class="panel" role="dialog" aria-label="Filtros" id="panel-filtros"></div></div>
+<div class="hoja" id="detalle" hidden><div class="panel detalle" role="dialog" aria-label="Detalle del equipo"></div></div>
 <div class="hoja" id="editor" hidden>
   <form class="panel editor" role="dialog" aria-label="Editar ítem">
     <h4>Editar ítem</h4>
@@ -343,7 +474,7 @@ li.pide.nota .t{color:var(--ink3);font-style:italic}
 <input type="file" id="foto-camara" hidden accept="image/*" capture="environment">
 <input type="file" id="foto-galeria" hidden accept="image/*" multiple>
 
-<script src="tablero.js"></script>
+<script src="tablero.js?v=2"></script>
 <script>
 /* El lector de PDF usa Map.getOrInsert(Computed), que solo traen los navegadores más nuevos. */
 for (const C of [Map, WeakMap]) {
@@ -363,6 +494,10 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const leer = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
 const escribir = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+// Las ayudas ("Baja con ↓…", "Pasa con ›…") salen solo la primera vez que se abren los reels (lo pidió el usuario).
+const AYUDA = !leer("lab-reels:ayuda-vista", false);
+escribir("lab-reels:ayuda-vista", true);
+if (!AYUDA) document.getElementById("teclas")?.remove();
 
 function aviso(t){
   const a = document.createElement("div"); a.className = "aviso"; a.textContent = t;
@@ -578,7 +713,7 @@ function pedidosDe(ext, traza, fuente, items){
 function htmlFicha(b, cat){
   // Sin categoría (modo normal) se ve todo igual. El admin toca un ítem para editarlo.
   const editable = V?.puede?.editar;
-  const item = x => `<li class="${!cat || reelDe(x) === cat ? "" : "otra"}${editable ? " editable" : ""}"${editable ? ` data-item="${esc(x.id)}"` : ""}><span class="q">${x.cantidad}</span><span class="t">${esc(corto(x.referencia))}
+  const item = x => `<li class="${!cat || reelDe(x) === cat ? "" : "otra"}${editable ? " editable" : ""}" data-item="${esc(x.id)}"><span class="q">${x.cantidad}</span><span class="t">${esc(corto(x.referencia))}
         ${corto(x.referencia) !== x.referencia ? `<small class="modelo">${esc((x.referencia.match(/\(([^)]*)\)/g) || []).map(p => p.slice(1, -1)).join(" · "))}</small>` : ""}
         ${x.nota ? `<small>${esc(x.nota)}</small>` : x.grupo === undefined && x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
         ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
@@ -616,14 +751,91 @@ function htmlComparar(b){
 
 /* ── Reel 0: subir un documento ── */
 const subida = {estado: "inicio", archivos: [], resultado: null, error: ""};
+/* Subir un documento, explicado como un reel (lo pidió el usuario: "el usuario no entiende de programación,
+   que sea como un juego que le explique"). Tres escenas que se repiten: el rider entra, la app lo lee y
+   sale el backline como en la planilla. Leyendo un archivo de verdad se queda en la segunda. */
+const ESCENAS = ["Sube el rider de la banda", "La app lo lee por ti", "Y te sale el backline, listo para revisar"];
+function htmlTutorial(leyendo){
+  const filas = [["1", "Bombo 22”"], ["1", "Redoblante 14”"], ["2", "Tom 10” · 12”"], ["4", "Bases de platillo"], ["1", "Ampeg SVT + 8x10"]];
+  const papel = `<span class="tuto-papel"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>`;
+  return `
+      <div class="tuto${leyendo ? " leyendo" : ""}" aria-hidden="true">
+        ${leyendo ? "" : `<div class="tuto-prog"><i></i><i></i><i></i></div>`}
+        <div class="tuto-escena e1"><span class="tuto-zona">${papel}</span></div>
+        <div class="tuto-escena e2">${papel.replace("tuto-papel", "tuto-papel leido")}<span class="tuto-linea"></span></div>
+        <div class="tuto-escena e3"><div class="tuto-hoja">${filas.map(([q, t], k) => `<p style="--k:${k}"><b>${q} x</b><span>${t}</span></p>`).join("")}</div></div>
+      </div>
+      ${leyendo ? "" : `<div class="tuto-textos" aria-live="off">${ESCENAS.map((t, k) => `<p class="t${k + 1}"><b>${k + 1}</b>${t}</p>`).join("")}</div>`}`;
+}
+/* La entrada (lo pidió el usuario): el texto se escribe solo, letra por letra, para que se lea; después
+   se borra y quedan solo los dos botones, sin texto fijo. El escáner es la espera mientras se lee el
+   documento, y el holograma presenta lo que se encontró. Tocar la pantalla salta la escritura. */
+const ICONO_RIDER = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2.5H6.5a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V8z"/><path d="M14 2.5V8h5.5"/><path d="M12 18v-6.5"/><path d="m9 14 3-3 3 3"/></svg>`;
+const ICONO_CAMARA = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 4.5h-5L7.5 7H4.5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h15a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3.5"/></svg>`;
+/* El mensaje de bienvenida (lo pidió el usuario: que a cualquier persona del equipo le guste leerlo).
+   Saluda según la hora, como un compañero; reconoce el oficio (el que monta sabe, la app solo le
+   quita leer el rider renglón por renglón); dice el beneficio concreto; y el cierre cambia en cada
+   visita para que no se vuelva paisaje. Al admin le habla del evento que organiza. */
+const CIERRES = [
+  "Súbelo y en segundos tienes el backline listo para montar.",
+  "Menos tiempo leyendo PDF, más tiempo en la tarima.",
+  "Rider en mano, backline en segundos.",
+  "Tú pones el oficio. Nosotros leemos la letra pequeña.",
+  "Llega a la prueba de sonido sabiendo qué va en cada lugar.",
+];
+function frasesBienvenida(){
+  const h = new Date().getHours();
+  const saludo = h < 12 ? "Buen día, equipo." : h < 19 ? "Buenas tardes, equipo." : "Buenas noches, equipo.";
+  const evento = leer("lab-reels:evento", "");
+  const admin = V?.perfil === "admin";
+  const medio = evento ? `Hoy toca ${evento}.` : admin ? "Tú organizas el evento; nosotros leemos los riders." : "Sube el rider de la banda; nosotros lo leemos por ti.";
+  const visitas = leer("lab-reels:visitas", 0);
+  escribir("lab-reels:visitas", visitas + 1);
+  return [saludo, medio, CIERRES[visitas % CIERRES.length]];
+}
+function htmlIntro(){
+  return `
+      <div class="intro" data-fase="1">
+        <p class="intro-escribe" aria-live="polite"><span class="txt"></span><span class="cursor" aria-hidden="true"></span></p>
+        <div class="intro-final">
+          <div class="acciones-subir">
+            <button class="accion-subir principal" data-acc="elegir">${ICONO_RIDER}<span>Subir rider</span><small>PDF, Excel o correo</small></button>
+            <button class="accion-subir" data-acc="foto">${ICONO_CAMARA}<span>Tomar foto</span><small>De la hoja impresa</small></button>
+          </div>
+        </div>
+      </div>`;
+}
+let introTimers = [], introHecha = false;
+function correrIntro(){
+  const el = document.querySelector("#subir .intro");
+  if (!el || el.dataset.corriendo) return;
+  el.dataset.corriendo = "1";
+  introTimers.forEach(clearTimeout); introTimers = [];
+  const txt = el.querySelector(".txt");
+  const final = () => { introTimers.forEach(clearTimeout); el.dataset.fase = "3"; };
+  // Se escribe una vez por visita: si la pantalla se vuelve a dibujar (filtros, perfil), queda en el final.
+  if (QUIETO || introHecha) return final();
+  introHecha = true;
+  // Escribe cada frase letra por letra, la deja leer y la borra.
+  let t = 400;
+  for (const frase of frasesBienvenida()) {
+    for (let i = 1; i <= frase.length; i++) { const k = i; introTimers.push(setTimeout(() => { txt.textContent = frase.slice(0, k); }, t)); t += 38; }
+    t += 900 + frase.length * 18;
+    introTimers.push(setTimeout(() => { el.dataset.fase = "2"; }, t));
+    t += 450;
+    introTimers.push(setTimeout(() => { txt.textContent = ""; el.dataset.fase = "1"; }, t));
+    t += 250;
+  }
+  introTimers.push(setTimeout(final, t));
+  el.addEventListener("click", e => { if (el.dataset.fase !== "3" && !e.target.closest("button")) final(); });
+}
 function htmlSubir(){
   const s = subida;
-  const flotan = QUIETO ? "" : `<div class="flotan" aria-hidden="true">${["📄","🧾","📸","📊","✉️","📄","🎸","🥁"].map((e,i) => `<span style="left:${8 + i*11.5}%;animation-delay:${(i*0.75).toFixed(2)}s">${e}</span>`).join("")}</div>`;
-  const pie = V?.doc && s.estado !== "leyendo" ? `<div class="fuente">Tu documento: <b>${esc(V.doc.nombre)}</b> · ${V.doc.totalItems} ítems <button data-acc="borrar">Borrar</button></div>` : "";
+  const pie = "";
   const lista = s.archivos.length ? `<ul class="archivos">${s.archivos.map(a => `<li class="${a.clase}"><span>${esc(a.nombre)}</span><span>${esc(a.estado)}</span></li>`).join("")}</ul>` : "";
   let cuerpo;
   if (s.estado === "leyendo") cuerpo = `
-      <div class="hojita" aria-hidden="true">${"<i></i>".repeat(9)}</div>
+      ${htmlTutorial(true)}
       <h2>Leyendo<em>…</em></h2>
       <p class="sub" id="lento">Todo pasa en este dispositivo. Una foto tarda más porque hay que reconocer las letras.</p>${lista}`;
   else if (s.estado === "error") cuerpo = `
@@ -631,23 +843,18 @@ function htmlSubir(){
       <h2>${esc(s.error.titulo)}</h2>
       <p class="sub">${esc(s.error.texto)}</p>
       ${s.error.avisos?.length ? `<ul class="archivos">${s.error.avisos.slice(0, 6).map(a => `<li><span>${esc(a)}</span></li>`).join("")}</ul>` : ""}
-      <div class="botones"><button class="btn" data-acc="elegir">Probar con otro archivo</button><button class="btn sec" data-acc="muestra">Probar con un ejemplo</button></div>${lista}`;
+      <div class="botones"><button class="btn" data-acc="elegir">Probar con otro archivo</button></div>${lista}`;
   else if (s.estado === "listo") {
     const r = s.resultado;
     cuerpo = `
-      <div class="encontre"><strong data-to="${r.items}">${r.items}</strong></div>
-      <h2>Ítems <em>encontrados</em></h2>
-      <p class="sub">${r.bandas} ${r.bandas === 1 ? "banda" : "bandas"} · ${r.cats} ${r.cats === 1 ? "categoría" : "categorías"}${r.dudosos ? ` · ${r.dudosos} por confirmar` : ""}${r.avisos ? ` · ${r.avisos} ${r.avisos === 1 ? "aviso" : "avisos"} del lector` : ""}</p>
+      <div class="resultado-holo"><div class="holo" data-cat="Tarima"><div class="emoji" aria-hidden="true">🥁</div></div></div>
+      <div class="encontre"><strong data-to="${r.bandas}">${r.bandas}</strong></div>
+      <h2>${r.bandas === 1 ? "Banda" : "Bandas"} <em>${r.bandas === 1 ? "encontrada" : "encontradas"}</em></h2>
+      ${r.dudosos || r.avisos ? `<p class="sub">${[r.dudosos ? `${r.dudosos} por confirmar` : "", r.avisos ? `${r.avisos} ${r.avisos === 1 ? "aviso" : "avisos"} del lector` : ""].filter(Boolean).join(" · ")}</p>` : ""}
       <div class="botones"><button class="btn" data-acc="ver">Ver mis reels ${PC ? "↓" : "↑"}</button><button class="btn sec" data-acc="otro">Subir otro</button></div>${lista}`;
-  } else cuerpo = `
-      <button class="orbe" data-acc="elegir" aria-label="Elegir un documento"><span class="anillo"></span><span class="nucleo">+</span></button>
-      <h2>Sube un <em>documento</em></h2>
-      <p class="sub">Rider en PDF, foto de la hoja, Excel del desglose o el correo. ${festival() ? "Sale un reel por cada categoría" : "Sale una pantalla por banda, con su backline como viene en el rider"}. Se lee en tu dispositivo, sin internet.</p>
-      <div class="botones"><button class="btn" data-acc="elegir">Elegir archivo</button><button class="btn sec" data-acc="foto">Tomar foto</button><button class="btn sec" data-acc="muestra">Probar con un ejemplo</button></div>
-      <a class="entrenar" href="../entrenar/">¿Quieres revisarlo renglón por renglón antes? Entrena el lector →</a>${lista}`;
+  } else cuerpo = htmlIntro() + lista;
   return `
   <article class="reel subir" id="subir" data-n="1" aria-label="Subir documento">
-    ${flotan}
     <div class="slides"><section class="slide">
       ${cuerpo}
       ${pie}
@@ -693,11 +900,6 @@ function htmlReel(c, i, total){
     </div>
     <button class="pasar ant" aria-label="Anterior" disabled>‹</button>
     <button class="pasar sig" aria-label="Siguiente">›</button>
-    <div class="riel">
-      <button class="listo" aria-pressed="${listos.has(c.id)}"><span class="ic">✓</span><span>Listo</span></button>
-      <button class="ir-subir"><span class="ic">＋</span><span>Subir</span></button>
-    </div>
-    <div class="corazon" aria-hidden="true">✅</div>
   </article>`;
 }
 
@@ -760,12 +962,8 @@ const nombreDeGrupo = t => sinTildes(String(t).replace(/^\d{1,2}\s*\.\s*(?:\d{1,
    la portada de la banda (holograma y el listado ahí mismo, compacto y entrando uno a uno) con sus
    fotos al lado; después una pantalla por sección del rider con, a los lados, solo su información,
    lo que está en el listado y lo que pidió la banda. */
-const riel = id => `
-    <div class="riel">
-      <button class="listo" aria-pressed="${listos.has(id)}"><span class="ic">✓</span><span>Listo</span></button>
-      <button class="ir-subir"><span class="ic">＋</span><span>Subir</span></button>
-    </div>
-    <div class="corazon" aria-hidden="true">✅</div>`;
+// A la derecha de cada reel solo va «›» (lo decidió el usuario): sin Listo ni Subir.
+const riel = () => "";
 const pasar = `
     <button class="pasar ant" aria-label="Anterior" disabled>‹</button>
     <button class="pasar sig" aria-label="Siguiente">›</button>`;
@@ -793,7 +991,7 @@ function htmlBanda(b){
   let k = 0;
   const vivo = b.secciones.map(s => `
         ${b.secciones.length > 1 || s.grupo ? `<li class="tit" style="--i:${k++}">${esc(s.grupo || "Sin sección")}</li>` : ""}
-        ${s.items.map(x => `<li style="--i:${k++}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(corto(x.referencia))}</li>`).join("")}`).join("");
+        ${s.items.map(x => `<li style="--i:${k++}" data-item="${esc(x.id)}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(corto(x.referencia))}</li>`).join("")}`).join("");
   return `
   <article class="reel" id="${esc(id)}" style="--h:20" data-n="2" aria-label="${esc(b.nombre)}">
     <div class="prog"><i></i><i></i></div>
@@ -803,9 +1001,9 @@ function htmlBanda(b){
         ${htmlHolo(`${id}|todo`, b.items)}
         ${htmlOrigen()}
         <h2${b.nombre.length > 18 ? ' class="largo"' : ""}>${esc(b.nombre)}</h2>
-        <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${secs.length} ${secs.length === 1 ? "sección" : "secciones"}${dudosos ? ` · <span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
+        ${dudosos ? `<p class="sub" style="margin:4px 0 8px"><span class="chip warn">${dudosos} por confirmar</span></p>` : ""}
         <ul class="vivo">${vivo}</ul>
-        <p class="pista">${secs.length ? (PC ? "Baja con ↓ para ir sección por sección" : "Desliza hacia arriba para ir sección por sección") : ""}</p>
+        ${AYUDA && secs.length ? `<p class="pista">${PC ? "Baja con ↓ para ir sección por sección" : "Desliza hacia arriba para ir sección por sección"}</p>` : ""}
       </section>
       <section class="slide banda">
         <h3>Fotos</h3>
@@ -836,15 +1034,14 @@ function htmlSeccion(b, s, j, total){
       <section class="slide portada seccion-portada">
         ${htmlHolo(`${id}|todo`, s.items)}
         <h2${titulo.length > 18 ? ' class="largo"' : ""}>${esc(titulo)}</h2>
-        <p class="sub" style="margin:4px 0 8px">${piezas} ${piezas === 1 ? "pieza" : "piezas"} · ${s.items.length} ${s.items.length === 1 ? "ítem" : "ítems"}</p>
         ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
         <p class="chips-pieza">${cats.map(c => `<span class="chip">${esc(c)}</span>`).join("")}${trae ? `<span class="chip ter">${trae} lo trae la banda</span>` : ""}${dudosos ? `<span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
-        <p class="pista">${PC ? "Pasa con › para ver el listado y lo que pidió la banda" : "Desliza para ver el listado y lo que pidió la banda"} <span class="flecha">→</span></p>
+        ${AYUDA ? `<p class="pista">${PC ? "Pasa con › para ver el listado y lo que pidió la banda" : "Desliza para ver el listado y lo que pidió la banda"} <span class="flecha">→</span></p>` : ""}
       </section>
       <section class="slide banda">
         <h3>En el listado</h3>
-        <p class="sub">${esc(titulo)}${V.puede.editar ? " · toca un ítem para editarlo" : ""}</p>
-        ${htmlFicha({secciones: [{grupo: "", items: s.items}], items: s.items}, null)}
+        <p class="sub">${esc(titulo)} · toca una pieza para ver más</p>
+        <div class="excel"><div class="cab-xl"><span>Cant</span><span>Requerimiento</span></div>${htmlFicha({secciones: [{grupo: "", items: s.items}], items: s.items}, null)}</div>
       </section>
       <section class="slide banda">
         <h3>Lo que pidió la banda</h3>
@@ -865,7 +1062,7 @@ function htmlPedido(renglones){
     if (r.tipo === "grupo") return `<h4 class="seccion">${esc(r.texto)}</h4>${r.opciones ? `<p class="opciones">Opciones de la banda: <b>${r.opciones.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}`;
     if (r.tipo === "item") {
       const x = enListado.get(r.itemId);
-      return `<li class="pide"><span class="t">${esc(r.texto)}</span><span class="va${x ? "" : " no"}">${x ? `→ ${x.cantidad} × ${esc(x.referencia)}` : "→ quitado del listado"}</span></li>`;
+      return `<li class="pide"${x ? ` data-item="${esc(x.id)}"` : ""}><span class="t">${esc(r.texto)}</span><span class="va${x ? "" : " no"}">${x ? `→ ${x.cantidad} × ${esc(x.referencia)}` : "→ quitado del listado"}</span></li>`;
     }
     if (r.tipo === "fuera") return `<li class="pide fuera"><span class="t">${esc(r.texto)}</span><span class="va no">no va: ${esc(r.motivo || "no es backline")}</span></li>`;
     if (r.tipo === "alternativa") return `<li class="pide nota"><span class="t">${esc(r.texto)}</span><span class="va no">alternativa, no suma</span></li>`;
@@ -908,7 +1105,7 @@ function cuandoSeSubio(iso){
 function htmlOrigen(){
   if (!V?.doc) return "";
   const c = cuandoSeSubio(V.doc.cuando);
-  return `<p class="origen">Del documento <b>${esc(V.doc.nombre)}</b>${c ? ` · subido ${esc(c)}` : ""} <button data-acc="borrar">Borrar</button></p>`;
+  return `<p class="origen">Del documento <b>${esc(V.doc.nombre)}</b>${c ? ` · subido ${esc(c)}` : ""}</p>`;
 }
 
 function htmlNada(){
@@ -926,7 +1123,8 @@ function htmlNada(){
 
 function contar(el){
   if (!el || !el.dataset.to) return;
-  const to = +el.dataset.to; if (QUIETO) return;
+  // Números chicos (1 banda, 2 bandas) van directo: la cuenta animada a veces se quedaba en 0.
+  const to = +el.dataset.to; el.textContent = to; if (QUIETO || to < 10) return;
   const t0 = performance.now();
   const paso = t => { const k = Math.min(1, Math.max(0, (t - t0) / 700)); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(paso); };
   requestAnimationFrame(paso);
@@ -934,7 +1132,7 @@ function contar(el){
 
 /* Holograma 3D de la rama de reconocimiento-3d en la portada. Si no hay WebGL se queda el emoji. */
 let holo3d = null;
-const holo3dListo = import("./holograma.js?v=3").then(m => holo3d = m).catch(() => null);
+const holo3dListo = import("./holograma.js?v=4").then(m => holo3d = m).catch(() => null);
 function holograma(r){
   holo3dListo.then(() => {
     // El de la pantalla que se ve: la portada o la sección a la que se deslizó.
@@ -978,6 +1176,7 @@ function pintar(destino){
   cargarFotos();
   reels = [...feed.querySelectorAll(".reel")];
   actual = reels[0];
+  correrIntro();
   io?.disconnect();
   io = new IntersectionObserver(es => es.forEach(e => {
     if (!e.isIntersecting) return;
@@ -1015,6 +1214,8 @@ function pintarSubir(){
   const nuevo = t.content.firstElementChild;
   viejo.replaceWith(nuevo); reels[0] = nuevo; if (actual === viejo) actual = nuevo;
   io.observe(nuevo);
+  correrIntro();
+  if (subida.estado === "listo") holograma(nuevo);
   contar(nuevo.querySelector(".encontre strong"));
 }
 
@@ -1051,7 +1252,7 @@ feed.addEventListener("click", async e => {
   const foto = e.target.closest("img[data-foto]");
   if (foto) return verFoto(foto);
   const li = e.target.closest("[data-item]");
-  if (li && V.puede.editar) return abrirEditor(li.dataset.item);
+  if (li) return abrirDetalle(li.dataset.item);
   if (acc === "ver") return reels[1]?.scrollIntoView({behavior: "smooth"});
   const vt = e.target.closest(".ver-totales, .totales .cerrar");
   if (vt) {
@@ -1081,10 +1282,11 @@ feed.addEventListener("click", async e => {
   if (img) { const v = document.getElementById("visor"); v.querySelector("img").src = img.src; v.querySelector(".borrar-foto").hidden = true; v.hidden = false; }
 });
 feed.addEventListener("change", e => {
-  if (e.target.matches("#archivo, #camara")) { const fs = [...e.target.files]; e.target.value = ""; subirArchivos(fs); }
+  // Un documento subido a mano no es del evento que se abrió desde el cronograma.
+  if (e.target.matches("#archivo, #camara")) { const fs = [...e.target.files]; e.target.value = ""; escribir("lab-reels:evento", null); subirArchivos(fs); }
 });
 // Doble toque en cualquier parte = listo, igual que el "me gusta".
-feed.addEventListener("dblclick", e => { if (!e.target.closest(".riel, .pasar, .subir, .ver-cmp, .ver-totales, .totales")) marcar(e.target.closest(".reel"), true); });
+
 document.getElementById("visor").addEventListener("click", e => {
   const v = e.currentTarget, b = v.querySelector(".borrar-foto");
   if (e.target === b) {
@@ -1101,7 +1303,8 @@ document.getElementById("visor").addEventListener("click", e => {
 
 const indice = document.getElementById("indice");
 const filaIndice = (c, cls, actualId) => `<button class="${cls}${c.sub ? " sub-fila" : ""}" data-id="${esc(c.id)}" aria-current="${actualId === c.id}"><span class="e">${c.e}</span><span>${esc(c.nombre)}</span><span class="x">${listos.has(c.id) ? '<span class="ok">✓ </span>' : ""}${esc(c.x)}</span></button>`;
-const filaSubir = (cls, actualId) => `<button class="${cls}" data-id="subir" aria-current="${actualId === "subir"}"><span class="e">＋</span><span>Subir documento</span></button>`;
+const filaSubir = (cls, actualId) => `<button class="${cls}" data-id="subir" aria-current="${actualId === "subir"}"><span class="e">＋</span><span>Subir documento</span></button>`
+  + (V?.puede?.planilla ? `<a class="${cls} enlace" href="../cronograma/"><span class="e">📅</span><span>Cronograma</span></a>` : "");
 function abrirIndice(){
   indice.querySelector("h4").textContent = festival() ? "Categorías" : "Bandas";
   document.getElementById("filas").innerHTML = filaSubir("fila") + entradas.map(c => filaIndice(c, "fila")).join("");
@@ -1109,10 +1312,12 @@ function abrirIndice(){
 }
 indice.addEventListener("click", e => {
   const f = e.target.closest(".fila");
+  if (f?.matches("a")) return;
   indice.hidden = true;
   if (f) document.getElementById(f.dataset.id).scrollIntoView({behavior: "smooth"});
 });
 addEventListener("keydown", e => {
+  if (!detalle.hidden) { if (e.key === "Escape") detalle.hidden = true; return; }
   if (!indice.hidden || !document.getElementById("visor").hidden) { if (e.key === "Escape") indice.hidden = document.getElementById("visor").hidden = true; return; }
   if (document.querySelector(".guia, .splash:not(.fuera)")) return;
   if (mover[e.key] && actual) { e.preventDefault(); mover[e.key](); }
@@ -1123,7 +1328,8 @@ document.getElementById("baja").addEventListener("click", () => mover.ArrowDown(
 // Índice fijo a la izquierda en PC.
 const lado = document.getElementById("lado");
 function pintarLado(){
-  lado.innerHTML = `<h1>Backline en reels</h1><p>${esc(titulo())}</p>` + filaSubir("", actual?.id) + entradas.map(c => filaIndice(c, "", actual?.id)).join("");
+  const ev = V?.espacio === "evento" ? leer("lab-reels:evento", "") : "Mis pruebas";
+  lado.innerHTML = `<h1>Backline en reels</h1><p>${ev ? `<b class="evento-actual">${esc(ev)}</b> · ` : ""}${esc(titulo())}</p>` + filaSubir("", actual?.id) + entradas.map(c => filaIndice(c, "", actual?.id)).join("");
   document.getElementById("sube").disabled = actual === reels[0];
   document.getElementById("baja").disabled = actual === reels[reels.length - 1];
 }
@@ -1142,7 +1348,21 @@ function pintarBarra(){
   const f = $b("filtrar");
   f.innerHTML = `Filtros${n ? ` · ${n}` : ""}${festival() ? '<span class="fest">Festival</span>' : ""}`;
   f.classList.toggle("on", n > 0);
+  // Evento: lo oficial, sincronizado con el cronograma (el empleado lo ve pero no lo cambia).
+  // Pruebas: el escritorio propio, donde cualquiera sube y prueba sin dañar el evento.
+  const e = $b("espacio"), enEvento = V.espacio === "evento";
+  e.hidden = !V.hay?.evento && !enEvento;
+  e.classList.toggle("pruebas", !enEvento);
+  e.innerHTML = enEvento ? `${V.puede.editar ? "" : "🔒 "}Evento` : "Mis pruebas";
+  e.title = enEvento ? (V.puede.editar ? "Backline del evento. Toca para ir a Mis pruebas" : "Backline del evento: lo armó el admin y no se puede cambiar. Toca para ir a Mis pruebas")
+    : "Tu escritorio: sube y prueba sin dañar el evento. Toca para volver al evento";
 }
+$b("espacio").addEventListener("click", () => {
+  // Al cambiar de espacio se va a la primera banda de ese espacio (o a subir, si no hay nada).
+  subida.estado = "inicio"; subida.archivos = []; destinoPendiente = "subir";
+  enviar({tipo: "espacio", espacio: V.espacio === "evento" ? "pruebas" : "evento"});
+  setTimeout(() => { if (V.doc && reels[1]) reels[1].scrollIntoView(); }, 80);
+});
 $b("perfil").addEventListener("click", () => {
   enviar({tipo: "perfil", perfil: V.perfil === "admin" ? "empleado" : "admin"});
   aviso(V.perfil === "admin" ? "Ahora eres admin" : "Ahora eres empleado");
@@ -1243,6 +1463,48 @@ function verFoto(img){
 /* ── Editar un ítem (solo el admin; el núcleo no acepta la edición de un empleado) ── */
 const editor = $b("editor"), form = editor.querySelector("form");
 let editando = null;
+/* Todo se puede tocar (lo pidió el usuario: "todo se relaciona con todo"): una pieza abre una hoja que
+   sube desde abajo con su información, el renglón del rider de donde salió, lo demás de su sección y
+   lo mismo en otras bandas; desde ahí se salta a cualquiera de esas piezas. El admin la edita. */
+const detalle = document.getElementById("detalle");
+function abrirDetalle(id){
+  const d = datos(), x = d.items.find(i => i.id === id); if (!x) return;
+  const art = Object.fromEntries(d.artistas.map(a => [a.id, a.nombre]));
+  const renglones = (d.pedidos || []).filter(p => p.artistaId === x.artistaId).flatMap(p => p.renglones || []).filter(r => r.itemId === x.id);
+  const deSeccion = d.items.filter(i => i.id !== x.id && i.artistaId === x.artistaId && (i.grupo || "") === (x.grupo || ""));
+  const enOtras = d.items.filter(i => i.artistaId !== x.artistaId && !i.sinBanda && i.categoria === x.categoria);
+  const pieza = (i, banda) => `<button class="pieza" data-item="${esc(i.id)}"><b>${i.cantidad}</b>${esc(corto(i.referencia))}${banda ? `<small>${esc(art[i.artistaId] || "")}</small>` : ""}</button>`;
+  const modelo = corto(x.referencia) !== x.referencia ? (x.referencia.match(/\(([^)]*)\)/g) || []).map(t => t.slice(1, -1)).join(" · ") : "";
+  detalle.querySelector(".panel").innerHTML = `
+    <div class="agarre" aria-hidden="true"></div>
+    <p class="donde">${esc(x.sinBanda ? "Listado general" : art[x.artistaId] || "")}${x.grupo ? ` · ${esc(x.grupo)}` : ""}</p>
+    <h4 class="titulo-pieza"><span class="cant">${x.cantidad} ×</span> ${esc(corto(x.referencia))}</h4>
+    ${modelo ? `<p class="modelo">${esc(modelo)}</p>` : ""}
+    <p class="chips-pieza"><span class="chip">${esc(x.categoria)}</span>${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "la banda")}</span>` : ""}${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</p>
+    ${x.nota ? `<p class="nota">${esc(x.nota)}</p>` : ""}
+    ${renglones.length ? `<p class="et">Así lo pidió el rider</p><blockquote>${renglones.map(r => esc(r.texto)).join("<br>")}</blockquote>` : ""}
+    ${deSeccion.length ? `<p class="et">En la misma sección</p><div class="piezas">${deSeccion.map(i => pieza(i, false)).join("")}</div>` : ""}
+    ${enOtras.length ? `<p class="et">${esc(x.categoria)} en otras bandas</p><div class="piezas">${enOtras.slice(0, 12).map(i => pieza(i, true)).join("")}</div>` : ""}
+    <div class="botones">${V.puede.editar ? `<button class="btn" data-acc="editar-item" data-id="${esc(x.id)}">Editar</button>` : ""}<button class="btn sec" data-acc="cerrar-detalle">Cerrar</button></div>`;
+  detalle.hidden = false;
+  detalle.querySelector(".panel").scrollTop = 0;
+}
+detalle.addEventListener("click", e => {
+  const otra = e.target.closest("[data-item]"); if (otra) return abrirDetalle(otra.dataset.item);
+  const acc = e.target.closest("[data-acc]")?.dataset.acc;
+  if (acc === "editar-item") { detalle.hidden = true; return abrirEditor(e.target.closest("[data-id]").dataset.id); }
+  if (e.target === detalle || acc === "cerrar-detalle") detalle.hidden = true;
+});
+// Se cierra también deslizándola hacia abajo.
+{
+  const panel = detalle.querySelector(".panel"); let y0 = null;
+  panel.addEventListener("touchstart", e => { y0 = panel.scrollTop <= 0 ? e.touches[0].clientY : null; }, {passive: true});
+  panel.addEventListener("touchmove", e => { if (y0 === null) return; panel.style.transform = `translateY(${Math.max(0, e.touches[0].clientY - y0)}px)`; }, {passive: true});
+  panel.addEventListener("touchend", e => {
+    if (y0 === null) return; const dy = e.changedTouches[0].clientY - y0; y0 = null;
+    panel.style.transform = ""; if (dy > 90) detalle.hidden = true;
+  });
+}
 function abrirEditor(id){
   const it = datos().items.find(x => x.id === id); if (!it) return;
   editando = it;
@@ -1303,19 +1565,19 @@ function fallo(titulo, texto, avisos){
   reels[0]?.scrollIntoView();
 }
 
-async function subirArchivos(archivos){
+async function subirArchivos(archivos, tipo = "cargar"){
   if (!archivos.length) return;
   subida.estado = "leyendo";
   subida.archivos = archivos.map(f => ({nombre: f.name, estado: "en cola", clase: ""}));
   pintarSubir();
   reels[0]?.scrollIntoView();
   const lento = setTimeout(() => { const el = document.getElementById("lento"); if (el) el.textContent = "Sigue leyendo. Un PDF escaneado o una foto puede tardar hasta un minuto en el celular."; }, 12000);
-  try { await leerYArmar(archivos); }
+  try { await leerYArmar(archivos, tipo); }
   catch (err) { fallo("No se pudo leer", (err && err.message) || "Algo falló leyendo el archivo. Prueba otra vez o con otro archivo."); }
   finally { clearTimeout(lento); }
 }
 
-async function leerYArmar(archivos){
+async function leerYArmar(archivos, tipo = "cargar"){
   let r;
   const traza = [];   // lo que el lector decidió de cada renglón: sirve para mostrar lo que pidió la banda
   {
@@ -1342,7 +1604,7 @@ async function leerYArmar(archivos){
   subida.estado = "listo";
   subida.resultado = {items: d.items.length, bandas: new Set(d.items.filter(i => !i.sinBanda).map(i => i.artistaId)).size, cats: categorias.length, dudosos: d.items.filter(i => i.porConfirmar).length, avisos: ext.avisos.length};
   destinoPendiente = "subir";
-  enviar({tipo: "cargar", doc: {nombre, archivos: archivos.map(f => f.name), cuando: new Date().toISOString(), datos: d}});
+  enviar({tipo, doc: {nombre, archivos: archivos.map(f => f.name), cuando: new Date().toISOString(), datos: d}});
 }
 
 async function probarMuestra(){
@@ -1369,7 +1631,6 @@ function guiaAlLlegar(r){
   if (document.querySelector(".splash:not(.fuera)")) return;
   if (r.id === "subir") entradas.length && guia("arriba", "arriba-g", PC ? (festival() ? "Baja para ver cada categoría" : "Baja para ver cada banda") : "Desliza hacia arriba", PC ? "Con la rueda del mouse, ↓ o los botones de la derecha" : festival() ? "Cada pantalla es una categoría: Batería, Platillos, Bases…" : "Cada pantalla es una banda, con su backline como viene en el rider");
   else if (!vistos.has("lado")) setTimeout(() => actual === r && guia("lado", "lado-g", PC ? "Pasa con ›" : "Desliza a la izquierda", festival() ? "Ahí está lo que hay que tener y cada banda con su plano" : "Ahí está cada sección en detalle, las fotos y lo que pidió la banda"), 1400);
-  else setTimeout(() => actual === r && guia("toque", "toque-g", "Doble toque = listo", festival() ? "Marca la categoría cuando esté revisada" : "Marca la banda cuando esté revisada"), 1400);
 }
 function splash(){
   return new Promise(ok => {
@@ -1382,6 +1643,58 @@ function splash(){
   });
 }
 
+/* Abierto desde el cronograma (?rider=…&evento=…): el rider que el admin subió allá queda guardado en
+   este dispositivo (IndexedDB "backline-riders") y se lee aquí como cualquier documento. */
+async function riderDelCronograma(){
+  const q = new URLSearchParams(location.search), id = q.get("rider");
+  if (q.get("evento")) escribir("lab-reels:evento", q.get("evento"));
+  if (!id) return;
+  history.replaceState(null, "", location.pathname);
+  const guardado = await new Promise(ok => {
+    const r = indexedDB.open("backline-riders", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("archivos");
+    r.onerror = () => ok(null);
+    r.onsuccess = () => { const q2 = r.result.transaction("archivos").objectStore("archivos").get(id); q2.onsuccess = () => ok(q2.result); q2.onerror = () => ok(null); };
+  });
+  if (!guardado) return aviso("No encontré ese rider en este dispositivo");
+  subirArchivos([new File([guardado.blob], guardado.nombre, {type: guardado.tipo})], "cargar-evento");
+}
+
+/* El evento de hoy en el cronograma: si ya tiene riders, se cargan todos como el backline del evento
+   (para cualquier perfil) y se entra directo a los reels, sin la entrada. Si ya estaban cargados, no
+   se vuelven a leer. */
+async function eventoDeHoy(){
+  const hoy = new Date(), iso = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
+  const ev = leer("cronograma:eventos", []).find(e => e.desde <= iso && iso <= e.hasta);
+  if (!ev) return false;
+  const riders = ev.escenarios.flatMap(e => e.bandas).map(b => b.rider?.archivoId).filter(Boolean);
+  if (!riders.length) return false;
+  escribir("lab-reels:evento", ev.nombre);
+  const clave = ev.id + ":" + riders.join(",");
+  if (leer("lab-reels:evento-cargado", "") === clave && V.hay?.evento) return true;
+  const archivos = (await Promise.all(riders.map(id => new Promise(ok => {
+    const r = indexedDB.open("backline-riders", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("archivos");
+    r.onerror = () => ok(null);
+    r.onsuccess = () => { const q = r.result.transaction("archivos").objectStore("archivos").get(id); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); };
+  })))).filter(Boolean).map(g => new File([g.blob], g.nombre, {type: g.tipo}));
+  if (!archivos.length) return false;
+  escribir("lab-reels:evento-cargado", clave);
+  introHecha = true;
+  await subirArchivos(archivos, "cargar-evento");
+  return true;
+}
+
+/* Con un rider ya cargado no hace falta la entrada: saludo corto y directo a los reels. */
+function directoALosReels(){
+  if (!V?.doc || !reels[1]) return;
+  introHecha = true;
+  const el = document.querySelector("#subir .intro"); if (el) el.dataset.fase = "3";
+  reels[1].scrollIntoView();
+  const h = new Date().getHours(), ev = leer("lab-reels:evento", "");
+  aviso(`${h < 12 ? "Buen día" : h < 19 ? "Buenas tardes" : "Buenas noches"}, equipo${ev && V.espacio === "evento" ? ` · Hoy toca ${ev}` : ""}`);
+}
+
 /* ── Arranque ── */
 splash().then(() => { if (actual) guiaAlLlegar(actual); });
 if (location.hash === "#intro") history.replaceState(null, "", location.pathname);
@@ -1391,7 +1704,11 @@ enviar({tipo: "limpiar"});
   if (!V) return setTimeout(arrancar, 20);
   arrancado = true;
   pintarBarra();
+  riderDelCronograma();
+  if (V.doc && !location.hash) introHecha = true;   // ya hay rider: sin la entrada
   pintar(location.hash.slice(1));
+  if (!location.hash) setTimeout(directoALosReels, 1700);   // después del logo de Circuito
+  eventoDeHoy().then(ok => ok && setTimeout(directoALosReels, 300)).catch(() => {});
 })();
 </script>
 </body>
