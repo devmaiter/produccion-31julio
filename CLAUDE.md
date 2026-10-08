@@ -241,6 +241,13 @@ prueba (que el % suba sin romper los riders anteriores).
   lleva a la historia de fotos.
   Una lista del sitio puede traer sus fotos en `listas/<nombre>.fotos.json` (pieza por nombre, momento y URLs
   en `listas/fotos/`, achicadas y sin EXIF): se ven en cualquier celular y no se borran desde la app.
+- **Lo que lleva cada instrumento (2026-10-08, lo pidió el usuario: "la batería debe llevar silla y no la
+  pidió"):** tabla `LLEVA` en `lab-reels/index.html` (batería: silla, pedal, base de redoblante, máquina de
+  hi-hat, platillos, alfombra; bajo: ampli y base; guitarra: ampli y base; teclado: base y pedal de sustain).
+  «Hardware completo» cubre stands y pedal, no silla ni alfombra. Se avisa (⚠ en los botones de sección,
+  «Revisa: no pidió…» en la portada de la sección, «Le falta» bajo el listado), nunca se agrega solo:
+  «+ Agregar» (admin) vuelve a cargar el mismo documento con la pieza (nota «Agregado al revisar») y «No hace
+  falta» lo descarta (`lab-reels:no-falta:<doc>`). Si el usuario corrige la tabla, cambiarla ahí.
 - **Respaldo (2026-10-08, lo pidió el usuario: no perder estados):** en Filtros, «Guardar respaldo» arma un
   .json (`respaldo-lab-reels/1`) con lo de `lab-reels:`/`cronograma:`/`planilla:` en localStorage y las fotos de
   IndexedDB, y lo comparte (WhatsApp/Drive) o lo descarga; «Cargar respaldo» lo devuelve. Se pide

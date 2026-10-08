@@ -425,6 +425,15 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
 .fila-fotos:empty{display:none}
 .fotos-pieza{margin:0 0 12px}
+.falta-aviso{margin:6px 0 8px;padding:8px 12px;border-radius:12px;background:rgba(255,190,60,.12);border:1px solid #f5b83d;color:#ffd27a;font-size:15px}
+.falta-aviso b{color:#fff}
+.faltan{margin:14px 0 0;padding:10px 12px;border:1px dashed #f5b83d;border-radius:12px;background:rgba(255,190,60,.06)}
+.faltan .et{color:#ffd27a;margin:0 0 6px}
+.falta-fila{display:flex;align-items:center;gap:8px;padding:6px 0}
+.falta-fila span{flex:1;font-weight:600}
+.falta-fila button{font-size:13px;font-weight:600;padding:7px 11px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
+.falta-fila button[data-falta-agregar]{border-color:var(--accent);color:var(--accent)}
+.ir-secciones .ojo{color:#ffd27a;font-weight:700}
 .pieza-fotos{padding:10px 0;border-bottom:1px solid var(--line)}
 .pieza-fotos .nombre{margin:0 0 6px}
 .pieza-fotos .nombre b{color:var(--accent)}
@@ -1066,6 +1075,67 @@ async function cargarFotosSitio(){
 function chipsFotos(x){
   return MOMENTOS.map(([m, t]) => { const n = fotosPieza(x, m).length; return n ? `<span class="chip foto">📷 ${t.replace("En b", "B").replace("En e", "E")} ${n}</span>` : ""; }).join("");
 }
+/* ── Lo que lleva cada instrumento (lo pidió el usuario: "una batería debe llevar silla y él no puso silla; ese
+   tipo de cosas las tiene que hacer la app"). Si la sección no lo nombra, se avisa para revisar; no se agrega
+   solo. "Hardware completo" cubre los stands y el pedal, pero no la silla ni la alfombra. ── */
+const HARDWARE = /hardware (completo|set|full)|full hardware|hardware de (la )?bater/;
+const LLEVA = {
+  "Batería": [
+    {pieza: "Silla de batería", categoria: "Batería", hay: /\b(sillas?|banquetas?|butacas?|thrones?|stools?|asientos?)\b/},
+    {pieza: "Pedal de bombo", categoria: "Batería", hay: /\b(pedal(es)?|kick pedal)\b(?! de (sustain|expresi|efecto))/, hardware: true},
+    {pieza: "Base de redoblante", categoria: "Batería", hay: /\b(bases?|stands?|soportes?)\b.{0,15}\b(redoblante|snare|tarola|caja)\b|snare stand/, hardware: true},
+    {pieza: "Máquina de hi-hat", categoria: "Batería", hay: /hi ?-?hat|charles|contratiempo|\bhh\b/, hardware: true},
+    {pieza: "Platillos", categoria: "Platillos", hay: /\b(platos?|platillos?|cymbals?|crash|ride|china|splash)\b/},
+    {pieza: "Alfombra para batería", categoria: "Batería", hay: /\b(alfombras?|tapetes?|rugs?|carpets?|mats?)\b/},
+  ],
+  "Bajo": [
+    {pieza: "Amplificador de bajo", categoria: "Ampli bajo", hay: /\b(ampli\w*|amp|cabezal|head|cabina|caja|cabinet|combo|svt|gallien|ampeg|markbass|\d ?x ?1[05])\b/},
+    {pieza: "Base para bajo", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|atril)\b/},
+  ],
+  "Guitarra": [
+    {pieza: "Amplificador de guitarra", categoria: "Ampli guitarra", hay: /\b(ampli\w*|amp|cabezal|head|cabina|combo|twin|deville|hot rod|marshall|vox|orange|jc ?-?120)\b/},
+    {pieza: "Base para guitarra", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|guitarrero)\b/},
+  ],
+  "Teclado": [
+    {pieza: "Base de teclado", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|atril)\b/},
+    {pieza: "Pedal de sustain", categoria: "Teclado", hay: /\b(sustain|pedal(es)?|fc ?-?\d)\b/},
+  ],
+};
+const sinTildesL = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+// De qué instrumento es la sección: el reel que más se repite entre sus piezas.
+function instrumentoDe(items){
+  const n = {}; for (const x of items) { const r = reelDe(x); n[r] = (n[r] || 0) + 1; }
+  return Object.keys(LLEVA).filter(r => n[r]).sort((a, b) => n[b] - n[a])[0] || null;
+}
+const claveNoFalta = () => "lab-reels:no-falta:" + (V?.doc?.nombre || "");
+const idFalta = (items, pieza) => `${items[0]?.artistaId || "sin-banda"}|${items[0]?.grupo || ""}|${pieza}`;
+function faltantes(items){
+  const inst = items.length && instrumentoDe(items); if (!inst) return [];
+  const texto = sinTildesL(items.map(x => `${x.referencia} ${x.descripcion || ""} ${x.nota || ""}`).join(" · "));
+  const descartadas = new Set(leer(claveNoFalta(), []));
+  return LLEVA[inst].filter(r => !r.hay.test(texto) && !(r.hardware && HARDWARE.test(texto)) && !descartadas.has(idFalta(items, r.pieza)))
+    .map(r => ({...r, instrumento: inst}));
+}
+function htmlFaltan(items, conBotones){
+  const f = faltantes(items); if (!f.length) return "";
+  if (!conBotones) return `<p class="falta-aviso">⚠ Revisa: no pidió <b>${f.map(r => esc(r.pieza)).join("</b>, <b>")}</b></p>`;
+  return `<div class="faltan"><p class="et">⚠ Le falta (revisa con la banda)</p>${f.map(r => `
+    <div class="falta-fila"><span>${esc(r.pieza)}</span>
+      ${V.puede.editar ? `<button data-falta-agregar="${esc(r.pieza)}" data-cat="${esc(r.categoria)}" data-de="${esc(items[0].id)}">+ Agregar</button>` : ""}
+      <button data-falta-no="${esc(idFalta(items, r.pieza))}">No hace falta</button></div>`).join("")}</div>`;
+}
+// "+ Agregar": el mismo documento, con la pieza nueva en la sección (fotos y chulos no se tocan).
+function agregarPieza(deId, pieza, categoria){
+  const d = datos(), de = d.items.find(i => i.id === deId); if (!de || !V.doc) return;
+  const nuevo = {...de, id: "agregado-" + Date.now().toString(36), cantidad: 1, categoria, referencia: pieza, descripcion: pieza,
+    nota: "Agregado al revisar: el rider no lo pedía", propietario: {tipo: "propio"}, porConfirmar: false};
+  const i = d.items.lastIndexOf(d.items.filter(x => x.artistaId === de.artistaId && (x.grupo || "") === (de.grupo || "")).at(-1));
+  const items = [...d.items.slice(0, i + 1), nuevo, ...d.items.slice(i + 1)];
+  destinoPendiente = actual?.id || null;
+  enviar({tipo: V.espacio === "evento" ? "cargar-evento" : "cargar", doc: {...V.doc, datos: {...d, items}}});
+  aviso(`${pieza}: agregado`);
+}
+
 /* La historia de fotos de una sección (lo pidió el usuario): cada pieza con su foto en bodega y en evento. */
 function htmlHistoriaFotos(titulo, items){
   const con = m => items.filter(x => fotosPieza(x, m).length).length;
@@ -1161,7 +1231,7 @@ function htmlBanda(b){
         ${htmlOrigen()}
         <h2${b.nombre.length > 18 ? ' class="largo"' : ""}>${esc(b.nombre)}</h2>
         ${dudosos ? `<p class="sub" style="margin:4px 0 8px"><span class="chip warn">${dudosos} por confirmar</span></p>` : ""}
-        ${secs.length > 1 ? `<nav class="ir-secciones" aria-label="Secciones">${secs.map((s, j) => `<button data-acc="ir-seccion" data-id="${esc(idSeccion(b, j))}"><span aria-hidden="true">${EMOJI[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] || "·"}</span>${esc(s.grupo || "Sin sección")}</button>`).join("")}</nav>` : ""}
+        ${secs.length > 1 ? `<nav class="ir-secciones" aria-label="Secciones">${secs.map((s, j) => `<button data-acc="ir-seccion" data-id="${esc(idSeccion(b, j))}"><span aria-hidden="true">${EMOJI[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] || "·"}</span>${esc(s.grupo || "Sin sección")}${faltantes(s.items).length ? ` <b class="ojo">⚠ ${faltantes(s.items).length}</b>` : ""}</button>`).join("")}</nav>` : ""}
         <ul class="vivo">${vivo}</ul>
         ${AYUDA && secs.length ? `<p class="pista">${PC ? "Baja con ↓ para ir sección por sección" : "Desliza hacia arriba para ir sección por sección"}</p>` : ""}
       </section>
@@ -1196,6 +1266,7 @@ function htmlSeccion(b, s, j, total){
         ${htmlHolo(`${id}|todo`, s.items)}
         <h2${titulo.length > 18 ? ' class="largo"' : ""}>${esc(titulo)}</h2>
         ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
+        ${htmlFaltan(s.items, false)}
         <p class="chips-pieza">${cats.map(c => `<span class="chip">${esc(c)}</span>`).join("")}${trae ? `<span class="chip ter">${trae} lo trae la banda</span>` : ""}${otros.map(n => `<span class="chip ter">Proveedor: ${esc(n)}</span>`).join("")}${dudosos ? `<span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
         ${AYUDA ? `<p class="pista">${PC ? "Pasa con › para ver el listado, lo que pidió la banda y las fotos" : "Desliza para ver el listado, lo que pidió la banda y las fotos"} <span class="flecha">→</span></p>` : ""}
       </section>
@@ -1203,6 +1274,7 @@ function htmlSeccion(b, s, j, total){
         <h3>En el listado</h3>
         <p class="sub">${esc(titulo)} · toca una pieza para marcarla ✓ · › para ver más</p>
         <div class="excel"><div class="cab-xl"><span>Cant</span><span>Requerimiento</span></div>${htmlFicha({secciones: [{grupo: "", items: s.items}], items: s.items}, null)}</div>
+        ${htmlFaltan(s.items, true)}
       </section>
       <section class="slide banda">
         <h3>Lo que pidió la banda</h3>
@@ -1414,6 +1486,10 @@ feed.addEventListener("click", async e => {
   if (acc === "planilla") return abrirPlanilla(e.target.closest("[data-banda]").dataset.banda);
   const foto = e.target.closest("img[data-foto]");
   if (foto) return verFoto(foto);
+  const fa = e.target.closest("[data-falta-agregar]");
+  if (fa) return agregarPieza(fa.dataset.de, fa.dataset.faltaAgregar, fa.dataset.cat);
+  const fn = e.target.closest("[data-falta-no]");
+  if (fn) { const no = new Set(leer(claveNoFalta(), [])); no.add(fn.dataset.faltaNo); escribir(claveNoFalta(), [...no]); destinoPendiente = actual?.id || null; return pintar(actual?.id); }
   const fp = e.target.closest("[data-foto-pieza]");
   if (fp) return abrirMomentos(fp.dataset.fotoPieza);
   const chipF = e.target.closest(".chip.foto");
