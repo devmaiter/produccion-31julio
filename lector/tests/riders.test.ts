@@ -190,7 +190,8 @@ ALIMENTOS ARTISTA:
 
   it("DRUMS después de la sección de audio es backline; dentro del input list con micrófonos, no", () => {
     expect(resumen(interpretar([doc('RIDER TÉCNICO\nLA BANDA\nSONIDO\nConsola digital de 48 canales\nDRUMS\n1 Kick 22"\n2 Snare stand\nBASS\n1 Ampeg SVT')])))
-      .toEqual(['1 Batería: Kick 22"', "2 Batería: Snare stand", "1 Ampli bajo: Ampeg SVT"]);
+      // La consola de la sección de sonido se lista en Consolas (lo pidió el usuario, 2026-10-08).
+      .toEqual(["1 Consolas: Consola digital de 48 canales", '1 Batería: Kick 22"', "2 Batería: Snare stand", "1 Ampli bajo: Ampeg SVT"]);
     expect(resumen(interpretar([doc('RIDER TÉCNICO\nLA BANDA\nINPUT LIST\nDRUMS\n1 KICK   BETA 91\n2 SNARE   SM57\n3 HH   SM81\nBACKLINE\n1 Kick 22"')])))
       .toEqual(['1 Batería: Kick 22"']);
   });

@@ -25,6 +25,8 @@ export const CATEGORIAS = [
   "Ampli guitarra",
   "Teclado",
   "Bases",
+  "In ears",
+  "Consolas",
   "DJ",
   "Escenario",
   "Cables y energía",

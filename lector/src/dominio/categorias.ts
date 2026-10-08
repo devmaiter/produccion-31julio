@@ -1,5 +1,20 @@
 import type { Categoria } from "./entidades";
 
+/** Equipo de in ears: "Shure PSM 1000", "Sennheiser EW IEM G4", petacas, antena helicoidal. */
+export const IN_EARS = /(\bpsm ?-?\d{3,4}\b|\biems?\b|\bin ?-?ears?\b|\bew ?-?iem\b|\bsr ?2050\b|\bp(9|10)[rt]\+?\b|\bek ?(2000|300|500)\b|\bsr ?(2000|300)\b|petacas?|bodypacks?|monitoreo (personal|inal[aá]mbrico)|personal monitor|antenas? helicoidal(es)?|helical antennas?|combinador(es)? de antenas?|antenna combiner|\bpa ?821\b|\bac ?3000\b)/i;
+/** Consolas: "Yamaha DM7", "CL5", "DiGiCo SD12", "Allen & Heath dLive", "X32"… o la palabra "consola". */
+export const CONSOLAS = /(\bconsolas?\b|\bmixers?\b(?! de (dj|djm))|mezcladoras?|mesas? de (sonido|mezcla|audio)|\bdm ?[37]\b|\bcl ?[135]\b|\bql ?[15]\b|\brivage\b|digico|\bsd ?(5|7|8|9|10|11|12)\b|\bquantum ?\d|\bdlive\b|\bavantis\b|\bsq ?-?[567]\b|\b[xm] ?32\b|\bwing\b|\bvi ?(1|3|7)000\b|\bs6l\b|\bavid (venue|s6l)|\bsc ?48\b|\bmidas\b|\bheritage ?d\b|\btf ?[135]\b)/i;
+
+/** El renglón ES un equipo de in ears o una consola: la palabra va justo después de la cantidad (y de la
+ *  marca): "16 Shure PSM 1000", "2 DM7 con 48 canales", "CONSOLA FOH: Yamaha CL5". En "3 LIDER IEM" o
+ *  "13 DRUMS L IEM (PSM1000)" el IEM es la mezcla de un músico, no un equipo que se pide. */
+const MARCA_AUDIO = /^(shure|sennheiser|yamaha|digico|allen ?(&|and|y) ?heath|a&h|midas|behringer|avid|soundcraft|lectrosonics|wisycom|audio-?technica)\s+/i;
+const AL_INICIO = new RegExp(`^(?:${IN_EARS.source}|${CONSOLAS.source})`, "i");
+export function equipoDeAudio(texto: string): boolean {
+  const t = texto.replace(/^[\s•·*-]*(\d{1,3}\s*(x\s*)?)?/i, "").replace(/^(sistemas?|equipos?)\s+(de\s+)?/i, "").replace(MARCA_AUDIO, "");
+  return AL_INICIO.test(t);
+}
+
 /* Reglas para adivinar la categoría por palabras clave (orden = prioridad).
    Vienen de la hoja de producción y se ampliaron con el vocabulario de las
    hojas de Cordillera (hardware de batería, percusión latina, cables).
@@ -7,6 +22,11 @@ import type { Categoria } from "./entidades";
    en "Teclado", y los amplis antes que "Bajo"/"Guitarra". */
 const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   ["DJ",               /(\bcdj\b|\bdjm\b|pioneer|\bdj\b|tornamesa|turntable)/i],
+  // In ears y consolas (los pidió el usuario como secciones propias): el sistema de monitoreo personal
+  // (transmisor, petacas, antenas) y las mesas de mezcla. Van antes de todo: "PSM 1000" no es un canal
+  // y "DM7 con 48 canales" no es un cable.
+  ["In ears",          IN_EARS],
+  ["Consolas",         CONSOLAS],
   // El HARDWARE de la batería es batería: así vienen los riders (DRUMS → HARDWARE con pedal,
   // stands, banqueta y tapete). Va antes de "Escenario" (tapete) y de "Bases" (stands, throne).
   ["Batería",          /((snares?|redoblantes?|tarolas?|hi ?-?hats?|hihats?|charles|cymbals?|c[ií]mbal(es)?|platillos?|boom|toms?|bombos?|kicks?)\s*(stands?|soportes?|bases?)\b|\b(stands?|soportes?|bases?)\s+((de|para|del)\s+)?(redoblante|tarola|snare|hi ?-?hat|charles|platillos?|cymbals?|c[ií]mbal(es)?|toms?|bombo)\b|\bdouble tom\b|\bthrone\b|banqueta|silla de bater|drum (stool|carpet|rug|mat)|(tapete|alfombra) (de |para )?(la )?bater|pedal de bombo|kick pedal|(twin|doble|double) pedal)/i],

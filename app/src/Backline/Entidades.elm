@@ -46,6 +46,8 @@ type Categoria
     | AmpliGuitarra
     | Teclado
     | Bases
+    | InEars
+    | Consolas
     | Dj
     | EquipoDeEscenario
     | CablesYEnergia
@@ -65,6 +67,8 @@ categorias =
     , AmpliGuitarra
     , Teclado
     , Bases
+    , InEars
+    , Consolas
     , Dj
     , EquipoDeEscenario
     , CablesYEnergia
@@ -103,6 +107,12 @@ categoriaANombre c =
 
         Bases ->
             "Bases"
+
+        InEars ->
+            "In ears"
+
+        Consolas ->
+            "Consolas"
 
         Dj ->
             "DJ"

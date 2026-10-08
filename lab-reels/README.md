@@ -42,9 +42,11 @@ nuevo: `lab-reels/#intro`.
   botones ↑ ↓ al lado para cambiar de categoría, y también el teclado y la rueda del mouse.
   En el celular nada de eso aparece; se desliza.
 
-### Siempre los mismos 7 reels
+### Siempre los mismos 9 reels
 
-Batería, Bajo, Guitarra, Teclado, Percusión, Platillos y Extras, en ese orden. Se
+Batería, Bajo, Guitarra, Teclado, Percusión, Platillos, In ears, Consolas y Extras, en ese
+orden (In ears y Consolas desde el 2026-10-08; van a su reel aunque vengan en el bloque de
+un instrumento). Se
 respeta cómo agrupa la banda: lo que pidió en el bloque del bajo (una mesa de percusión,
 un ventilador) se queda en Bajo, y los platillos y bases del bloque de batería, en
 Batería. Un grupo que no es de un instrumento ("Tarimas", "Vientos", "DJ") no abre reel:

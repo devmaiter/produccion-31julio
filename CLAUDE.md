@@ -59,6 +59,10 @@ Piezas, en `lector/src/lectura/`:
 - `interpretar.ts`: reglas que recorren los renglones.
   - **Secciones:** backline sí; input list, monitores, PA, luces, video,
     camerinos, catering, hotel, transporte y radios no.
+  - **In ears y consolas** (2026-10-08, las pidió el usuario): son categorías y secciones propias.
+    "IN EARS" o "CONSOLAS" abren su grupo. Dentro del audio se lee el renglón que ES el equipo
+    ("CONSOLA FOH: Yamaha CL5", "2 Shure PSM 1000"); "3 LIDER IEM" es una mezcla y no cuenta
+    (`equipoDeAudio` en `categorias.ts`).
   - **La banda:** "RIDER TÉCNICO" o "TECHNICAL RIDER" + nombre fija la banda de
     todo el documento.
     Si debajo no está el nombre (va en el logo), se busca: el nombre en MAYÚSCULAS
@@ -117,19 +121,19 @@ Piezas, en `lector/src/lectura/`:
   esa banda en la planilla OML. Al 2026-10-07, 9 de 10 bandas reales coinciden al 100 % y la otra al 97 %.
 - `../dominio/categorias.ts`: categoría por palabras clave (Batería, Platillos,
   Percusión, Teclado, Ampli bajo, Ampli guitarra, Guitarra, Bajo, Bases,
-  Escenario, Cables y energía, DJ, Otro).
+  In ears, Consolas, Escenario, Cables y energía, DJ, Otro).
 - Pruebas: `tests/riders.test.ts` tiene riders de prueba inventados
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 231 pruebas en verde.
+  inglés). Hay 237 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
   (la planilla .xlsx). Los riders reales van en `lector/riders-reales/`, que no se sube.
 - Reglas que no se deben perder: un correo o teléfono nunca es ítem (ni llega a la
   planilla); si el rider tiene sección de backline, lo leído antes y fuera de toda
-  sección (tarima, wifi, consolas) se quita; el hardware de batería es Batería;
+  sección (tarima, wifi) se quita, salvo in ears y consolas; el hardware de batería es Batería;
   en la planilla no entran párrafos del contrato ("deberá…", transporte, hotel).
 
 **Qué es backline (lo definió el usuario, 2026-10-04; respetarlo siempre):**
@@ -259,8 +263,9 @@ están el resumen y cada banda. Todo usa CSS scroll-snap.
   `../cordillera/lector/` y arma reels solo con lo que encontró. Se guarda en
   `localStorage` (`lab-reels:doc`) y "Borrar" lo quita. No hay datos de ejemplo
   fijos: el usuario no quiere ver Cordillera ahí.
-- **Siempre 7 reels, en este orden:** Batería, Bajo, Guitarra, Teclado, Percusión,
-  Platillos y Extras (lo pidió el usuario; nada de "Tarimas", "Vientos" ni "DJ").
+- **Siempre 9 reels, en este orden:** Batería, Bajo, Guitarra, Teclado, Percusión,
+  Platillos, In ears, Consolas y Extras (lo pidió el usuario; nada de "Tarimas", "Vientos" ni "DJ").
+  In ears y Consolas (2026-10-08) van a su reel aunque vengan en el bloque de un instrumento.
   Se respeta el bloque de la banda (el `grupo` del lector): lo pedido en el bloque
   del bajo se queda en Bajo y los platillos del bloque de batería, en Batería. Sin
   grupo de instrumento, cada ítem va por su categoría; las bases van con su

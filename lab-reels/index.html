@@ -484,9 +484,9 @@ for (const C of [Map, WeakMap]) {
 const BASE_IMG = "../extractor/data/";
 const LECTOR = new URL("../cordillera/lector/", location.href).href;   // el mismo lector de "Subir documento"
 const MUESTRA = "../extractor/muestras/hoja-backline.pdf";
-const ORDEN = ["Batería","Platillos","Percusión","Teclado","Ampli bajo","Ampli guitarra","Guitarra","Bajo","Vientos","Voces","Bases","Escenario","Cables y energía","DJ","Otro"];
-const EMOJI = {"Batería":"🥁","Platillos":"🔔","Percusión":"🪘","Teclado":"🎹","Ampli bajo":"🔊","Ampli guitarra":"📢","Guitarra":"🎸","Bajo":"🎸","Bases":"🎙️","Escenario":"🏗️","Cables y energía":"🔌","DJ":"🎧","Vientos":"🎷","Voces":"🎤","Extras":"✨","Otro":"📦"};
-const HUE = {"Batería":20,"Platillos":45,"Percusión":5,"Teclado":265,"Ampli bajo":200,"Ampli guitarra":340,"Guitarra":30,"Bajo":180,"Bases":220,"Escenario":120,"Cables y energía":55,"DJ":290,"Vientos":40,"Voces":310,"Extras":150,"Otro":0};
+const ORDEN = ["Batería","Platillos","Percusión","Teclado","Ampli bajo","Ampli guitarra","Guitarra","Bajo","Vientos","Voces","Bases","In ears","Consolas","Escenario","Cables y energía","DJ","Otro"];
+const EMOJI = {"Batería":"🥁","Platillos":"🔔","Percusión":"🪘","Teclado":"🎹","Ampli bajo":"🔊","Ampli guitarra":"📢","Guitarra":"🎸","Bajo":"🎸","Bases":"🎙️","Escenario":"🏗️","Cables y energía":"🔌","DJ":"🎧","In ears":"🎧","Consolas":"🎛️","Vientos":"🎷","Voces":"🎤","Extras":"✨","Otro":"📦"};
+const HUE = {"Batería":20,"Platillos":45,"Percusión":5,"Teclado":265,"Ampli bajo":200,"Ampli guitarra":340,"Guitarra":30,"Bajo":180,"Bases":220,"Escenario":120,"Cables y energía":55,"DJ":290,"In ears":175,"Consolas":235,"Vientos":40,"Voces":310,"Extras":150,"Otro":0};
 const PC = matchMedia("(hover: hover) and (pointer: fine)").matches;
 const QUIETO = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -539,15 +539,15 @@ const datos = () => V?.doc?.datos || VACIO;
 const titulo = () => V?.doc ? V.doc.nombre : "Sube un documento para empezar";
 const festival = () => V?.modo === "festival";
 
-/* Siempre los mismos siete reels, en este orden. Se respeta cómo agrupa la banda: lo que
+/* Siempre los mismos reels, en este orden (In ears y Consolas los pidió el usuario el 2026-10-08). Se respeta cómo agrupa la banda: lo que
    pidió en el bloque del bajo (una mesa de percusión) se queda en Bajo, y los platillos del
    bloque de batería, en Batería. Un grupo que no es de un instrumento ("Tarimas", "Vientos",
    "DJ") no es un reel: cada ítem va por su categoría y lo que no es instrumento, a Extras. */
-const REELES = ["Batería", "Bajo", "Guitarra", "Teclado", "Percusión", "Platillos", "Extras"];
+const REELES = ["Batería", "Bajo", "Guitarra", "Teclado", "Percusión", "Platillos", "In ears", "Consolas", "Extras"];
 const GRUPOS = [[/bater|drum|\bkit\b/, "Batería"], [/platillo|cymbal/, "Platillos"], [/percus|\bperc\b/, "Percusión"],
   [/teclad|\bkeys?\b|piano|synth|sintet/, "Teclado"], [/\bbajo|bass/, "Bajo"], [/guitar|\bgtr\b/, "Guitarra"]];
 const POR_CATEGORIA = {"Batería": "Batería", "Platillos": "Platillos", "Percusión": "Percusión", "Teclado": "Teclado",
-  "Ampli bajo": "Bajo", "Bajo": "Bajo", "Ampli guitarra": "Guitarra", "Guitarra": "Guitarra"};
+  "Ampli bajo": "Bajo", "Bajo": "Bajo", "Ampli guitarra": "Guitarra", "Guitarra": "Guitarra", "In ears": "In ears", "Consolas": "Consolas"};
 // Una base o un tapete sin grupo va con su instrumento: "Boom cymbal stand" a Batería.
 const DE_QUIEN = [[/cymbal|platillo|plato|hi ?-?hat|snare|redoblante|throne|drum|bater|tom stand|porter/, "Batería"],
   [/teclado|keyboard|\bks ?\d|ax-?\d|tipo z|\bkeys? stand/, "Teclado"], [/guitar|guitarrero/, "Guitarra"],
@@ -556,6 +556,8 @@ function reelDe(it){
   const norm = t => (t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   // Los ventiladores siempre van a Extras, aunque est\u00e9n en el bloque del bajo o de la percusi\u00f3n (pedido del usuario).
   if (/\b(fans?|ventiladore?s?|cooler)\b/.test(norm(it.referencia))) return "Extras";
+  // Los in ears y las consolas van a su reel aunque vengan en el bloque de un instrumento.
+  if (it.categoria === "In ears" || it.categoria === "Consolas") return it.categoria;
   const n = norm(it.grupo);
   const g = n && GRUPOS.find(([re]) => re.test(n))?.[1];
   if (g) return g;
@@ -566,7 +568,7 @@ function reelDe(it){
 /* El holograma de cada reel: el del equipo principal del grupo (en "Teclado" sin teclados,
    solo bases, salen las bases) y armado solo con lo que pide ese grupo. */
 const PRINCIPAL = {"Batería": ["Batería", "Platillos"], "Bajo": ["Ampli bajo", "Bajo"], "Guitarra": ["Ampli guitarra", "Guitarra"], "Teclado": ["Teclado"]};
-const PRIORIDAD = ["Batería","Ampli bajo","Ampli guitarra","Teclado","Percusión","Platillos","Guitarra","Bajo","Bases"];
+const PRIORIDAD = ["Batería","Ampli bajo","Ampli guitarra","Teclado","Percusión","Platillos","Guitarra","Bajo","Bases","In ears","Consolas"];
 const sinNum = r => r.replace(/\s\d$/, "");   // "Guitarra 1" se ve como Guitarra
 function catHolograma(reel, items){
   reel = sinNum(reel);
@@ -1582,7 +1584,7 @@ async function leerYArmar(archivos, tipo = "cargar"){
   const traza = [];   // lo que el lector decidió de cada renglón: sirve para mostrar lo que pidió la banda
   {
     const L = await cargarLector();
-    r = await L.leerTodo(archivos, {rutas: {pdfWorker: LECTOR + "pdf.worker.min.mjs", ocr: LECTOR + "ocr/"}, base: null, traza,
+    r = await L.leerTodo(archivos, {rutas: {pdfWorker: LECTOR + "pdf.worker.min.mjs", ocr: LECTOR + "ocr/"}, base: null, traza, sinNombre: true,
       alProgreso: (nombre, estado) => {
         const a = subida.archivos.find(x => x.nombre === nombre); if (!a) return;
         a.estado = estado; a.clase = /^error/.test(estado) ? "err" : /ítem/.test(estado) ? "ok" : "";

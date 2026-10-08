@@ -10,7 +10,7 @@
  *   - encabezados: de grupo ("DRUMS", "Bass") o de artista ("LOS RAYOS")
  * Lo que no entiende no lo inventa: lo devuelve en avisos para revisarlo.
  */
-import { CAJA_AMPLI, categorizar, noEsBackline } from "../dominio/categorias";
+import { CAJA_AMPLI, categorizar, equipoDeAudio, noEsBackline } from "../dominio/categorias";
 import type { Categoria, PaqueteEvento } from "../dominio/entidades";
 import { separarCantidad } from "../dominio/lista";
 import type { Documento, Linea } from "./documento";
@@ -97,20 +97,29 @@ const PROVEEDOR_SUELTO = /^(cn|oml|backline( cop)?|propio|banda)$/i;
  * Esas secciones tienen cantidades ("1 VAN para 15 personas", "27 SNARE 2 SM57")
  * que no son backline; dentro de ellas no se leen ítems. */
 const SECCION_BACKLINE = /^(backline|back line|instrumentos|requerimientos? de backline|equipos? de backline|listado de backline|lista de backline)\b/i;
-const SECCION_AUDIO = /^(input(s| list)?|mixers?( de monitores?)?|mezcladoras?|requerimientos? de (sala|audio|sonido)|amplificaci[oó]n de sala|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|monitor world|mezclas?( de monitores)?|iem|in ?ears?|pa\b|p\.\s?a\.?|sistema de (sonido|pa)|sonido|audio|foh|front of house|consolas?|control (foh|monitor(es|s)?)|microfon[ií]a|micr[oó]fonos|microphones?|mic (list|packages?)|stands? de mic(r[oó]fonos?)?|mic stands?|microphone stands?|cue monitor|arreglo principal|(sub ?)?snakes?|multipares?|wireless|inal[aá]mbricos|rf\b)/i;
+const SECCION_AUDIO = /^(input(s| list)?|mixers? de monitores?|requerimientos? de (sala|audio|sonido)|amplificaci[oó]n de sala|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|monitor world|mezclas?( de monitores)?|pa\b|p\.\s?a\.?|sistema de (sonido|pa)|sonido|audio|foh|front of house|control (foh|monitor(es|s)?)|microfon[ií]a|micr[oó]fonos|microphones?|mic (list|packages?)|stands? de mic(r[oó]fonos?)?|mic stands?|microphone stands?|cue monitor|arreglo principal|(sub ?)?snakes?|multipares?|wireless|inal[aá]mbricos|rf\b)/i;
+/* In ears y consolas: secciones propias (las pidió el usuario). Lo que viene debajo se lee como el
+ * backline, en su grupo: "IN EARS" → "16 Shure PSM 1000"; "CONSOLAS" → "2 Yamaha DM7". */
+const SECCION_IN_EARS = /^((sistemas?|equipos?|requerimientos?) (de )?)?(iems?|in ?-?ears?|monitoreo (personal|inal[aá]mbrico)|personal monitors?)(\s+(de\s+|para\s+)?(la banda|banda|m[uú]sicos|artistas?))?$/i;
+const SECCION_CONSOLAS = /^((requerimientos?|listado) (de )?)?(consolas?|mixers?|mezcladoras?|mesas? de (sonido|mezcla))(\s+(de\s+|para\s+)?(foh|monitores?|monitors?|sala|front of house))?$/i;
 const SECCION_OTRA = /^(stage$|stage requirements?|stage needs|requerimientos? de (escenario|tarima)|requisitos de (escenario|tarima)|avisos?( importantes?)?$|stage plot|planta de escenario|ground support|stage ?hands|power( generators)?|generadores?|moving heads|follow ?spots?|fx$|sfx\b|efectos|luminarias?\b|seguidores\b|tarimas?$|risers?$|drum risers?$|sobre ?-?tarimas?$|led screens?|pantallas led|pronters|prompters?|teleprompters?|quick change|accesorios (artista|ballet|mariachi|staff|producci[oó]n)|alimentos|bebidas|comida|cena|iluminaci[oó]n|planta de iluminaci[oó]n|lighting|luces|lista de materiales|video|pantallas|screens?|led\b|catering|camerinos?|camarines?|dressing ?rooms?|hospitality|alimentaci[oó]n|comidas?|bebidas|hotel(es)?|hospedaje|alojamiento|estad[ií]a|transporte|traslados?|viajes?|vuelos?|seguridad|security|contactos?|contact|comunicaci[oó]n|prensa|grabaci[oó]n|fotograf[ií]a|merch(andising)?|pagos?|contrato|rigging|estructura|energ[ií]a el[eé]ctrica|planta el[eé]ctrica|generador(es)?|radios?|handies|walkie|motorola|intercom|backstage|pre-?show|after-?show|medidas|dimensiones|especiales|control\b|barricada|vallas?|credenciales|acreditaciones|invitaciones|guest ?list)/i;
 /* Lo que no es backline aunque aparezca con cantidad dentro de la lista. */
 const NO_BACKLINE = /\b(handies?|radios?|walkie|motorola|pilas?|cintas?|gaf+er|toallas?|agua|hielo|bebidas?|personas|habitaci[oó]n(es)?|suburban|vans?|guardias?|sillones?|espejos?|percheros?|(sub ?)?snakes?|multipar(es)?|retornos?|returns|canales|channels|pronters?|prompters?|iems?|in ?-?ears?|cuñas?|wedges?|sidefills?|subwoofers?)\b/i;
 /* Renglón de input list: canal, instrumento y micrófono ("27  SNARE 2  SM 57  SHORT BOOM"). */
 /** En una tabla, la primera columna que solo dice la familia ("Cymbals", "Percussion"). */
 const FAMILIA_TABLA = /^(cymbals?|platillos?|percussion|percusi[oó]n)$/i;
-const CANAL = /^\d{1,2}\s+.*\b(sm ?\d{2}|beta ?\d{2}|e ?9\d{2}|e ?6\d{2}|md ?4\d{2}|d ?box|di\b|ksm|c ?414|re ?20|m ?88|psm ?\d+|xlr|phantom|short boom|tall boom|claw)\b/i;
+const CANAL = /^\d{1,2}\s+.*\b(sm ?\d{2}|beta ?\d{2}|e ?9\d{2}|e ?6\d{2}|md ?4\d{2}|d ?box|di\b|ksm|c ?414|re ?20|m ?88|xlr|phantom|short boom|tall boom|claw)\b/i;
 
-function seccionDe(t: string): { tipo: "backline" | "audio" | "otra" } | null {
+/** In ears y consolas se listan aunque vengan fuera de toda sección (los pidió el usuario). */
+const deAudioPedido = (c: string) => c === "In ears" || c === "Consolas";
+
+function seccionDe(t: string): { tipo: "backline" | "audio" | "otra"; grupo?: string } | null {
   const h = t.replace(/^[\s•·*\d.)-]+(?=\p{L})/u, "").trim();
   // "P.A." es abreviatura, no fin de frase.
   if (h.length > 70 || h.split(/\s+/).length > 9 || (/[.?!]$/.test(h) && h.split(/\s+/).length > 2)) return null;
   if (SECCION_BACKLINE.test(h)) return { tipo: "backline" };
+  if (SECCION_IN_EARS.test(h)) return { tipo: "backline", grupo: "In ears" };
+  if (SECCION_CONSOLAS.test(h)) return { tipo: "backline", grupo: "Consolas" };
   if (SECCION_AUDIO.test(h)) return { tipo: "audio" };
   if (SECCION_OTRA.test(h)) return { tipo: "otra" };
   return null;
@@ -283,6 +292,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         const comoGrupo = sec.tipo === "backline" && GRUPOS.test(texto.replace(/[\s:·|–—-]+$/, "")) && !SECCION_BACKLINE.test(texto);
         // "DRUMS" dentro del input list es un grupo de canales, no el backline.
         if (!(comoGrupo && seccion === "audio" && siguenCanales(n))) { seccion = sec.tipo; ponerGrupo(null); modoAlternativa = false; }
+        if (sec.grupo) { ponerGrupo(sec.grupo); anotar("grupo", `empieza la sección de ${sec.grupo.toLowerCase()}`); continue; }
         if (sec.tipo === "backline" && !comoGrupo) {
           // Empieza el backline de un rider (PDF o foto) y no se sabe de qué banda es: el nombre del archivo
           // ("LOS RAYOS - BACKLINE 2026.pdf") si el texto también lo nombra; si no, sin nombre. Sin esto se
@@ -299,6 +309,14 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         // cuando el backline es el capítulo 10), ni "VOCES": las voces no son backline.
         const otroCapitulo = capituloBackline !== null && capituloActual !== null && capituloActual !== capituloBackline;
         if (GRUPOS.test(sinColaF) && !SECCION_BACKLINE.test(sinColaF) && !otroCapitulo && !/^(vocals?|voces|voz)$/i.test(sinColaF) && (seccion === "otra" || !siguenCanales(n))) { seccion = "backline"; ponerGrupo(nombrePropio(sinColaF)); anotar("grupo", "título de instrumento: vuelve el backline"); continue; }
+        // "CONSOLA FOH: Yamaha CL5", "8 Shure PSM 1000" dentro del audio: in ears y consolas sí se listan.
+        const deAudio = seccion === "audio" ? categorizar(texto) : null;
+        if ((deAudio === "In ears" || deAudio === "Consolas") && equipoDeAudio(texto) && !CANAL.test(texto) && !CONTACTO.test(texto)) {
+          const grupoAntes = grupo as string | null, antesAu = ext.items.length;
+          ponerGrupo(deAudio);
+          if (item(texto, l) && ext.items.length > antesAu) { anotar("item", `${deAudio.toLowerCase()} en la sección de audio`, ext.items.length - 1); continue; }
+          ponerGrupo(grupoAntes);
+        }
         anotar("no-backline", seccion === "audio" ? "está en una sección de audio" : "está en una sección que no es backline");
         continue;
       }
@@ -393,7 +411,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
           // Fuera de toda sección y sin un título de instrumento encima ("RIDER TÉCNICO" no lo es).
           const g = grupo as string | null; // ponerGrupo lo cambia desde una función: TypeScript no lo ve
           const deInstrumento = !!g && (GRUPOS.test(g.replace(/\s*\([^)]*\)\s*$/, "")) || esTituloGenerico(g) || categorizar(g) !== "Otro");
-          fueraDeSeccion.set(ext.items.length - 1, seccion === "neutra" && !deInstrumento);
+          // In ears y consolas no se quitan, pero tampoco dicen dónde empieza el backline: no se anotan.
+          if (!deAudioPedido(ext.items.at(-1)!.categoria)) fueraDeSeccion.set(ext.items.length - 1, seccion === "neutra" && !deInstrumento);
         } else anotar("no-backline", artistaAntes ? "radios, pilas, cinta… no son backline" : "parece backline pero no se sabe de qué banda");
         continue;
       }
@@ -409,7 +428,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     }
 
     // Si el rider tiene sección de backline (o títulos de instrumento), lo que se leyó antes, fuera de
-    // toda sección (medidas de la tarima, wifi, consolas…), no era backline: se quita.
+    // toda sección (medidas de la tarima, wifi…), no era backline: se quita. Los in ears y las consolas se quedan.
     if ([...fueraDeSeccion.values()].some(fuera => !fuera)) {
       const quitar = new Set([...fueraDeSeccion].filter(([, fuera]) => fuera).map(([i]) => i));
       if (quitar.size) {
@@ -579,6 +598,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.replace(/\s*\([^)]*\)/g, "").length > (explicita || opcion !== null ? 140 : 90)) return false; // las opciones entre paréntesis no cuentan
       const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
       if (NO_BACKLINE.test(descripcion) && categorizar(principal ?? descripcion) === "Otro") return true; // radios, pilas, cinta: se lee pero no es backline
+      // "3 LIDER IEM": la mezcla de in ear de un músico, no un equipo. En la sección de in ears sí cuenta.
+      if (["In ears", "Consolas"].includes(categoria) && !equipoDeAudio(descripcion) && !(grupo === "In ears" || grupo === "Consolas")) return true;
       if (CONSUMIBLE.test(descripcion)) return true; // "ORANGE GAFFER TAPE": la marca de un ampli no lo vuelve backline
       if (noEsBackline(descripcion, grupo)) return true; // risers, pedestales de mic, DI, cables y corriente: se piden con el backline pero no lo son
       // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
