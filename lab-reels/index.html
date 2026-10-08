@@ -75,7 +75,7 @@ ul.lista li{display:flex;gap:12px;align-items:baseline;padding:10px 0;border-bot
 /* "En el listado" se ve como la planilla de Excel: hoja blanca, letra oscura y cuadrícula, sin naranja
    (lo pidió el usuario: el listado no debe competir con el resto). */
 .excel{background:#fff;color:#1f1f1f;border:1px solid #c8c8c8;border-radius:6px;overflow:hidden;font-family:Calibri,"Segoe UI",Arial,sans-serif}
-.excel .cab-xl,.excel ul.lista li{display:grid;grid-template-columns:58px 1fr;gap:0;align-items:stretch}
+.excel .cab-xl,.excel ul.lista li{display:grid;grid-template-columns:58px 1fr 40px;gap:0;align-items:stretch}
 .excel .cab-xl{background:#f3f3f3;border-bottom:1px solid #c8c8c8;font-size:12px;font-weight:700;color:#444}
 .excel .cab-xl span,.excel ul.lista li>span{padding:8px 10px}
 .excel .cab-xl span:first-child,.excel ul.lista li>.q{border-right:1px solid #d9d9d9}
@@ -175,6 +175,15 @@ ul.lista .t .chip{font-size:11px;padding:1px 7px;margin:4px 4px 0 0;display:inli
 .detalle .botones{margin-top:18px;justify-content:flex-start}
 [data-item]{cursor:pointer}
 ul.lista li[data-item],.vivo li[data-item]{transition:background .15s,transform .15s}
+/* Chulo verde: el ítem ya está listo */
+li.hecho .q,.vivo li.hecho b{color:#1fa34a}
+li.hecho .q::before,.vivo li.hecho b::before{content:"✓ ";font-weight:800}
+.excel ul.lista li.hecho,.excel ul.lista li.hecho:nth-child(even){background:#e7f6ec}
+.excel ul.lista li.hecho .q,.excel ul.lista li.hecho .q *{color:#1a8f3e;font-weight:700}
+ul.lista li.hecho .t{opacity:.75}
+.vivo li.hecho{color:#7ee2a0}
+.ver-pieza{flex:none;align-self:center;margin-left:auto;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:22px;line-height:1;opacity:.55;cursor:pointer}
+.excel .ver-pieza{color:#555}
 ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 @media (prefers-reduced-motion:reduce){.hoja .panel{animation:none}}
 .hoja .fila{display:flex;align-items:center;gap:12px;width:100%;padding:12px 4px;border-bottom:1px solid var(--line);text-align:left}
@@ -535,6 +544,17 @@ tablero.ports.vista.subscribe(v => {
   if (!document.getElementById("filtros").hidden) pintarFiltros();
 });
 
+/* El chulo verde (lo pidió el usuario): tocar un ítem del listado lo marca como listo, y otro toque lo
+   quita. Se guarda en el dispositivo, por documento. La hoja de detalle queda en el «›» del renglón. */
+const claveChulos = () => "lab-reels:chulos:" + (V?.doc ? V.doc.nombre + "|" + V.doc.cuando : "");
+let chulos = new Set();
+const cargarChulos = () => { chulos = new Set(leer(claveChulos(), [])); };
+function marcarChulo(id){
+  chulos.has(id) ? chulos.delete(id) : chulos.add(id);
+  escribir(claveChulos(), [...chulos]);
+  document.querySelectorAll(`[data-item="${CSS.escape(id)}"]`).forEach(el => el.classList.toggle("hecho", chulos.has(id)));
+  navigator.vibrate?.(15);
+}
 let listos = new Set();
 const cargarListos = () => { listos = new Set(leer("lab-reels:listos:doc", [])); };
 const guardarListos = () => escribir("lab-reels:listos:doc", [...listos]);
@@ -727,11 +747,11 @@ function pedidosDe(ext, traza, fuente, items){
 function htmlFicha(b, cat){
   // Sin categoría (modo normal) se ve todo igual. El admin toca un ítem para editarlo.
   const editable = V?.puede?.editar;
-  const item = x => `<li class="${!cat || reelDe(x) === cat ? "" : "otra"}${editable ? " editable" : ""}" data-item="${esc(x.id)}"><span class="q">${x.cantidad}</span><span class="t">${esc(corto(x.referencia))}
+  const item = x => `<li class="${!cat || reelDe(x) === cat ? "" : "otra"}${editable ? " editable" : ""}${chulos.has(x.id) ? " hecho" : ""}" data-item="${esc(x.id)}"><span class="q">${x.cantidad}</span><span class="t">${esc(corto(x.referencia))}
         ${corto(x.referencia) !== x.referencia ? `<small class="modelo">${esc((x.referencia.match(/\(([^)]*)\)/g) || []).map(p => p.slice(1, -1)).join(" · "))}</small>` : ""}
         ${x.nota ? `<small>${esc(x.nota)}</small>` : x.grupo === undefined && x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
         ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
-        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span></li>`;
+        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span><button class="ver-pieza" data-detalle="${esc(x.id)}" aria-label="Ver detalle">›</button></li>`;
   const conTitulos = b.secciones.some(s => s.grupo);
   const rider = b.secciones.length
     ? b.secciones.map(s => `${conTitulos ? `<h4 class="seccion">${esc(s.grupo || "Sin sección")}</h4>` : ""}<ul class="lista">${s.items.map(item).join("")}</ul>`).join("")
@@ -1005,7 +1025,7 @@ function htmlBanda(b){
   let k = 0;
   const vivo = b.secciones.map(s => `
         ${b.secciones.length > 1 || s.grupo ? `<li class="tit" style="--i:${k++}">${esc(s.grupo || "Sin sección")}</li>` : ""}
-        ${s.items.map(x => `<li style="--i:${k++}" data-item="${esc(x.id)}"${x.porConfirmar ? ' class="dudoso"' : ""}><b>${x.cantidad}</b> ${esc(corto(x.referencia))}</li>`).join("")}`).join("");
+        ${s.items.map(x => `<li style="--i:${k++}" data-item="${esc(x.id)}" class="${x.porConfirmar ? "dudoso" : ""}${chulos.has(x.id) ? " hecho" : ""}"><b>${x.cantidad}</b> ${esc(corto(x.referencia))}</li>`).join("")}`).join("");
   return `
   <article class="reel" id="${esc(id)}" style="--h:20" data-n="2" aria-label="${esc(b.nombre)}">
     <div class="prog"><i></i><i></i></div>
@@ -1056,7 +1076,7 @@ function htmlSeccion(b, s, j, total){
       </section>
       <section class="slide banda">
         <h3>En el listado</h3>
-        <p class="sub">${esc(titulo)} · toca una pieza para ver más</p>
+        <p class="sub">${esc(titulo)} · toca una pieza para marcarla ✓ · › para ver más</p>
         <div class="excel"><div class="cab-xl"><span>Cant</span><span>Requerimiento</span></div>${htmlFicha({secciones: [{grupo: "", items: s.items}], items: s.items}, null)}</div>
       </section>
       <section class="slide banda">
@@ -1173,7 +1193,7 @@ const feed = document.getElementById("feed");
 let cats = [], entradas = [], reels = [], actual = null, io = null;
 
 function pintar(destino){
-  cargarListos();
+  cargarListos(); cargarChulos();
   holoItems.clear();
   const d = datos();
   if (festival()) {
@@ -1268,8 +1288,10 @@ feed.addEventListener("click", async e => {
   if (acc === "planilla") return abrirPlanilla(e.target.closest("[data-banda]").dataset.banda);
   const foto = e.target.closest("img[data-foto]");
   if (foto) return verFoto(foto);
+  const det = e.target.closest("[data-detalle]");
+  if (det) return abrirDetalle(det.dataset.detalle);
   const li = e.target.closest("[data-item]");
-  if (li) return abrirDetalle(li.dataset.item);
+  if (li) return marcarChulo(li.dataset.item);
   if (acc === "ver") return reels[1]?.scrollIntoView({behavior: "smooth"});
   const vt = e.target.closest(".ver-totales, .totales .cerrar");
   if (vt) {

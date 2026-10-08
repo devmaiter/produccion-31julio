@@ -1,4 +1,4 @@
-import{t as q,C as N,d as T,p as z,l as B,e as F}from"./navegador-D9T-49ii.js";const U=/\s{3,}/g;function P(e){const t=e.texto.trim().replace(U," │ ");return e.confianza!==void 0&&e.confianza<N?`${t}  ⟨${e.confianza} %⟩`:t}function W(e){if(!e.length)return"";const[t,...a]=e,o=Z(e.reduce((r,i)=>r+i.lineas.length,0)),n=[L(t,1,o)];for(const r of t.tipo==="correo"?a:[])n.push(L(r,2,o,"Adjunto: "));if(t.tipo!=="correo")for(const r of a)n.push(L(r,1,o));return n.join(`
+import{t as q,C as N,d as T,p as z,l as B,e as F}from"./navegador-db6fQ-s1.js";const U=/\s{3,}/g;function P(e){const t=e.texto.trim().replace(U," │ ");return e.confianza!==void 0&&e.confianza<N?`${t}  ⟨${e.confianza} %⟩`:t}function W(e){if(!e.length)return"";const[t,...a]=e,o=Z(e.reduce((r,i)=>r+i.lineas.length,0)),n=[L(t,1,o)];for(const r of t.tipo==="correo"?a:[])n.push(L(r,2,o,"Adjunto: "));if(t.tipo!=="correo")for(const r of a)n.push(L(r,1,o));return n.join(`
 
 `)+`
 `}function V(e,t){const a=[`# ${t}`,`Excel · ${x(e.hojas.length,"hoja")}`];for(const o of e.hojas)a.push("",...H(o));return a.join(`

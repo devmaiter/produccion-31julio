@@ -128,7 +128,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 238 pruebas en verde.
+  inglés). Hay 239 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -224,8 +224,10 @@ prueba (que el % suba sin romper los riders anteriores).
 - **A la derecha de cada reel solo va «›».** No hay Listo, Subir, doble toque ni conteos bajo el título;
   solo las etiquetas de categoría. Las ayudas salen solo la primera vez.
 - **El listado se ve como Excel** (blanco, cuadrícula, Cant | Requerimiento).
-- **Todo se toca:** una pieza abre una hoja desde abajo con el renglón del rider, su sección y la
-  misma categoría en otras bandas (`abrirDetalle`). El admin edita desde ahí.
+- **Chulo verde (2026-10-08, lo pidió el usuario):** tocar una pieza del listado la marca como lista (✓ verde)
+  y otro toque la quita; se guarda en el dispositivo por documento (`lab-reels:chulos:…`). La hoja de
+  detalle (`abrirDetalle`: renglón del rider, su sección y la misma categoría en otras bandas; el admin
+  edita desde ahí) se abre con el «›» al final del renglón.
 - **Dos espacios** (en Elm, `Espacio`): **Evento** (oficial, viene del cronograma; el empleado lo ve
   con candado y no lo cambia) y **Mis pruebas** (el escritorio propio; lo que el empleado sube a mano cae
   ahí). La regla es `puedeEscribir` en `Tablero.elm`.

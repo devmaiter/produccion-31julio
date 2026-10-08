@@ -1043,6 +1043,8 @@ function posicionesLista(t: string): number[] {
     // "Crash 14 Zildjian", "Ride 20 Zildjian": el número después del tipo de platillo o tambor es la medida.
     if (/\b(crash|ride|splash|china|hi-?hats?|hit hats?|platos?|platillos?|toms?|bombo|kick|snare|tambor|redoblante|floor)\s+$/i.test(t.slice(0, m.index! + m[0].length - m[1]!.length))) continue;
     const antes = t.slice(0, m.index! + m[0].length - m[1]!.length);
+    // "(el dual va en el mismo rack, 4 de Audio Room)": dentro de un paréntesis es una nota, no otra pieza.
+    if ((antes.match(/\(/g) ?? []).length > (antes.match(/\)/g) ?? []).length) continue;
     // "1 Fan / 1 Ventilador": la traducción, no otro ítem. "AMPEG SVT 3 Pro": el 3 es del modelo.
     if (/\/\s*$/.test(antes) || (/\p{Ll}/u.test(t) && /\b[A-Z]{2,4}\s+$/.test(antes))) continue;
     // "AMPEG SVT 4 PRO" en un renglón todo en mayúsculas: el 4 sigue siendo del modelo (SVT-4 PRO, un cabezal).
@@ -1096,12 +1098,15 @@ function dividirLista(l: Linea): Linea[] {
     if (piezas) return [...(cabeza ? [{ ...l, texto: cabeza + ":" }] : []), ...piezas.map(p => ({ ...l, texto: p.cantidad !== null ? `${p.cantidad} ${p.texto}` : p.texto }))];
   }
   const marca = /(?:^|(?<!\d)[,;]|\s(?:y|and|e|\+))\s*(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L}/giu;
-  if ((l.texto.match(marca) ?? []).length < 2) return dividirEnumeracion(l);
-  const [cabeza, ...resto] = l.texto.split(/:\s+(?=(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+\p{L})/iu);
+  // Las comas dentro de un paréntesis son de la nota ("(el dual va en el rack, 4 de Audio Room)"): no parten.
+  const texto = l.texto.replace(/\([^()]*\)/g, m => m.replace(/,/g, "\u0001").replace(/;/g, "\u0002"));
+  const devolver = (t: string) => t.replace(/\u0001/g, ",").replace(/\u0002/g, ";");
+  if ((texto.match(marca) ?? []).length < 2) return dividirEnumeracion(l);
+  const [cabeza, ...resto] = texto.split(/:\s+(?=(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+\p{L})/iu);
   const cuerpo = resto.length ? resto.join(": ") : cabeza!;
   const partes = cuerpo.split(/(?:(?<!\d)[,;]\s*|\s+(?:y|and|e|\+)\s+)(?=(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L})/iu).map(t => t.trim()).filter(Boolean);
-  const lineas = partes.map(texto => ({ ...l, texto }));
-  return resto.length ? [{ ...l, texto: cabeza! + ":" }, ...lineas] : lineas;
+  const lineas = partes.map(t => ({ ...l, texto: devolver(t) }));
+  return resto.length ? [{ ...l, texto: devolver(cabeza!) + ":" }, ...lineas] : lineas;
 }
 
 /** "Quinto, conga, Tumba, bongos con sus bases, cortina" → un ítem por parte, si casi todas se reconocen como equipo. */

@@ -12,8 +12,7 @@ BAJO
 1 Cabezal Gallien Krueger + cabina 4x10
 1 Bajo Fender
 IN EARS
-16 Shure PSM 1000 con antena helicoidal
-Antenas helicoidales   4   AUDIO ROOM
+16 Shure PSM 1000 con antena helicoidal (el dual va dentro del mismo rack, 4 de Audio Room)
 4 Micrófonos Lectrosonics
 CONSOLAS
 Yamaha DM7 con 48 canales c/u   2   AUDIO ROOM

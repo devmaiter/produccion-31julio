@@ -87,4 +87,10 @@ TECLADO
 1 Yamaha Montage 8`, "pdf");
     expect(resumen(e)).toEqual(["1 Bombo [Batería DW·Batería]", "1 Snare [Batería DW·Batería]", "1 Yamaha Montage 8 [Teclado·Teclado]"]);
   });
+
+  it("una coma dentro del paréntesis no parte la pieza", () => {
+    const e = leer(`IN EARS
+16 Shure PSM 1000 (el dual va dentro del mismo rack, 4 de Audio Room)`, "pdf");
+    expect(resumen(e)).toEqual(["16 Shure PSM 1000 (el dual va dentro del mismo rack, 4 de Audio Room) [In ears·In ears]"]);
+  });
 });
