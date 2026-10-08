@@ -224,6 +224,10 @@ prueba (que el % suba sin romper los riders anteriores).
 - **A la derecha de cada reel solo va «›».** No hay Listo, Subir, doble toque ni conteos bajo el título;
   solo las etiquetas de categoría. Las ayudas salen solo la primera vez.
 - **El listado se ve como Excel** (blanco, cuadrícula, Cant | Requerimiento).
+- **Scroll en las historias (2026-10-08):** las historias de los lados (`.slide.banda`) se deslizan enteras hacia
+  abajo (antes quedaban cortadas y el dedo cambiaba de reel); adentro no hay otro scroll y arriba se desvanecen
+  bajo el título. Para probar el dedo en Playwright sirve `Input.dispatchTouchEvent` por CDP
+  (`synthesizeScrollGesture` no mueve nada en este Chromium).
 - **Chulo verde (2026-10-08, lo pidió el usuario):** tocar una pieza del listado la marca como lista (✓ verde)
   y otro toque la quita. Se guarda por pieza (banda|sección|nombre corto) en `lab-reels:chulos2:<documento>`, así
   sobrevive a volver a abrir la lista o a que cambie; las claves viejas `lab-reels:chulos:<doc>|<cuando>` se

@@ -33,6 +33,12 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 /* Carrusel horizontal dentro del reel */
 .slides{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none}
 .slides::-webkit-scrollbar{display:none}
+/* Las historias de los lados (listado, lo que pidió la banda, fotos…) se deslizan hacia abajo enteras: antes
+   lo que no cabía quedaba cortado. Adentro ya no hay otro scroll, así el dedo mueve una sola cosa. */
+.slide.banda{display:block;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;padding-bottom:calc(env(safe-area-inset-bottom) + 110px);scrollbar-width:none}
+.slide.banda::-webkit-scrollbar{display:none}
+.slide.banda{--tope:calc(env(safe-area-inset-top) + var(--barra) + 46px);-webkit-mask-image:linear-gradient(transparent var(--tope),#000 calc(var(--tope) + 22px));mask-image:linear-gradient(transparent var(--tope),#000 calc(var(--tope) + 22px))}
+.slide.banda ul.lista,.slide.banda .rider,.slide.banda .cmp{overflow:visible;flex:none;max-height:none;mask-image:none;-webkit-mask-image:none}
 .slide{flex:0 0 100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always;position:relative;padding:calc(env(safe-area-inset-top) + var(--barra) + 58px) 76px calc(env(safe-area-inset-bottom) + 34px) var(--gx);display:flex;flex-direction:column;overflow:hidden}
 
 /* Barra de progreso tipo historias */
