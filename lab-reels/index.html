@@ -422,6 +422,10 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .fila-fotos{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 .fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
 .fila-fotos:empty{display:none}
+.fotos-pieza{margin:0 0 12px}
+.fotos-pieza .momento{margin:0 0 6px;font-weight:600;color:var(--ink)}
+.chip.foto{background:transparent;border:1px solid #1fa34a;color:#1fa34a;margin-left:6px}
+.excel .chip.foto{background:#fff;border-color:#1fa34a;color:#1a8f3e}
 .botones-foto{display:flex;gap:8px;margin-top:8px}
 .botones-foto button{font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--ink2)}
 .ir-planilla{font-size:13px;font-weight:600;padding:3px 10px;margin-left:6px;border-radius:999px;border:1px solid var(--accent);color:var(--accent)}
@@ -539,8 +543,11 @@ tablero.ports.vista.subscribe(v => {
   pintarBarra();
   if (!arrancado) return;   // la primera vista la pinta el arranque
   const destino = destinoPendiente ?? (actual && document.getElementById(actual.id) ? actual.id : null);
+  // Al volver a dibujar (una foto, un chulo…) se queda en el mismo panel del reel, no vuelve al primero.
+  const lado = !destinoPendiente && destino ? document.querySelector(`#${CSS.escape(destino)} .slides`)?.scrollLeft : 0;
   destinoPendiente = null;
   pintar(destino);
+  if (lado) requestAnimationFrame(() => { const sl = document.querySelector(`#${CSS.escape(destino)} .slides`); if (sl) sl.scrollTo({left: lado, behavior: "instant"}); });
   if (!document.getElementById("filtros").hidden) pintarFiltros();
 });
 
@@ -751,7 +758,7 @@ function htmlFicha(b, cat){
         ${corto(x.referencia) !== x.referencia ? `<small class="modelo">${esc((x.referencia.match(/\(([^)]*)\)/g) || []).map(p => p.slice(1, -1)).join(" · "))}</small>` : ""}
         ${x.nota ? `<small>${esc(x.nota)}</small>` : x.grupo === undefined && x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
         ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
-        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</span><button class="ver-pieza" data-detalle="${esc(x.id)}" aria-label="Ver detalle">›</button></li>`;
+        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}${chipsFotos(x)}</span><button class="ver-pieza" data-detalle="${esc(x.id)}" aria-label="Ver detalle">›</button></li>`;
   const conTitulos = b.secciones.some(s => s.grupo);
   const rider = b.secciones.length
     ? b.secciones.map(s => `${conTitulos ? `<h4 class="seccion">${esc(s.grupo || "Sin sección")}</h4>` : ""}<ul class="lista">${s.items.map(item).join("")}</ul>`).join("")
@@ -973,6 +980,26 @@ function htmlFotos(b){
         <div class="fila-fotos">${fotos.map(f => `<img data-foto="${esc(f)}" data-banda="${esc(b.artistaId)}" alt="Foto de ${esc(b.nombre)}">`).join("")}</div>
         <div class="botones-foto"><button data-acc="tomar-foto" data-banda="${esc(b.artistaId)}">📷 Tomar foto</button><button data-acc="subir-foto" data-banda="${esc(b.artistaId)}">🖼 Subir foto</button>${fotos.length ? `<span class="sub" style="margin:0;align-self:center">${fotos.length} ${fotos.length === 1 ? "foto" : "fotos"}</span>` : ""}</div>
       </div>`;
+}
+
+/* Fotos de cada pieza (lo pidió el usuario): una tanda en la bodega, al alistar, y otra en el evento. Se
+   guardan como las de las bandas, con una clave que no cambia al recargar la misma lista. */
+const MOMENTOS = [["bodega", "En bodega"], ["evento", "En evento"]];
+const clavePieza = (x, momento) => `pieza|${x.artistaId || "sin-banda"}|${x.grupo || ""}|${x.referencia}|${momento}`;
+const fotosPieza = (x, momento) => V?.fotos?.[clavePieza(x, momento)] || [];
+function chipsFotos(x){
+  return MOMENTOS.map(([m, t]) => { const n = fotosPieza(x, m).length; return n ? `<span class="chip foto">📷 ${t.replace("En b", "B").replace("En e", "E")} ${n}</span>` : ""; }).join("");
+}
+function htmlFotosPieza(x){
+  return `<p class="et">Fotos</p>` + MOMENTOS.map(([m, t]) => {
+    const k = clavePieza(x, m), fotos = fotosPieza(x, m);
+    return `
+    <div class="fotos-pieza">
+      <p class="momento">${t}${fotos.length ? ` · ${fotos.length} ${fotos.length === 1 ? "foto" : "fotos"}` : ""}</p>
+      <div class="fila-fotos">${fotos.map(f => `<img data-foto="${esc(f)}" data-banda="${esc(k)}" alt="Foto ${esc(t.toLowerCase())}">`).join("")}</div>
+      <div class="botones-foto"><button data-acc="tomar-foto" data-banda="${esc(k)}">📷 Tomar foto</button><button data-acc="subir-foto" data-banda="${esc(k)}">🖼 Subir</button></div>
+    </div>`;
+  }).join("");
 }
 
 /* El holograma que le toca a un grupo de ítems: el del equipo principal que haya (batería antes que
@@ -1336,6 +1363,7 @@ document.getElementById("visor").addEventListener("click", e => {
     urlsFotos.delete(foto);
     enviar({tipo: "quitar-foto", banda, foto});
     aviso("Foto borrada");
+    refrescarDetalle();
   }
   v.hidden = true;
 });
@@ -1456,8 +1484,8 @@ async function idb(modo, accion){
   });
 }
 const urlsFotos = new Map();
-async function cargarFotos(){
-  for (const img of feed.querySelectorAll("img[data-foto]")) {
+async function cargarFotos(raiz = feed){
+  for (const img of raiz.querySelectorAll("img[data-foto]")) {
     const id = img.dataset.foto;
     if (!urlsFotos.has(id)) {
       const blob = await idb("readonly", st => st.get(id)).catch(() => null);
@@ -1489,6 +1517,7 @@ for (const id of ["foto-camara", "foto-galeria"]) $b(id).addEventListener("chang
     enviar({tipo: "foto", banda, foto});
   }
   aviso(n ? (n === 1 ? "Foto guardada" : `${n} fotos guardadas`) : "No se pudo guardar la foto en este dispositivo");
+  refrescarDetalle();
 });
 function verFoto(img){
   const v = $b("visor"), b = v.querySelector(".borrar-foto");
@@ -1521,16 +1550,25 @@ function abrirDetalle(id){
     ${modelo ? `<p class="modelo">${esc(modelo)}</p>` : ""}
     <p class="chips-pieza"><span class="chip">${esc(x.categoria)}</span>${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "la banda")}</span>` : ""}${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}</p>
     ${x.nota ? `<p class="nota">${esc(x.nota)}</p>` : ""}
+    ${htmlFotosPieza(x)}
     ${renglones.length ? `<p class="et">Así lo pidió el rider</p><blockquote>${renglones.map(r => esc(r.texto)).join("<br>")}</blockquote>` : ""}
     ${deSeccion.length ? `<p class="et">En la misma sección</p><div class="piezas">${deSeccion.map(i => pieza(i, false)).join("")}</div>` : ""}
     ${enOtras.length ? `<p class="et">${esc(x.categoria)} en otras bandas</p><div class="piezas">${enOtras.slice(0, 12).map(i => pieza(i, true)).join("")}</div>` : ""}
     <div class="botones">${V.puede.editar ? `<button class="btn" data-acc="editar-item" data-id="${esc(x.id)}">Editar</button>` : ""}<button class="btn sec" data-acc="cerrar-detalle">Cerrar</button></div>`;
+  const vuelve = detalleId === id && !detalle.hidden, arriba = detalle.querySelector(".panel").scrollTop;
+  detalleId = id;
   detalle.hidden = false;
-  detalle.querySelector(".panel").scrollTop = 0;
+  detalle.querySelector(".panel").scrollTop = vuelve ? arriba : 0;
+  cargarFotos(detalle);
 }
+let detalleId = null;
+// Después de tomar o borrar una foto, la hoja abierta se vuelve a dibujar con lo nuevo.
+const refrescarDetalle = () => setTimeout(() => { if (!detalle.hidden && detalleId) abrirDetalle(detalleId); }, 150);
 detalle.addEventListener("click", e => {
   const otra = e.target.closest("[data-item]"); if (otra) return abrirDetalle(otra.dataset.item);
   const acc = e.target.closest("[data-acc]")?.dataset.acc;
+  if (acc === "tomar-foto" || acc === "subir-foto") { fotoDe = e.target.closest("[data-banda]").dataset.banda; return document.getElementById(acc === "tomar-foto" ? "foto-camara" : "foto-galeria").click(); }
+  const foto = e.target.closest("img[data-foto]"); if (foto) return verFoto(foto);
   if (acc === "editar-item") { detalle.hidden = true; return abrirEditor(e.target.closest("[data-id]").dataset.id); }
   if (e.target === detalle || acc === "cerrar-detalle") detalle.hidden = true;
 });

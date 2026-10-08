@@ -228,6 +228,10 @@ prueba (que el % suba sin romper los riders anteriores).
   y otro toque la quita; se guarda en el dispositivo por documento (`lab-reels:chulos:…`). La hoja de
   detalle (`abrirDetalle`: renglón del rider, su sección y la misma categoría en otras bandas; el admin
   edita desde ahí) se abre con el «›» al final del renglón.
+- **Fotos por pieza (2026-10-08, lo pidió el usuario):** en la hoja de detalle, «En bodega» y «En evento»,
+  cada una con Tomar foto / Subir. Se guardan como las de las bandas (IndexedDB + `fotos` de Elm) con la
+  clave `pieza|banda|sección|referencia|momento`, que no cambia al recargar la misma lista. En el listado
+  sale «📷 Bodega n» / «📷 Evento n». Al volver a dibujar, el reel se queda en el panel donde estaba.
 - **Dos espacios** (en Elm, `Espacio`): **Evento** (oficial, viene del cronograma; el empleado lo ve
   con candado y no lo cambia) y **Mis pruebas** (el escritorio propio; lo que el empleado sube a mano cae
   ahí). La regla es `puedeEscribir` en `Tablero.elm`.
