@@ -58,6 +58,10 @@ button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:poin
 .chip{font-size:13px;font-weight:600;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.1);color:var(--ink);white-space:nowrap}
 .chip.ac{background:var(--accent);color:var(--accent-ink)}
 .chip.warn{background:transparent;border:1px solid var(--warn);color:var(--warn)}
+/* Portada de la banda: una fila de secciones para saltar a cada una (lo pidió el usuario). */
+.ir-secciones{display:flex;flex-wrap:wrap;gap:7px;margin:6px 0 10px}
+.ir-secciones button{flex:none;display:flex;align-items:center;gap:6px;font:600 14px/1 "IBM Plex Sans",sans-serif;color:var(--ink);background:rgba(255,255,255,.08);border:1px solid var(--accent);border-radius:999px;padding:8px 12px;cursor:pointer}
+.ir-secciones button span{font-size:16px}
 .chip.ter{background:transparent;border:1px solid var(--ink3);color:var(--ink2)}
 .pista{margin-top:18px;font-size:14px;color:var(--ink2);display:flex;align-items:center;gap:8px}
 .pista .flecha{display:inline-block;animation:empuja 1.4s ease-in-out infinite}
@@ -1012,6 +1016,7 @@ function htmlBanda(b){
         ${htmlOrigen()}
         <h2${b.nombre.length > 18 ? ' class="largo"' : ""}>${esc(b.nombre)}</h2>
         ${dudosos ? `<p class="sub" style="margin:4px 0 8px"><span class="chip warn">${dudosos} por confirmar</span></p>` : ""}
+        ${secs.length > 1 ? `<nav class="ir-secciones" aria-label="Secciones">${secs.map((s, j) => `<button data-acc="ir-seccion" data-id="${esc(idSeccion(b, j))}"><span aria-hidden="true">${EMOJI[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] || "·"}</span>${esc(s.grupo || "Sin sección")}</button>`).join("")}</nav>` : ""}
         <ul class="vivo">${vivo}</ul>
         ${AYUDA && secs.length ? `<p class="pista">${PC ? "Baja con ↓ para ir sección por sección" : "Desliza hacia arriba para ir sección por sección"}</p>` : ""}
       </section>
@@ -1248,6 +1253,7 @@ const mover = {
 feed.addEventListener("click", async e => {
   const r = e.target.closest(".reel"); if (!r) return;
   const acc = e.target.closest("[data-acc]")?.dataset.acc;
+  if (acc === "ir-seccion") return document.getElementById(e.target.closest("[data-acc]").dataset.id)?.scrollIntoView({behavior: "smooth"});
   if (acc === "elegir") return document.getElementById("archivo").click();
   if (acc === "foto") return document.getElementById("camara").click();
   if (acc === "muestra") return probarMuestra();

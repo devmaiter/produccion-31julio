@@ -254,6 +254,8 @@ lo que llega por `guardar` (`localStorage` `lab-reels:tablero`).
   del rider y, a los lados, **solo tres**: información (holograma, opciones de marca, resumen),
   "En el listado" (el admin edita ahí) y "Lo que pidió la banda" (los renglones del rider de
   esa sección, de `datos.pedidos`, con qué quedó de cada uno). Sin botones de Índice ni Enviar.
+  En la portada, una fila de botones con las secciones (Batería, Bajo, In ears, Consolas…) salta a
+  cada una (2026-10-08, lo pidió el usuario).
   Un ítem que es solo el cabezal (SVT, head) se dibuja como cabezal. El nombre de la banda va
   solo en la cabecera.
 - **Modo festival** (lo elige el admin en Filtros): los reels por categoría de abajo.
