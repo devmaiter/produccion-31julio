@@ -225,7 +225,9 @@ prueba (que el % suba sin romper los riders anteriores).
   solo las etiquetas de categoría. Las ayudas salen solo la primera vez.
 - **El listado se ve como Excel** (blanco, cuadrícula, Cant | Requerimiento).
 - **Chulo verde (2026-10-08, lo pidió el usuario):** tocar una pieza del listado la marca como lista (✓ verde)
-  y otro toque la quita; se guarda en el dispositivo por documento (`lab-reels:chulos:…`). La hoja de
+  y otro toque la quita. Se guarda por pieza (banda|sección|nombre corto) en `lab-reels:chulos2:<documento>`, así
+  sobrevive a volver a abrir la lista o a que cambie; las claves viejas `lab-reels:chulos:<doc>|<cuando>` se
+  migran al cargar y no se borran. Las fotos de una pieza se buscan por su nombre corto (sin paréntesis). La hoja de
   detalle (`abrirDetalle`: renglón del rider, su sección y la misma categoría en otras bandas; el admin
   edita desde ahí) se abre con el «›» al final del renglón.
 - **Fotos por pieza (2026-10-08, lo pidió el usuario):** en la hoja de detalle, «En bodega» y «En evento»,
@@ -239,6 +241,11 @@ prueba (que el % suba sin romper los riders anteriores).
   lleva a la historia de fotos.
   Una lista del sitio puede traer sus fotos en `listas/<nombre>.fotos.json` (pieza por nombre, momento y URLs
   en `listas/fotos/`, achicadas y sin EXIF): se ven en cualquier celular y no se borran desde la app.
+- **Respaldo (2026-10-08, lo pidió el usuario: no perder estados):** en Filtros, «Guardar respaldo» arma un
+  .json (`respaldo-lab-reels/1`) con lo de `lab-reels:`/`cronograma:`/`planilla:` en localStorage y las fotos de
+  IndexedDB, y lo comparte (WhatsApp/Drive) o lo descarga; «Cargar respaldo» lo devuelve. Se pide
+  `navigator.storage.persist()`. Firestore `backline-2797d` hoy niega lectura y escritura (403): para subir
+  a la nube hay que abrir reglas o poner login.
 - **Dos espacios** (en Elm, `Espacio`): **Evento** (oficial, viene del cronograma; el empleado lo ve
   con candado y no lo cambia) y **Mis pruebas** (el escritorio propio; lo que el empleado sube a mano cae
   ahí). La regla es `puedeEscribir` en `Tablero.elm`.
