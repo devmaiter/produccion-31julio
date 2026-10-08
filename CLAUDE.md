@@ -233,7 +233,10 @@ prueba (que el % suba sin romper los riders anteriores).
   clave `pieza|banda|sección|referencia|momento`, que no cambia al recargar la misma lista. En el listado
   sale «📷 Bodega n» / «📷 Evento n». Al volver a dibujar, el reel se queda en el panel donde estaba.
   Además, cada sección tiene una **cuarta historia «Fotos»** (`htmlHistoriaFotos`): cada pieza con su fila de
-  Bodega y de Evento, 📷 y 🖼, y arriba cuántas piezas tienen foto en cada momento.
+  Bodega y de Evento, 📷 y 🖼, y arriba cuántas piezas tienen foto en cada momento. Las fotos se ven
+  **grandes y en carrusel** (deslizar de lado), y las piezas con fotos van primero. En el listado, cada
+  renglón trae su **📷** (abre «En bodega / En evento» con Tomar foto y Subir), y el chip «📷 Bodega n»
+  lleva a la historia de fotos.
   Una lista del sitio puede traer sus fotos en `listas/<nombre>.fotos.json` (pieza por nombre, momento y URLs
   en `listas/fotos/`, achicadas y sin EXIF): se ven en cualquier celular y no se borran desde la app.
 - **Dos espacios** (en Elm, `Espacio`): **Evento** (oficial, viene del cronograma; el empleado lo ve

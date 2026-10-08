@@ -75,7 +75,7 @@ ul.lista li{display:flex;gap:12px;align-items:baseline;padding:10px 0;border-bot
 /* "En el listado" se ve como la planilla de Excel: hoja blanca, letra oscura y cuadrícula, sin naranja
    (lo pidió el usuario: el listado no debe competir con el resto). */
 .excel{background:#fff;color:#1f1f1f;border:1px solid #c8c8c8;border-radius:6px;overflow:hidden;font-family:Calibri,"Segoe UI",Arial,sans-serif}
-.excel .cab-xl,.excel ul.lista li{display:grid;grid-template-columns:58px 1fr 40px;gap:0;align-items:stretch}
+.excel .cab-xl,.excel ul.lista li{display:grid;grid-template-columns:52px 1fr 40px 34px;gap:0;align-items:stretch}
 .excel .cab-xl{background:#f3f3f3;border-bottom:1px solid #c8c8c8;font-size:12px;font-weight:700;color:#444}
 .excel .cab-xl span,.excel ul.lista li>span{padding:8px 10px}
 .excel .cab-xl span:first-child,.excel ul.lista li>.q{border-right:1px solid #d9d9d9}
@@ -182,6 +182,8 @@ li.hecho .q::before,.vivo li.hecho b::before{content:"✓ ";font-weight:800}
 .excel ul.lista li.hecho .q,.excel ul.lista li.hecho .q *{color:#1a8f3e;font-weight:700}
 ul.lista li.hecho .t{opacity:.75}
 .vivo li.hecho{color:#7ee2a0}
+.foto-pieza{flex:none;align-self:center;width:38px;height:38px;border:1px solid var(--line);border-radius:50%;background:rgba(255,255,255,.06);font-size:17px;line-height:1;cursor:pointer;padding:0}
+.excel .foto-pieza{border-color:#d4dbe5;background:#f3f6fa}
 .ver-pieza{flex:none;align-self:center;margin-left:auto;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:inherit;font-size:22px;line-height:1;opacity:.55;cursor:pointer}
 .excel .ver-pieza{color:#555}
 ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
@@ -426,8 +428,11 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .pieza-fotos{padding:10px 0;border-bottom:1px solid var(--line)}
 .pieza-fotos .nombre{margin:0 0 6px}
 .pieza-fotos .nombre b{color:var(--accent)}
-.momento-fila{display:flex;align-items:center;gap:8px;margin:4px 0}
-.momento-fila .m{flex:none;width:66px;font-size:13px;color:var(--ink3)}
+.momento-fila{display:flex;align-items:center;gap:8px;margin:6px 0}
+.carrusel{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:4px -4px 10px;padding:0 4px 6px;overscroll-behavior-x:contain}
+.carrusel img{flex:none;width:82%;max-width:420px;aspect-ratio:3/4;object-fit:cover;border-radius:14px;background:var(--surface2);scroll-snap-align:start;cursor:zoom-in}
+.carrusel img:only-child{width:100%}
+.momento-fila .m{flex:1;font-size:14px;color:var(--ink3)}
 .momento-fila .m.si{color:#1fa34a;font-weight:600}
 .momento-fila .fila-fotos{flex:1;min-width:0;display:flex}
 .momento-fila .fila-fotos:empty{display:block}
@@ -769,7 +774,7 @@ function htmlFicha(b, cat){
         ${corto(x.referencia) !== x.referencia ? `<small class="modelo">${esc((x.referencia.match(/\(([^)]*)\)/g) || []).map(p => p.slice(1, -1)).join(" · "))}</small>` : ""}
         ${x.nota ? `<small>${esc(x.nota)}</small>` : x.grupo === undefined && x.descripcion !== x.referencia ? `<small>${esc(x.descripcion)}</small>` : ""}
         ${x.propietario?.tipo === "tercero" ? `<span class="chip ter">Lo trae ${esc(x.propietario.nombre || "un tercero")}</span>` : ""}
-        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}${chipsFotos(x)}</span><button class="ver-pieza" data-detalle="${esc(x.id)}" aria-label="Ver detalle">›</button></li>`;
+        ${x.porConfirmar ? `<span class="chip warn">Por confirmar</span>` : ""}${chipsFotos(x)}</span><button class="foto-pieza" data-foto-pieza="${esc(x.id)}" aria-label="Tomar o subir foto">📷</button><button class="ver-pieza" data-detalle="${esc(x.id)}" aria-label="Ver detalle">›</button></li>`;
   const conTitulos = b.secciones.some(s => s.grupo);
   const rider = b.secciones.length
     ? b.secciones.map(s => `${conTitulos ? `<h4 class="seccion">${esc(s.grupo || "Sin sección")}</h4>` : ""}<ul class="lista">${s.items.map(item).join("")}</ul>`).join("")
@@ -1024,11 +1029,13 @@ function chipsFotos(x){
 function htmlHistoriaFotos(titulo, items){
   const con = m => items.filter(x => fotosPieza(x, m).length).length;
   const fila = (x, m, t) => {
-    const k = clavePieza(x, m), fotos = fotosPieza(x, m);
-    return `<div class="momento-fila"><span class="m${fotos.length ? " si" : ""}">${fotos.length ? "✓ " : ""}${t === "En bodega" ? "Bodega" : "Evento"}</span>
-      <div class="fila-fotos">${fotos.map(f => `<img data-foto="${esc(f)}" data-banda="${esc(k)}" alt="Foto ${esc(t.toLowerCase())}">`).join("")}</div>
-      <button class="cam" data-acc="tomar-foto" data-banda="${esc(k)}" aria-label="Tomar foto ${esc(t.toLowerCase())}">📷</button><button class="cam" data-acc="subir-foto" data-banda="${esc(k)}" aria-label="Subir foto ${esc(t.toLowerCase())}">🖼</button></div>`;
+    const k = clavePieza(x, m), fotos = fotosPieza(x, m), corto = t === "En bodega" ? "Bodega" : "Evento";
+    return `<div class="momento-fila"><span class="m${fotos.length ? " si" : ""}">${fotos.length ? `✓ ${corto} · ${fotos.length}` : corto}</span>
+      <button class="cam" data-acc="tomar-foto" data-banda="${esc(k)}" aria-label="Tomar foto ${esc(t.toLowerCase())}">📷</button><button class="cam" data-acc="subir-foto" data-banda="${esc(k)}" aria-label="Subir foto ${esc(t.toLowerCase())}">🖼</button></div>
+      ${fotos.length ? `<div class="carrusel">${fotos.map(f => `<img data-foto="${esc(f)}" data-banda="${esc(k)}" alt="Foto ${esc(t.toLowerCase())}">`).join("")}</div>` : ""}`;
   };
+  // Primero las piezas que ya tienen fotos: es lo que se quiere ver.
+  items = [...items].sort((a, b) => (MOMENTOS.some(([m]) => fotosPieza(b, m).length) ? 1 : 0) - (MOMENTOS.some(([m]) => fotosPieza(a, m).length) ? 1 : 0));
   return `
       <section class="slide banda historia-fotos">
         <h3>Fotos</h3>
@@ -1366,6 +1373,10 @@ feed.addEventListener("click", async e => {
   if (acc === "planilla") return abrirPlanilla(e.target.closest("[data-banda]").dataset.banda);
   const foto = e.target.closest("img[data-foto]");
   if (foto) return verFoto(foto);
+  const fp = e.target.closest("[data-foto-pieza]");
+  if (fp) return abrirMomentos(fp.dataset.fotoPieza);
+  const chipF = e.target.closest(".chip.foto");
+  if (chipF) { const sl = chipF.closest(".reel")?.querySelector(".slides"), h = sl?.querySelector(".historia-fotos"); if (h) return sl.scrollTo({left: h.offsetLeft, behavior: "smooth"}); }
   const det = e.target.closest("[data-detalle]");
   if (det) return abrirDetalle(det.dataset.detalle);
   const li = e.target.closest("[data-item]");
@@ -1614,6 +1625,26 @@ function abrirDetalle(id){
   cargarFotos(detalle);
 }
 let detalleId = null;
+/* El 📷 del listado: elegir si la foto es de la bodega o del evento, y tomarla o subirla. */
+const momentos = Object.assign(document.createElement("div"), {className: "hoja", id: "momentos", hidden: true});
+momentos.innerHTML = `<div class="panel" role="dialog" aria-label="Foto de la pieza"></div>`;
+document.body.append(momentos);
+function abrirMomentos(id){
+  const x = datos().items.find(i => i.id === id); if (!x) return;
+  momentos.querySelector(".panel").innerHTML = `
+    <div class="agarre" aria-hidden="true"></div>
+    <h4 class="titulo-pieza"><span class="cant">${x.cantidad} ×</span> ${esc(corto(x.referencia))}</h4>
+    ${MOMENTOS.map(([m, t]) => { const k = clavePieza(x, m), n = fotosPieza(x, m).length; return `
+    <p class="et">${t}${n ? ` · ${n} ${n === 1 ? "foto" : "fotos"}` : ""}</p>
+    <div class="botones"><button class="btn" data-acc="tomar-foto" data-banda="${esc(k)}">📷 Tomar foto</button><button class="btn sec" data-acc="subir-foto" data-banda="${esc(k)}">🖼 Subir</button></div>`; }).join("")}
+    <div class="botones"><button class="btn sec" data-acc="cerrar">Cancelar</button></div>`;
+  momentos.hidden = false;
+}
+momentos.addEventListener("click", e => {
+  const acc = e.target.closest("[data-acc]")?.dataset.acc;
+  if (acc === "tomar-foto" || acc === "subir-foto") { fotoDe = e.target.closest("[data-banda]").dataset.banda; momentos.hidden = true; return document.getElementById(acc === "tomar-foto" ? "foto-camara" : "foto-galeria").click(); }
+  if (e.target === momentos || acc === "cerrar") momentos.hidden = true;
+});
 // Después de tomar o borrar una foto, la hoja abierta se vuelve a dibujar con lo nuevo.
 const refrescarDetalle = () => setTimeout(() => { if (!detalle.hidden && detalleId) abrirDetalle(detalleId); }, 150);
 detalle.addEventListener("click", e => {
