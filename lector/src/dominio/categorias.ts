@@ -34,7 +34,7 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   ["Bajo",             /((pedal(es)?|pedalboard|pedal ?board|efectos?|fx)\b.{0,25}\b(bajo|bass)\b|\bbass (pedals?|pedalboard|fx|effects?)\b)/i],
   ["Guitarra",         /(pedal(es)? de efectos?|pedalboard|pedal ?board|effects? pedals?|fx pedals?|tuner pedal|pedal afinador|\bafinador(es)?\b|\btuners?\b|\bwah\b|overdrive|distorsi[oó]n|\bhelix\b|\bkemper\b)/i],
   // Parches por su marca o modelo ("Remo Coated Ambassador", "Evans G2") y baquetas: son de la batería.
-  ["Batería",          /(\b(remo|evans|aquarian)\b|ambassador|emperor|powerstroke|pinstripe|\bemad\b|\bg(1|2|14)\b|drum ?heads?|baquetas?|escobillas?|\bmallets?\b|drum ?sticks?|\bsticks\b|\bbrushes\b|vic firth)/i],
+  ["Batería",          /(\b(remo|evans|aquarian)\b|ambassador|emperor|powerstroke|pinstripe|\bemad\b|\bg(1|2|14)\b|drum ?heads?|pl[aá]sticos?|baquetas?|escobillas?|\bmallets?\b|drum ?sticks?|\bsticks\b|\bbrushes\b|vic firth)/i],
   ["Escenario",        /(stage fan|cooler fan|tapete|\bfans?\b|ventilador|fald[oó]n|plexiglass|sand ?bags|sacos de arena|alfombra|carpet|\brug\b|stage ?dex|\briser|tarima)/i],
   ["Percusión",        /(magician|percussion tables?|toys tables?|trap tables?|cortina|bar chimes|mark tree|mesas? (de percusi[oó]n|tipo mago|de toys))/i],
   ["Batería",          /(\bx ?-?hat\b|\bkd\b|\bclamps?\b|boom arm|\bspd\b|sample ?pad|octapad)/i],

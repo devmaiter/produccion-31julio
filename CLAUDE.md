@@ -128,7 +128,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 239 pruebas en verde.
+  inglés). Hay 239 pruebas en verde (las de categorías revisan también «plásticos»).
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -247,7 +247,8 @@ prueba (que el % suba sin romper los riders anteriores).
   en `listas/fotos/`, achicadas y sin EXIF): se ven en cualquier celular y no se borran desde la app.
 - **Lo que lleva cada instrumento (2026-10-08, lo pidió el usuario: "la batería debe llevar silla y no la
   pidió"):** tabla `LLEVA` en `lab-reels/index.html` (batería: silla, pedal, base de redoblante, máquina de
-  hi-hat, platillos, alfombra; bajo: ampli y base; guitarra: ampli y base; teclado: base y pedal de sustain).
+  hi-hat, platillos, alfombra y plásticos —así les dicen a los parches; cuenta también «parches» o una marca
+  como Remo/Evans—; bajo: ampli y base; guitarra: ampli y base; teclado: base y pedal de sustain).
   «Hardware completo» cubre stands y pedal, no silla ni alfombra. Se avisa (⚠ en los botones de sección,
   «Revisa: no pidió…» en la portada de la sección, «Le falta» bajo el listado), nunca se agrega solo:
   «+ Agregar» (admin) vuelve a cargar el mismo documento con la pieza (nota «Agregado al revisar») y «No hace

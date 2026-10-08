@@ -14,6 +14,8 @@ describe("in ears y consolas", () => {
     expect(categorizar("DM7 con 48 canales")).toBe("Consolas");
     expect(categorizar("DiGiCo SD12")).toBe("Consolas");
     expect(categorizar("Mesa de percusión")).toBe("Percusión");
+    expect(categorizar("Plásticos Remo para toms")).toBe("Batería");
+    expect(categorizar("2 plásticos de redoblante")).toBe("Batería");
   });
 
   it("una lista corta, como la escrita a mano, saca los in ears y las consolas por su categoría", () => {
