@@ -3,7 +3,7 @@ Batería DW
 Toms 10”, 12” y 14”
 1 Snare
 1 Pedal
-4 Bases
+5 Bases (hardware completo DW, con una base extra)
 1 Platos (solo para Guayacán)
 TECLADO
 Yamaha Montage 8   1   ARBOL NARANJA
@@ -12,7 +12,8 @@ BAJO
 1 Cabezal Gallien Krueger + cabina 4x10
 1 Bajo Fender
 IN EARS
-16 Shure PSM 1000 con antena helicoidal (el dual va dentro del mismo rack, 4 de Audio Room)
+Shure PSM 1000 con antena helicoidal (el dual va dentro del mismo rack)   12   JON
+Shure PSM 1000   4   AUDIO ROOM
 4 Micrófonos Lectrosonics
 CONSOLAS
 Yamaha DM7 con 48 canales c/u   2   AUDIO ROOM

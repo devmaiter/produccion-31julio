@@ -1,0 +1,25 @@
+{
+ "_": "Fotos que el usuario mandó, por pieza (la pieza se busca por su nombre) y momento.",
+ "fotos": [
+  {
+   "pieza": "PSM 1000 con antena",
+   "momento": "bodega",
+   "fotos": [
+    "listas/fotos/antena-helicoidal.jpg",
+    "listas/fotos/in-ears-maleta-1.jpg",
+    "listas/fotos/in-ears-maleta-2.jpg"
+   ]
+  },
+  {
+   "pieza": "Bases",
+   "momento": "bodega",
+   "fotos": [
+    "listas/fotos/hardware-1.jpg",
+    "listas/fotos/hardware-2.jpg",
+    "listas/fotos/hardware-3.jpg",
+    "listas/fotos/hardware-4.jpg",
+    "listas/fotos/hardware-5.jpg"
+   ]
+  }
+ ]
+}

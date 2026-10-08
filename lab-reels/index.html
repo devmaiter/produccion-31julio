@@ -550,6 +550,7 @@ tablero.ports.guardar.subscribe(v => { escribir("lab-reels:tablero", v); escribi
 tablero.ports.error.subscribe(e => console.warn("tablero:", e));
 tablero.ports.vista.subscribe(v => {
   V = v;
+  cargarFotosSitio();
   pintarBarra();
   if (!arrancado) return;   // la primera vista la pinta el arranque
   const destino = destinoPendiente ?? (actual && document.getElementById(actual.id) ? actual.id : null);
@@ -694,7 +695,7 @@ function armar(d){
 function dueno(p){
   if (p === "ARTISTA") return {tipo: "tercero", nombre: "la banda"};
   if (!p || /^(cn|propio|producci[oó]n)$/i.test(p)) return {tipo: "propio"};
-  return {tipo: "tercero", nombre: p.length <= 4 ? p : p.toLowerCase().replace(/(^|\s)\p{L}/gu, m => m.toUpperCase())};
+  return {tipo: "tercero", nombre: /^(OML|BACKLINE COP)$/i.test(p) ? p.toUpperCase() : p.toLowerCase().replace(/(^|\s)\p{L}/gu, m => m.toUpperCase())};
 }
 
 /* Lo que devuelve el lector → el mismo formato de datos que Cordillera, para armar los reels. */
@@ -996,7 +997,26 @@ function htmlFotos(b){
    guardan como las de las bandas, con una clave que no cambia al recargar la misma lista. */
 const MOMENTOS = [["bodega", "En bodega"], ["evento", "En evento"]];
 const clavePieza = (x, momento) => `pieza|${x.artistaId || "sin-banda"}|${x.grupo || ""}|${x.referencia}|${momento}`;
-const fotosPieza = (x, momento) => V?.fotos?.[clavePieza(x, momento)] || [];
+const fotosPieza = (x, momento) => [...fotosDelSitio(x, momento), ...(V?.fotos?.[clavePieza(x, momento)] || [])];
+/* Las fotos que vienen con una lista del sitio (listas/<nombre>.fotos.json): se ven en cualquier celular y no
+   se borran desde la app. Van como "url:…" para distinguirlas de las del dispositivo. */
+let fotosSitio = {de: null, fotos: []};
+function fotosDelSitio(x, momento){
+  if (!V?.doc || fotosSitio.de !== V.doc.nombre) return [];
+  const ref = (x.referencia || "").toLowerCase();
+  return fotosSitio.fotos.filter(f => f.momento === momento && ref.includes(String(f.pieza).toLowerCase())).flatMap(f => f.fotos.map(u => "url:" + u));
+}
+async function cargarFotosSitio(){
+  const nombre = V?.doc?.nombre;
+  if (!nombre || fotosSitio.de === nombre || !/^[\w.-]+$/.test(nombre)) return;
+  fotosSitio = {de: nombre, fotos: []};
+  try {
+    const r = await fetch(`listas/${nombre}.fotos.json`, {cache: "no-store"});
+    if (!r.ok) return;
+    fotosSitio.fotos = (await r.json()).fotos || [];
+    if (fotosSitio.fotos.length && arrancado) pintar(actual?.id);
+  } catch {}
+}
 function chipsFotos(x){
   return MOMENTOS.map(([m, t]) => { const n = fotosPieza(x, m).length; return n ? `<span class="chip foto">📷 ${t.replace("En b", "B").replace("En e", "E")} ${n}</span>` : ""; }).join("");
 }
@@ -1518,6 +1538,7 @@ const urlsFotos = new Map();
 async function cargarFotos(raiz = feed){
   for (const img of raiz.querySelectorAll("img[data-foto]")) {
     const id = img.dataset.foto;
+    if (id.startsWith("url:")) { img.src = id.slice(4); img.loading = "lazy"; continue; }
     if (!urlsFotos.has(id)) {
       const blob = await idb("readonly", st => st.get(id)).catch(() => null);
       if (blob) urlsFotos.set(id, URL.createObjectURL(blob));
@@ -1554,7 +1575,7 @@ function verFoto(img){
   const v = $b("visor"), b = v.querySelector(".borrar-foto");
   if (!img.src) return;
   v.querySelector("img").src = img.src;
-  b.hidden = false; b.textContent = "Borrar esta foto"; delete b.dataset.seguro;
+  b.hidden = img.dataset.foto.startsWith("url:"); b.textContent = "Borrar esta foto"; delete b.dataset.seguro;
   b.dataset.foto = img.dataset.foto; b.dataset.banda = img.dataset.banda;
   v.hidden = false;
 }
@@ -1820,6 +1841,7 @@ enviar({tipo: "limpiar"});
 (function arrancar(){
   if (!V) return setTimeout(arrancar, 20);
   arrancado = true;
+  fotosSitio.de = null; cargarFotosSitio();
   pintarBarra();
   riderDelCronograma();
   if (V.doc && !location.hash) introHecha = true;   // ya hay rider: sin la entrada
