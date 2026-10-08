@@ -232,6 +232,8 @@ prueba (que el % suba sin romper los riders anteriores).
   cada una con Tomar foto / Subir. Se guardan como las de las bandas (IndexedDB + `fotos` de Elm) con la
   clave `pieza|banda|sección|referencia|momento`, que no cambia al recargar la misma lista. En el listado
   sale «📷 Bodega n» / «📷 Evento n». Al volver a dibujar, el reel se queda en el panel donde estaba.
+  Además, cada sección tiene una **cuarta historia «Fotos»** (`htmlHistoriaFotos`): cada pieza con su fila de
+  Bodega y de Evento, 📷 y 🖼, y arriba cuántas piezas tienen foto en cada momento.
 - **Dos espacios** (en Elm, `Espacio`): **Evento** (oficial, viene del cronograma; el empleado lo ve
   con candado y no lo cambia) y **Mis pruebas** (el escritorio propio; lo que el empleado sube a mano cae
   ahí). La regla es `puedeEscribir` en `Tablero.elm`.

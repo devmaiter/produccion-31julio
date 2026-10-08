@@ -423,6 +423,16 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
 .fila-fotos:empty{display:none}
 .fotos-pieza{margin:0 0 12px}
+.pieza-fotos{padding:10px 0;border-bottom:1px solid var(--line)}
+.pieza-fotos .nombre{margin:0 0 6px}
+.pieza-fotos .nombre b{color:var(--accent)}
+.momento-fila{display:flex;align-items:center;gap:8px;margin:4px 0}
+.momento-fila .m{flex:none;width:66px;font-size:13px;color:var(--ink3)}
+.momento-fila .m.si{color:#1fa34a;font-weight:600}
+.momento-fila .fila-fotos{flex:1;min-width:0;display:flex}
+.momento-fila .fila-fotos:empty{display:block}
+.momento-fila .fila-fotos img{width:52px;height:52px;border-radius:8px}
+.momento-fila .cam{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:rgba(255,255,255,.06);font-size:18px}
 .fotos-pieza .momento{margin:0 0 6px;font-weight:600;color:var(--ink)}
 .chip.foto{background:transparent;border:1px solid #1fa34a;color:#1fa34a;margin-left:6px}
 .excel .chip.foto{background:#fff;border-color:#1fa34a;color:#1a8f3e}
@@ -990,6 +1000,26 @@ const fotosPieza = (x, momento) => V?.fotos?.[clavePieza(x, momento)] || [];
 function chipsFotos(x){
   return MOMENTOS.map(([m, t]) => { const n = fotosPieza(x, m).length; return n ? `<span class="chip foto">📷 ${t.replace("En b", "B").replace("En e", "E")} ${n}</span>` : ""; }).join("");
 }
+/* La historia de fotos de una sección (lo pidió el usuario): cada pieza con su foto en bodega y en evento. */
+function htmlHistoriaFotos(titulo, items){
+  const con = m => items.filter(x => fotosPieza(x, m).length).length;
+  const fila = (x, m, t) => {
+    const k = clavePieza(x, m), fotos = fotosPieza(x, m);
+    return `<div class="momento-fila"><span class="m${fotos.length ? " si" : ""}">${fotos.length ? "✓ " : ""}${t === "En bodega" ? "Bodega" : "Evento"}</span>
+      <div class="fila-fotos">${fotos.map(f => `<img data-foto="${esc(f)}" data-banda="${esc(k)}" alt="Foto ${esc(t.toLowerCase())}">`).join("")}</div>
+      <button class="cam" data-acc="tomar-foto" data-banda="${esc(k)}" aria-label="Tomar foto ${esc(t.toLowerCase())}">📷</button><button class="cam" data-acc="subir-foto" data-banda="${esc(k)}" aria-label="Subir foto ${esc(t.toLowerCase())}">🖼</button></div>`;
+  };
+  return `
+      <section class="slide banda historia-fotos">
+        <h3>Fotos</h3>
+        <p class="sub">${esc(titulo)} · ${con("bodega")} de ${items.length} en bodega · ${con("evento")} de ${items.length} en evento</p>
+        ${items.map(x => `
+        <div class="pieza-fotos">
+          <p class="nombre"><b>${x.cantidad} ×</b> ${esc(corto(x.referencia))}</p>
+          ${MOMENTOS.map(([m, t]) => fila(x, m, t)).join("")}
+        </div>`).join("")}
+      </section>`;
+}
 function htmlFotosPieza(x){
   return `<p class="et">Fotos</p>` + MOMENTOS.map(([m, t]) => {
     const k = clavePieza(x, m), fotos = fotosPieza(x, m);
@@ -1090,8 +1120,8 @@ function htmlSeccion(b, s, j, total){
   const otros = [...new Set(s.items.filter(x => x.propietario?.tipo === "tercero" && x.propietario.nombre !== "la banda").map(x => x.propietario.nombre))];
   const cats = [...new Set(s.items.map(x => x.categoria))];
   return `
-  <article class="reel" id="${esc(id)}" style="--h:${HUE[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] ?? 20}" data-n="3" aria-label="${esc(titulo)} · ${esc(b.nombre)}">
-    <div class="prog"><i></i><i></i><i></i></div>
+  <article class="reel" id="${esc(id)}" style="--h:${HUE[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] ?? 20}" data-n="4" aria-label="${esc(titulo)} · ${esc(b.nombre)}">
+    <div class="prog"><i></i><i></i><i></i><i></i></div>
     <div class="cab"><b>${esc(titulo)}</b><span class="n">${esc(b.nombre)} · ${j + 1}/${total}</span></div>
     <div class="slides">
       <section class="slide portada seccion-portada">
@@ -1099,7 +1129,7 @@ function htmlSeccion(b, s, j, total){
         <h2${titulo.length > 18 ? ' class="largo"' : ""}>${esc(titulo)}</h2>
         ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
         <p class="chips-pieza">${cats.map(c => `<span class="chip">${esc(c)}</span>`).join("")}${trae ? `<span class="chip ter">${trae} lo trae la banda</span>` : ""}${otros.map(n => `<span class="chip ter">Proveedor: ${esc(n)}</span>`).join("")}${dudosos ? `<span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
-        ${AYUDA ? `<p class="pista">${PC ? "Pasa con › para ver el listado y lo que pidió la banda" : "Desliza para ver el listado y lo que pidió la banda"} <span class="flecha">→</span></p>` : ""}
+        ${AYUDA ? `<p class="pista">${PC ? "Pasa con › para ver el listado, lo que pidió la banda y las fotos" : "Desliza para ver el listado, lo que pidió la banda y las fotos"} <span class="flecha">→</span></p>` : ""}
       </section>
       <section class="slide banda">
         <h3>En el listado</h3>
@@ -1110,6 +1140,7 @@ function htmlSeccion(b, s, j, total){
         <h3>Lo que pidió la banda</h3>
         ${pide.length ? htmlPedido(pide) : `<p class="sub">No está el texto del rider de esta sección. Vuelve a subir el documento para verlo.</p>`}
       </section>
+      ${htmlHistoriaFotos(titulo, s.items)}
     </div>
     ${pasar}
     ${riel(id)}
