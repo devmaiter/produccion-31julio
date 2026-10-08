@@ -33,7 +33,7 @@ describe("in ears y consolas", () => {
 1 Bajo Fender
 16 Shure PSM 1000
 2 DM7`, "pdf");
-    expect(resumen(e)).toEqual(["1 Batería DW [·Batería]", "1 Bajo Fender [·Bajo]", "16 Shure PSM 1000 [·In ears]", "2 DM7 [·Consolas]"]);
+    expect(resumen(e)).toEqual(["1 Bajo Fender [·Bajo]", "16 Shure PSM 1000 [·In ears]", "2 DM7 [·Consolas]"]);
   });
 
   it("los títulos IN EARS y CONSOLAS abren su sección", () => {
@@ -77,5 +77,14 @@ OUTPUT LIST
 BACKLINE
 1 Bajo Fender Jazz Bass`, "pdf");
     expect(resumen(e)).toEqual(["1 Consola: Yamaha DM7 [·Consolas]", "1 Bajo Fender Jazz Bass [·Bajo]"]);
+  });
+
+  it("\"Batería DW\" sin cantidad es el título del bloque de la batería, no se pierde", () => {
+    const e = leer(`Batería DW
+1 Bombo
+1 Snare
+TECLADO
+1 Yamaha Montage 8`, "pdf");
+    expect(resumen(e)).toEqual(["1 Bombo [Batería DW·Batería]", "1 Snare [Batería DW·Batería]", "1 Yamaha Montage 8 [Teclado·Teclado]"]);
   });
 });

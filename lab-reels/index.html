@@ -648,6 +648,14 @@ function armar(d){
   });
 }
 
+/* Quién pone el equipo: "ARTISTA" es la banda; "CN" o nada, nosotros; otro nombre ("AUDIO ROOM",
+   "ARBOL NARANJA") es el proveedor que lo trae. */
+function dueno(p){
+  if (p === "ARTISTA") return {tipo: "tercero", nombre: "la banda"};
+  if (!p || /^(cn|propio|producci[oó]n)$/i.test(p)) return {tipo: "propio"};
+  return {tipo: "tercero", nombre: p.length <= 4 ? p : p.toLowerCase().replace(/(^|\s)\p{L}/gu, m => m.toUpperCase())};
+}
+
 /* Lo que devuelve el lector → el mismo formato de datos que Cordillera, para armar los reels. */
 function aDatos(ext, traza){
   // Los reels son por banda: lo que el lector marcó como listado general (la hoja no dice de qué
@@ -669,7 +677,7 @@ function aDatos(ext, traza){
     return {id: "doc-" + n, diaId: i.fecha ? "d-" + i.fecha : "d-doc", artistaId: id, cantidad: Math.max(0, Math.round(+i.cantidad || 0)) || 1,
       categoria: i.categoria || "Otro", grupo: (i.grupo || "").trim(), referencia: ref, descripcion: i.nota || ref,
       nota: i.nota || null,   // la nota del rider, para la ficha
-      propietario: i.proveedor === "ARTISTA" ? {tipo: "tercero", nombre: "la banda"} : {tipo: "propio"}, porConfirmar: !!i.dudoso,
+      propietario: dueno(i.proveedor), porConfirmar: !!i.dudoso,
       ...(conBanda && i.sinBanda ? {sinBanda: true} : {})};
   });
   // "Cant | Requerimiento | Cant | Propuesta": lo que pide cada banda junto a lo que se le propone.
@@ -1026,7 +1034,8 @@ function htmlSeccion(b, s, j, total){
   const pide = pedidoDeSeccion(b, s);
   const op = pide.find(r => r.tipo === "grupo" && r.opciones)?.opciones;
   const piezas = piezasDe(s.items), dudosos = s.items.filter(x => x.porConfirmar).length;
-  const trae = s.items.filter(x => x.propietario?.tipo === "tercero").length;
+  const trae = s.items.filter(x => x.propietario?.nombre === "la banda").length;
+  const otros = [...new Set(s.items.filter(x => x.propietario?.tipo === "tercero" && x.propietario.nombre !== "la banda").map(x => x.propietario.nombre))];
   const cats = [...new Set(s.items.map(x => x.categoria))];
   return `
   <article class="reel" id="${esc(id)}" style="--h:${HUE[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] ?? 20}" data-n="3" aria-label="${esc(titulo)} · ${esc(b.nombre)}">
@@ -1037,7 +1046,7 @@ function htmlSeccion(b, s, j, total){
         ${htmlHolo(`${id}|todo`, s.items)}
         <h2${titulo.length > 18 ? ' class="largo"' : ""}>${esc(titulo)}</h2>
         ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
-        <p class="chips-pieza">${cats.map(c => `<span class="chip">${esc(c)}</span>`).join("")}${trae ? `<span class="chip ter">${trae} lo trae la banda</span>` : ""}${dudosos ? `<span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
+        <p class="chips-pieza">${cats.map(c => `<span class="chip">${esc(c)}</span>`).join("")}${trae ? `<span class="chip ter">${trae} lo trae la banda</span>` : ""}${otros.map(n => `<span class="chip ter">Proveedor: ${esc(n)}</span>`).join("")}${dudosos ? `<span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
         ${AYUDA ? `<p class="pista">${PC ? "Pasa con › para ver el listado y lo que pidió la banda" : "Desliza para ver el listado y lo que pidió la banda"} <span class="flecha">→</span></p>` : ""}
       </section>
       <section class="slide banda">
@@ -1649,6 +1658,15 @@ function splash(){
    este dispositivo (IndexedDB "backline-riders") y se lee aquí como cualquier documento. */
 async function riderDelCronograma(){
   const q = new URLSearchParams(location.search), id = q.get("rider");
+  // ?lista=listas/….txt: una lista guardada en el sitio (la hoja escrita a mano, ya pasada a texto).
+  const lista = q.get("lista");
+  if (lista && /^listas\/[\w.-]+\.(txt|pdf|xlsx|csv)$/.test(lista)) {
+    history.replaceState(null, "", location.pathname);
+    try {
+      const r = await fetch(lista, {cache: "no-store"}); if (!r.ok) throw 0;
+      return subirArchivos([new File([await r.blob()], lista.split("/").pop(), {type: r.headers.get("content-type") || "text/plain"})]);
+    } catch { return aviso("No encontré esa lista"); }
+  }
   if (q.get("evento")) escribir("lab-reels:evento", q.get("evento"));
   if (!id) return;
   history.replaceState(null, "", location.pathname);

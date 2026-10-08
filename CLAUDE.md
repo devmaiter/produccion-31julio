@@ -63,6 +63,8 @@ Piezas, en `lector/src/lectura/`:
     "IN EARS" o "CONSOLAS" abren su grupo. Dentro del audio se lee el renglón que ES el equipo
     ("CONSOLA FOH: Yamaha CL5", "2 Shure PSM 1000"); "3 LIDER IEM" es una mezcla y no cuenta
     (`equipoDeAudio` en `categorias.ts`).
+  - **"Batería DW"** (batería + marca, sin cantidad) es el título del bloque de la batería; en una
+    lista sin títulos, lo de otro instrumento ("1 Bajo Fender") cierra ese bloque.
   - **La banda:** "RIDER TÉCNICO" o "TECHNICAL RIDER" + nombre fija la banda de
     todo el documento.
     Si debajo no está el nombre (va en el logo), se busca: el nombre en MAYÚSCULAS
@@ -126,7 +128,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 237 pruebas en verde.
+  inglés). Hay 238 pruebas en verde.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -230,6 +232,9 @@ prueba (que el % suba sin romper los riders anteriores).
 - **`cronograma/`** (admin): el mes con los eventos, escenarios, bandas por día con su rider
   (falta / recibido / revisado) y el contra-rider. Se guarda en el dispositivo por ahora. «Ver en reels»
   abre `lab-reels/?rider=…&evento=…`.
+- **`?lista=listas/….txt`** abre los reels con una lista guardada en `lab-reels/listas/` (la hoja a mano
+  del usuario del 2026-10-08, pasada a texto: `lista-a-mano.txt`). El proveedor de cada pieza
+  ("Equipo   2   AUDIO ROOM") sale como «Proveedor: Audio Room» en la sección y «Lo trae …» en la pieza.
 - **El plan del servidor** está en `docs/modelo-de-datos.md`: tablas, llaves y permisos.
 - Para revisar en celular se usa una página local con varios iframes de 390×844 lado a lado
   (`_celular.html`, no se sube).

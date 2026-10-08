@@ -110,6 +110,7 @@ const NO_BACKLINE = /\b(handies?|radios?|walkie|motorola|pilas?|cintas?|gaf+er|t
 const FAMILIA_TABLA = /^(cymbals?|platillos?|percussion|percusi[oó]n)$/i;
 const CANAL = /^\d{1,2}\s+.*\b(sm ?\d{2}|beta ?\d{2}|e ?9\d{2}|e ?6\d{2}|md ?4\d{2}|d ?box|di\b|ksm|c ?414|re ?20|m ?88|xlr|phantom|short boom|tall boom|claw)\b/i;
 
+const OTRO_INSTRUMENTO = new Set(["Bajo", "Ampli bajo", "Guitarra", "Ampli guitarra", "Teclado", "Percusión", "In ears", "Consolas", "DJ"]);
 /** In ears y consolas se listan aunque vengan fuera de toda sección (los pidió el usuario). */
 const deAudioPedido = (c: string) => c === "In ears" || c === "Consolas";
 
@@ -183,6 +184,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     };
     // En qué sección del rider va la lectura: "fuera" = audio, luces, catering…; ahí no se leen ítems.
     let seccion: "neutra" | "backline" | "audio" | "otra" = "neutra";
+    let grupoBateriaMarca: string | null = null;
     // "RIDER TÉCNICO / LOS RAYOS 2026": el rider es de una sola banda y su nombre ya no cambia.
     let artistaFijo = !!ctx.artista, esperarArtista = false;
     const sinInterpretar: string[] = [];
@@ -350,6 +352,12 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       // Un renglón con viñeta ("• Bajo eléctrico") es un equipo de una lista, no un título.
       // "PERCUSSION (MEINL PROFESSIONAL SERIES)", "BAJO (Omar)": el título sin lo que va entre paréntesis.
       const sinParentesis = sinCola.replace(/\s*\([^)]*\)\s*$/, "");
+      // "Batería DW", "Drums Pearl": la batería con su marca, sin cantidad, es el título del bloque.
+      const bateriaMarca = sinCola.match(/^(bater[ií]a|drums?|drum ?kit)\s+(\S+)$/iu);
+      if (bateriaMarca && MARCA_EQUIPO.test(bateriaMarca[2]!)) {
+        grupoBateriaMarca = `${nombrePropio(bateriaMarca[1]!)} ${bateriaMarca[2]!.toUpperCase()}`;
+        ponerGrupo(grupoBateriaMarca); seccion = "backline"; modoAlternativa = false; anotar("grupo", "batería con su marca"); continue;
+      }
       if (GRUPOS.test(sinCola) || (sinParentesis !== sinCola && GRUPOS.test(sinParentesis)) || pegados || (esTituloGenerico(sinCola) && !/^\s*[•●▪◦·*–-]/.test(l.texto))) {
         // "CYMBALS" después de "DRUMS": es la misma batería, sigue en su grupo.
         if (grupo && familiaGrupo && familiaDe(sinCola) === familiaGrupo) { anotar("nota", "subtítulo del mismo instrumento"); continue; }
@@ -390,6 +398,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       if (bloqueHorario(texto)) { anotar("horario", "hora de un bloque"); continue; }
       // Cada renglón de la lista es una pieza: "1. Roland XPS-30" → "1 Roland XPS-30".
       if (numerados.has(n) && !listaOpciones) texto = texto.replace(NUMERADO, "1 ");
+      // Una lista sin títulos ("Batería DW", sus piezas y luego "1 Bajo Fender"): lo de otro instrumento
+      // cierra el bloque de la batería.
+      if (grupoBateriaMarca && grupo === grupoBateriaMarca && OTRO_INSTRUMENTO.has(categorizar(texto))) ponerGrupo(null);
       // "1 Ampeg SVT Classic + 8x10": cabezal y caja son dos piezas (lo definió el usuario).
       const ampli = cabezalYCaja(texto);
       if (ampli) {
