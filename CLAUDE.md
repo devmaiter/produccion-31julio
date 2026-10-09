@@ -278,6 +278,13 @@ prueba (que el % suba sin romper los riders anteriores).
 - **`?lista=listas/….txt`** abre los reels con una lista guardada en `lab-reels/listas/` (la hoja a mano
   del usuario del 2026-10-08, pasada a texto: `lista-a-mano.txt`). El proveedor de cada pieza
   ("Equipo   2   AUDIO ROOM") sale como «Proveedor: Audio Room» en la sección y «Lo trae …» en la pieza.
+- **Presentación para Backstage Company (2026-10-09, para Don John, el jefe):** link corto
+  `backstage/` (redirige a `lab-reels/?lista=listas/lista-a-mano.txt&demo=backstage`; trae vista previa para
+  WhatsApp). Con `demo` (o `#presentacion`), después del logo de Circuito sale `presentacion()`: «Así llega el
+  equipo a la bodega», las fotos de bodega con acercamiento lento y ✓ verde (`ESCENAS_BODEGA`), y al final el
+  logo `lab-reels/marca/backstage.png` (Backstage Company 27 años, sobre tarjeta blanca) con «Revisado en
+  bodega · <fecha de hoy>»; luego entra directo a la banda. «Saltar» arriba. La hoja a mano se ve como
+  «Lista de bodega» (`nombreVisible`; las claves no cambian). La fecha de subida dice «hoy, 9 oct · hora».
 - **El plan del servidor** está en `docs/modelo-de-datos.md`: tablas, llaves y permisos.
 - Para revisar en celular se usa una página local con varios iframes de 390×844 lado a lado
   (`_celular.html`, no se sube).

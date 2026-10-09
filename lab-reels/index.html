@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Backline">
 <link rel="icon" href="data:,">
 <title>Backline en reels</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Quicksand:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -365,6 +368,37 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .encontre strong{display:block;font-family:var(--display);font-size:clamp(90px,30vw,140px);line-height:.85;color:var(--accent)}
 
 /* ── Primera vez: logo con glitch y la mano que enseña a deslizar, como al abrir TikTok ── */
+.presenta{position:fixed;inset:0;z-index:31;background:#000;overflow:hidden;transition:opacity .6s;font-family:"IBM Plex Sans",sans-serif;color:#fff}
+.presenta.fuera{opacity:0;pointer-events:none}
+.presenta>*{position:absolute;inset:0;opacity:0;transition:opacity .7s ease}
+.pr-titulo{display:flex;flex-direction:column;justify-content:center;padding:0 28px;gap:8px}
+.pr-titulo small{color:var(--accent);font:600 13px/1 "IBM Plex Sans",sans-serif;letter-spacing:.18em;text-transform:uppercase}
+.pr-titulo b{font:700 46px/.95 "Barlow Condensed",sans-serif;text-transform:uppercase}
+.presenta[data-paso="0"] .pr-titulo{opacity:1}
+.pr-foto{margin:0}
+.pr-foto img{width:100%;height:100%;object-fit:cover;transform:scale(1.18) translate(2%,2%);transition:transform 2.6s cubic-bezier(.2,.6,.2,1)}
+.pr-foto::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 45%,rgba(0,0,0,.85))}
+.pr-foto figcaption{position:absolute;z-index:1;left:22px;right:22px;bottom:calc(env(safe-area-inset-bottom) + 64px);display:grid;grid-template-columns:auto 1fr;column-gap:12px;align-items:center}
+.pr-foto figcaption b{font:700 34px/1 "Barlow Condensed",sans-serif;text-transform:uppercase}
+.pr-foto figcaption small{grid-column:2;color:#ffd0b5;font-size:15px}
+.pr-ok{grid-row:span 2;width:46px;height:46px;border-radius:50%;background:#1fa34a;display:grid;place-items:center;font-size:26px;font-weight:800;transform:scale(0);transition:transform .35s cubic-bezier(.3,1.6,.5,1) .7s}
+.presenta[data-paso="1"] .pr-foto[style*="--i:0"],.presenta[data-paso="2"] .pr-foto[style*="--i:1"],.presenta[data-paso="3"] .pr-foto[style*="--i:2"],.presenta[data-paso="4"] .pr-foto[style*="--i:3"]{opacity:1}
+.presenta[data-paso="1"] .pr-foto[style*="--i:0"] img,.presenta[data-paso="2"] .pr-foto[style*="--i:1"] img,.presenta[data-paso="3"] .pr-foto[style*="--i:2"] img,.presenta[data-paso="4"] .pr-foto[style*="--i:3"] img{transform:scale(1.02) translate(0,0)}
+.presenta[data-paso="1"] .pr-foto[style*="--i:0"] .pr-ok,.presenta[data-paso="2"] .pr-foto[style*="--i:1"] .pr-ok,.presenta[data-paso="3"] .pr-foto[style*="--i:2"] .pr-ok,.presenta[data-paso="4"] .pr-foto[style*="--i:3"] .pr-ok{transform:scale(1)}
+.pr-final{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:0 24px;background:radial-gradient(80% 50% at 50% 45%,#3a1606 0%,#000 70%)}
+.presenta[data-paso="5"] .pr-final{opacity:1}
+.pr-logo{width:88%;max-width:440px;background:#fff;padding:14px 16px;border-radius:16px;box-shadow:0 0 0 1px rgba(255,255,255,.2),0 10px 60px rgba(255,106,31,.45);transform:scale(.86) translateY(14px);opacity:0;transition:transform 1.1s cubic-bezier(.2,.9,.2,1.15) .15s,opacity .6s ease .15s}
+.presenta[data-paso="5"] .pr-logo,.presenta.quieto .pr-logo{transform:none;opacity:1}
+.pr-logo+.pr-nombre{display:none}
+.pr-nombre{display:flex;flex-direction:column;line-height:.9;transform:scale(.92);transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.presenta[data-paso="5"] .pr-nombre{transform:none}
+.pr-nombre b{font:800 64px/.9 "Barlow Condensed",sans-serif;letter-spacing:.04em;text-shadow:0 0 30px rgba(255,106,31,.55)}
+.pr-nombre span{font:600 22px/1 "Barlow Condensed",sans-serif;letter-spacing:.6em;color:var(--accent);padding-left:.6em}
+.pr-final p{margin:6px 0 0;font-size:16px;color:#ddd}
+.pr-final p::first-letter{text-transform:uppercase}
+.pr-final small{color:#999;font-size:13px}
+.pr-saltar{opacity:1!important;inset:auto 16px auto auto!important;top:calc(env(safe-area-inset-top) + 14px)!important;padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(0,0,0,.4);color:#fff;font:600 14px/1 "IBM Plex Sans",sans-serif}
+.presenta.quieto .pr-final{opacity:1}
 .splash{position:fixed;inset:0;z-index:30;background:#000;display:grid;place-items:center;transition:opacity .45s}
 .splash.fuera{opacity:0;pointer-events:none}
 /* Logo de Circuito Naranja: "circuit" + la "o" como conector XLR, y "Naranja" espaciado. Tres copias: blanca encima y cian/naranja corridas con cortes, como el glitch de TikTok. */
@@ -538,6 +572,8 @@ const EMOJI = {"Batería":"🥁","Platillos":"🔔","Percusión":"🪘","Teclado
 const HUE = {"Batería":20,"Platillos":45,"Percusión":5,"Teclado":265,"Ampli bajo":200,"Ampli guitarra":340,"Guitarra":30,"Bajo":180,"Bases":220,"Escenario":120,"Cables y energía":55,"DJ":290,"In ears":175,"Consolas":235,"Vientos":40,"Voces":310,"Extras":150,"Otro":0};
 const PC = matchMedia("(hover: hover) and (pointer: fine)").matches;
 const QUIETO = matchMedia("(prefers-reduced-motion: reduce)").matches;
+// ?demo=backstage (el link corto backstage/): la presentación para Backstage Company al abrir.
+const DEMO = new URLSearchParams(location.search).get("demo") || (location.hash === "#presentacion" ? "backstage" : "");
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
@@ -1013,7 +1049,7 @@ function armarBandas(d){
   const bandas = new Map();
   const deLa = (id, sinBanda) => {
     const k = sinBanda ? "sin-banda" : id;
-    if (!bandas.has(k)) bandas.set(k, {id: k, artistaId: sinBanda ? null : id, nombre: sinBanda ? "Listado general" : art[id] || id, items: [], secciones: []});
+    if (!bandas.has(k)) bandas.set(k, {id: k, artistaId: sinBanda ? null : id, nombre: sinBanda ? "Listado general" : nombreVisible(art[id] || id), items: [], secciones: []});
     return bandas.get(k);
   };
   for (const it of d.items) {
@@ -1345,7 +1381,8 @@ function cuandoSeSubio(iso){
   const f = new Date(iso); if (isNaN(f)) return "";
   const hora = f.toLocaleTimeString("es", {hour: "numeric", minute: "2-digit"});
   const dias = Math.round((new Date().setHours(0,0,0,0) - new Date(f).setHours(0,0,0,0)) / 864e5);
-  return dias === 0 ? `hoy ${hora}` : dias === 1 ? `ayer ${hora}` : `${f.toLocaleDateString("es", {day: "numeric", month: "short"})} ${hora}`;
+  const fecha = f.toLocaleDateString("es", {day: "numeric", month: "short"});
+  return dias === 0 ? `hoy, ${fecha} · ${hora}` : dias === 1 ? `ayer ${hora}` : `${f.toLocaleDateString("es", {day: "numeric", month: "short"})} ${hora}`;
 }
 function htmlOrigen(){
   if (!V?.doc) return "";
@@ -2058,6 +2095,51 @@ function guiaAlLlegar(r){
   if (r.id === "subir") entradas.length && guia("arriba", "arriba-g", PC ? (festival() ? "Baja para ver cada categoría" : "Baja para ver cada banda") : "Desliza hacia arriba", PC ? "Con la rueda del mouse, ↓ o los botones de la derecha" : festival() ? "Cada pantalla es una categoría: Batería, Platillos, Bases…" : "Cada pantalla es una banda, con su backline como viene en el rider");
   else if (!vistos.has("lado")) setTimeout(() => actual === r && guia("lado", "lado-g", PC ? "Pasa con ›" : "Desliza a la izquierda", festival() ? "Ahí está lo que hay que tener y cada banda con su plano" : "Ahí está cada sección en detalle, las fotos y lo que pidió la banda"), 1400);
 }
+/* La presentación (lo pidió el usuario, para mostrársela a Don John de Backstage Company): el equipo
+   llegando a la bodega con las fotos de verdad, cada pieza se marca con el chulo, y al final Backstage
+   Company. Se salta tocando «Saltar». El logo va en marca/backstage.png; si no está, el nombre en letras. */
+const ESCENAS_BODEGA = [
+  {foto: "listas/fotos/antena-helicoidal.jpg", pieza: "Antena helicoidal", nota: "In ears · Jon"},
+  {foto: "listas/fotos/in-ears-maleta-2.jpg", pieza: "12 Shure PSM 1000", nota: "In ears · Jon"},
+  {foto: "listas/fotos/hardware-1.jpg", pieza: "Hardware DW completo", nota: "Batería · 5 bases"},
+  {foto: "listas/fotos/hardware-3.jpg", pieza: "Pedales y stands", nota: "Batería"},
+];
+for (const e of ESCENAS_BODEGA) { const i = new Image(); i.src = e.foto; }
+// La hoja a mano no dice banda: se muestra como "Lista de bodega" (solo el nombre; las claves de chulos y fotos no cambian).
+const nombreVisible = n => n === "Banda sin nombre" && V?.doc?.nombre === "lista-a-mano" ? "Lista de bodega" : n;
+function presentacion(){
+  return new Promise(ok => {
+    const hoy = new Date().toLocaleDateString("es", {weekday: "long", day: "numeric", month: "long"});
+    const p = document.createElement("div"); p.className = "presenta";
+    p.innerHTML = `
+      <div class="pr-titulo"><small>Backline en reels</small><b>Así llega el equipo a la bodega</b></div>
+      ${ESCENAS_BODEGA.map((e, i) => `<figure class="pr-foto" style="--i:${i}"><img src="${e.foto}" alt=""><figcaption><span class="pr-ok">✓</span><b>${esc(e.pieza)}</b><small>${esc(e.nota)}</small></figcaption></figure>`).join("")}
+      <div class="pr-final">
+        <img class="pr-logo" src="marca/backstage.png" alt="Backstage Company" onerror="this.remove()">
+        <div class="pr-nombre"><b>BACKSTAGE</b><span>COMPANY</span></div>
+        <p>Revisado en bodega · ${esc(hoy)}</p>
+        <small>con Circuito Naranja · Backline en reels</small>
+      </div>
+      <button class="pr-saltar">Saltar</button>`;
+    document.body.append(p);
+    let listo = false;
+    const fin = () => { if (listo) return; listo = true; p.classList.add("fuera"); ok(); setTimeout(() => p.remove(), 700); };
+    p.querySelector(".pr-saltar").addEventListener("click", fin);
+    if (QUIETO) { p.classList.add("quieto"); setTimeout(fin, 2500); return; }
+    // 1,6 s el título, 1,9 s cada foto, 2,8 s el final.
+    const pasos = [1600, ...ESCENAS_BODEGA.map(() => 1900), 2800];
+    let t = 0;
+    pasos.forEach((d, i) => { setTimeout(() => { if (!listo) p.dataset.paso = String(i + 1); }, t); t += d; });
+    setTimeout(fin, t);
+    p.dataset.paso = "0";
+    p.addEventListener("click", e => { if (e.target.closest(".pr-final") && p.dataset.paso === String(pasos.length)) fin(); });
+  });
+}
+// Después de la presentación: a la portada de la banda (la lista ya está leída o se está leyendo).
+function irALaBanda(){
+  const intento = (n) => { if (V?.doc && reels[1]) { introHecha = true; reels[1].scrollIntoView(); } else if (n > 0) setTimeout(() => intento(n - 1), 400); };
+  intento(25);
+}
 function splash(){
   return new Promise(ok => {
     const s = document.createElement("div"); s.className = "splash";
@@ -2131,7 +2213,7 @@ function directoALosReels(){
 }
 
 /* ── Arranque ── */
-splash().then(() => { if (actual) guiaAlLlegar(actual); });
+splash().then(() => DEMO ? presentacion() : null).then(() => { if (DEMO) irALaBanda(); if (actual) guiaAlLlegar(actual); });
 if (location.hash === "#intro") history.replaceState(null, "", location.pathname);
 // Los filtros no se guardan: se arranca sin ellos, y así llega la primera vista.
 enviar({tipo: "limpiar"});
