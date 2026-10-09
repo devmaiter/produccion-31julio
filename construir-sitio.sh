@@ -19,6 +19,7 @@ ln -sfn ../../lector/ocr extractor-fuente/public/ocr   # el extractor publica es
 rm -rf extractor && cp -rL extractor-fuente/dist extractor
 node demo-listado/construir.mjs
 (cd app && npm install && npx elm make src/Tablero.elm --optimize --output=../lab-reels/tablero.js)   # el núcleo en Elm de los reels
+python3 lab-reels/hacer-marcas.py   # las copias con otra marca (backstage.html), desde lab-reels/index.html
 
 # Bytes de control crudos dentro de cadenas de los scripts minificados → \xNN (igual para JS).
 python3 - <<'PY'

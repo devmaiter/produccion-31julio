@@ -279,8 +279,12 @@ prueba (que el % suba sin romper los riders anteriores).
   del usuario del 2026-10-08, pasada a texto: `lista-a-mano.txt`). El proveedor de cada pieza
   ("Equipo   2   AUDIO ROOM") sale como «Proveedor: Audio Room» en la sección y «Lo trae …» en la pieza.
 - **Presentación para Backstage Company (2026-10-09, para Don John, el jefe):** link corto
-  `backstage/` (redirige a `lab-reels/?lista=listas/lista-a-mano.txt&demo=backstage`; trae vista previa para
-  WhatsApp). Con `demo` (o `#presentacion`), después del logo de Circuito sale `presentacion()`: «Así llega el
+  `backstage/` → `lab-reels/backstage.html?lista=listas/lista-a-mano.txt` (vista previa para WhatsApp).
+  **`backstage.html` no se edita a mano:** la arma `lab-reels/hacer-marcas.py` desde `index.html` (lo corre
+  `construir-sitio.sh`; si se cambia `index.html`, correrlo antes de publicar). Es la misma app con
+  `window.MARCA` (logo de Backstage en el arranque con el mismo glitch y en el final, sin Circuito) y con
+  sus datos aparte: claves `backstage:` y `backstage-cronograma:`, IndexedDB `backstage-fotos` y
+  `backstage-riders`. Otra empresa = otra entrada en `MARCAS` de ese script y su logo en `lab-reels/marca/`. Con `demo` (o `#presentacion`), después del logo de Circuito sale `presentacion()`: «Así llega el
   equipo a la bodega», las fotos de bodega con acercamiento lento y ✓ verde (`ESCENAS_BODEGA`), y al final el
   logo `lab-reels/marca/backstage.png` (Backstage Company 27 años, sobre tarjeta blanca) con «Revisado en
   bodega · <fecha de hoy>»; luego entra directo a la banda. «Saltar» arriba. La hoja a mano se ve como

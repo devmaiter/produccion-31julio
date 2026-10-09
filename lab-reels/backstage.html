@@ -2,13 +2,15 @@
 <html lang="es" data-theme="dark">
 <head>
 <meta charset="utf-8">
+<!-- Copia armada por hacer-marcas.py desde index.html: no editar a mano. -->
+<script>window.MARCA = {"nombre": "Backstage Company", "logo": "marca/backstage.png"};</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Backline">
 <link rel="icon" href="data:,">
-<title>Backline en reels</title>
+<title>Backstage Company · Backline</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Quicksand:wght@500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Lab: el backline de ESC 2 como reels. Arriba/abajo cambia de categoría (Batería, Platillos…),
@@ -590,8 +592,8 @@ const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase(
 const leer = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
 const escribir = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 // Las ayudas ("Baja con ↓…", "Pasa con ›…") salen solo la primera vez que se abren los reels (lo pidió el usuario).
-const AYUDA = !leer("lab-reels:ayuda-vista", false);
-escribir("lab-reels:ayuda-vista", true);
+const AYUDA = !leer("backstage:ayuda-vista", false);
+escribir("backstage:ayuda-vista", true);
 if (!AYUDA) document.getElementById("teclas")?.remove();
 
 function aviso(t){
@@ -603,10 +605,10 @@ function aviso(t){
    (admin o empleado), el modo (normal o festival), la búsqueda, los filtros y las fotos de cada banda.
    Elm decide qué puede hacer cada perfil y devuelve la vista; aquí solo se dibuja y se guarda. ── */
 function estadoGuardado(){
-  const t = leer("lab-reels:tablero", null);
+  const t = leer("backstage:tablero", null);
   if (t) return t;
   // Lo que se subió antes de que existiera el núcleo: se trae tal cual.
-  const viejo = leer("lab-reels:doc", null);
+  const viejo = leer("backstage:doc", null);
   return viejo ? {doc: viejo} : null;
 }
 const tablero = Elm.Tablero.init({flags: estadoGuardado()});
@@ -614,7 +616,7 @@ let V = null;                 // la última vista que mandó Elm
 let arrancado = false;
 let destinoPendiente = null;  // a qué reel ir cuando llegue la próxima vista
 const enviar = m => tablero.ports.entrada.send(m);
-tablero.ports.guardar.subscribe(v => { escribir("lab-reels:tablero", v); escribir("lab-reels:doc", null); });
+tablero.ports.guardar.subscribe(v => { escribir("backstage:tablero", v); escribir("backstage:doc", null); });
 tablero.ports.error.subscribe(e => console.warn("tablero:", e));
 tablero.ports.vista.subscribe(v => {
   V = v;
@@ -635,7 +637,7 @@ tablero.ports.vista.subscribe(v => {
 /* Se guardan por pieza (banda, sección y nombre), no por el número del ítem: así sobreviven a volver a abrir
    la misma lista o a que la lista se actualice. Antes se guardaban por "nombre|cuando" + "doc-N"; esos se
    recuperan al cargar (ver migrarChulos). */
-const claveChulos = () => "lab-reels:chulos2:" + (V?.doc ? V.doc.nombre : "");
+const claveChulos = () => "backstage:chulos2:" + (V?.doc ? V.doc.nombre : "");
 const piezaDe = x => `${x.artistaId || "sin-banda"}|${x.grupo || ""}|${corto(x.referencia).toLowerCase()}`;
 let chulos = new Set();   // ids de ítems del documento abierto que tienen chulo
 function cargarChulos(){
@@ -645,11 +647,11 @@ function cargarChulos(){
   chulos = new Set(d.items.filter(x => guardadas.has(piezaDe(x))).map(x => x.id));
 }
 function migrarChulos(d, guardadas){
-  const viejas = Object.keys(localStorage).filter(k => k.startsWith("lab-reels:chulos:" + V.doc.nombre + "|"));
+  const viejas = Object.keys(localStorage).filter(k => k.startsWith("backstage:chulos:" + V.doc.nombre + "|"));
   if (!viejas.length) return;
   const porId = new Map(d.items.map(x => [x.id, x]));
   for (const k of viejas) {
-    const actual = k === "lab-reels:chulos:" + V.doc.nombre + "|" + V.doc.cuando;
+    const actual = k === "backstage:chulos:" + V.doc.nombre + "|" + V.doc.cuando;
     for (const id of leer(k, [])) {
       const n = Number(String(id).replace("doc-", ""));
       // De una carga anterior solo se confía en el número si es del tramo que no cambió entre versiones de la
@@ -671,8 +673,8 @@ function marcarChulo(id){
   huboCambio();
 }
 let listos = new Set();
-const cargarListos = () => { listos = new Set(leer("lab-reels:listos:doc", [])); };
-const guardarListos = () => escribir("lab-reels:listos:doc", [...listos]);
+const cargarListos = () => { listos = new Set(leer("backstage:listos:doc", [])); };
+const guardarListos = () => escribir("backstage:listos:doc", [...listos]);
 const VACIO = {artistas: [], dias: [], bloques: [], stagePlots: [], items: []};
 const datos = () => V?.doc?.datos || VACIO;
 const titulo = () => V?.doc ? V.doc.nombre : "Sube un documento para empezar";
@@ -935,11 +937,11 @@ const CIERRES = [
 function frasesBienvenida(){
   const h = new Date().getHours();
   const saludo = h < 12 ? "Buen día, equipo." : h < 19 ? "Buenas tardes, equipo." : "Buenas noches, equipo.";
-  const evento = leer("lab-reels:evento", "");
+  const evento = leer("backstage:evento", "");
   const admin = V?.perfil === "admin";
   const medio = evento ? `Hoy toca ${evento}.` : admin ? "Tú organizas el evento; nosotros leemos los riders." : "Sube el rider de la banda; nosotros lo leemos por ti.";
-  const visitas = leer("lab-reels:visitas", 0);
-  escribir("lab-reels:visitas", visitas + 1);
+  const visitas = leer("backstage:visitas", 0);
+  escribir("backstage:visitas", visitas + 1);
   return [saludo, medio, CIERRES[visitas % CIERRES.length]];
 }
 function htmlIntro(){
@@ -1163,7 +1165,7 @@ function instrumentoDe(items){
   const n = {}; for (const x of items) { const r = reelDe(x); n[r] = (n[r] || 0) + 1; }
   return Object.keys(LLEVA).filter(r => n[r]).sort((a, b) => n[b] - n[a])[0] || null;
 }
-const claveNoFalta = () => "lab-reels:no-falta:" + (V?.doc?.nombre || "");
+const claveNoFalta = () => "backstage:no-falta:" + (V?.doc?.nombre || "");
 const idFalta = (items, pieza) => `${items[0]?.artistaId || "sin-banda"}|${items[0]?.grupo || ""}|${pieza}`;
 function faltantes(items){
   const inst = items.length && instrumentoDe(items); if (!inst) return [];
@@ -1538,7 +1540,7 @@ feed.addEventListener("click", async e => {
     // Dos toques: el botón está en cada pantalla y se puede tocar sin querer.
     const btn = e.target.closest("[data-acc]");
     if (!btn.dataset.seguro) { btn.dataset.seguro = "1"; btn.textContent = "¿Borrar el documento? Toca otra vez"; return; }
-    instantanea("antes de borrar el documento").finally(() => { escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; destinoPendiente = "subir"; enviar({tipo: "borrar"}); });
+    instantanea("antes de borrar el documento").finally(() => { escribir("backstage:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; destinoPendiente = "subir"; enviar({tipo: "borrar"}); });
     return; }
   if (acc === "limpiar") { document.getElementById("buscar").value = ""; destinoPendiente = "subir"; return enviar({tipo: "limpiar"}); }
   if (acc === "tomar-foto" || acc === "subir-foto") { fotoDe = e.target.closest("[data-banda]").dataset.banda; return document.getElementById(acc === "tomar-foto" ? "foto-camara" : "foto-galeria").click(); }
@@ -1587,7 +1589,7 @@ feed.addEventListener("click", async e => {
 });
 feed.addEventListener("change", e => {
   // Un documento subido a mano no es del evento que se abrió desde el cronograma.
-  if (e.target.matches("#archivo, #camara")) { const fs = [...e.target.files]; e.target.value = ""; escribir("lab-reels:evento", null); subirArchivos(fs); }
+  if (e.target.matches("#archivo, #camara")) { const fs = [...e.target.files]; e.target.value = ""; escribir("backstage:evento", null); subirArchivos(fs); }
 });
 // Doble toque en cualquier parte = listo, igual que el "me gusta".
 
@@ -1598,9 +1600,9 @@ document.getElementById("visor").addEventListener("click", e => {
     if (!b.dataset.seguro) { b.dataset.seguro = "1"; b.textContent = "¿Seguro? Toca otra vez para borrar"; return; }
     const {foto, banda} = b.dataset;
     // La imagen NO se borra del celular: queda en la papelera y se puede recuperar desde Filtros.
-    const papelera = leer("lab-reels:papelera", []);
+    const papelera = leer("backstage:papelera", []);
     papelera.push({foto, banda, cuando: new Date().toISOString()});
-    escribir("lab-reels:papelera", papelera);
+    escribir("backstage:papelera", papelera);
     enviar({tipo: "quitar-foto", banda, foto});
     huboCambio();
     aviso("Foto quitada · se puede recuperar en Filtros");
@@ -1636,7 +1638,7 @@ document.getElementById("baja").addEventListener("click", () => mover.ArrowDown(
 // Índice fijo a la izquierda en PC.
 const lado = document.getElementById("lado");
 function pintarLado(){
-  const ev = V?.espacio === "evento" ? leer("lab-reels:evento", "") : "Mis pruebas";
+  const ev = V?.espacio === "evento" ? leer("backstage:evento", "") : "Mis pruebas";
   lado.innerHTML = `<h1>Backline en reels</h1><p>${ev ? `<b class="evento-actual">${esc(ev)}</b> · ` : ""}${esc(titulo())}</p>` + filaSubir("", actual?.id) + entradas.map(c => filaIndice(c, "", actual?.id)).join("");
   document.getElementById("sube").disabled = actual === reels[0];
   document.getElementById("baja").disabled = actual === reels[reels.length - 1];
@@ -1698,8 +1700,8 @@ function pintarFiltros(){
     <p class="et">Respaldo</p>
     <p class="nota">Los chulos y las fotos quedan en este celular. Guarda un respaldo y mándalo por WhatsApp o guárdalo en Drive; con «Cargar respaldo» se recupera todo.</p>
     <div class="botones"><button class="btn sec" data-respaldo="guardar">💾 Guardar respaldo</button><button class="btn sec" data-respaldo="cargar">📂 Cargar respaldo</button></div>
-    ${leer("lab-reels:ultimo-respaldo", "") ? `<p class="nota">Último respaldo: ${esc(cuandoSeSubio(leer("lab-reels:ultimo-respaldo", "")) || "")}.</p>` : `<p class="nota"><b>Todavía no has guardado ningún respaldo.</b></p>`}
-    ${leer("lab-reels:papelera", []).length ? `<div class="botones"><button class="btn sec" data-respaldo="papelera">♻️ Recuperar ${leer("lab-reels:papelera", []).length} ${leer("lab-reels:papelera", []).length === 1 ? "foto quitada" : "fotos quitadas"}</button></div>` : ""}
+    ${leer("backstage:ultimo-respaldo", "") ? `<p class="nota">Último respaldo: ${esc(cuandoSeSubio(leer("backstage:ultimo-respaldo", "")) || "")}.</p>` : `<p class="nota"><b>Todavía no has guardado ningún respaldo.</b></p>`}
+    ${leer("backstage:papelera", []).length ? `<div class="botones"><button class="btn sec" data-respaldo="papelera">♻️ Recuperar ${leer("backstage:papelera", []).length} ${leer("backstage:papelera", []).length === 1 ? "foto quitada" : "fotos quitadas"}</button></div>` : ""}
     <div class="botones"><button class="btn sec" data-respaldo="instantanea">🕘 Volver a una copia interna</button></div>
     <div class="botones"><button class="btn" data-cerrar>Ver ${V.encontrados} ${V.encontrados === 1 ? "ítem" : "ítems"}</button>${V.hayFiltro ? '<button class="btn sec" data-limpiar>Quitar filtros</button>' : ""}</div>`;
 }
@@ -1709,8 +1711,8 @@ $b("filtros").addEventListener("click", e => {
   if (t.dataset.respaldo === "guardar") return guardarRespaldo();
   if (t.dataset.respaldo === "cargar") return $b("respaldo-archivo").click();
   if (t.dataset.respaldo === "papelera") {
-    for (const {foto, banda} of leer("lab-reels:papelera", [])) enviar({tipo: "foto", banda, foto});
-    escribir("lab-reels:papelera", []); huboCambio();
+    for (const {foto, banda} of leer("backstage:papelera", [])) enviar({tipo: "foto", banda, foto});
+    escribir("backstage:papelera", []); huboCambio();
     e.currentTarget.hidden = true; return aviso("Fotos recuperadas");
   }
   if (t.dataset.respaldo === "instantanea") return elegirInstantanea();
@@ -1725,7 +1727,7 @@ $b("filtros").addEventListener("click", e => {
 /* ── Fotos de las bandas: la imagen queda en este dispositivo (IndexedDB) y el núcleo guarda de qué banda es. ── */
 const fotosDB = new Promise((ok, mal) => {
   try {
-    const r = indexedDB.open("backline-fotos", 1);
+    const r = indexedDB.open("backstage-fotos", 1);
     r.onupgradeneeded = () => r.result.createObjectStore("fotos");
     r.onsuccess = () => ok(r.result); r.onerror = () => mal(r.error);
   } catch (err) { mal(err); }
@@ -1789,7 +1791,7 @@ function sumarEstado(otro){
       if (actual === null) { localStorage.setItem(k, v); continue; }
       const A = JSON.parse(actual), B = JSON.parse(v);
       if (Array.isArray(A) && Array.isArray(B)) { localStorage.setItem(k, JSON.stringify(unir(A, B))); continue; }
-      if (k === "lab-reels:tablero" && A && B) {
+      if (k === "backstage:tablero" && A && B) {
         const fotos = {...(B.fotos || {})};
         for (const [c, fs] of Object.entries(A.fotos || {})) fotos[c] = unir(fotos[c] || [], fs);
         localStorage.setItem(k, JSON.stringify({...B, ...A, pruebas: A.pruebas || B.pruebas, evento: A.evento || B.evento, fotos}));
@@ -1803,7 +1805,7 @@ function sumarEstado(otro){
 async function instantanea(motivo){
   try {
     const ls = {};
-    for (const k of Object.keys(localStorage)) if (/^(lab-reels|cronograma|planilla):/.test(k)) ls[k] = localStorage.getItem(k);
+    for (const k of Object.keys(localStorage)) if (/^(backstage|backstage-cronograma|planilla):/.test(k)) ls[k] = localStorage.getItem(k);
     const clave = "instantanea-" + new Date().toISOString();
     await idb("readwrite", st => st.put(new Blob([JSON.stringify({motivo, ls})], {type: "application/json"}), clave));
     const todas = (await idb("readonly", st => st.getAllKeys())).filter(k => String(k).startsWith("instantanea-")).sort();
@@ -1815,7 +1817,7 @@ async function instantaneas(){
 }
 {
   const hoy = new Date().toISOString().slice(0, 10);
-  if (leer("lab-reels:instantanea-dia", "") !== hoy) { escribir("lab-reels:instantanea-dia", hoy); setTimeout(() => instantanea("la del día"), 4000); }
+  if (leer("backstage:instantanea-dia", "") !== hoy) { escribir("backstage:instantanea-dia", hoy); setTimeout(() => instantanea("la del día"), 4000); }
 }
 async function elegirInstantanea(){
   const ks = await instantaneas();
@@ -1839,13 +1841,13 @@ $b("filtros").addEventListener("click", async e => {
   } catch { aviso("No se pudo abrir esa copia"); }
 }, true);
 /* Aviso de cambios sin respaldo: cada chulo, foto o pieza agregada suma uno; al guardar el respaldo vuelve a 0. */
-function huboCambio(){ escribir("lab-reels:cambios", leer("lab-reels:cambios", 0) + 1); pintarPendiente(); }
+function huboCambio(){ escribir("backstage:cambios", leer("backstage:cambios", 0) + 1); pintarPendiente(); }
 function pintarPendiente(){
   let el = document.getElementById("pendiente");
-  const n = leer("lab-reels:cambios", 0);
+  const n = leer("backstage:cambios", 0);
   // Nunca se ha guardado un respaldo y ya hay chulos o fotos: también se avisa.
-  const hayDatos = Object.keys(localStorage).some(k => k.startsWith("lab-reels:chulos") && (localStorage.getItem(k) || "[]") !== "[]") || Object.keys(V?.fotos || {}).length > 0;
-  const primero = !n && !leer("lab-reels:ultimo-respaldo", "") && hayDatos;
+  const hayDatos = Object.keys(localStorage).some(k => k.startsWith("backstage:chulos") && (localStorage.getItem(k) || "[]") !== "[]") || Object.keys(V?.fotos || {}).length > 0;
+  const primero = !n && !leer("backstage:ultimo-respaldo", "") && hayDatos;
   if (!n && !primero) { el?.remove(); return; }
   if (!el) { el = Object.assign(document.createElement("button"), {id: "pendiente", className: "pendiente"}); el.addEventListener("click", guardarRespaldo); document.body.append(el); }
   el.textContent = primero ? "💾 Guarda tu primer respaldo" : `💾 ${n} ${n === 1 ? "cambio" : "cambios"} sin respaldo · Guardar`;
@@ -1853,7 +1855,7 @@ function pintarPendiente(){
 async function guardarRespaldo(){
   aviso("Armando el respaldo…");
   const ls = {};
-  for (const k of Object.keys(localStorage)) if (/^(lab-reels|cronograma|planilla):/.test(k)) ls[k] = localStorage.getItem(k);
+  for (const k of Object.keys(localStorage)) if (/^(backstage|backstage-cronograma|planilla):/.test(k)) ls[k] = localStorage.getItem(k);
   const fotos = {};
   try {
     const db = await fotosDB;
@@ -1868,7 +1870,7 @@ async function guardarRespaldo(){
   const hoy = new Date(), f = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}-${String(hoy.getHours()).padStart(2, "0")}${String(hoy.getMinutes()).padStart(2, "0")}`;
   const archivo = new File([JSON.stringify({formato: "respaldo-lab-reels/1", cuando: hoy.toISOString(), localStorage: ls, fotos})], `respaldo-reels-${f}.json`, {type: "application/json"});
   const n = Object.keys(fotos).length;
-  const listo = () => { escribir("lab-reels:cambios", 0); escribir("lab-reels:ultimo-respaldo", new Date().toISOString()); pintarPendiente(); };
+  const listo = () => { escribir("backstage:cambios", 0); escribir("backstage:ultimo-respaldo", new Date().toISOString()); pintarPendiente(); };
   try {
     if (navigator.canShare?.({files: [archivo]})) { await navigator.share({files: [archivo], title: "Respaldo de los reels"}); listo(); return aviso(`Respaldo listo: ${n} ${n === 1 ? "foto" : "fotos"} y los chulos`); }
   } catch (err) { if (err?.name === "AbortError") return; }
@@ -1887,7 +1889,7 @@ $b("respaldo-archivo").addEventListener("change", async e => {
   }
   await instantanea("antes de cargar un respaldo");
   sumarEstado(r.localStorage || {});
-  escribir("lab-reels:cambios", 0); escribir("lab-reels:ultimo-respaldo", new Date().toISOString());
+  escribir("backstage:cambios", 0); escribir("backstage:ultimo-respaldo", new Date().toISOString());
   aviso("Respaldo cargado (sumado a lo que había). Volviendo a abrir…");
   setTimeout(() => location.replace(location.pathname), 800);
 });
@@ -2072,7 +2074,7 @@ async function leerYArmar(archivos, tipo = "cargar"){
   }
   const d = aDatos(ext, traza);
   const nombre = archivos.length === 1 ? archivos[0].name.replace(/\.[^.]+$/, "") : archivos.length + " archivos";
-  escribir("lab-reels:listos:doc", null);
+  escribir("backstage:listos:doc", null);
   const categorias = [...new Set(d.items.map(reelDe))];
   subida.estado = "listo";
   subida.resultado = {items: d.items.length, bandas: new Set(d.items.filter(i => !i.sinBanda).map(i => i.artistaId)).size, cats: categorias.length, dudosos: d.items.filter(i => i.porConfirmar).length, avisos: ext.avisos.length};
@@ -2088,11 +2090,11 @@ async function probarMuestra(){
 }
 
 /* ── Al abrir: el logo de Circuito Naranja con glitch, siempre, como TikTok. La mano que enseña cada gesto sale una sola vez. ── */
-const vistos = new Set(leer("lab-reels:guias", []));
+const vistos = new Set(leer("backstage:guias", []));
 if (location.hash === "#intro") vistos.clear();
 function guia(clave, tipo, texto, sub){
   if (vistos.has(clave) || document.querySelector(".guia")) return;
-  vistos.add(clave); escribir("lab-reels:guias", [...vistos]);
+  vistos.add(clave); escribir("backstage:guias", [...vistos]);
   const dedo = tipo === "toque-g" ? "👆" : "☝️";
   const g = document.createElement("div"); g.className = "guia " + tipo; g.setAttribute("role", "dialog");
   g.innerHTML = `<div class="mano" aria-hidden="true"><span class="estela"></span><span class="dedo">${dedo}</span></div><p>${texto}</p><small>${sub}</small>`;
@@ -2165,7 +2167,7 @@ function splash(){
 }
 
 /* Abierto desde el cronograma (?rider=…&evento=…): el rider que el admin subió allá queda guardado en
-   este dispositivo (IndexedDB "backline-riders") y se lee aquí como cualquier documento. */
+   este dispositivo (IndexedDB "backstage-riders") y se lee aquí como cualquier documento. */
 async function riderDelCronograma(){
   const q = new URLSearchParams(location.search), id = q.get("rider");
   // ?lista=listas/….txt: una lista guardada en el sitio (la hoja escrita a mano, ya pasada a texto).
@@ -2177,11 +2179,11 @@ async function riderDelCronograma(){
       return subirArchivos([new File([await r.blob()], lista.split("/").pop(), {type: r.headers.get("content-type") || "text/plain"})]);
     } catch { return aviso("No encontré esa lista"); }
   }
-  if (q.get("evento")) escribir("lab-reels:evento", q.get("evento"));
+  if (q.get("evento")) escribir("backstage:evento", q.get("evento"));
   if (!id) return;
   history.replaceState(null, "", location.pathname);
   const guardado = await new Promise(ok => {
-    const r = indexedDB.open("backline-riders", 1);
+    const r = indexedDB.open("backstage-riders", 1);
     r.onupgradeneeded = () => r.result.createObjectStore("archivos");
     r.onerror = () => ok(null);
     r.onsuccess = () => { const q2 = r.result.transaction("archivos").objectStore("archivos").get(id); q2.onsuccess = () => ok(q2.result); q2.onerror = () => ok(null); };
@@ -2195,21 +2197,21 @@ async function riderDelCronograma(){
    se vuelven a leer. */
 async function eventoDeHoy(){
   const hoy = new Date(), iso = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
-  const ev = leer("cronograma:eventos", []).find(e => e.desde <= iso && iso <= e.hasta);
+  const ev = leer("backstage-cronograma:eventos", []).find(e => e.desde <= iso && iso <= e.hasta);
   if (!ev) return false;
   const riders = ev.escenarios.flatMap(e => e.bandas).map(b => b.rider?.archivoId).filter(Boolean);
   if (!riders.length) return false;
-  escribir("lab-reels:evento", ev.nombre);
+  escribir("backstage:evento", ev.nombre);
   const clave = ev.id + ":" + riders.join(",");
-  if (leer("lab-reels:evento-cargado", "") === clave && V.hay?.evento) return true;
+  if (leer("backstage:evento-cargado", "") === clave && V.hay?.evento) return true;
   const archivos = (await Promise.all(riders.map(id => new Promise(ok => {
-    const r = indexedDB.open("backline-riders", 1);
+    const r = indexedDB.open("backstage-riders", 1);
     r.onupgradeneeded = () => r.result.createObjectStore("archivos");
     r.onerror = () => ok(null);
     r.onsuccess = () => { const q = r.result.transaction("archivos").objectStore("archivos").get(id); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); };
   })))).filter(Boolean).map(g => new File([g.blob], g.nombre, {type: g.tipo}));
   if (!archivos.length) return false;
-  escribir("lab-reels:evento-cargado", clave);
+  escribir("backstage:evento-cargado", clave);
   introHecha = true;
   await subirArchivos(archivos, "cargar-evento");
   return true;
@@ -2221,7 +2223,7 @@ function directoALosReels(){
   introHecha = true;
   const el = document.querySelector("#subir .intro"); if (el) el.dataset.fase = "3";
   reels[1].scrollIntoView();
-  const h = new Date().getHours(), ev = leer("lab-reels:evento", "");
+  const h = new Date().getHours(), ev = leer("backstage:evento", "");
   aviso(`${h < 12 ? "Buen día" : h < 19 ? "Buenas tardes" : "Buenas noches"}, equipo${ev && V.espacio === "evento" ? ` · Hoy toca ${ev}` : ""}`);
 }
 
