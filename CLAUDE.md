@@ -269,6 +269,11 @@ prueba (que el % suba sin romper los riders anteriores).
   - Aviso fijo abajo «💾 n cambios sin respaldo · Guardar» (`lab-reels:cambios`, se pone en 0 al guardar), o
     «💾 Guarda tu primer respaldo» si nunca se ha guardado y ya hay chulos o fotos.
   - Cualquier cambio futuro que toque claves de `localStorage` o IndexedDB debe migrar, no borrar.
+  - **Piezas agregadas (2026-10-09):** el usuario agregó «Pedal de sustain», le tomó foto y al reabrir el link
+    de la lista la pieza se cayó (la lista se vuelve a leer del archivo). Ahora cada pieza agregada se guarda
+    en `lab-reels:agregados:<doc>` y `ponerAgregados` la vuelve a meter al leer la lista. `recuperarPiezas`
+    (una vez por carga) trae lo que falte de: las copias internas, la app de Circuito (en la copia con marca)
+    y las fotos o chulos que quedaron sin pieza (arma la pieza con lo que dice su clave).
 - **Dos espacios** (en Elm, `Espacio`): **Evento** (oficial, viene del cronograma; el empleado lo ve
   con candado y no lo cambia) y **Mis pruebas** (el escritorio propio; lo que el empleado sube a mano cae
   ahí). La regla es `puedeEscribir` en `Tablero.elm`.
