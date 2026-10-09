@@ -258,6 +258,17 @@ prueba (que el % suba sin romper los riders anteriores).
   IndexedDB, y lo comparte (WhatsApp/Drive) o lo descarga; «Cargar respaldo» lo devuelve. Se pide
   `navigator.storage.persist()`. Firestore `backline-2797d` hoy niega lectura y escritura (403): para subir
   a la nube hay que abrir reglas o poner login.
+- **Nada se pierde (2026-10-09, lo pidió el usuario: "ni una foto, ni un chulo"):**
+  - Quitar una foto no la borra: va a `lab-reels:papelera` (la imagen sigue en IndexedDB) y en Filtros sale
+    «Recuperar n fotos quitadas».
+  - Cargar un respaldo o volver a una copia **suma** (`sumarEstado`): listas se unen, fotos por clave se unen,
+    lo que ya existe manda. Nunca reemplaza.
+  - Copias internas (`instantanea`) en IndexedDB `backline-fotos` con clave `instantanea-<fecha>`: una al día
+    y antes de borrar el documento, subir otro o cargar un respaldo; se guardan las 5 últimas. Filtros →
+    «Volver a una copia interna». No van dentro del respaldo exportado.
+  - Aviso fijo abajo «💾 n cambios sin respaldo · Guardar» (`lab-reels:cambios`, se pone en 0 al guardar), o
+    «💾 Guarda tu primer respaldo» si nunca se ha guardado y ya hay chulos o fotos.
+  - Cualquier cambio futuro que toque claves de `localStorage` o IndexedDB debe migrar, no borrar.
 - **Dos espacios** (en Elm, `Espacio`): **Evento** (oficial, viene del cronograma; el empleado lo ve
   con candado y no lo cambia) y **Mis pruebas** (el escritorio propio; lo que el empleado sube a mano cae
   ahí). La regla es `puedeEscribir` en `Tablero.elm`.

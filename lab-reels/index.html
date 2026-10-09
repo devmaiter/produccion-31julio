@@ -431,6 +431,7 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
 .fila-fotos:empty{display:none}
 .fotos-pieza{margin:0 0 12px}
+.pendiente{position:fixed;z-index:9;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 14px);padding:10px 16px;border-radius:999px;border:1px solid var(--accent);background:rgba(0,0,0,.85);color:var(--ink);font:600 14px/1.1 "IBM Plex Sans",sans-serif;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 .falta-aviso{margin:6px 0 8px;padding:8px 12px;border-radius:12px;background:rgba(255,190,60,.12);border:1px solid #f5b83d;color:#ffd27a;font-size:15px}
 .falta-aviso b{color:#fff}
 .faltan{margin:14px 0 0;padding:10px 12px;border:1px dashed #f5b83d;border-radius:12px;background:rgba(255,190,60,.06)}
@@ -621,6 +622,7 @@ function marcarChulo(id){
   chulos.has(id) ? chulos.delete(id) : chulos.add(id);
   document.querySelectorAll(`[data-item="${CSS.escape(id)}"]`).forEach(el => el.classList.toggle("hecho", chulos.has(id)));
   navigator.vibrate?.(15);
+  huboCambio();
 }
 let listos = new Set();
 const cargarListos = () => { listos = new Set(leer("lab-reels:listos:doc", [])); };
@@ -1141,6 +1143,7 @@ function agregarPieza(deId, pieza, categoria){
   const items = [...d.items.slice(0, i + 1), nuevo, ...d.items.slice(i + 1)];
   destinoPendiente = actual?.id || null;
   enviar({tipo: V.espacio === "evento" ? "cargar-evento" : "cargar", doc: {...V.doc, datos: {...d, items}}});
+  huboCambio();
   aviso(`${pieza}: agregado`);
 }
 
@@ -1488,7 +1491,8 @@ feed.addEventListener("click", async e => {
     // Dos toques: el botón está en cada pantalla y se puede tocar sin querer.
     const btn = e.target.closest("[data-acc]");
     if (!btn.dataset.seguro) { btn.dataset.seguro = "1"; btn.textContent = "¿Borrar el documento? Toca otra vez"; return; }
-    escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; destinoPendiente = "subir"; return enviar({tipo: "borrar"}); }
+    instantanea("antes de borrar el documento").finally(() => { escribir("lab-reels:listos:doc", null); subida.estado = "inicio"; subida.archivos = []; destinoPendiente = "subir"; enviar({tipo: "borrar"}); });
+    return; }
   if (acc === "limpiar") { document.getElementById("buscar").value = ""; destinoPendiente = "subir"; return enviar({tipo: "limpiar"}); }
   if (acc === "tomar-foto" || acc === "subir-foto") { fotoDe = e.target.closest("[data-banda]").dataset.banda; return document.getElementById(acc === "tomar-foto" ? "foto-camara" : "foto-galeria").click(); }
   if (acc === "planilla") return abrirPlanilla(e.target.closest("[data-banda]").dataset.banda);
@@ -1546,10 +1550,13 @@ document.getElementById("visor").addEventListener("click", e => {
     // Dos toques para borrar: el primero pregunta.
     if (!b.dataset.seguro) { b.dataset.seguro = "1"; b.textContent = "¿Seguro? Toca otra vez para borrar"; return; }
     const {foto, banda} = b.dataset;
-    idb("readwrite", st => st.delete(foto)).catch(() => {});
-    urlsFotos.delete(foto);
+    // La imagen NO se borra del celular: queda en la papelera y se puede recuperar desde Filtros.
+    const papelera = leer("lab-reels:papelera", []);
+    papelera.push({foto, banda, cuando: new Date().toISOString()});
+    escribir("lab-reels:papelera", papelera);
     enviar({tipo: "quitar-foto", banda, foto});
-    aviso("Foto borrada");
+    huboCambio();
+    aviso("Foto quitada · se puede recuperar en Filtros");
     refrescarDetalle();
   }
   v.hidden = true;
@@ -1644,6 +1651,9 @@ function pintarFiltros(){
     <p class="et">Respaldo</p>
     <p class="nota">Los chulos y las fotos quedan en este celular. Guarda un respaldo y mándalo por WhatsApp o guárdalo en Drive; con «Cargar respaldo» se recupera todo.</p>
     <div class="botones"><button class="btn sec" data-respaldo="guardar">💾 Guardar respaldo</button><button class="btn sec" data-respaldo="cargar">📂 Cargar respaldo</button></div>
+    ${leer("lab-reels:ultimo-respaldo", "") ? `<p class="nota">Último respaldo: ${esc(cuandoSeSubio(leer("lab-reels:ultimo-respaldo", "")) || "")}.</p>` : `<p class="nota"><b>Todavía no has guardado ningún respaldo.</b></p>`}
+    ${leer("lab-reels:papelera", []).length ? `<div class="botones"><button class="btn sec" data-respaldo="papelera">♻️ Recuperar ${leer("lab-reels:papelera", []).length} ${leer("lab-reels:papelera", []).length === 1 ? "foto quitada" : "fotos quitadas"}</button></div>` : ""}
+    <div class="botones"><button class="btn sec" data-respaldo="instantanea">🕘 Volver a una copia interna</button></div>
     <div class="botones"><button class="btn" data-cerrar>Ver ${V.encontrados} ${V.encontrados === 1 ? "ítem" : "ítems"}</button>${V.hayFiltro ? '<button class="btn sec" data-limpiar>Quitar filtros</button>' : ""}</div>`;
 }
 $b("filtros").addEventListener("click", e => {
@@ -1651,6 +1661,12 @@ $b("filtros").addEventListener("click", e => {
   if (!t) { if (e.target === e.currentTarget) e.currentTarget.hidden = true; return; }
   if (t.dataset.respaldo === "guardar") return guardarRespaldo();
   if (t.dataset.respaldo === "cargar") return $b("respaldo-archivo").click();
+  if (t.dataset.respaldo === "papelera") {
+    for (const {foto, banda} of leer("lab-reels:papelera", [])) enviar({tipo: "foto", banda, foto});
+    escribir("lab-reels:papelera", []); huboCambio();
+    e.currentTarget.hidden = true; return aviso("Fotos recuperadas");
+  }
+  if (t.dataset.respaldo === "instantanea") return elegirInstantanea();
   destinoPendiente = "subir";
   if (t.dataset.modo !== undefined) return enviar({tipo: "modo", modo: t.dataset.modo});
   if (t.dataset.banda !== undefined) return enviar({tipo: "banda", banda: t.dataset.banda || null});
@@ -1708,6 +1724,7 @@ for (const id of ["foto-camara", "foto-galeria"]) $b(id).addEventListener("chang
     try { await idb("readwrite", st => st.put(blob, foto)); } catch { continue; }
     n++;
     enviar({tipo: "foto", banda, foto});
+    huboCambio();
   }
   aviso(n ? (n === 1 ? "Foto guardada" : `${n} fotos guardadas`) : "No se pudo guardar la foto en este dispositivo");
   refrescarDetalle();
@@ -1715,6 +1732,77 @@ for (const id of ["foto-camara", "foto-galeria"]) $b(id).addEventListener("chang
 /* ── Respaldo (lo pidió el usuario: "no perder los estados"): un archivo con todo lo de la app en este celular:
    documentos, chulos, fotos (las imágenes también), cronograma. Se comparte por WhatsApp/Drive o se descarga. ── */
 const blobADataURL = b => new Promise(ok => { const r = new FileReader(); r.onload = () => ok(r.result); r.readAsDataURL(b); });
+/* Sumar un estado guardado al de ahora sin perder nada: los chulos, los "no hace falta" y la papelera se
+   unen; las fotos de cada pieza o banda se unen; lo que no estaba se agrega; un documento abierto se queda. */
+function sumarEstado(otro){
+  const unir = (a, b) => [...new Map([...a, ...b].map(x => [JSON.stringify(x), x])).values()];
+  for (const [k, v] of Object.entries(otro)) {
+    const actual = localStorage.getItem(k);
+    try {
+      if (actual === null) { localStorage.setItem(k, v); continue; }
+      const A = JSON.parse(actual), B = JSON.parse(v);
+      if (Array.isArray(A) && Array.isArray(B)) { localStorage.setItem(k, JSON.stringify(unir(A, B))); continue; }
+      if (k === "lab-reels:tablero" && A && B) {
+        const fotos = {...(B.fotos || {})};
+        for (const [c, fs] of Object.entries(A.fotos || {})) fotos[c] = unir(fotos[c] || [], fs);
+        localStorage.setItem(k, JSON.stringify({...B, ...A, pruebas: A.pruebas || B.pruebas, evento: A.evento || B.evento, fotos}));
+      }
+      // Cualquier otro valor que ya existe se deja como está (lo de ahora manda).
+    } catch {}
+  }
+}
+/* Copia interna automática (en este celular): una al día y antes de cualquier cosa que reemplace algo
+   (borrar el documento, subir otro, cargar un respaldo). Se guardan las 5 últimas. */
+async function instantanea(motivo){
+  try {
+    const ls = {};
+    for (const k of Object.keys(localStorage)) if (/^(lab-reels|cronograma|planilla):/.test(k)) ls[k] = localStorage.getItem(k);
+    const clave = "instantanea-" + new Date().toISOString();
+    await idb("readwrite", st => st.put(new Blob([JSON.stringify({motivo, ls})], {type: "application/json"}), clave));
+    const todas = (await idb("readonly", st => st.getAllKeys())).filter(k => String(k).startsWith("instantanea-")).sort();
+    for (const k of todas.slice(0, -5)) await idb("readwrite", st => st.delete(k));
+  } catch {}
+}
+async function instantaneas(){
+  try { return (await idb("readonly", st => st.getAllKeys())).filter(k => String(k).startsWith("instantanea-")).sort().reverse(); } catch { return []; }
+}
+{
+  const hoy = new Date().toISOString().slice(0, 10);
+  if (leer("lab-reels:instantanea-dia", "") !== hoy) { escribir("lab-reels:instantanea-dia", hoy); setTimeout(() => instantanea("la del día"), 4000); }
+}
+async function elegirInstantanea(){
+  const ks = await instantaneas();
+  const motivos = {};
+  for (const k of ks) { try { motivos[k] = JSON.parse(await (await idb("readonly", st => st.get(k))).text()).motivo || ""; } catch {} }
+  const hora = k => new Date(k.replace("instantanea-", "")).toLocaleString("es-CO", {day: "numeric", month: "short", hour: "numeric", minute: "2-digit"});
+  const panel = $b("panel-filtros");
+  panel.innerHTML = `<h4>Copias internas</h4>
+    <p class="nota">La app guarda sola una copia al día y antes de borrar o reemplazar algo. Al volver a una, se <b>suma</b> a lo de ahora: no se pierde ningún chulo ni foto.</p>
+    ${ks.length ? ks.map(k => `<div class="botones"><button class="btn sec" data-instantanea="${esc(k)}" style="text-transform:none;text-align:left">${esc(hora(k))}<small style="display:block;font:400 13px/1.2 'IBM Plex Sans',sans-serif;opacity:.75">${esc(motivos[k] || "")}</small></button></div>`).join("") : `<p class="nota">Todavía no hay copias internas.</p>`}
+    <div class="botones"><button class="btn" data-cerrar>Cerrar</button></div>`;
+}
+$b("filtros").addEventListener("click", async e => {
+  const k = e.target.closest("[data-instantanea]")?.dataset.instantanea; if (!k) return;
+  e.stopImmediatePropagation();
+  try {
+    const blob = await idb("readonly", st => st.get(k)); const r = JSON.parse(await blob.text());
+    await instantanea("antes de volver a una copia");
+    sumarEstado(r.ls || {});
+    aviso("Copia sumada. Volviendo a abrir…"); setTimeout(() => location.replace(location.pathname), 800);
+  } catch { aviso("No se pudo abrir esa copia"); }
+}, true);
+/* Aviso de cambios sin respaldo: cada chulo, foto o pieza agregada suma uno; al guardar el respaldo vuelve a 0. */
+function huboCambio(){ escribir("lab-reels:cambios", leer("lab-reels:cambios", 0) + 1); pintarPendiente(); }
+function pintarPendiente(){
+  let el = document.getElementById("pendiente");
+  const n = leer("lab-reels:cambios", 0);
+  // Nunca se ha guardado un respaldo y ya hay chulos o fotos: también se avisa.
+  const hayDatos = Object.keys(localStorage).some(k => k.startsWith("lab-reels:chulos") && (localStorage.getItem(k) || "[]") !== "[]") || Object.keys(V?.fotos || {}).length > 0;
+  const primero = !n && !leer("lab-reels:ultimo-respaldo", "") && hayDatos;
+  if (!n && !primero) { el?.remove(); return; }
+  if (!el) { el = Object.assign(document.createElement("button"), {id: "pendiente", className: "pendiente"}); el.addEventListener("click", guardarRespaldo); document.body.append(el); }
+  el.textContent = primero ? "💾 Guarda tu primer respaldo" : `💾 ${n} ${n === 1 ? "cambio" : "cambios"} sin respaldo · Guardar`;
+}
 async function guardarRespaldo(){
   aviso("Armando el respaldo…");
   const ls = {};
@@ -1726,16 +1814,18 @@ async function guardarRespaldo(){
       const tx = db.transaction("fotos"), st = tx.objectStore("fotos"), q = st.openCursor();
       const pendientes = [];
       q.onsuccess = () => { const c = q.result; if (c) { pendientes.push([c.key, c.value]); c.continue(); } };
-      tx.oncomplete = async () => { for (const [k, v] of pendientes) fotos[k] = await blobADataURL(v); ok(); };
+      tx.oncomplete = async () => { for (const [k, v] of pendientes) if (!String(k).startsWith("instantanea-")) fotos[k] = await blobADataURL(v); ok(); };
       tx.onerror = () => mal(tx.error);
     });
   } catch {}
   const hoy = new Date(), f = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}-${String(hoy.getHours()).padStart(2, "0")}${String(hoy.getMinutes()).padStart(2, "0")}`;
   const archivo = new File([JSON.stringify({formato: "respaldo-lab-reels/1", cuando: hoy.toISOString(), localStorage: ls, fotos})], `respaldo-reels-${f}.json`, {type: "application/json"});
   const n = Object.keys(fotos).length;
+  const listo = () => { escribir("lab-reels:cambios", 0); escribir("lab-reels:ultimo-respaldo", new Date().toISOString()); pintarPendiente(); };
   try {
-    if (navigator.canShare?.({files: [archivo]})) { await navigator.share({files: [archivo], title: "Respaldo de los reels"}); return aviso(`Respaldo listo: ${n} ${n === 1 ? "foto" : "fotos"} y los chulos`); }
+    if (navigator.canShare?.({files: [archivo]})) { await navigator.share({files: [archivo], title: "Respaldo de los reels"}); listo(); return aviso(`Respaldo listo: ${n} ${n === 1 ? "foto" : "fotos"} y los chulos`); }
   } catch (err) { if (err?.name === "AbortError") return; }
+  listo();
   const a = Object.assign(document.createElement("a"), {href: URL.createObjectURL(archivo), download: archivo.name});
   document.body.append(a); a.click(); a.remove();
   aviso(`Respaldo descargado: ${n} ${n === 1 ? "foto" : "fotos"} y los chulos`);
@@ -1748,8 +1838,10 @@ $b("respaldo-archivo").addEventListener("change", async e => {
   for (const [k, url] of Object.entries(r.fotos || {})) {
     try { const blob = await (await fetch(url)).blob(); await idb("readwrite", st => st.put(blob, k)); } catch {}
   }
-  for (const [k, v] of Object.entries(r.localStorage || {})) { try { localStorage.setItem(k, v); } catch {} }
-  aviso("Respaldo cargado. Volviendo a abrir…");
+  await instantanea("antes de cargar un respaldo");
+  sumarEstado(r.localStorage || {});
+  escribir("lab-reels:cambios", 0); escribir("lab-reels:ultimo-respaldo", new Date().toISOString());
+  aviso("Respaldo cargado (sumado a lo que había). Volviendo a abrir…");
   setTimeout(() => location.replace(location.pathname), 800);
 });
 // Que el navegador no borre los datos de la app (fotos y chulos) cuando le falte espacio.
@@ -1911,6 +2003,7 @@ async function subirArchivos(archivos, tipo = "cargar"){
 }
 
 async function leerYArmar(archivos, tipo = "cargar"){
+  if (V?.doc) await instantanea("antes de subir " + archivos.map(f => f.name).join(", "));
   let r;
   const traza = [];   // lo que el lector decidió de cada renglón: sirve para mostrar lo que pidió la banda
   {
@@ -2046,6 +2139,7 @@ enviar({tipo: "limpiar"});
   if (!V) return setTimeout(arrancar, 20);
   arrancado = true;
   fotosSitio.de = null; cargarFotosSitio();
+  pintarPendiente();
   pintarBarra();
   riderDelCronograma();
   if (V.doc && !location.hash) introHecha = true;   // ya hay rider: sin la entrada
