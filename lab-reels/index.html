@@ -472,7 +472,12 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
 .fila-fotos:empty{display:none}
 .fotos-pieza{margin:0 0 12px}
-.capitulo{display:inline-block;margin:0 0 4px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.1);font:600 13px/1.2 "IBM Plex Sans",sans-serif;letter-spacing:.04em}
+.tope{flex-wrap:wrap}
+.pestanas{flex:1 0 100%;display:flex;justify-content:center;gap:26px;margin-top:2px}
+.pestanas button{background:none;border:0;padding:4px 2px 6px;color:var(--ink3);font:700 16px/1 "Barlow Condensed",sans-serif;letter-spacing:.06em;text-transform:uppercase;border-bottom:3px solid transparent}
+.pestanas button[aria-current="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+html.con-pestanas{--barra:88px}
+.capitulo{display:inline-block;align-self:flex-start;margin:0 0 4px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.1);font:600 13px/1.2 "IBM Plex Sans",sans-serif;letter-spacing:.04em}
 .capitulo.show{background:var(--accent);color:#000}
 /* Fotos, más claras y compactas */
 .ayuda-fotos{margin:4px 0 10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.06);font-size:14px;line-height:1.35;color:var(--ink2)}
@@ -594,6 +599,9 @@ li.pide.nota .t{color:var(--ink3);font-style:italic}
   <button class="espacio" id="espacio" hidden>Evento</button>
   <input class="buscar" id="buscar" type="search" placeholder="Buscar equipo o banda" aria-label="Buscar equipo o banda" autocomplete="off">
   <button class="filtrar" id="filtrar" aria-haspopup="dialog">Filtros</button>
+  <nav class="pestanas" id="pestanas" hidden aria-label="Páginas">
+    <button data-pestana="alistando">📦 Alistando</button><button data-pestana="bandas">🎤 Bandas</button>
+  </nav>
 </header>
 <div class="hoja" id="filtros" hidden><div class="panel" role="dialog" aria-label="Filtros" id="panel-filtros"></div></div>
 <div class="hoja" id="detalle" hidden><div class="panel detalle" role="dialog" aria-label="Detalle del equipo"></div></div>
@@ -1344,13 +1352,35 @@ function capituloDe(b){
   if (show) return `<p class="capitulo show">🎤 Show${show.nota ? ` · ${esc(show.nota)}` : ""}</p>`;
   return showSitio.bandas.length && b.nombre === "Lista de bodega" ? `<p class="capitulo">📦 Bodega</p>` : "";
 }
+/* Dos páginas, como las pestañas de arriba de una red social (lo pidió el usuario): «Alistando» (la lista
+   de bodega) y «Bandas» (el show). Solo salen cuando el documento tiene bandas del show. */
+const hayShow = () => !festival() && showSitio.bandas.length > 0 && datos().items.some(i => showSitio.bandas.some(b => b.id === i.artistaId));
+const pestana = () => leer("lab-reels:pestana", "alistando");
+function bandasDePestana(bs){
+  if (!hayShow()) return bs;
+  const show = new Set(showSitio.bandas.map(b => b.id));
+  return bs.filter(b => (pestana() === "bandas") === show.has(b.artistaId));
+}
+function pintarPestanas(){
+  const nav = $b("pestanas"); if (!nav) return;
+  const ver = hayShow();
+  nav.hidden = !ver;
+  document.documentElement.classList.toggle("con-pestanas", ver);
+  nav.querySelectorAll("[data-pestana]").forEach(b => b.setAttribute("aria-current", String(b.dataset.pestana === pestana())));
+}
+function cambiarPestana(p){
+  if (p === pestana()) return reels[1]?.scrollIntoView({behavior: "smooth"});
+  escribir("lab-reels:pestana", p); pintarPestanas(); pintar(null);
+  setTimeout(() => reels[1]?.scrollIntoView(), 60);
+}
 let showDe = null;
 async function asegurarShow(){
   if (!V?.doc || showDe === V.doc.nombre + "|" + V.doc.cuando) return;
   showDe = V.doc.nombre + "|" + V.doc.cuando;
   const bandas = await cargarShow(V.doc.nombre); if (!bandas.length) return;
   const d = {...datos(), items: [...datos().items], artistas: [...datos().artistas]};
-  const n = ponerShow(d, bandas); if (!n) return;
+  const n = ponerShow(d, bandas);
+  if (!n) { if (!document.documentElement.classList.contains("con-pestanas") && hayShow()) { pintarPestanas(); pintar(actual?.id); } return; }
   showDe = null;
   destinoPendiente = actual?.id || null;
   enviar({tipo: V.espacio === "evento" ? "cargar-evento" : "cargar", doc: {...V.doc, datos: d}});
@@ -1536,7 +1566,7 @@ function htmlResumen(bs){
   return `
   <article class="reel" id="resumen" style="--h:30" data-n="1" aria-label="Todo el equipo">
     <div class="prog"><i></i></div>
-    <div class="cab"><b>Todo el equipo</b><span class="n">Administrador</span></div>
+    <div class="cab"><b>Todo el equipo</b><span class="n">${hayShow() ? (pestana() === "bandas" ? "🎤 Bandas" : "📦 Alistando") : "Administrador"}</span></div>
     <div class="slides">
       <section class="slide banda resumen">
         <h3>Todo el equipo</h3>
@@ -1752,7 +1782,7 @@ function pintar(destino){
     cats = armar(d);
     entradas = cats.map(c => ({id: c.id, e: EMOJI[sinNum(c.cat)] || "📦", nombre: c.cat, x: `${c.equipos} ${c.equipos === 1 ? "banda" : "bandas"}`}));
   } else {
-    const bs = armarBandas(d);
+    const bs = bandasDePestana(armarBandas(d));
     cats = [];
     // El admin ve primero todo el equipo con su estado (lo pidió el usuario).
     entradas = [...(V?.perfil === "admin" && d.items.length ? [{id: "resumen", e: "📋", nombre: "Todo el equipo", x: `${piezasDe(d.items)} piezas`, html: () => htmlResumen(bs)}] : []), ...bs.flatMap(pantallasBanda)];
@@ -1960,6 +1990,7 @@ lado.addEventListener("click", e => { const b = e.target.closest("button"); if (
 const $b = id => document.getElementById(id);
 function pintarBarra(){
   if (!V) return;
+  pintarPestanas();
   const p = $b("perfil"), admin = V.perfil === "admin";
   p.textContent = admin ? "Admin" : "Empleado";
   p.classList.toggle("admin", admin);
@@ -2585,6 +2616,9 @@ function directoALosReels(){
   const h = new Date().getHours(), ev = leer("lab-reels:evento", "");
   aviso(`${h < 12 ? "Buen día" : h < 19 ? "Buenas tardes" : "Buenas noches"}, equipo${ev && V.espacio === "evento" ? ` · Hoy toca ${ev}` : ""}`);
 }
+
+// Las pestañas de arriba: Alistando / Bandas.
+$b("pestanas").addEventListener("click", e => { const b = e.target.closest("[data-pestana]"); if (b) cambiarPestana(b.dataset.pestana); });
 
 /* Notas: lo que se escribe se guarda solo; la foto de una nota queda en el celular. */
 feed.addEventListener("input", e => {

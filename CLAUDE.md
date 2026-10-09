@@ -315,6 +315,10 @@ prueba (que el % suba sin romper los riders anteriores).
   al abrir la app), así la lista de bodega no cambia de clave. Cada banda sale con su portada (etiqueta
   «🎤 Show · nota»; la lista dice «📦 Bodega»), sus secciones, fotos y notas. Otra banda = otra entrada en
   `bandas` del json. Horarios: pendientes de que el usuario los pase.
+  **Dos páginas (2026-10-09, lo pidió el usuario: «una cosa es alistando el evento y otra las bandas»):** cuando hay
+  bandas del show, la barra de arriba trae pestañas **📦 Alistando** / **🎤 Bandas** (como una red social);
+  `bandasDePestana` deja en el feed solo las de esa página (y «Todo el equipo» cuenta solo esas). La pestaña
+  se recuerda en `lab-reels:pestana`; con pestañas la barra mide 88 px (`html.con-pestanas`).
 - **El plan del servidor** está en `docs/modelo-de-datos.md`: tablas, llaves y permisos.
 - Para revisar en celular se usa una página local con varios iframes de 390×844 lado a lado
   (`_celular.html`, no se sube).
