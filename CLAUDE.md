@@ -243,6 +243,16 @@ prueba (que el % suba sin romper los riders anteriores).
   **grandes y en carrusel** (deslizar de lado), y las piezas con fotos van primero. En el listado, cada
   renglón trae su **📷** (abre «En bodega / En evento» con Tomar foto y Subir), y el chip «📷 Bodega n»
   lleva a la historia de fotos.
+  **Pulida (2026-10-09, para quien no maneja la app):** arriba explica «Bodega = cuando se alista y se empaca ·
+  Evento = cuando ya está montado en tarima», dos contadores (Bodega 1/8 · Evento 0/8) y cada pieza con sus
+  renglones Bodega/Evento: estado («✓ 2 fotos» / «Sin foto»), miniaturas pequeñas (se abren en grande) y
+  botones «📷 Tomar» y «🖼 Galería».
+- **Notas de última hora (2026-10-09, lo pidió el usuario):** quinta historia de cada sección
+  (`htmlHistoriaNotas`): escribir, «🎙 Grabar audio» (MediaRecorder) y «📷 Foto», «Guardar nota»; cada nota
+  con fecha y hora. Lista en `lab-reels:notas:<doc>` (sección = banda|grupo); audio y foto en IndexedDB
+  `nota-audio-…` / `nota-foto-…` (entran al respaldo). Lo que se va escribiendo y lo grabado antes de guardar
+  queda en `lab-reels:nota-borrador:<doc>|<sección>`. «Quitar» solo la marca (`quitada`); Filtros → «Recuperar
+  notas quitadas». En «Todo el equipo» hay un conteo de notas.
   Una lista del sitio puede traer sus fotos en `listas/<nombre>.fotos.json` (pieza por nombre, momento y URLs
   en `listas/fotos/`, achicadas y sin EXIF): se ven en cualquier celular y no se borran desde la app.
 - **Lo que lleva cada instrumento (2026-10-08, lo pidió el usuario: "la batería debe llevar silla y no la

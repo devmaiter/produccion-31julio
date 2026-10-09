@@ -472,6 +472,37 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
 .fila-fotos:empty{display:none}
 .fotos-pieza{margin:0 0 12px}
+/* Fotos, más claras y compactas */
+.ayuda-fotos{margin:4px 0 10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.06);font-size:14px;line-height:1.35;color:var(--ink2)}
+.ayuda-fotos p{margin:0}.ayuda-fotos b{color:var(--ink)}
+.fotos-conteo{display:flex;gap:8px;margin:0 0 6px}
+.fotos-conteo span{flex:1;padding:8px 10px;border-radius:10px;border:1px solid var(--line);font-size:13px;color:var(--ink2)}
+.fotos-conteo span b{float:right;color:var(--ink)}.fotos-conteo span.si{border-color:#1fa34a}.fotos-conteo span.si b{color:#1fa34a}
+.pieza-fotos .nombre{font-size:17px;margin:0 0 4px}
+.mom{margin:4px 0}
+.mom-cab{display:flex;justify-content:space-between;align-items:center;margin:0 0 4px;font-size:13px}
+.mom-nombre{font-weight:700;color:var(--ink);letter-spacing:.02em}
+.mom-estado.si{color:#1fa34a;font-weight:600}.mom-estado.no{color:var(--ink3)}
+.mom-fila{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.mom-fila::-webkit-scrollbar{display:none}
+.mom-fila .mini{flex:none;width:50px;height:62px;object-fit:cover;border-radius:8px;background:var(--surface2);cursor:zoom-in}
+.mom-btn{flex:none;width:54px;height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:1px dashed var(--line);border-radius:8px;background:rgba(255,255,255,.04);color:var(--ink2);font-size:12px;font-weight:600}
+.mom-btn span{font-size:17px}
+/* Notas */
+.nota-nueva{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:10px;margin:0 0 12px}
+.nota-nueva textarea{width:100%;box-sizing:border-box;min-height:70px;border-radius:10px;border:1px solid var(--line);background:#111;color:var(--ink);font:15px/1.35 "IBM Plex Sans",sans-serif;padding:10px;resize:vertical}
+.nota-adjuntos{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+.adj{font-size:13px;padding:5px 10px;border-radius:999px;background:rgba(31,163,74,.15);color:#7ee2a0}
+.nota-botones{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.nota-botones button{flex:1 1 auto;padding:10px 12px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink);font:600 14px/1 "IBM Plex Sans",sans-serif}
+.nota-botones .principal{background:var(--accent);border-color:var(--accent);color:#000}
+.nota-botones .grabando{border-color:#ff4d4d;color:#ff8a8a;animation:late 1s infinite}
+.nota{border-left:3px solid var(--accent);padding:6px 0 8px 12px;margin:0 0 12px}
+.n-cuando{margin:0;font-size:12px;color:var(--ink3);text-transform:capitalize}
+.n-texto{margin:4px 0;font-size:15px;white-space:pre-wrap}
+.nota audio{width:100%;margin:4px 0;height:36px}
+.n-foto{display:block;width:120px;height:150px;object-fit:cover;border-radius:10px;margin:4px 0;cursor:zoom-in}
+.n-quitar{background:none;border:0;color:var(--ink3);font-size:12px;padding:4px 0;text-decoration:underline}
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 14px}
 .kpi{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center}
 .kpi b{display:block;font:700 30px/1 "Barlow Condensed",sans-serif}
@@ -576,6 +607,7 @@ li.pide.nota .t{color:var(--ink3);font-style:italic}
 <input type="file" id="foto-camara" hidden accept="image/*" capture="environment">
 <input type="file" id="foto-galeria" hidden accept="image/*" multiple>
 <input type="file" id="respaldo-archivo" hidden accept=".json,application/json">
+<input type="file" id="nota-foto" hidden accept="image/*">
 
 <script src="tablero.js?v=2"></script>
 <script>
@@ -1296,25 +1328,112 @@ async function recuperarPiezas(){
 /* La historia de fotos de una sección (lo pidió el usuario): cada pieza con su foto en bodega y en evento. */
 function htmlHistoriaFotos(titulo, items){
   const con = m => items.filter(x => fotosPieza(x, m).length).length;
-  const fila = (x, m, t) => {
-    const k = clavePieza(x, m), fotos = fotosPieza(x, m), corto = t === "En bodega" ? "Bodega" : "Evento";
-    return `<div class="momento-fila"><span class="m${fotos.length ? " si" : ""}">${fotos.length ? `✓ ${corto} · ${fotos.length}` : corto}</span>
-      <button class="cam" data-acc="tomar-foto" data-banda="${esc(k)}" aria-label="Tomar foto ${esc(t.toLowerCase())}">📷</button><button class="cam" data-acc="subir-foto" data-banda="${esc(k)}" aria-label="Subir foto ${esc(t.toLowerCase())}">🖼</button></div>
-      ${fotos.length ? `<div class="carrusel">${fotos.map(f => `<img data-foto="${esc(f)}" data-banda="${esc(fotoAClave.get(f) || k)}" alt="Foto ${esc(t.toLowerCase())}">`).join("")}</div>` : ""}`;
+  // Cada momento en un renglón: qué es, si ya tiene foto, las miniaturas (se abren en grande) y los botones.
+  const momento = (x, m, t) => {
+    const k = clavePieza(x, m), fotos = fotosPieza(x, m), nombre = t === "En bodega" ? "Bodega" : "Evento";
+    return `<div class="mom">
+      <div class="mom-cab"><span class="mom-nombre">${nombre}</span><span class="mom-estado ${fotos.length ? "si" : "no"}">${fotos.length ? `✓ ${fotos.length} ${fotos.length === 1 ? "foto" : "fotos"}` : "Sin foto"}</span></div>
+      <div class="mom-fila">
+        ${fotos.map(f => `<img class="mini" data-foto="${esc(f)}" data-banda="${esc(fotoAClave.get(f) || k)}" alt="Foto de ${esc(nombre.toLowerCase())}">`).join("")}
+        <button class="mom-btn" data-acc="tomar-foto" data-banda="${esc(k)}"><span>📷</span>Tomar</button>
+        <button class="mom-btn" data-acc="subir-foto" data-banda="${esc(k)}"><span>🖼</span>Galería</button>
+      </div></div>`;
   };
   // Primero las piezas que ya tienen fotos: es lo que se quiere ver.
   items = [...items].sort((a, b) => (MOMENTOS.some(([m]) => fotosPieza(b, m).length) ? 1 : 0) - (MOMENTOS.some(([m]) => fotosPieza(a, m).length) ? 1 : 0));
   return `
       <section class="slide banda historia-fotos">
         <h3>Fotos</h3>
-        <p class="sub">${esc(titulo)} · ${con("bodega")} de ${items.length} en bodega · ${con("evento")} de ${items.length} en evento</p>
+        <div class="ayuda-fotos"><p><b>Bodega</b> = cuando se alista y se empaca.</p><p><b>Evento</b> = cuando ya está montado en tarima.</p><p>Toca una foto para verla grande.</p></div>
+        <div class="fotos-conteo"><span class="${con("bodega") ? "si" : ""}">Bodega <b>${con("bodega")}/${items.length}</b></span><span class="${con("evento") ? "si" : ""}">Evento <b>${con("evento")}/${items.length}</b></span></div>
         ${items.map(x => `
         <div class="pieza-fotos">
           <p class="nombre"><b>${x.cantidad} ×</b> ${esc(corto(x.referencia))}</p>
-          ${MOMENTOS.map(([m, t]) => fila(x, m, t)).join("")}
+          ${MOMENTOS.map(([m, t]) => momento(x, m, t)).join("")}
         </div>`).join("")}
       </section>`;
 }
+/* ── Notas de última hora (lo pidió el usuario: "el sábado dejar una nota… grabar un audio, tomar una foto").
+   Una historia por sección. Texto, audio y foto quedan en el celular (el audio y la foto en IndexedDB, con
+   clave nota-audio-… / nota-foto-…, así entran al respaldo); la lista en lab-reels:notas:<doc>. Quitar una
+   nota no la borra: queda marcada y se recupera desde Filtros. Lo que se va escribiendo se guarda solo. ── */
+const claveNotas = () => "lab-reels:notas:" + (V?.doc?.nombre || "");
+const seccionDeItems = items => `${items[0]?.artistaId || "sin-banda"}|${items[0]?.grupo || ""}`;
+const claveBorrador = sec => "lab-reels:nota-borrador:" + (V?.doc?.nombre || "") + "|" + sec;
+const todasNotas = () => leer(claveNotas(), []);
+const notasDe = sec => todasNotas().filter(n => n.seccion === sec && !n.quitada).sort((a, b) => b.cuando.localeCompare(a.cuando));
+function cuandoNota(iso){
+  const f = new Date(iso);
+  return `${f.toLocaleDateString("es", {weekday: "short", day: "numeric", month: "short"})} · ${f.toLocaleTimeString("es", {hour: "numeric", minute: "2-digit"})}`;
+}
+function htmlHistoriaNotas(titulo, items){
+  const sec = seccionDeItems(items), notas = notasDe(sec), b = leer(claveBorrador(sec), {texto: "", audio: null, foto: null, dur: 0});
+  return `
+      <section class="slide banda historia-notas" data-seccion="${esc(sec)}">
+        <h3>Notas</h3>
+        <p class="ayuda-fotos"><b>Lo de última hora</b> de ${esc(titulo)}: escribe, graba un audio o toma una foto. Queda con fecha y hora.</p>
+        <div class="nota-nueva">
+          <textarea data-nota-texto="${esc(sec)}" rows="3" placeholder="Ej.: el bajista pidió otra base">${esc(b.texto || "")}</textarea>
+          ${b.audio || b.foto ? `<div class="nota-adjuntos">${b.audio ? `<span class="adj">🎙 Audio ${b.dur ? `(${b.dur} s)` : ""} listo</span>` : ""}${b.foto ? `<span class="adj">📷 Foto lista</span>` : ""}</div>` : ""}
+          <div class="nota-botones">
+            <button data-nota="grabar" data-sec="${esc(sec)}">🎙 Grabar audio</button>
+            <button data-nota="foto" data-sec="${esc(sec)}">📷 Foto</button>
+            <button data-nota="guardar" data-sec="${esc(sec)}" class="principal">Guardar nota</button>
+          </div>
+        </div>
+        ${notas.length ? notas.map(n => `
+        <article class="nota">
+          <p class="n-cuando">${esc(cuandoNota(n.cuando))}</p>
+          ${n.texto ? `<p class="n-texto">${esc(n.texto)}</p>` : ""}
+          ${n.audio ? `<audio controls preload="metadata" data-nota-media="${esc(n.audio)}"></audio>` : ""}
+          ${n.foto ? `<img class="n-foto" data-nota-media="${esc(n.foto)}" data-foto-nota alt="Foto de la nota">` : ""}
+          <button class="n-quitar" data-nota-quitar="${esc(n.id)}">Quitar</button>
+        </article>`).join("") : `<p class="sub">Todavía no hay notas en esta sección.</p>`}
+      </section>`;
+}
+const urlsNotas = new Map();
+async function cargarMediaNotas(raiz = feed){
+  for (const el of raiz.querySelectorAll("[data-nota-media]")) {
+    const k = el.dataset.notaMedia;
+    if (!urlsNotas.has(k)) { const b = await idb("readonly", st => st.get(k)).catch(() => null); if (b) urlsNotas.set(k, URL.createObjectURL(b)); }
+    if (urlsNotas.has(k)) el.src = urlsNotas.get(k);
+  }
+}
+// Volver a dibujar sin moverse de donde está el usuario (mismo reel, misma historia, mismo punto).
+function repintarQuieto(){
+  const id = actual?.id, sl = id && document.querySelector(`#${CSS.escape(id)} .slides`);
+  const lado = sl?.scrollLeft || 0, i = sl ? Math.round(lado / (sl.clientWidth || 1)) : 0, arriba = sl?.children[i]?.scrollTop || 0;
+  pintar(id);
+  requestAnimationFrame(() => { const s2 = id && document.querySelector(`#${CSS.escape(id)} .slides`); if (!s2) return; s2.scrollTo({left: lado, behavior: "instant"}); if (s2.children[i]) s2.children[i].scrollTop = arriba; });
+}
+let grabando = null;
+async function grabarAudio(btn, sec){
+  if (grabando) { grabando.rec.stop(); return; }
+  if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return aviso("Este navegador no deja grabar audio");
+  let stream; try { stream = await navigator.mediaDevices.getUserMedia({audio: true}); } catch { return aviso("Sin permiso para el micrófono"); }
+  const rec = new MediaRecorder(stream), partes = [], t0 = Date.now();
+  rec.ondataavailable = e => { if (e.data.size) partes.push(e.data); };
+  rec.onstop = async () => {
+    stream.getTracks().forEach(t => t.stop()); clearInterval(grabando?.reloj); grabando = null;
+    const blob = new Blob(partes, {type: rec.mimeType || "audio/mp4"}), k = "nota-audio-" + Date.now().toString(36);
+    try { await idb("readwrite", st => st.put(blob, k)); } catch { return aviso("No se pudo guardar el audio"); }
+    const b = leer(claveBorrador(sec), {}); escribir(claveBorrador(sec), {...b, audio: k, dur: Math.round((Date.now() - t0) / 1000)});
+    aviso("Audio listo: toca «Guardar nota»"); repintarQuieto();
+  };
+  rec.start();
+  btn.classList.add("grabando");
+  grabando = {rec, reloj: setInterval(() => { btn.textContent = `⏹ Detener · ${Math.round((Date.now() - t0) / 1000)} s`; }, 300)};
+}
+let notaFotoDe = null;
+
+async function guardarNota(sec){
+  const b = leer(claveBorrador(sec), {}), texto = (document.querySelector(`[data-nota-texto="${CSS.escape(sec)}"]`)?.value || b.texto || "").trim();
+  if (!texto && !b.audio && !b.foto) return aviso("Escribe algo, graba un audio o toma una foto");
+  escribir(claveNotas(), [...todasNotas(), {id: "n-" + Date.now().toString(36), seccion: sec, texto, audio: b.audio || null, foto: b.foto || null, cuando: new Date().toISOString()}]);
+  localStorage.removeItem(claveBorrador(sec));
+  huboCambio(); aviso("Nota guardada"); repintarQuieto();
+}
+
 function htmlFotosPieza(x){
   return `<p class="et">Fotos</p>` + MOMENTOS.map(([m, t]) => {
     const k = clavePieza(x, m), fotos = fotosPieza(x, m);
@@ -1377,7 +1496,7 @@ function htmlResumen(bs){
       <section class="slide banda resumen">
         <h3>Todo el equipo</h3>
         <p class="sub">${esc(V.doc?.nombre || "")} · ${esc(cuandoSeSubio(V.doc?.cuando || "") || "")}</p>
-        <div class="kpis">${n(piezasDe(todas), "piezas")}${n(listas, "✓ listas", "ok")}${n(con("bodega"), "📷 en bodega")}${n(con("evento"), "📷 en evento")}${n(faltan, "⚠ por revisar", faltan ? "warn" : "")}</div>
+        <div class="kpis">${n(piezasDe(todas), "piezas")}${n(listas, "✓ listas", "ok")}${n(con("bodega"), "📷 en bodega")}${n(con("evento"), "📷 en evento")}${n(faltan, "⚠ por revisar", faltan ? "warn" : "")}${n(todasNotas().filter(x => !x.quitada).length, "📝 notas")}</div>
         ${bs.map(b => conSeccionesDe(b).map((s, j) => `
         <button class="r-seccion" data-acc="ir-seccion" data-id="${esc(idSeccion(b, j))}">${esc(s.grupo || "Sin sección")}${bs.length > 1 ? ` · ${esc(b.nombre)}` : ""} <span>›</span></button>
         <div class="excel"><div class="cab-xl r-cab"><span>Cant</span><span>Equipo</span><span>✓</span><span>Bod.</span><span>Ev.</span></div>
@@ -1445,8 +1564,8 @@ function htmlSeccion(b, s, j, total){
   const otros = [...new Set(s.items.filter(x => x.propietario?.tipo === "tercero" && x.propietario.nombre !== "la banda").map(x => x.propietario.nombre))];
   const cats = [...new Set(s.items.map(x => x.categoria))];
   return `
-  <article class="reel" id="${esc(id)}" style="--h:${HUE[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] ?? 20}" data-n="4" aria-label="${esc(titulo)} · ${esc(b.nombre)}">
-    <div class="prog"><i></i><i></i><i></i><i></i></div>
+  <article class="reel" id="${esc(id)}" style="--h:${HUE[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] ?? 20}" data-n="5" aria-label="${esc(titulo)} · ${esc(b.nombre)}">
+    <div class="prog"><i></i><i></i><i></i><i></i><i></i></div>
     <div class="cab"><b>${esc(titulo)}</b><span class="n">${esc(b.nombre)} · ${j + 1}/${total}</span></div>
     <div class="slides">
       <section class="slide portada seccion-portada">
@@ -1455,7 +1574,7 @@ function htmlSeccion(b, s, j, total){
         ${op ? `<p class="opciones">Opciones de la banda: <b>${op.map(esc).join("</b>, <b>")}</b>. Es una sola, de cualquiera de esas marcas.</p>` : ""}
         ${htmlFaltan(s.items, false)}
         <p class="chips-pieza">${cats.map(c => `<span class="chip">${esc(c)}</span>`).join("")}${trae ? `<span class="chip ter">${trae} lo trae la banda</span>` : ""}${otros.map(n => `<span class="chip ter">Proveedor: ${esc(n)}</span>`).join("")}${dudosos ? `<span class="chip warn">${dudosos} por confirmar</span>` : ""}</p>
-        ${AYUDA ? `<p class="pista">${PC ? "Pasa con › para ver el listado, lo que pidió la banda y las fotos" : "Desliza para ver el listado, lo que pidió la banda y las fotos"} <span class="flecha">→</span></p>` : ""}
+        ${AYUDA ? `<p class="pista">${PC ? "Pasa con › para ver el listado, lo que pidió la banda, las fotos y las notas" : "Desliza para ver el listado, lo que pidió la banda, las fotos y las notas"} <span class="flecha">→</span></p>` : ""}
       </section>
       <section class="slide banda">
         <h3>En el listado</h3>
@@ -1468,6 +1587,7 @@ function htmlSeccion(b, s, j, total){
         ${pide.length ? htmlPedido(pide) : `<p class="sub">No está el texto del rider de esta sección. Vuelve a subir el documento para verlo.</p>`}
       </section>
       ${htmlHistoriaFotos(titulo, s.items)}
+      ${htmlHistoriaNotas(titulo, s.items)}
     </div>
     ${pasar}
     ${riel(id)}
@@ -1596,7 +1716,7 @@ function pintar(destino){
     : festival() ? cats.map((c,i) => htmlReel(c, i, cats.length)).join("")
     : entradas.map(x => x.html()).join(""));
   feed.setAttribute("aria-label", festival() ? "Backline por categoría" : "Backline por banda");
-  cargarFotos();
+  cargarFotos(); cargarMediaNotas().catch(() => {});
   reels = [...feed.querySelectorAll(".reel")];
   actual = reels[0];
   correrIntro();
@@ -1676,6 +1796,22 @@ feed.addEventListener("click", async e => {
   if (acc === "planilla") return abrirPlanilla(e.target.closest("[data-banda]").dataset.banda);
   const foto = e.target.closest("img[data-foto]");
   if (foto) return verFoto(foto);
+  const bn = e.target.closest("[data-nota]");
+  if (bn) {
+    const sec = bn.dataset.sec;
+    if (bn.dataset.nota === "grabar") return grabarAudio(bn, sec);
+    if (bn.dataset.nota === "foto") { notaFotoDe = sec; return $b("nota-foto").click(); }
+    if (bn.dataset.nota === "guardar") return guardarNota(sec);
+  }
+  const nq = e.target.closest("[data-nota-quitar]");
+  if (nq) {
+    if (!nq.dataset.seguro) { nq.dataset.seguro = "1"; nq.textContent = "¿Quitar? Toca otra vez"; return; }
+    escribir(claveNotas(), todasNotas().map(n => n.id === nq.dataset.notaQuitar ? {...n, quitada: new Date().toISOString()} : n));
+    huboCambio(); aviso("Nota quitada · se puede recuperar en Filtros"); return repintarQuieto();
+  }
+  const nf = e.target.closest("img[data-foto-nota]");
+  if (nf?.src) { const v = $b("visor"); v.querySelector("img").src = nf.src; v.querySelector(".borrar-foto").hidden = true; return v.hidden = false; }
+  if (e.target.closest(".historia-notas textarea")) return;
   const fa = e.target.closest("[data-falta-agregar]");
   if (fa) return agregarPieza(fa.dataset.de, fa.dataset.faltaAgregar, fa.dataset.cat);
   const fn = e.target.closest("[data-falta-no]");
@@ -1831,6 +1967,7 @@ function pintarFiltros(){
     <div class="botones"><button class="btn sec" data-respaldo="guardar">💾 Guardar respaldo</button><button class="btn sec" data-respaldo="cargar">📂 Cargar respaldo</button></div>
     ${leer("lab-reels:ultimo-respaldo", "") ? `<p class="nota">Último respaldo: ${esc(cuandoSeSubio(leer("lab-reels:ultimo-respaldo", "")) || "")}.</p>` : `<p class="nota"><b>Todavía no has guardado ningún respaldo.</b></p>`}
     ${leer("lab-reels:papelera", []).length ? `<div class="botones"><button class="btn sec" data-respaldo="papelera">♻️ Recuperar ${leer("lab-reels:papelera", []).length} ${leer("lab-reels:papelera", []).length === 1 ? "foto quitada" : "fotos quitadas"}</button></div>` : ""}
+    ${Object.keys(localStorage).filter(k => k.startsWith("lab-reels:notas:")).flatMap(k => leer(k, [])).some(n => n.quitada) ? `<div class="botones"><button class="btn sec" data-respaldo="notas">♻️ Recuperar notas quitadas</button></div>` : ""}
     <div class="botones"><button class="btn sec" data-respaldo="instantanea">🕘 Volver a una copia interna</button></div>
     ${MARCA ? `<div class="botones"><button class="btn sec" data-respaldo="circuito">📥 Traer fotos y chulos de la app de Circuito</button></div>` : ""}
     <div class="botones"><button class="btn" data-cerrar>Ver ${V.encontrados} ${V.encontrados === 1 ? "ítem" : "ítems"}</button>${V.hayFiltro ? '<button class="btn sec" data-limpiar>Quitar filtros</button>' : ""}</div>`;
@@ -1846,6 +1983,10 @@ $b("filtros").addEventListener("click", e => {
     e.currentTarget.hidden = true; return aviso("Fotos recuperadas");
   }
   if (t.dataset.respaldo === "instantanea") return elegirInstantanea();
+  if (t.dataset.respaldo === "notas") {
+    for (const k of Object.keys(localStorage).filter(k => k.startsWith("lab-reels:notas:"))) escribir(k, leer(k, []).map(({quitada, ...n}) => n));
+    e.currentTarget.hidden = true; huboCambio(); aviso("Notas recuperadas"); return repintarQuieto();
+  }
   if (t.dataset.respaldo === "circuito") { e.currentTarget.hidden = true; return traerDeCircuito().then(f => aviso(f ? `Traje ${f} ${f === 1 ? "foto" : "fotos"} y los chulos` : "Ya estaba todo: chulos al día")); }
   destinoPendiente = "subir";
   if (t.dataset.modo !== undefined) return enviar({tipo: "modo", modo: t.dataset.modo});
@@ -2397,6 +2538,19 @@ function directoALosReels(){
   const h = new Date().getHours(), ev = leer("lab-reels:evento", "");
   aviso(`${h < 12 ? "Buen día" : h < 19 ? "Buenas tardes" : "Buenas noches"}, equipo${ev && V.espacio === "evento" ? ` · Hoy toca ${ev}` : ""}`);
 }
+
+/* Notas: lo que se escribe se guarda solo; la foto de una nota queda en el celular. */
+feed.addEventListener("input", e => {
+  const t = e.target.closest("[data-nota-texto]"); if (!t) return;
+  const sec = t.dataset.notaTexto; escribir(claveBorrador(sec), {...leer(claveBorrador(sec), {}), texto: t.value});
+});
+$b("nota-foto").addEventListener("change", async e => {
+  const f = e.target.files[0]; e.target.value = ""; const sec = notaFotoDe; notaFotoDe = null; if (!f || !sec) return;
+  const blob = await achicar(f), k = "nota-foto-" + Date.now().toString(36);
+  try { await idb("readwrite", st => st.put(blob, k)); } catch { return aviso("No se pudo guardar la foto"); }
+  escribir(claveBorrador(sec), {...leer(claveBorrador(sec), {}), foto: k});
+  aviso("Foto lista: toca «Guardar nota»"); repintarQuieto();
+});
 
 /* ── Arranque ── */
 splash().then(() => DEMO ? presentacion() : null).then(() => { if (DEMO) irALaBanda(); if (actual) guiaAlLlegar(actual); });
