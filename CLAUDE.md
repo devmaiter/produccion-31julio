@@ -309,6 +309,12 @@ prueba (que el % suba sin romper los riders anteriores).
   logo `lab-reels/marca/backstage.png` (Backstage Company 27 años, sobre tarjeta blanca) con «Revisado en
   bodega · <fecha de hoy>»; luego entra directo a la banda. «Saltar» arriba. La hoja a mano se ve como
   «Lista de bodega» (`nombreVisible`; las claves no cambian). La fecha de subida dice «hoy, 9 oct · hora».
+- **El show (2026-10-09, lo pidió el usuario: «otro capítulo», las bandas del evento):** `listas/<doc>.show.json`
+  (hoy `lista-a-mano.show.json`, primera banda Pastor López Jr.: ampli de bajo, teclado, timbales y congas,
+  «Todo al frente»). `ponerShow` suma esas bandas al MISMO documento (al leer la lista y, con `asegurarShow`,
+  al abrir la app), así la lista de bodega no cambia de clave. Cada banda sale con su portada (etiqueta
+  «🎤 Show · nota»; la lista dice «📦 Bodega»), sus secciones, fotos y notas. Otra banda = otra entrada en
+  `bandas` del json. Horarios: pendientes de que el usuario los pase.
 - **El plan del servidor** está en `docs/modelo-de-datos.md`: tablas, llaves y permisos.
 - Para revisar en celular se usa una página local con varios iframes de 390×844 lado a lado
   (`_celular.html`, no se sube).

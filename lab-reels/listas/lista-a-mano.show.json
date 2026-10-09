@@ -1,0 +1,16 @@
+{
+ "_": "Bandas del show: otro capítulo, aparte de la lista de bodega. Se suman al mismo documento sin tocar lo que ya hay (chulos, fotos y notas siguen). Para otra banda, otra entrada en 'bandas'.",
+ "bandas": [
+  {
+   "id": "pastor-lopez-jr",
+   "nombre": "Pastor López Jr.",
+   "nota": "Todo al frente",
+   "piezas": [
+    {"grupo": "Bajo", "cantidad": 1, "referencia": "Amplificador de bajo", "categoria": "Ampli bajo"},
+    {"grupo": "Teclado", "cantidad": 1, "referencia": "Teclado", "categoria": "Teclado"},
+    {"grupo": "Percusión", "cantidad": 1, "referencia": "Timbales", "categoria": "Percusión"},
+    {"grupo": "Percusión", "cantidad": 1, "referencia": "Congas", "categoria": "Percusión"}
+   ]
+  }
+ ]
+}

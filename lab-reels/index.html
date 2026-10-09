@@ -472,6 +472,8 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
 .fila-fotos:empty{display:none}
 .fotos-pieza{margin:0 0 12px}
+.capitulo{display:inline-block;margin:0 0 4px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.1);font:600 13px/1.2 "IBM Plex Sans",sans-serif;letter-spacing:.04em}
+.capitulo.show{background:var(--accent);color:#000}
 /* Fotos, más claras y compactas */
 .ayuda-fotos{margin:4px 0 10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.06);font-size:14px;line-height:1.35;color:var(--ink2)}
 .ayuda-fotos p{margin:0}.ayuda-fotos b{color:var(--ink)}
@@ -664,7 +666,7 @@ tablero.ports.error.subscribe(e => console.warn("tablero:", e));
 tablero.ports.vista.subscribe(v => {
   V = v;
   cargarFotosSitio();
-  if (arrancado) setTimeout(() => recuperarPiezas().catch(() => {}), 600);
+  if (arrancado) setTimeout(() => recuperarPiezas().catch(() => {}).then(() => asegurarShow()).catch(() => {}), 600);
   pintarBarra();
   if (!arrancado) return;   // la primera vista la pinta el arranque
   const destino = destinoPendiente ?? (actual && document.getElementById(actual.id) ? actual.id : null);
@@ -1311,6 +1313,49 @@ async function piezasRecuperables(){
   for (const x of de) if (!unicas.has(piezaDe(x)) && !actuales.has(piezaDe(x))) unicas.set(piezaDe(x), x);
   return [...unicas.values()];
 }
+/* ── El show (lo pidió el usuario): las bandas del evento son otro capítulo, aparte de la lista de bodega.
+   Vienen en listas/<doc>.show.json y se suman al MISMO documento como bandas nuevas, así nada de lo que
+   ya hay (chulos, fotos, notas, piezas agregadas) cambia de clave. Cada pieza tiene su espacio de fotos y
+   notas como cualquier otra. ── */
+let showSitio = {de: null, bandas: []};
+async function cargarShow(nombre){
+  if (!nombre || showSitio.de === nombre || !/^[\w.-]+$/.test(nombre)) return showSitio.de === nombre ? showSitio.bandas : [];
+  showSitio = {de: nombre, bandas: []};
+  try { const r = await fetch(`listas/${nombre}.show.json`, {cache: "no-store"}); if (r.ok) showSitio.bandas = (await r.json()).bandas || []; } catch {}
+  return showSitio.bandas;
+}
+function ponerShow(d, bandas){
+  let n = 0;
+  const hay = new Set(d.items.map(piezaDe)), diaId = d.items[0]?.diaId || "d-doc";
+  for (const b of bandas) {
+    if (!d.artistas.some(a => a.id === b.id)) d.artistas = [...d.artistas, {id: b.id, nombre: b.nombre}];
+    (b.piezas || []).forEach((p, i) => {
+      const x = {id: `show-${b.id}-${i}`, diaId, artistaId: b.id, cantidad: p.cantidad || 1, categoria: p.categoria || "Otro", grupo: p.grupo || "",
+        referencia: p.referencia, descripcion: p.referencia, nota: p.nota || b.nota || null, propietario: {tipo: "propio"}, porConfirmar: false};
+      if (hay.has(piezaDe(x))) return;
+      d.items = [...d.items, x]; hay.add(piezaDe(x)); n++;
+    });
+  }
+  return n;
+}
+// La etiqueta de capítulo en la portada de cada banda: la lista de bodega o una banda del show.
+function capituloDe(b){
+  const show = showSitio.bandas.find(x => x.id === b.artistaId);
+  if (show) return `<p class="capitulo show">🎤 Show${show.nota ? ` · ${esc(show.nota)}` : ""}</p>`;
+  return showSitio.bandas.length && b.nombre === "Lista de bodega" ? `<p class="capitulo">📦 Bodega</p>` : "";
+}
+let showDe = null;
+async function asegurarShow(){
+  if (!V?.doc || showDe === V.doc.nombre + "|" + V.doc.cuando) return;
+  showDe = V.doc.nombre + "|" + V.doc.cuando;
+  const bandas = await cargarShow(V.doc.nombre); if (!bandas.length) return;
+  const d = {...datos(), items: [...datos().items], artistas: [...datos().artistas]};
+  const n = ponerShow(d, bandas); if (!n) return;
+  showDe = null;
+  destinoPendiente = actual?.id || null;
+  enviar({tipo: V.espacio === "evento" ? "cargar-evento" : "cargar", doc: {...V.doc, datos: d}});
+  aviso(`Show: ${bandas.map(b => b.nombre).join(", ")} ${bandas.length === 1 ? "lista" : "listas"} para fotos y notas`);
+}
 let recuperadoDe = null;
 async function recuperarPiezas(){
   if (!V?.doc || recuperadoDe === V.doc.nombre + "|" + V.doc.cuando) return;
@@ -1535,6 +1580,7 @@ function htmlBanda(b){
       <section class="slide portada portada-banda">
         ${htmlHolo(`${id}|todo`, b.items)}
         ${htmlOrigen()}
+        ${capituloDe(b)}
         <h2${b.nombre.length > 18 ? ' class="largo"' : ""}>${esc(b.nombre)}</h2>
         ${dudosos ? `<p class="sub" style="margin:4px 0 8px"><span class="chip warn">${dudosos} por confirmar</span></p>` : ""}
         ${secs.length > 1 ? `<nav class="ir-secciones" aria-label="Secciones">${secs.map((s, j) => `<button data-acc="ir-seccion" data-id="${esc(idSeccion(b, j))}"><span aria-hidden="true">${EMOJI[PRIORIDAD.find(c => s.items.some(x => x.categoria === c))] || "·"}</span>${esc(s.grupo || "Sin sección")}${faltantes(s.items).length ? ` <b class="ojo">⚠ ${faltantes(s.items).length}</b>` : ""}</button>`).join("")}</nav>` : ""}
@@ -2386,6 +2432,7 @@ async function leerYArmar(archivos, tipo = "cargar"){
   const nombre = archivos.length === 1 ? archivos[0].name.replace(/\.[^.]+$/, "") : archivos.length + " archivos";
   // Las piezas que se agregaron a mano a este documento no se pierden al volver a leerlo.
   ponerAgregados(d, leer("lab-reels:agregados:" + nombre, []));
+  ponerShow(d, await cargarShow(nombre));
   escribir("lab-reels:listos:doc", null);
   const categorias = [...new Set(d.items.map(reelDe))];
   subida.estado = "listo";
@@ -2561,6 +2608,8 @@ enviar({tipo: "limpiar"});
   if (!V) return setTimeout(arrancar, 20);
   arrancado = true;
   fotosSitio.de = null; cargarFotosSitio();
+  // Al abrir: recuperar piezas que se hayan caído y sumar las bandas del show.
+  setTimeout(() => recuperarPiezas().catch(() => {}).then(() => asegurarShow()).catch(() => {}), 1200);
   pintarPendiente();
   if (MARCA && !leer("lab-reels:importado-circuito", "")) {
     const esperar = n => V?.doc ? traerDeCircuito().then(f => f && aviso(`Traje ${f} ${f === 1 ? "foto" : "fotos"} de la app de Circuito`)) : n > 0 && setTimeout(() => esperar(n - 1), 500);
