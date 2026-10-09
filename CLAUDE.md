@@ -284,7 +284,12 @@ prueba (que el % suba sin romper los riders anteriores).
   `construir-sitio.sh`; si se cambia `index.html`, correrlo antes de publicar). Es la misma app con
   `window.MARCA` (logo de Backstage en el arranque con el mismo glitch y en el final, sin Circuito) y con
   sus datos aparte: claves `backstage:` y `backstage-cronograma:`, IndexedDB `backstage-fotos` y
-  `backstage-riders`. Otra empresa = otra entrada en `MARCAS` de ese script y su logo en `lab-reels/marca/`. Con `demo` (o `#presentacion`), después del logo de Circuito sale `presentacion()`: «Así llega el
+  `backstage-riders`. Otra empresa = otra entrada en `MARCAS` de ese script y su logo en `lab-reels/marca/`.
+  **Ojo (2026-10-09):** la noche del 8 el link de Backstage todavía guardaba en el espacio de Circuito y el
+  usuario tomó fotos ahí; al separar los espacios «desaparecieron» del link de Backstage. Por eso la copia con
+  marca, la primera vez, **copia** de Circuito (`traerDeCircuito`) las fotos de piezas (imagen incluida),
+  chulos y «no hace falta» (allá no se borra nada), y en Filtros queda «Traer fotos y chulos de la app de
+  Circuito». Lección: nunca cambiar dónde se guarda algo sin migrar lo ya guardado. Con `demo` (o `#presentacion`), después del logo de Circuito sale `presentacion()`: «Así llega el
   equipo a la bodega», las fotos de bodega con acercamiento lento y ✓ verde (`ESCENAS_BODEGA`), y al final el
   logo `lab-reels/marca/backstage.png` (Backstage Company 27 años, sobre tarjeta blanca) con «Revisado en
   bodega · <fecha de hoy>»; luego entra directo a la banda. «Saltar» arriba. La hoja a mano se ve como

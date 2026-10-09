@@ -1703,6 +1703,7 @@ function pintarFiltros(){
     ${leer("backstage:ultimo-respaldo", "") ? `<p class="nota">Último respaldo: ${esc(cuandoSeSubio(leer("backstage:ultimo-respaldo", "")) || "")}.</p>` : `<p class="nota"><b>Todavía no has guardado ningún respaldo.</b></p>`}
     ${leer("backstage:papelera", []).length ? `<div class="botones"><button class="btn sec" data-respaldo="papelera">♻️ Recuperar ${leer("backstage:papelera", []).length} ${leer("backstage:papelera", []).length === 1 ? "foto quitada" : "fotos quitadas"}</button></div>` : ""}
     <div class="botones"><button class="btn sec" data-respaldo="instantanea">🕘 Volver a una copia interna</button></div>
+    ${MARCA ? `<div class="botones"><button class="btn sec" data-respaldo="circuito">📥 Traer fotos y chulos de la app de Circuito</button></div>` : ""}
     <div class="botones"><button class="btn" data-cerrar>Ver ${V.encontrados} ${V.encontrados === 1 ? "ítem" : "ítems"}</button>${V.hayFiltro ? '<button class="btn sec" data-limpiar>Quitar filtros</button>' : ""}</div>`;
 }
 $b("filtros").addEventListener("click", e => {
@@ -1716,6 +1717,7 @@ $b("filtros").addEventListener("click", e => {
     e.currentTarget.hidden = true; return aviso("Fotos recuperadas");
   }
   if (t.dataset.respaldo === "instantanea") return elegirInstantanea();
+  if (t.dataset.respaldo === "circuito") { e.currentTarget.hidden = true; return traerDeCircuito().then(f => aviso(f ? `Traje ${f} ${f === 1 ? "foto" : "fotos"} y los chulos` : "Ya estaba todo: chulos al día")); }
   destinoPendiente = "subir";
   if (t.dataset.modo !== undefined) return enviar({tipo: "modo", modo: t.dataset.modo});
   if (t.dataset.banda !== undefined) return enviar({tipo: "banda", banda: t.dataset.banda || null});
@@ -1840,6 +1842,43 @@ $b("filtros").addEventListener("click", async e => {
     aviso("Copia sumada. Volviendo a abrir…"); setTimeout(() => location.replace(location.pathname), 800);
   } catch { aviso("No se pudo abrir esa copia"); }
 }, true);
+/* Una copia con otra marca (Backstage) guarda aparte, pero lo que se hizo antes en la app de Circuito no se
+   puede quedar atrás (el 2026-10-08 en la noche el link de Backstage todavía guardaba en el espacio de Circuito):
+   se COPIA de allá para acá lo de las piezas (fotos, chulos, avisos descartados). Allá no se borra nada.
+   Las claves de Circuito se escriben por partes para que hacer-marcas.py no las cambie. */
+const CLAVE_CIRCUITO = ["lab", "reels:"].join("-"), FOTOS_CIRCUITO = ["backline", "fotos"].join("-");
+async function traerDeCircuito(){
+  if (!MARCA) return 0;
+  const unir = (a, b) => [...new Set([...(a || []), ...(b || [])])];
+  let fotos = 0;
+  // Chulos, chulos viejos y "no hace falta": se unen con los de aquí.
+  for (const k of Object.keys(localStorage)) {
+    if (!k.startsWith(CLAVE_CIRCUITO)) continue;
+    const resto = k.slice(CLAVE_CIRCUITO.length);
+    if (!/^(chulos2?:|no-falta:)/.test(resto)) continue;
+    try { escribir("backstage:" + resto, unir(leer("backstage:" + resto, []), JSON.parse(localStorage.getItem(k)))); } catch {}
+  }
+  // Fotos de las piezas: la imagen se copia a la base de aquí y se agrega a la pieza.
+  let deAlla = {};
+  try { deAlla = JSON.parse(localStorage.getItem(CLAVE_CIRCUITO + "tablero") || "{}").fotos || {}; } catch {}
+  const pendientes = Object.entries(deAlla).filter(([k]) => k.startsWith("pieza|"));
+  if (pendientes.length) {
+    const db = await new Promise(ok => { try { const r = indexedDB.open(FOTOS_CIRCUITO, 1); r.onupgradeneeded = () => r.result.createObjectStore("fotos"); r.onsuccess = () => ok(r.result); r.onerror = () => ok(null); } catch { ok(null); } });
+    for (const [clave, ids] of pendientes) {
+      for (const id of ids) {
+        if ((V?.fotos?.[clave] || []).includes(id)) continue;
+        const blob = db ? await new Promise(ok => { try { const q = db.transaction("fotos").objectStore("fotos").get(id); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null); } catch { ok(null); } }) : null;
+        if (!blob) continue;
+        try { await idb("readwrite", st => st.put(blob, id)); } catch { continue; }
+        enviar({tipo: "foto", banda: clave, foto: id});
+        fotos++;
+      }
+    }
+  }
+  escribir("backstage:importado-circuito", new Date().toISOString());
+  cargarChulos(); pintar(actual?.id);
+  return fotos;
+}
 /* Aviso de cambios sin respaldo: cada chulo, foto o pieza agregada suma uno; al guardar el respaldo vuelve a 0. */
 function huboCambio(){ escribir("backstage:cambios", leer("backstage:cambios", 0) + 1); pintarPendiente(); }
 function pintarPendiente(){
@@ -2237,6 +2276,10 @@ enviar({tipo: "limpiar"});
   arrancado = true;
   fotosSitio.de = null; cargarFotosSitio();
   pintarPendiente();
+  if (MARCA && !leer("backstage:importado-circuito", "")) {
+    const esperar = n => V?.doc ? traerDeCircuito().then(f => f && aviso(`Traje ${f} ${f === 1 ? "foto" : "fotos"} de la app de Circuito`)) : n > 0 && setTimeout(() => esperar(n - 1), 500);
+    setTimeout(() => esperar(40), 1500);
+  }
   pintarBarra();
   riderDelCronograma();
   if (V.doc && !location.hash) introHecha = true;   // ya hay rider: sin la entrada
