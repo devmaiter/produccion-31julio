@@ -322,6 +322,11 @@ lo que llega por `guardar` (`localStorage` `lab-reels:tablero`).
   cada una (2026-10-08, lo pidió el usuario).
   Un ítem que es solo el cabezal (SVT, head) se dibuja como cabezal. El nombre de la banda va
   solo en la cabecera.
+- **«Todo el equipo» (2026-10-09, lo pidió el usuario: el admin ve primero el listado de todos los equipos):**
+  solo con perfil admin (`V.perfil === "admin"`; `puede.editar` no sirve, el empleado también edita en Mis
+  pruebas), es la primera pantalla después de «subir» (`htmlResumen`): conteos (piezas, ✓ listas, 📷 bodega,
+  📷 evento, ⚠ por revisar) y por sección una tabla Cant | Equipo | ✓ | Bod. | Ev.; tocar una pieza pone el
+  chulo, el título de la sección lleva a ella, y debajo «⚠ Le falta».
 - **Modo festival** (lo elige el admin en Filtros): los reels por categoría de abajo.
 - Las fotos quedan en el dispositivo (IndexedDB `backline-fotos`), achicadas a 1600 px;
   todavía no se comparten entre celulares.

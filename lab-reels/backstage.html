@@ -474,6 +474,19 @@ ul.lista li[data-item]:active,.vivo li[data-item]:active{transform:scale(.98)}
 .fila-fotos img{flex:none;width:76px;height:76px;object-fit:cover;border-radius:10px;background:var(--surface2);cursor:zoom-in}
 .fila-fotos:empty{display:none}
 .fotos-pieza{margin:0 0 12px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 14px}
+.kpi{background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:12px;padding:10px 8px;text-align:center}
+.kpi b{display:block;font:700 30px/1 "Barlow Condensed",sans-serif}
+.kpi span{font-size:12px;color:var(--ink2)}
+.kpi.ok b{color:#1fa34a}.kpi.warn b{color:#ffd27a}
+.r-seccion{display:flex;justify-content:space-between;width:100%;margin:14px 0 6px;padding:0;background:none;border:0;color:var(--accent);font:700 20px/1 "Barlow Condensed",sans-serif;text-transform:uppercase;text-align:left;cursor:pointer}
+.resumen .excel .cab-xl,.resumen .excel ul.lista li{grid-template-columns:40px 1fr 30px 40px 40px}
+.resumen .excel ul.lista li>span{padding:7px 6px}
+.resumen .t small{display:block;color:#888;font-size:11px}
+.resumen .c-ok,.resumen .c-foto{text-align:center;color:#bbb;border-left:1px solid #e3e3e3}
+.resumen .c-foto.si{color:#1a8f3e;font-weight:700}
+.resumen li.hecho .c-ok::after{content:"✓";color:#1a8f3e;font-weight:800}
+.resumen .falta-aviso{font-size:13px;margin:6px 0 0}
 .pendiente{position:fixed;z-index:9;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 14px);padding:10px 16px;border-radius:999px;border:1px solid var(--accent);background:rgba(0,0,0,.85);color:var(--ink);font:600 14px/1.1 "IBM Plex Sans",sans-serif;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 .falta-aviso{margin:6px 0 8px;padding:8px 12px;border-radius:12px;background:rgba(255,190,60,.12);border:1px solid #f5b83d;color:#ffd27a;font-size:15px}
 .falta-aviso b{color:#fff}
@@ -671,6 +684,8 @@ function marcarChulo(id){
   chulos.has(id) ? chulos.delete(id) : chulos.add(id);
   document.querySelectorAll(`[data-item="${CSS.escape(id)}"]`).forEach(el => el.classList.toggle("hecho", chulos.has(id)));
   navigator.vibrate?.(15);
+  // En «Todo el equipo» el contador de listas cambia al tocar.
+  const kOk = document.querySelector("#resumen .kpi.ok b"); if (kOk) kOk.textContent = datos().items.filter(i => chulos.has(i.id)).length;
   huboCambio();
 }
 let listos = new Set();
@@ -1346,6 +1361,36 @@ const piezasDe = items => items.reduce((s, x) => s + x.cantidad, 0);
 const conSeccionesDe = b => b.secciones.filter(s => s.items.length);
 const idSeccion = (b, j) => `${idBanda(b)}-s${j + 1}`;
 
+/* «Todo el equipo» (solo admin): cada sección con sus piezas y en qué va cada una: ✓ lista, foto en bodega,
+   foto en evento, y lo que le falta. Tocar una pieza le pone o quita el chulo; tocar la sección va a ella. */
+function htmlResumen(bs){
+  const todas = bs.flatMap(b => b.items);
+  const con = m => todas.filter(x => fotosPieza(x, m).length).length;
+  const listas = todas.filter(x => chulos.has(x.id)).length;
+  const faltan = bs.flatMap(b => conSeccionesDe(b).flatMap(s => faltantes(s.items))).length;
+  const n = (v, t, cls = "") => `<div class="kpi ${cls}"><b>${v}</b><span>${t}</span></div>`;
+  const celda = (x, m) => { const k = fotosPieza(x, m).length; return `<span class="c-foto${k ? " si" : ""}">${k ? "📷" + (k > 1 ? k : "") : "·"}</span>`; };
+  const fila = x => `<li data-item="${esc(x.id)}" class="${chulos.has(x.id) ? "hecho" : ""}"><span class="q">${x.cantidad}</span><span class="t">${esc(corto(x.referencia))}${x.propietario?.tipo === "tercero" ? `<small>${esc(x.propietario.nombre)}</small>` : ""}</span><span class="c-ok"></span>${celda(x, "bodega")}${celda(x, "evento")}</li>`;
+  return `
+  <article class="reel" id="resumen" style="--h:30" data-n="1" aria-label="Todo el equipo">
+    <div class="prog"><i></i></div>
+    <div class="cab"><b>Todo el equipo</b><span class="n">Administrador</span></div>
+    <div class="slides">
+      <section class="slide banda resumen">
+        <h3>Todo el equipo</h3>
+        <p class="sub">${esc(V.doc?.nombre || "")} · ${esc(cuandoSeSubio(V.doc?.cuando || "") || "")}</p>
+        <div class="kpis">${n(piezasDe(todas), "piezas")}${n(listas, "✓ listas", "ok")}${n(con("bodega"), "📷 en bodega")}${n(con("evento"), "📷 en evento")}${n(faltan, "⚠ por revisar", faltan ? "warn" : "")}</div>
+        ${bs.map(b => conSeccionesDe(b).map((s, j) => `
+        <button class="r-seccion" data-acc="ir-seccion" data-id="${esc(idSeccion(b, j))}">${esc(s.grupo || "Sin sección")}${bs.length > 1 ? ` · ${esc(b.nombre)}` : ""} <span>›</span></button>
+        <div class="excel"><div class="cab-xl r-cab"><span>Cant</span><span>Equipo</span><span>✓</span><span>Bod.</span><span>Ev.</span></div>
+          <ul class="lista">${s.items.map(fila).join("")}</ul></div>
+        ${faltantes(s.items).length ? `<p class="falta-aviso">⚠ Le falta: <b>${faltantes(s.items).map(r => esc(r.pieza)).join("</b>, <b>")}</b></p>` : ""}`).join("")).join("")}
+      </section>
+    </div>
+    ${riel("resumen")}
+  </article>`;
+}
+
 /* Las pantallas de una banda en modo normal, para el feed y el índice. */
 function pantallasBanda(b){
   const secs = conSeccionesDe(b), piezas = piezasDe(b.items);
@@ -1545,7 +1590,8 @@ function pintar(destino){
   } else {
     const bs = armarBandas(d);
     cats = [];
-    entradas = bs.flatMap(pantallasBanda);
+    // El admin ve primero todo el equipo con su estado (lo pidió el usuario).
+    entradas = [...(V?.perfil === "admin" && d.items.length ? [{id: "resumen", e: "📋", nombre: "Todo el equipo", x: `${piezasDe(d.items)} piezas`, html: () => htmlResumen(bs)}] : []), ...bs.flatMap(pantallasBanda)];
   }
   const nada = V?.doc && V.hayFiltro && !V.encontrados;
   feed.innerHTML = htmlSubir() + (nada ? htmlNada()
