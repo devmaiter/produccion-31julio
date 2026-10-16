@@ -51,7 +51,9 @@ describe("riders completos en PDF", () => {
       "3 Batería: Bases de platillo tipo boom (Con sus tuercas y fieltros)",
       "1 Ampli bajo: Amplificador de bajo Ampeg SVT (Con caja 4x10)",
       "2 Ampli guitarra: Amplificador de guitarra Fender Hot Rod Deluxe (A 110 V)",
-      "1 Teclado: Teclado Nord Electro 6 (Con pedal de sustain)",
+      // El teclado con sus accesorios va en filas aparte, también en una tabla (lo definió el usuario, 2026-10-16).
+      "1 Teclado: Teclado Nord Electro 6",
+      "1 Teclado: pedal de sustain",
       "4 Percusión: Congas LP Classic (Con sus bases)",
     ]);
   });

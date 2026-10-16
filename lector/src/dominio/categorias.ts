@@ -29,7 +29,7 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   ["Consolas",         CONSOLAS],
   // El HARDWARE de la batería es batería: así vienen los riders (DRUMS → HARDWARE con pedal,
   // stands, banqueta y tapete). Va antes de "Escenario" (tapete) y de "Bases" (stands, throne).
-  ["Batería",          /((snares?|redoblantes?|tarolas?|hi ?-?hats?|hihats?|charles|cymbals?|c[ií]mbal(es)?|platillos?|boom|toms?|bombos?|kicks?)\s*(stands?|soportes?|bases?)\b|\b(stands?|soportes?|bases?)\s+((de|para|del)\s+)?(redoblante|tarola|snare|hi ?-?hat|charles|platillos?|cymbals?|c[ií]mbal(es)?|toms?|bombo)\b|\bdouble tom\b|\bthrone\b|banqueta|silla de bater|drum (stool|carpet|rug|mat)|(tapete|alfombra) (de |para )?(la )?bater|pedal de bombo|kick pedal|(twin|doble|double) pedal|double bass (drum )?pedal)/i],
+  ["Batería",          /((snares?|redoblantes?|tarolas?|hi ?-?hats?|hihats?|charles|cymbals?|c[ií]mbal(es)?|platillos?|boom|toms?|bombos?|kicks?)\s*(stands?|soportes?|bases?)\b|\b(stands?|soportes?|bases?)\s+((de|para|del)\s+)?(redoblante|tarola|snare|hi ?-?hat|charles|platillos?|cymbals?|c[ií]mbal(es)?|toms?|bombo)\b|\bdouble tom\b|\bthrone\b|banqueta|silla de bater|drum (stool|carpet|rug|mat)|(tapete|alfombra) (de |para )?(la )?bater|pedal de bombo|kick pedal|(twin|doble|double) pedal|double bass (drum )?pedal|m[aá]quinas? (de )?(hi ?-?hats?|charles))/i],
   // Pedales de efectos y pedalboards son de la guitarra (o del bajo si lo dice), no de la batería.
   ["Bajo",             /((pedal(es)?|pedaleras?|pedalboard|pedal ?board|efectos?|fx|afinador(es)?|cuerdas)\b.{0,25}\b(bajo|bass)\b|\bbass (pedals?|pedalboard|fx|effects?|tuner|strings)\b)/i],
   ["Guitarra",         /(pedal(es)? de efectos?|pedaleras?|pitchblack|polytune|\btu-?3\b|pedalboard|pedal ?board|effects? pedals?|fx pedals?|tuner pedal|pedal afinador|\bafinador(es)?\b|\btuners?\b|\bwah\b|overdrive|distorsi[oó]n|\bhelix\b|\bkemper\b)/i],
@@ -43,17 +43,17 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   ["Batería",          /(\bx ?-?hat\b|\bkd\b|\bclamps?\b|boom arm|\bspd\b|sample ?pad|octapad)/i],
   ["Cables y energía", /(\bcables?\b|transformador|convertidor|\bups\b|(?<!(cajas?|gabinetes?|cabinas?|bafles?) (de )?)extensi[oó]n|regleta|power ?strip)/i],
   // Modelos de teclado: "YAMAHA MO6 STAND" es el teclado con su base, no una base.
-  ["Teclado",          /(hammond|\bnord (stage|electro|piano|lead|wave|c2d?)|kronos|montage|\bmodx\b|\bmo ?[68]\b|motif|fantom|\bjuno\b|triton|kurzweil|\bcp-?(73|88)\b|rd-?(88|2000)|yamaha es7)/i],
+  ["Teclado",          /(hammond|pedal(es)? de expresi[oó]n|expression pedals?|\bnord (stage|electro|piano|lead|wave|c2d?)|kronos|montage|\bmodx\b|\bmo ?[68]\b|motif|fantom|\bjuno\b|triton|kurzweil|\bcp-?(73|88)\b|rd-?(88|2000)|yamaha es7)/i],
   ["Bases",            /(\bbases?\b|\bsoportes?\b|\batril|\bstands?\b|pie de micr[oó]|guitar boat|guitarrero|\bstool\b|\bsillas?\b|\bbancos?\b|\basientos?\b|\bthrone\b|laptop stand|mesa(?! ?boogie))/i],
   // Contrabajo, baby bass y bajo sexto o quinto van en Bajo (lo dijo el usuario, 2026-10-16); su ampli es Ampli bajo.
   ["Bajo",             /^(?!.*\b(ampli\w*|amps?|cabezal|head|combo|caja|cabina)\b).*(contrabajo|upright bass|baby ?bass|bajo (sexto|quinto))/i],
   ["Ampli bajo",       /(\b[48] ?x ?10\b|\bampeg\b|\bsvt\b|gallien|\bg-?k\b|mark ?bass|hartke|\brumble\b|aguilar|darkglass|bassman|trace elliot|\bebs\b|\bswr\b|ashdown|orange ob1|terror bass|ampli(ficador)?(es)? (de|para) (contra)?bajo|\bamps? (de|para) bajo|combos? (de|para) bajo|cabezal de bajo|bass (heads?|cabs?|amps?|combos?))/i],
-  ["Ampli guitarra",   /(hot ?rod|deville|blues junior|bassbreaker|twin reverb|deluxe reverb|jazz chorus|jc[- ]?120|marshall|vox ac|\borange\b|mesa ?boogie|princeton|katana|ampli(ficador)? de guitarra|cabezal de guitarra)/i],
+  ["Ampli guitarra",   /(\b[124] ?x ?12\b|blues cube|roland cube|hot ?rod|deville|blues junior|bassbreaker|twin reverb|deluxe reverb|jazz chorus|jc[- ]?120|marshall|vox ac|\borange\b|mesa ?boogie|princeton|katana|ampli(ficador)? de guitarra|cabezal de guitarra)/i],
   // Tiple, requinto, cuatro, bandola, charango y tres van con las guitarras (2026-10-16).
   ["Guitarra",         /(\btiples?\b|requintos?|\bbandolas?\b|charangos?|\btres cubanos?\b|\bcuatros? (venezolanos?|llaneros?|puertorrique\w*)\b|^\s*cuatro\s*$|ukeleles?|ukuleles?|mandolinas?)/i],
   ["Teclado",          /(hammond|leslie|[oó]rganos?\b|\borgans?\b|rhodes|wurlitzer|clavinet|montage|\bnord\b|fantom|\bjuno\b|motif|kurzweil|\bkorg\b|\bmoog\b|kronos|triton|rd-?88|cp-?88|yamaha es7|teclado|\bpiano\b|keyboard|sintetizador|\bsynth\b|sustain|\bfc[47]\b)/i],
   ["Platillos",        /(\bh\/h\b|platillo|\bride\b|crash|splash|china|hi ?-?hat|hit hat|charles|c[ií]mbal|cymbal)/i],
-  ["Percusión",        /(conga|tumbadoras?|bong[oó]|timbal|campanas?|djembes?|yembes?|g[uü]iras?|caja vallenata|panderetas?|panderos?|tambourines?|shakers?|cabasa|agog[oó]|\bclaves\b|\bquinto\b|\btumba\b|cencerro|cowbell|shekere|g[uü]iro|maraca|chimes|surdo|\bclave\b|\btoys\b|cajón|cajon|\blp\b|percusi[oó]n|tambora|alegre|llamador|guacharaca)/i],
+  ["Percusión",        /(conga|tumbadoras?|bong[oó]|timbal|pailas?|campanas?|djemb[eé]s?|yemb[eé]s?|g[uü]iras?|caja vallenata|panderetas?|panderos?|tambourines?|shakers?|cabasa|agog[oó]|\bclaves\b|\bquinto\b|\btumba\b|cencerro|cowbell|shekere|g[uü]iro|maraca|chimes|surdo|\bclave\b|\btoys\b|cajón|cajon|\blp\b|percusi[oó]n|tambora|alegre|llamador|guacharaca)/i],
   // Contrabajo, baby bass y bajo sexto también van en Bajo (lo dijo el usuario, 2026-10-16).
   // "Double bass" no entra: en batería es el doble pedal.
   ["Bajo",             /(bass guitar|jazz bass|precision bass|\b[pj]-?bass\b|bajo el[eé]ctrico|contrabajo|upright bass|baby ?bass|bajo sexto|^bass\b(?!.*\b(amp|head|cab|drum|pedal)))/i],
@@ -111,7 +111,7 @@ export const CAJA_AMPLI = /\b(\d{1,2}\s*[x×]\s*(10|12|15)\b|cabinets?|\bcab\b|c
 
 export function categorizar(texto: string): Categoria {
   // "Congas LP con sus bases", "Timbales con base": la base viene con el instrumento, no es una base.
-  texto = texto.replace(/\b(con|with|incl\.?|incluye|including)\s+(su|sus|its|their|el|la|los|las)?\s*(bases?|soportes?|stands?)\b/gi, " ");
+  texto = texto.replace(/(?:\b(?:con|with|incl\.?|incluye|including)\s+|\bw\/\s*)(su|sus|its|their|el|la|los|las)?\s*(bases?|soportes?|stands?)\b/gi, " ");
   for (const [cat, re] of REGLAS) {
     if (!re.test(texto)) continue;
     // Dentro de la sección de batería (el texto trae el grupo: "silla batería Baterías"), los stands,

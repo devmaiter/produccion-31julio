@@ -128,8 +128,9 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 244 pruebas en verde (las de categorías revisan también «plásticos», y que contrabajo, baby
-  bass y bajo sexto van en Bajo; "double bass pedal" es el doble pedal de la batería).
+  inglés). Hay 425 pruebas en verde (las de categorías revisan también «plásticos», y que contrabajo, baby
+  bass y bajo sexto van en Bajo; "double bass pedal" es el doble pedal de la batería). El entrenamiento va en
+  141/141 casos y 386/386 piezas. `tests/filas-respuestas.test.ts` cubre lo de las rondas del 2026-10-16.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -204,8 +205,15 @@ respondidas todas las rondas (bajo, guitarra, teclado, percusión, batería y lo
   baterías electrónicas en Batería; mesa o cabina de DJ y base para laptop son backline.
 - **No es backline:** audífonos in ear (SE215…), mezcladores personales (P16, ME-1), inalámbricos de
   instrumento (GLXD16…) y el computador o la interfaz sueltos. La «caja de extensión» de un ampli sí es backline.
-- **Filas:** teclado «con base … y pedal …» = 3 filas; Hammond con Leslie = 1 fila; «hardware completo» se
-  abre pieza por pieza; congas, timbales y bongó = una fila por set; «set de congas» sin número = 2 tambores.
+- **Filas:** teclado «con base … y pedal …» = 3 filas (`filasTeclado` en `interpretar.ts`, también en inglés y
+  entre paréntesis); Hammond con Leslie = 1 fila; «hardware completo» se abre pieza por pieza (`hardwareCompleto`:
+  base de redoblante, máquina de hi-hat, pedal y una base por platillo sin el hi-hat, 2 si el kit no dice
+  platillos; con la marca; lo que el rider ya pide aparte no se repite; si lo trae la banda, va marcado);
+  congas, timbales, pailas y bongó = una fila por set (`cortar.ts`); «set de congas» sin número = 2 tambores
+  (nota en la pieza). «8x10», «4x12», «1x12» son cajas de parlantes, no cantidades; «15"» son 15 pulgadas;
+  «Nord Stage 3 Compact» es una pieza; la X de «X-hat» no se pierde.
+- **Pendiente visto en las pruebas:** «1 Batería DW 22", 10", 12", 16"» sale como cuatro «Batería DW …» (una por
+  medida) en vez de bombo, toms y tom de piso.
 - La investigación de la web (catálogos de backline, nombres y modelos) quedó en el contexto de la sesión
   del 2026-10-16; los hallazgos útiles ya están en `categorias.ts` y en los casos de entrenamiento.
 

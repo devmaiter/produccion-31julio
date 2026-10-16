@@ -12,9 +12,10 @@
  */
 import { CAJA_AMPLI, categorizar, equipoDeAudio, noEsBackline } from "../dominio/categorias";
 import type { Categoria, PaqueteEvento } from "../dominio/entidades";
-import { separarCantidad } from "../dominio/lista";
+import { piezaDeBateria, type PiezaBateria } from "../dominio/bateria";
+import { separarCantidad as separarCantidadLista } from "../dominio/lista";
 import type { Documento, Linea } from "./documento";
-import { cortarRenglon } from "./cortar";
+import { cortarRenglon, medidaAlComienzo, partirFuera, PIEZA, SET_CONGAS, SET_PERCUSION, TAMBOR_DE_CONGAS, xDeTipo } from "./cortar";
 import type { Extraccion } from "./esquema";
 import { buscarDiaSemana, buscarFecha, HORA, normalizarHora } from "./fechas";
 
@@ -114,6 +115,28 @@ const OTRO_INSTRUMENTO = new Set(["Bajo", "Ampli bajo", "Guitarra", "Ampli guita
 /** In ears y consolas se listan aunque vengan fuera de toda sección (los pidió el usuario). */
 const deAudioPedido = (c: string) => c === "In ears" || c === "Consolas";
 
+/** La cantidad y el resto, sin los tropiezos de las medidas: "4x10 Aguilar DB 410" (los parlantes de la caja, no 4
+ *  cajas), "14x6.5 snare" (el tamaño del tambor), "1 X stand" / "1 X-hat" (la X es el tipo de base o de hi-hat, no
+ *  "por") y "Crash 16” x2" (dos crash de 16”). `explicita` dice que el renglón sí trae su cantidad (una caja). */
+function separarCantidad(t: string): { cantidad: number; descripcion: string; explicita?: boolean } {
+  const x = xDeTipo(t);
+  if (x) return { cantidad: x.cantidad, descripcion: x.resto };
+  // "2 x 4x10": 2 cajas de 4x10.
+  const cajas = t.trim().match(/^(\d{1,2})\s*[x×]\s+(\d{1,2}\s*[x×]\s*\d{1,2}(?![\d.,]).*)$/i);
+  if (cajas) return { cantidad: Number(cajas[1]), descripcion: cajas[2]!.trim() };
+  if (medidaAlComienzo(t)) return { cantidad: 1, descripcion: t.trim(), explicita: true };
+  // "2x14 Floor Tom", "2x16 Crash": cantidad por medida.
+  const porMedida = t.trim().match(/^([1-9])\s*[x×]\s*(\d{1,2}(?:[.,]\d+)?\s*(?:["”″]|[’'′]{2})?)\s+(\p{L}.*)$/u);
+  if (porMedida) return { cantidad: Number(porMedida[1]), descripcion: `${porMedida[2]} ${porMedida[3]}` };
+  // "Crash 16” x2": la x pegada al número, después de la medida, es cuántos (si el renglón no empieza con su cantidad).
+  // En un tambor ("Snare 14” x5") suele ser la profundidad: solo cuenta hasta 2.
+  const veces = t.trim().match(/^(?![\d(])(.*\d\s*(?:["”″]|[’'′]{2}))\s+[x×](\d)$/);
+  if (veces && (Number(veces[2]) <= 2 || !/\b(snare|redoblante|caja|tarola|piccolo|toms?|bombo|kick|bass\s*drum|floor)\b/i.test(veces[1]!))) {
+    return { cantidad: Number(veces[2]), descripcion: veces[1]!.trim() };
+  }
+  return separarCantidadLista(t);
+}
+
 function seccionDe(t: string): { tipo: "backline" | "audio" | "otra"; grupo?: string } | null {
   const h = t.replace(/^[\s•·*\d.)-]+(?=\p{L})/u, "").trim();
   // "P.A." es abreviatura, no fin de frase.
@@ -170,6 +193,10 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
     let ultimaEtiqueta: Etiqueta | null = null;
     // Índice de cada ítem leído en este documento → ¿se leyó fuera de toda sección (antes del backline)?
     const fueraDeSeccion = new Map<number, boolean>();
+    // "Hardware completo" abierto pieza por pieza: al final se cuentan sus bases de platillo y se quita lo que el
+    // rider ya pide aparte.
+    const hardwares: Array<{ artista: string | null; grupo: string | null; sets: number; bases: number | null;
+      piezas: Array<{ pieza: PiezaBateria; i: number; traza?: RenglonLeido }> }> = [];
     // "La agrupación lleva…" → lo que sigue lo pone el artista; "El festival suministra…" → lo pone la producción.
     let proveedorActual: string | null = null;
     // "Sustituciones aceptables:", "Guitarras spare", "Opción 2 …" → lo que sigue es alternativa, no suma.
@@ -204,9 +231,10 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
 
     if (doc.asunto) tituloEvento(doc.asunto);
 
-    const renglones = sinRepetidos(unirRenglones(doc.lineas)).flatMap(dividirLista);
+    const renglones = sinRepetidos(unirRenglones(doc.lineas.map(l => ({ ...l, texto: unirLeslie(l.texto) })))).flatMap(dividirLista);
     // "1. Roland XPS-30 / 2. Roland JV-30 / 3. …": lista numerada; el número es el orden, no la cantidad.
-    const NUMERADO = /^\s*(\d{1,2})\.\s+(?=\p{L})/u;
+    // "1. 8x10 Ampeg SVT-810E", "2. 2x12 Marshall": también cuando lo que sigue es la caja.
+    const NUMERADO = /^\s*(\d{1,2})\.\s+(?=\p{L}|\d{1,2}\s*[x×]\s*\d)/u;
     const numerados = new Set<number>();
     renglones.forEach((r, i) => {
       const a = r.texto.match(NUMERADO), b = renglones[i + 1]?.texto.match(NUMERADO);
@@ -260,10 +288,46 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
           anotar("grupo", "capítulo del instrumento"); continue;
         }
       }
+      // "Hardware completo", "Full hardware", "Hardware DW 9000" en la batería: se abre pieza por pieza, con su
+      // marca (lo definió el usuario). Las bases de platillo se cuentan al final, con los platillos del kit. Lo que
+      // excluye no va, lo que la banda trae va marcado y lo que pide además ("silla y alfombra") sale aparte.
+      const hw = seccion === "audio" || seccion === "otra" ? null : hardwareCompleto(texto);
+      if (hw && artista && ((familiaGrupo as string | null) === "bateria" || /bater[ií]a|drums?/i.test(texto))) {
+        const registro: (typeof hardwares)[number] = { artista, grupo, sets: hw.sets, bases: hw.bases, piezas: [] };
+        const g = grupo as string | null;
+        const enSeccion = seccion !== "neutra" || (!!g && (GRUPOS.test(g) || esTituloGenerico(g) || categorizar(g) !== "Otro"));
+        const previo: string | null = proveedorActual;
+        const agregar = (txt: string, categoria: Categoria | undefined, motivo: string, artistaPone: boolean): number | null => {
+          const a = ext.items.length;
+          proveedorActual = artistaPone ? "ARTISTA" : previo;
+          const ok = item(txt, l, categoria);
+          proveedorActual = previo;
+          if (!ok || ext.items.length === a) return null;
+          const i = ext.items.length - 1;
+          itemsDelSubgrupo++; anotar("item", motivo, i);
+          fueraDeSeccion.set(i, !enSeccion);
+          if (hw.notas.length) ext.items[i]!.nota = [ext.items[i]!.nota, ...hw.notas].filter(Boolean).join(" · ");
+          return i;
+        };
+        for (const [pieza, nombre] of PIEZAS_HARDWARE) {
+          const excluida = hw.sin.includes(pieza);
+          if (excluida && !hw.traeSin) continue;
+          const i = agregar(`${hw.sets} ${nombre}${hw.marca ? ` ${hw.marca}` : ""}`, "Batería", "hardware completo: se abre pieza por pieza", hw.trae || excluida);
+          if (i !== null) registro.piezas.push({ pieza, i, traza: ctx.traza?.at(-1) });
+        }
+        for (const extra of hw.extras) agregar(/^\d/.test(extra) ? extra : `${hw.sets} ${extra}`, undefined, "lo pide junto al hardware completo", hw.trae);
+        if (registro.piezas.length) hardwares.push(registro);
+        if (registro.piezas.length || hw.extras.length) continue;
+      }
       // "DRUMS: DW COLLECTOR, YAMAHA STAGE CUSTOM, PEARL MASTER CUSTOM": el título del instrumento con las
       // opciones de la banda. Es una sola batería (sus piezas vienen debajo); las marcas son información, no ítems.
       const conNota = seccion === "audio" || seccion === "otra" ? null : tituloConNota(texto);
-      if (conNota) {
+      // "Keyboard: Nord Stage 4 88 with stand and sustain pedal": no es un título con nota, es el teclado con sus
+      // accesorios. El título abre su grupo y lo de después de los dos puntos se lee como el renglón.
+      if (conNota && familiaDe(conNota.titulo) === "teclado" && filasTeclado(conNota.nota)) {
+        if (familiaDe(conNota.titulo) !== familiaGrupo) ponerGrupo(nombrePropio(conNota.titulo));
+        texto = conNota.nota;
+      } else if (conNota) {
         ponerGrupo(nombrePropio(conNota.titulo)); modoAlternativa = false;
         if (seccion === "neutra" && capituloBackline !== null) seccion = "backline";
         anotar("grupo", conNota.opciones.length > 1 ? `título con opciones de la banda: ${conNota.opciones.join(" · ")}` : `título con nota: ${conNota.nota}`);
@@ -401,18 +465,26 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       // Una lista sin títulos ("Batería DW", sus piezas y luego "1 Bajo Fender"): lo de otro instrumento
       // cierra el bloque de la batería.
       if (grupoBateriaMarca && grupo === grupoBateriaMarca && OTRO_INSTRUMENTO.has(categorizar(texto))) ponerGrupo(null);
-      // "1 Ampeg SVT Classic + 8x10": cabezal y caja son dos piezas (lo definió el usuario).
+      // "1 Ampeg SVT Classic + 8x10": cabezal y caja son dos piezas. "1 Nord Stage 88 con base tipo Z y pedal de
+      // sustain": el teclado, la base y el pedal, cada uno en su fila (las dos cosas las definió el usuario).
       const ampli = cabezalYCaja(texto);
-      if (ampli) {
-        const antesA = ext.items.length;
-        for (const parte of ampli) {
-          const a = ext.items.length;
-          if (item(parte, l) && ext.items.length > a) {
-            itemsDelSubgrupo++; anotar("item", "cabezal y caja por separado", ext.items.length - 1);
+      const teclado = ampli ? null : filasTeclado(texto);
+      const conAccesorios = teclado?.filas.map(f => ({ texto: `${f.cantidad} ${f.texto.trim()}${teclado.nota ? ` (${teclado.nota})` : ""}`, accesorio: f.accesorio })) ?? null;
+      if (ampli || conAccesorios) {
+        const antesA = ext.items.length, previo: string | null = proveedorActual;
+        // "(lo trae la banda)" al final: todas las filas van marcadas.
+        if (teclado?.trae) proveedorActual = "ARTISTA";
+        for (const fila of ampli ? ampli.map(texto => ({ texto, accesorio: false })) : conAccesorios!) {
+          const parte = fila.texto, a = ext.items.length;
+          // El pedal es del teclado (no de la batería) y la base es una base, como diga el renglón.
+          const fija: Categoria | undefined = fila.accesorio ? (/pedal|sustain|sostenido|damper|half ?moon|media luna/i.test(parte) ? "Teclado" : "Bases") : conAccesorios ? "Teclado" : undefined;
+          if (item(parte, l, fija) && ext.items.length > a) {
+            itemsDelSubgrupo++; anotar("item", ampli ? "cabezal y caja por separado" : "teclado y sus accesorios por separado", ext.items.length - 1);
             const g = grupo as string | null;
             fueraDeSeccion.set(ext.items.length - 1, seccion === "neutra" && !(g && (GRUPOS.test(g) || esTituloGenerico(g) || categorizar(g) !== "Otro")));
           }
         }
+        proveedorActual = previo;
         if (ext.items.length > antesA) continue;
       }
       const antes = ext.items.length, artistaAntes = artista;
@@ -438,20 +510,50 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       sinInterpretar.push(texto);
     }
 
+    // Lo que se quita al final, con lo que queda dicho en la traza.
+    const quitar = new Map<number, { etiqueta: Etiqueta; motivo: string }>();
+    // "Hardware completo": una base de platillo por platillo del kit, sin el hi-hat (si el kit no dice sus
+    // platillos, las 2 de siempre: crash y ride), y nada repetido de lo que el rider ya pide aparte.
+    const deHardware = new Set(hardwares.flatMap(h => h.piezas.map(p => p.i)));
+    for (const h of hardwares) {
+      const delKit = ext.items.filter((it, i) => !deHardware.has(i) && it.artista === h.artista && it.grupo === h.grupo);
+      // "1 Boom stand extra": lo de más se suma, no cuenta como ya pedido.
+      const ya = new Set(delKit.filter(it => !/(?<![\p{L}])(extras?|adicional(?:es)?|de\s+m[aá]s|spare|de\s+repuesto|additional)(?![\p{L}])/iu.test(it.descripcion)).map(it => piezaDeBateria(it.descripcion)));
+      const platillos = delKit.reduce((n, it) => n + (esPlatilloConBase(it.descripcion, it.categoria) ? it.cantidad : 0), 0);
+      for (const p of h.piezas) {
+        if (ya.has(p.pieza)) { quitar.set(p.i, { etiqueta: "nota", motivo: "hardware completo: el rider ya pide esta pieza aparte" }); continue; }
+        if (p.pieza !== "base de platillo") continue;
+        const it = ext.items[p.i]!;
+        const n = h.bases ?? (platillos || 2);
+        it.cantidad = h.sets * n;
+        if (it.cantidad === 1) it.descripcion = it.descripcion.replace(/^Bases/, "Base");
+        const porque = h.bases ? "las que dice el rider" : platillos ? "una por platillo del kit, sin el hi-hat" : "2, lo de siempre (crash y ride): el kit no dice sus platillos";
+        it.nota = [it.nota, `bases de platillo del hardware completo: ${porque}`].filter(Boolean).join(" · ");
+      }
+    }
     // Si el rider tiene sección de backline (o títulos de instrumento), lo que se leyó antes, fuera de
     // toda sección (medidas de la tarima, wifi…), no era backline: se quita. Los in ears y las consolas se quedan.
     if ([...fueraDeSeccion.values()].some(fuera => !fuera)) {
-      const quitar = new Set([...fueraDeSeccion].filter(([, fuera]) => fuera).map(([i]) => i));
-      if (quitar.size) {
-        const nuevoIndice = new Map<number, number>();
-        const quedan = ext.items.filter((_, i) => { if (quitar.has(i)) return false; nuevoIndice.set(i, nuevoIndice.size); return true; });
-        ext.items.splice(0, ext.items.length, ...quedan);
-        for (const r of ctx.traza ?? []) {
-          if (r.item === null) continue;
-          if (quitar.has(r.item)) { r.etiqueta = "no-backline"; r.motivo = "antes de la sección de backline"; r.item = null; }
-          else r.item = nuevoIndice.get(r.item) ?? r.item;
-        }
+      for (const [i, fuera] of fueraDeSeccion) if (fuera && !quitar.has(i)) quitar.set(i, { etiqueta: "no-backline", motivo: "antes de la sección de backline" });
+    }
+    if (quitar.size) {
+      const nuevoIndice = new Map<number, number>();
+      const quedan = ext.items.filter((_, i) => { if (quitar.has(i)) return false; nuevoIndice.set(i, nuevoIndice.size); return true; });
+      ext.items.splice(0, ext.items.length, ...quedan);
+      for (const r of ctx.traza ?? []) {
+        if (r.item === null) continue;
+        const q = quitar.get(r.item);
+        if (q) { r.etiqueta = q.etiqueta; r.motivo = q.motivo; r.item = null; }
+        else r.item = nuevoIndice.get(r.item) ?? r.item;
       }
+      // Del renglón del hardware no quedan anotaciones de lo quitado; si se quitó todo, queda una, como nota.
+      const sobran = new Set<RenglonLeido>();
+      for (const h of hardwares) {
+        const fuera = h.piezas.filter(p => quitar.has(p.i)), todas = fuera.length === h.piezas.length;
+        if (todas && fuera[0]?.traza) fuera[0].traza.motivo = "hardware completo: el rider ya pide cada pieza aparte";
+        for (const p of fuera.slice(todas ? 1 : 0)) if (p.traza) sobran.add(p.traza);
+      }
+      if (ctx.traza && sobran.size) ctx.traza.splice(0, ctx.traza.length, ...ctx.traza.filter(r => !sobran.has(r)));
     }
 
     // Subtítulos cortos ("Instrumento", "Amplificación", "Configuración:") no hace falta revisarlos.
@@ -515,7 +617,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       return true;
     }
 
-    function item(t: string, l: Linea): boolean {
+    function item(t: string, l: Linea, categoriaFija?: Categoria): boolean {
       let redactado = false, opcion: string | null = null;
       // "Opción 2 Fender Precision…" → el ítem es lo que sigue, como alternativa.
       const op = t.match(/^opci[oó]n\s*#?\s*(\d)\s*[:.)-]?\s+(\p{L}.*)$/iu);
@@ -569,7 +671,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         descripcion = desc;
         cantidad = iNum > 0 ? Number(cols[iNum]!.replace(/\D/g, "")) : separarCantidad(desc).cantidad;
         if (iNum < 0) descripcion = separarCantidad(desc).descripcion;
-        explicita = iNum > 0 || separarCantidad(desc).descripcion !== desc;
+        explicita = iNum > 0 || separarCantidad(desc).descripcion !== desc || !!separarCantidad(desc).explicita;
         const resto = cols.filter((c, i) => i !== iNum && c !== desc);
         principal = descripcion;
         proveedor = resto.find(c => PROVEEDOR.test(c)) ?? null;
@@ -586,7 +688,7 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         } else {
           const cuerpo = conCat && categorizar(conCat[1]!) !== "Otro" ? conCat[2]! : t;
           const s = separarCantidad(cuerpo);
-          descripcion = s.descripcion; cantidad = s.cantidad; explicita = s.descripcion !== cuerpo;
+          descripcion = s.descripcion; cantidad = s.cantidad; explicita = s.descripcion !== cuerpo || !!s.explicita;
           if (conCat && cuerpo !== t) descripcion = `${conCat[1]}: ${descripcion}`;
         }
       }
@@ -607,7 +709,10 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         if (medidas.length >= 2) cantidad = medidas.length;
       }
       if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.replace(/\s*\([^)]*\)/g, "").length > (explicita || opcion !== null ? 140 : 90)) return false; // las opciones entre paréntesis no cuentan
-      const categoria: Categoria = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
+      // "Pailas 14” y 15”", "Timbaletas", "djembé": percusión con su nombre de aquí (o con tilde) también es percusión.
+      const setPercusion = (SET_PERCUSION.test(principal ?? descripcion) || /(?<![\p{L}])djemb[eé]s?(?![\p{L}])/iu.test(principal ?? descripcion)) && categorizar(principal ?? descripcion) === "Otro";
+      const porPalabras = categorizar(`${principal ?? descripcion} ${grupo ?? ""}`);
+      const categoria: Categoria = categoriaFija ?? (setPercusion && porPalabras === "Otro" ? "Percusión" : porPalabras);
       if (NO_BACKLINE.test(descripcion) && categorizar(principal ?? descripcion) === "Otro") return true; // radios, pilas, cinta: se lee pero no es backline
       // "3 LIDER IEM": la mezcla de in ear de un músico, no un equipo. En la sección de in ears sí cuenta.
       if (["In ears", "Consolas"].includes(categoria) && !equipoDeAudio(descripcion) && !(grupo === "In ears" || grupo === "Consolas")) return true;
@@ -616,9 +721,10 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
       // Sin cantidad explícita solo es ítem si se reconoce el equipo por su nombre
       // (salvo lo que la banda dice que trae: "Gaita hembra" también cuenta).
       const loTraeLaBanda = proveedorActual === "ARTISTA" && !proveedor && descripcion.split(" ").length <= 4 && !/[.?!]$/.test(t);
-      if (!explicita && opcion === null && categorizar(descripcion) === "Otro" && !loTraeLaBanda) return false;
+      if (!explicita && opcion === null && categorizar(descripcion) === "Otro" && !setPercusion && !loTraeLaBanda) return false;
       const sinNotas = descripcion.replace(/\([^)]*\)/g, "");
-      if (!explicita && sinNotas.split(",").length >= 3 && !/\d/.test(sinNotas)) return false; // "Ampeg, Markbass, Fender o equivalente": marcas, no equipo
+      // "Ampeg, Markbass, Fender o equivalente": marcas, no equipo ("Congas LP, quinto, conga, tumba" sí: el set y sus tambores).
+      if (!explicita && sinNotas.split(",").length >= 3 && !/\d/.test(sinNotas) && !SET_CONGAS.test(sinNotas)) return false;
       if (!explicita && /[.?!]$/.test(descripcion) && descripcion.split(" ").length > 6) return false; // una frase del correo
       if (!proveedor && proveedorActual) proveedor = proveedorActual;
       // "OPCIÓN #1" es lo preferido; desde la 2 son alternativas que no suman.
@@ -631,6 +737,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         baja ? `lectura dudosa (${l.confianza}%)` : sinCantidad ? "cantidad no leída en la foto" : "",
         alternativa ? `alternativa aceptada${opcion ? ` (opción ${opcion})` : ""}: no suma` : "",
         redactado ? "tomado de una frase del rider; revisar" : "",
+        // "Set de congas", "Tumbadoras" sin decir cuántas: son 2 tambores (lo definió el usuario).
+        congasSinNumero(descripcion, cantidad) ? "set de 2 tambores: conga y tumba (el rider no dice cuántos)" : "",
       ].filter(Boolean);
       ext.items.push({
         artista, fecha, grupo, descripcion, cantidad: Math.max(0, cantidad), categoria,
@@ -756,6 +864,190 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
   }
 }
 
+/** Lo que trae un "hardware completo" (lo definió el usuario): base de redoblante, máquina de hi-hat, pedal de bombo
+ *  y bases de platillo. Silla y alfombra no: son aparte. */
+const PIEZAS_HARDWARE: ReadonlyArray<readonly [PiezaBateria, string]> = [
+  ["base de redoblante", "Base de redoblante"], ["máquina de hi-hat", "Máquina de hi-hat"],
+  ["pedal de bombo", "Pedal de bombo"], ["base de platillo", "Bases de platillo"],
+];
+const MARCA_HARDWARE = /^(dw|drum ?workshop|pearl|tama|yamaha|ludwig|gretsch|sonor|mapex|gibraltar|pdp|premier|dixon|rogers)\b/i;
+/** "lo trae la banda", "drummer brings his own", "propio": lo pone el músico, no la producción. */
+const TRAE_LA_BANDA = /(?<![\p{L}])(?:(?:lo|la|los|las)\s+(?:trae|traen|lleva|llevan)|(?:trae|traen|lleva|llevan)\s+(?:la|el|su)\s+(?:banda|artista|baterista|m[uú]sico|grupo|agrupaci[oó]n)|(?:banda|artista|baterista|m[uú]sico)\s+(?:lo\s+)?(?:trae|lleva)|(?:(?:the\s+)?(?:drummer|band|artist)\s+)?brings?(?:\s+(?:his|her|their|its)\s+own)?|(?:his|her|their)\s+own|propi[oa]s?|provided\s+by\s+(?:the\s+)?(?:band|artist|drummer))(?:\s+(?:la|el)\s+(?:banda|artista|baterista))?(?![\p{L}])/giu;
+
+export interface HardwareCompleto {
+  sets: number;
+  /** La marca o el modelo ("DW 9000"), para cada pieza. */
+  marca: string;
+  /** Las bases de platillo que dice el renglón ("con 2 soportes"), o null para contarlas con los platillos del kit. */
+  bases: number | null;
+  /** Piezas que el renglón excluye ("sin pedal de bombo"); `traeSin` si dice que esas las trae el músico. */
+  sin: PiezaBateria[];
+  traeSin: boolean;
+  /** "Hardware completo: lo trae la banda": cada pieza va marcada. */
+  trae: boolean;
+  /** Lo que el renglón pide además ("silla y alfombra"): piezas aparte. */
+  extras: string[];
+  /** Lo que dice el renglón y no es pieza ni marca: queda de nota en cada pieza. */
+  notas: string[];
+}
+
+/** "Hardware completo", "Full hardware", "Hardware DW 9000", "01 Set de hardware completo", "Herrajes completos DW": todo
+ *  el hardware de la batería. Dice cuántos sets ("x2", "para 2 baterías"), la marca o modelo, las bases de platillo si las
+ *  dice ("con 2 soportes", "incl. 4 boom stands"), lo que excluye ("sin pedal de bombo"), si lo trae la banda y lo que
+ *  pide además ("silla y alfombra"). null si no es eso: "HARDWARE" o "HARDWARE SET" solos son el título de la sección, y
+ *  "5 Bases (hardware completo DW…)" son 5 bases. */
+export function hardwareCompleto(t: string): HardwareCompleto | null {
+  // "3. Hardware completo Tama": el número de una lista numerada es el orden, no cuántos.
+  const s = t.trim().replace(/^\d{1,2}\.\s+(?=\p{L})/u, "");
+  const m = s.match(/^(?:(\d{1,2})\s*(?:[x×]\s+)?)?((?:set|kit|juego|pack|paquete)\s+(?:de\s+|of\s+)?)?((?:full|complete|completo|todo el)\s+)?(?:(?:drum|de\s+bater[ií]a)\s+)?(?:hardware|herrajes?)(?![\p{L}])\s*:?\s*(.*)$/iu);
+  if (!m) return null;
+  let completo = !!m[2] || !!m[3], bases: number | null = null, sets = Number(m[1] ?? 1), trae = false, traeSin = false;
+  const sin: PiezaBateria[] = [];
+  let r = m[4]!;
+  // "sin pedal de bombo", "(except kick pedal, drummer brings his own)": esas piezas no van (o las trae el músico).
+  r = r.replace(/\(?\s*(?<![\p{L}])(?:sin|excepto|except(?:\s+for)?|menos|salvo|without|w\/o|but\s+no|no\s+incluye|not\s+including)\s+([^()]*?)\s*(?:\)|;|$|(?=,\s*(?:con|with|y|and|\+)\s))/giu, (_, clausula: string) => {
+    completo = true;
+    for (const parte of clausula.split(/\s*,\s*|\s+(?:y|and|e|ni|or|o)\s+/i)) {
+      // "sin pedal": en la batería, el pedal es el del bombo.
+      const pieza = piezaDeBateria(parte) ?? (/^(?:(?:el|los|the)\s+)?(?:pedal(?:es)?|pedals?)$/i.test(parte.trim()) ? "pedal de bombo" : null);
+      if (pieza) sin.push(pieza);
+      if (new RegExp(TRAE_LA_BANDA.source, "iu").test(parte)) traeSin = true;
+    }
+    return " ";
+  });
+  r = r.replace(TRAE_LA_BANDA, () => { trae = true; return " "; });
+  // "con 2 soportes", "with 3 boom stands", "incl. 4 boom stands", "(2 boom stands)", "lleva 3 boom stands": cuántas bases
+  // de platillo.
+  r = r.replace(/(?:(?<![\p{L}])(?:con|with|w\/|incl\p{L}*\.?|including|incluye|lleva|llevan|trae|traen)\s+|\(\s*)(\d{1,2})\s+(?:(?:boom|cymbal)\s+)?(?:bases?|soportes?|stands?|booms?)(?:\s+(?:stands?|boom|de\s+platillos?|para\s+platillos?|cymbal))?(?![\p{L}])(?:\s*\))?/giu, (_, n: string) => { bases = Number(n); return " "; });
+  // "x2", "(2 sets)", "para 2 baterías": cuántos sets.
+  r = r.replace(/(?:^|\s)[x×]\s*(\d)(?![\d"”])|\(\s*(\d)\s*(?:sets?|juegos?|kits?)\s*\)|(?<![\p{L}])(?:para|for)\s+(\d)\s+(?:bater[ií]as?|drums?|drum\s*kits?|kits?|sets?)(?![\p{L}])|(?<![\p{L}\d])(\d)\s+(?:sets?|juegos?)(?![\p{L}])/giu,
+    (_, a?: string, b?: string, c?: string, d?: string) => { sets = Number(a ?? b ?? c ?? d); return " "; });
+  r = r.replace(/(?<![\p{L}])(?:completos?|completas?|complete|full)(?![\p{L}])/giu, () => { completo = true; return " "; })
+    .replace(/(?<![\p{L}])(?:de|para|for)\s+(?:la\s+)?(?:bater[ií]a|drums?)(?![\p{L}])/giu, " ")
+    // "Full hardware set Tama Iron Cobra": "set" no es de la marca.
+    .replace(/^\s*(?:set|kit)(?![\p{L}])/iu, " ");
+  // Lo que queda, por partes: la marca va pegada a "hardware"; lo que viene después de una coma, "y" o "+" son otras
+  // piezas ("silla y alfombra") o notas.
+  const conSeparador = /^\s*(?:[,;+(\/–-]|(?:y|and|e|&|con|with|w\/|plus)\s)/i.test(r);
+  const partes = r.split(/\s*[,;+()]\s*|\s+[-–—]\s+|\s+(?:y|and|e|&|con|with|w\/|incl\p{L}*\.?|including|plus)\s+/iu)
+    .map(x => x.replace(/^[\s:.,\-–]+|[\s:.,\-–]+$/g, "").replace(/^(?:y|and|e|&|con|with|w\/|plus)\s+/i, "").trim());
+  let marca = "";
+  const extras: string[] = [], notas: string[] = [];
+  partes.forEach((parte, k) => {
+    if (letras(parte) < 2) return;
+    if (piezaDeBateria(parte) || (categorizar(parte) !== "Otro" && !MARCA_HARDWARE.test(parte))) { extras.push(parte); return; }
+    // "DW 9000", "Tama Iron Cobra", "Speed Cobra": la marca o el modelo, pegado a "hardware".
+    if (k === 0 && !conSeparador && (MARCA_HARDWARE.test(parte) || parte.split(/\s+/).every(w => /^[\p{Lu}\d]/u.test(w))) && parte.split(/\s+/).length <= 4) { marca = parte; return; }
+    notas.push(parte);
+  });
+  if (!completo && !MARCA_HARDWARE.test(marca)) return null;
+  return { sets, marca, bases, sin, traeSin, trae, extras, notas };
+}
+
+/** Un platillo que va en su base (crash, ride, china, splash, efecto); el hi-hat no, va en su máquina. */
+function esPlatilloConBase(descripcion: string, categoria: Categoria): boolean {
+  const p = piezaDeBateria(descripcion);
+  if (p) return p === "crash" || p === "ride" || p === "china" || p === "splash";
+  return categoria === "Platillos" && !/\b(stands?|bases?|soportes?|booms?)\b/i.test(descripcion);
+}
+
+/** "Set de congas LP", "Tumbadoras con sus bases": un set de congas que no dice cuántos tambores. */
+function congasSinNumero(descripcion: string, cantidad: number): boolean {
+  const set = /\b(?:set|juego|kit)\s+(?:(?:de|of)\s+)?(?:congas|tumbadoras|tumbas)\b|\b(?:congas?|tumbadoras|tumbas)\s+set\b/i;
+  const plural = /^(?:congas|tumbadoras)\b/i;
+  if (!set.test(descripcion) && !(cantidad === 1 && plural.test(descripcion))) return false;
+  const resto = descripcion.replace(set, " ").replace(plural, " ");
+  // "(quinto, conga y tumba)", "11 3/4” y 12 1/2”", "set de 3 congas": ya dice cuántos.
+  return !/\b(quintos?|requintos?|congas?|tumbas?|supertumbas?|tambores|drums)\b|\d\s*(?:["”″]|[’'′]{2})|\b\d\b/i.test(resto);
+}
+
+/** Accesorios de un teclado que van en su propia fila: base, stand, pedal, sustain, banco, atril. El nombre puede ir
+ *  después de lo que lo describe ("keyboard stand", "sustain pedal", "double X stand", "Ultimate Apex stand"). */
+const NOMBRE_ACCESORIO = String.raw`(?:bases?|stands?|soportes?|pedal(?:es|s)?|sustain|sostenido|damper|bancos?|banquetas?|bench(?:es)?|sillas?|atril(?:es)?|half ?moon|media luna)`;
+const ANTES_DEL_ACCESORIO = /^(?:su|sus|el|la|los|las|un|una|its|their|an?|the|de|del|para|for|tipo|type|en|keyboard|keyboards|teclado|teclados|piano|z|x|a-frame|double|doble|triple|single|sencill[oa]|volume|volumen|expression|expresi[oó]n|sustain|damper|two-tier|2-tier|tier|heavy|duty|met[aá]lic[oa]|plegable)$/i;
+function esAccesorioTeclado(trozo: string): boolean {
+  const palabras = trozo.replace(/^\d{1,2}\s+/, "").trim().split(/\s+/);
+  const k = palabras.findIndex(w => new RegExp(`^${NOMBRE_ACCESORIO}$`, "i").test(w.replace(/[.,;:]+$/, "")));
+  if (k < 0 || k > 3 || palabras.length > k + 5) return false;
+  // Lo de antes del nombre lo describe ("keyboard", "doble", "X") o es la marca de la base ("Ultimate Apex", "K&M").
+  return palabras.slice(0, k).every(w => ANTES_DEL_ACCESORIO.test(w) || /^[\p{Lu}\d]|&/u.test(w));
+}
+/** El Leslie va con su órgano, en la misma fila (lo definió el usuario). */
+const LESLIE = /^(?:\d{1,2}\s+)?(?:(?:su|el|un|una|its|an?)\s+)?(?:leslie|rotary|ventilator)(?![\p{L}])/iu;
+/** "1 Hammond B3 and 1 Leslie 122", "1 Hammond XK-5 + 1 Leslie 3300": el número del Leslie no lo vuelve otra fila. */
+export const unirLeslie = (t: string) => t.replace(/(\+|(?<![\p{L}])(?:y|and|con|with|w\/))\s*\d{1,2}\s*(?:x\s+)?(?=(?:leslie|rotary)(?![\p{L}]))/giu, "$1 ");
+
+interface FilaTeclado { cantidad: string; texto: string; accesorio: boolean }
+/** "1 Nord Stage 88 con base tipo Z y pedal de sustain" → el teclado, la base y el pedal, cada uno en su fila, con la
+ *  cantidad del teclado (lo definió el usuario). "Hammond XK-5 + Leslie 3300 + pedal de expresión": el órgano y su
+ *  Leslie siguen juntos y el pedal va aparte. Lo que no es accesorio ("con funda") se queda en la fila de antes, y una
+ *  nota final ("(lo trae la banda)") vale para todas. null si no hay accesorios que separar. */
+function filasTeclado(t: string): { filas: FilaTeclado[]; nota: string | null; trae: boolean } | null {
+  let cuerpo = t.trim();
+  // En una tabla ("1   Nord Stage 3 88   Con base tipo Z y pedal de sustain") solo si la última columna es la lista de
+  // accesorios; si no, la observación queda con su equipo.
+  const cols = cuerpo.split(/\t|\s{3,}|\s+\|\s+/).map(c => c.trim()).filter(Boolean);
+  if (cols.length >= 2) {
+    const obs = cols.at(-1)!.replace(/^(?:con|with|w\/|incl\p{L}*\.?|\+)\s*/iu, "");
+    const equipo = cols.slice(0, -1);
+    const partesObs = partirFuera(obs, /\s*[+,;]\s*|\s+(?:y|and|e|&)\s+/i).map(p => p.texto);
+    if (cols.length > 3 || (equipo.length === 2 && !/^\d{1,2}$/.test(equipo[0]!)) || /^\d{1,3}$/.test(cols.at(-1)!)
+      || !partesObs.every(p => esAccesorioTeclado(p) || noEsBackline(p))) return null;
+    cuerpo = `${equipo.join(" ")} con ${obs}`;
+  }
+  const m = cuerpo.match(/^\s*(\d{1,2})\s*(?:x\s+)?(?=\p{L})/u);
+  const cant = m ? m[1]! : "1";
+  if (m) cuerpo = cuerpo.slice(m[0].length).trim();
+  // "(con base y pedal de sustain)": la lista de accesorios entre paréntesis se lee como si no lo tuviera.
+  // "(lo trae la banda)", "- lo trae la banda": la nota final vale para todas las filas.
+  let nota: string | null = null, trae = false;
+  const fin = cuerpo.match(/\s*\(([^()]*)\)\s*$/) ?? cuerpo.match(/\s+[-–—]\s+([^-–—()]+)$/);
+  if (fin) {
+    const dentro = fin[1]!.trim();
+    const lista = dentro.replace(/^(?:con|with|w\/|incl\p{L}*\.?|\+)\s*/iu, "");
+    if (lista !== dentro || esAccesorioTeclado(partirFuera(lista, /\s*[+,;]\s*|\s+(?:y|and|e|&)\s+/i)[0]?.texto ?? "")) {
+      cuerpo = `${cuerpo.slice(0, fin.index).trim()} con ${lista}`;
+    } else if (new RegExp(TRAE_LA_BANDA.source, "iu").test(dentro)) {
+      cuerpo = cuerpo.slice(0, fin.index).trim(); trae = true;
+    } else if (/(?<![\p{L}])(similar|equivalentes?|parecido|preferibles?|preferiblemente|or similar|or equivalent)(?![\p{L}])/iu.test(dentro)) {
+      // "(o similar)" vale para todo el renglón; otra nota ("(tipo piano)") se queda con la última pieza.
+      cuerpo = cuerpo.slice(0, fin.index).trim(); nota = dentro;
+    }
+  }
+  const trozos = partirFuera(cuerpo, /\s*[+,;]\s*|\s+(?:y|and|e|&|con|with|w\/|incl\p{L}*\.?|plus)\s+/iu);
+  const teclado = trozos[0]?.texto ?? "";
+  if (categorizar(teclado) !== "Teclado" || esAccesorioTeclado(teclado) || LESLIE.test(teclado)) return null;
+  const filas: FilaTeclado[] = [{ cantidad: cant, texto: teclado, accesorio: false }];
+  for (const { texto: trozo, sep } of trozos.slice(1)) {
+    const ultima = filas.at(-1)!;
+    const unir = () => { ultima.texto += `${/^[,;]$/.test(sep.trim()) ? sep.trim() : ` ${sep.trim()}`} ${trozo}`; };
+    // "+ Leslie 3300": el Leslie va con su órgano.
+    if (!filas.some(f => f.accesorio) && LESLIE.test(trozo)) { ultima.texto += `${sep.trim() === "," ? "," : ` ${sep.trim()}`} ${trozo.replace(/^\d{1,2}\s+/, "")}`; continue; }
+    if (noEsBackline(trozo)) continue; // "… y cable": el cable no es backline
+    const propia = trozo.match(/^(\d{1,2})\s+(?=\p{L})/u);
+    if (esAccesorioTeclado(trozo)) {
+      filas.push({ cantidad: propia ? propia[1]! : cant, texto: trozo.replace(/^\d{1,2}\s+/, "").replace(/^(?:su|sus|el|la|los|las|its|their|the)\s+/i, ""), accesorio: true });
+      continue;
+    }
+    // "+ Nord Lead 4": otro teclado, en su fila.
+    if (categorizar(trozo) === "Teclado" && !LESLIE.test(trozo) && /\d|\p{Lu}/u.test(trozo)) {
+      filas.push({ cantidad: propia ? propia[1]! : "1", texto: trozo.replace(/^\d{1,2}\s+/, ""), accesorio: false });
+      continue;
+    }
+    // "con funda", "negro": se queda en la fila de antes.
+    unir();
+  }
+  if (!filas.some(f => f.accesorio)) return null;
+  return { filas, nota, trae };
+}
+
+/** Las filas de un teclado con sus accesorios, como texto ("1 Nord Stage 88", "1 base tipo Z", …); null si no hay que
+ *  separar nada. */
+export function tecladoYAccesorios(t: string): string[] | null {
+  const r = filasTeclado(t);
+  return r ? r.filas.map(f => `${f.cantidad} ${f.texto.trim()}${r.nota ? ` (${r.nota})` : ""}`) : null;
+}
+
 /** "1 Ampeg SVT Classic + 8x10" → ["1 Ampeg SVT Classic", "1 Caja 8x10"]; null si no es cabezal + caja. */
 export function cabezalYCaja(t: string): string[] | null {
   if (!t.includes("+")) return null;
@@ -816,7 +1108,7 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
       const sigue = /^\p{Ll}/u.test(sig) && !/[.:;]$/.test(actual.texto.trim()) && actual.texto.trim().split(/\s+/).length >= 3 && !/\s{3}/.test(actual.texto) && !/^(x\s*\d|o\s)/i.test(sig);
       // "1 Ampeg SVT con caja" + "8x10": la medida que quedó sola abajo.
       // "1 AMPEG" + "8 X 10“ ENCLOSURE": también con una o dos palabras más, si arriba quedó corto.
-      const medida = /^\d{1,2}\s*[x×]\s*\d{1,2}\b/i.test(sig) && /\p{L}$/u.test(actual.texto.trim())
+      const medida = /^\d{1,2}\s*[x×]\s*\d{1,2}\b/i.test(sig) && /\p{L}$/u.test(actual.texto.trim()) && !encabezado(actual.texto.trim())
         && (sig.split(/\s+/).length <= 2 || (sig.replace(/^\d{1,2}\s*[x×]\s*\d{1,2}\S*/i, "").trim().split(/\s+/).length <= 2 && actual.texto.trim().split(/\s+/).length <= 3));
       // "…1 Base para" + "Teclados, 2 Mesas…": el renglón quedó colgando en una preposición o una coma.
       const a = actual.texto.trim();
@@ -877,7 +1169,8 @@ export function grupoConMusico(t: string): string | null {
  *  solo cuenta en un rider con capítulos y si lo que sigue es un título en mayúsculas, porque "1. DW" también
  *  puede ser la primera de unas opciones. */
 export function capituloDe(t: string, conCapitulos: boolean): { numero: number; titulo: string } | null {
-  const dos = t.match(/^(\d{1,2})\s*\.\s*\d{1,2}\s*\.?\s*[-–]?\s*(?=\p{L})(.*)$/u);
+  // "1. 8x10 Ampeg" no es el capítulo 1.8: es la primera de una lista y una caja de 8x10.
+  const dos = t.match(/^(\d{1,2})\s*\.\s*\d{1,2}(?!\s*[x×]\s*\d)\s*\.?\s*[-–]?\s*(?=\p{L})(.*)$/u);
   if (dos) return { numero: Number(dos[1]), titulo: dos[2]!.trim() };
   if (!conCapitulos) return null;
   const uno = t.match(/^(\d{1,2})\s*\.\s*[-–]?\s*(?=\p{L})(.*)$/u);
@@ -1031,7 +1324,7 @@ function variosGrupos(t: string): string | null {
  * ni "88 keys" (minúscula o medida), ni "16 CH" / "4 RETORNOS" (unidades). */
 const MARCA_LISTA = /(?:^|\s)((?:0?[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]*))/gu;
 // "8 X 10" es una medida, no otra cantidad.
-const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft|x|voltios|volts?|vatios|watts?|amperios|amps?)$/i;
+const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft|x|voltios|volts?|vatios|watts?|amperios|amps?|inch(es)?|pulg(adas)?)$/i;
 /** Lo que sigue al número de un modelo: "SVT 4 PRO", "JCM 2000 DSL", "MK II". */
 const MODELO_SUFIJO = /^(pro|plus|classic|mk\w*|ii|iii|iv|xl|xt|se|ce|ex|hd|deluxe|custom|reverb|series|dsl|tsl|vr)$/i;
 function posicionesLista(t: string): number[] {
@@ -1049,6 +1342,12 @@ function posicionesLista(t: string): number[] {
     if (/\/\s*$/.test(antes) || (/\p{Ll}/u.test(t) && /\b[A-Z]{2,4}\s+$/.test(antes))) continue;
     // "AMPEG SVT 4 PRO" en un renglón todo en mayúsculas: el 4 sigue siendo del modelo (SVT-4 PRO, un cabezal).
     if (/\b[A-Z]{2,4}\s+$/.test(antes) && MODELO_SUFIJO.test(m[2]!)) continue;
+    // "8 x 10 Ampeg": el 10 es de la medida, no otra cantidad.
+    if (/\d\s*[x×]\s*$/i.test(antes)) continue;
+    // "Nord Stage 3 Compact", "Nord Stage 2 EX 76", "Nord Stage 3 HA88": el número es la generación del teclado. Pero en
+    // "1 Yamaha Motif 2 Keyboard stands" el 2 es la cantidad de lo que sigue.
+    if (/\b(nord\s+(stage|electro|piano|lead|grand|wave)|kronos|montage|modx|motif|fantom|juno|prophet|triton|krome|nautilus)\s+$/i.test(antes)
+      && /^(compact|ex|ha|hp|sw|xf|xs|xl|es|se|ls|le|mk\w*|pro|plus|rack|classic|d|m|r|x)$/i.test(m[2]!)) continue;
     // "NORD STAGE 2 MODEL SW73 OR HA76": lo que sigue al número es el modelo, no otro ítem.
     if (/^(model|modelo|version|versi[oó]n|series|serie|edition|edici[oó]n)$/i.test(m[2]!)) continue;
     // "YAMAHA MOTIF 8 XF": número y código corto del modelo (XF8) detrás del nombre del equipo. Los códigos
@@ -1091,10 +1390,19 @@ function dividirLista(l: Linea): Linea[] {
   // De izquierda a derecha: "TOMS 10”, 12” Y 14”", "2 CRASH DE 16” Y 18”, RIDE 20”", "· 1 22” Bass drum · 1 …".
   // "SET DE PLATOS: SABIAN AAX: 1 CHINA 16”, …": lo de antes de los dos puntos queda como título.
   // Con columnas ("2 Toms 10” y 12”   Montados en el bombo") la fila es de una tabla: no se corta aquí.
-  if (!l.texto.includes("+") && !/\t|\s{3,}/.test(l.texto.trim())) {
-    const iDos = l.texto.lastIndexOf(": ");
-    const cabeza = iDos > 0 && !/\d/.test(l.texto.slice(0, iDos)) ? l.texto.slice(0, iDos) : null;
-    const piezas = cortarRenglon(cabeza ? l.texto.slice(iDos + 2) : l.texto);
+  // "1 Hi-hat 14” + X-hat 10”": con piezas de batería a los dos lados, el "+" separa como una coma (en "Ampeg SVT + 8x10" o
+  // "Nord + base" no: eso lo leen el cabezal y la caja, y el teclado con sus accesorios).
+  const conMas = l.texto.split(/\s*\+\s*/);
+  const masDeBateria = conMas.length >= 2 && conMas.every(p => PIEZA.test(p.replace(/^[\s•·*-]*(?:\d{1,3}\s*(?:x\s+)?)?/i, "")));
+  const sinMas = masDeBateria ? conMas.join(", ") : l.texto;
+  if (!sinMas.includes("+") && !/\t|\s{3,}/.test(sinMas.trim())) {
+    const iDos = sinMas.lastIndexOf(": ");
+    const cabeza = iDos > 0 && !/\d/.test(sinMas.slice(0, iDos)) ? sinMas.slice(0, iDos) : null;
+    const piezas = cortarRenglon(cabeza ? sinMas.slice(iDos + 2) : sinMas);
+    // "Congas: quinto, conga y tumba": los tambores del set van en la fila del set (lo dijo el usuario).
+    if (piezas && cabeza && SET_CONGAS.test(cabeza) && piezas.every(p => p.cantidad === null || p.cantidad === 1) && piezas.every(p => TAMBOR_DE_CONGAS.test(p.texto))) {
+      return [{ ...l, texto: `${cabeza.replace(/^[\s•·*-]+/, "")} (${sinMas.slice(iDos + 2).trim()})` }];
+    }
     if (piezas) return [...(cabeza ? [{ ...l, texto: cabeza + ":" }] : []), ...piezas.map(p => ({ ...l, texto: p.cantidad !== null ? `${p.cantidad} ${p.texto}` : p.texto }))];
   }
   const marca = /(?:^|(?<!\d)[,;]|\s(?:y|and|e|\+))\s*(?:x\s*)?\(?\d{1,3}\)?\s*x?\s+(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|hz|k)\b)\p{L}/giu;
@@ -1112,8 +1420,11 @@ function dividirLista(l: Linea): Linea[] {
 /** "Quinto, conga, Tumba, bongos con sus bases, cortina" → un ítem por parte, si casi todas se reconocen como equipo. */
 function dividirEnumeracion(l: Linea): Linea[] {
   if (/:\s/.test(l.texto) || /\d\s*["”″]/.test(l.texto) || /\bequivalente|sugerid|\bmarcas?\b|\bo\s+\p{Lu}/iu.test(l.texto)) return [l];
-  const partes = l.texto.split(/,\s*/).map(t => t.trim()).filter(Boolean);
+  // Las comas de un paréntesis son de la nota: "1 Congas LP (quinto, conga, tumba) w/ stands" es una pieza.
+  const partes = partirFuera(l.texto, /,\s*/).map(p => p.texto);
   if (partes.length < 3) return [l];
+  // "Congas LP, quinto, conga, tumba": los tambores del set son el mismo set.
+  if (SET_CONGAS.test(partes[0]!) && partes.slice(1).every(p => TAMBOR_DE_CONGAS.test(p.replace(/^(y|and|e)\s+/i, "")))) return [l];
   const reconocidas = partes.filter(p => categorizar(p) !== "Otro").length;
   if (reconocidas < partes.length * 0.75) return [l];
   return partes.map(texto => ({ ...l, texto: texto.replace(/^(y|and|e)\s+/i, "") }));

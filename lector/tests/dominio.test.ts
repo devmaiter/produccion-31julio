@@ -90,6 +90,8 @@ describe("categorizar", () => {
     // El acrílico y las baterías electrónicas son batería.
     ["Drum shield", "Batería"], ["Acrílico para batería", "Batería"], ["Plexiglass 5 paneles", "Batería"],
     ["Roland TD-27", "Batería"], ["Batería electrónica Yamaha DTX", "Batería"],
+    ["Máquina de hi-hat", "Batería"], ["Pedal de expresión", "Teclado"], ["Pailas 14 y 15", "Percusión"], ["Djembé", "Percusión"],
+    ["Congas w/ stands", "Percusión"], ["2x12 cab", "Ampli guitarra"], ["1x12 Roland Blues Cube", "Ampli guitarra"],
   ])("%s → %s", (texto, cat) => expect(categorizar(texto)).toBe(cat));
 });
 

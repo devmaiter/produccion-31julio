@@ -234,3 +234,812 @@ Amplificador Fender Twin Reverb o similar
 4 Stands para guitarra acústica
 => 1 | Amplificador Fender Twin Reverb o similar
 => 4 | Stands para guitarra acústica
+
+# ---- Respuestas del usuario (2026-10-16): cómo van las filas de teclados, órganos, hardware y percusión ----
+
+## teclado con su base y su pedal en un renglón: tres piezas
+KEYS
+1 Nord Stage 88 con base tipo Z y pedal de sustain
+=> 1 | Nord Stage 88
+=> 1 | base tipo Z
+=> 1 | pedal de sustain
+
+## teclado + base + sustain sin cantidad: tres piezas
+TECLADOS
+Yamaha Montage 8 + stand X + sustain
+=> 1 | Yamaha Montage 8
+=> 1 | stand X
+=> 1 | sustain
+
+## dos teclados con sus bases y sus pedales: cada accesorio con la cantidad del teclado
+TECLADOS
+2 Yamaha Motif XF8 con sus bases y pedales de sustain
+=> 2 | Yamaha Motif XF8
+=> 2 | bases
+=> 2 | pedales de sustain
+
+## teclado con accesorios en inglés
+KEYBOARDS
+1 Korg Kronos 61 with X stand and sustain pedal
+=> 1 | Korg Kronos 61
+=> 1 | X stand
+=> 1 | sustain pedal
+
+## teclado con su banqueta
+PIANO
+1 Piano digital Yamaha CP88 con banqueta
+=> 1 | Piano digital Yamaha CP88
+=> 1 | banqueta
+
+## teclado con su pedal y un cable: el cable no es backline
+KEYS
+1 Nord Electro 6D con pedal de sustain y cable
+=> 1 | Nord Electro 6D
+=> 1 | pedal de sustain
+
+## teclado con funda: la funda no es otra pieza
+KEYS
+1 Nord Electro 6D con funda
+=> 1 | Nord Electro 6D con funda
+
+## órgano con Leslie: una sola fila
+KEYS
+1 Hammond B3 con Leslie 122
+=> 1 | Hammond B3 con Leslie 122
+
+## órgano + Leslie: una sola fila, aunque vaya con "+"
+KEYS
+1 Hammond XK-5 + Leslie 3300
+=> 1 | Hammond XK-5 + Leslie 3300
+
+## órgano + Leslie sin cantidad
+KEYS
+Hammond XK-5 + Leslie
+=> 1 | Hammond XK-5 + Leslie
+
+## órgano y Leslie juntos; el pedal de expresión aparte
+TECLADOS
+1 Hammond XK-5 + Leslie 3300 + pedal de expresión
+=> 1 | Hammond XK-5 + Leslie 3300
+=> 1 | pedal de expresión
+
+## hardware completo: pieza por pieza, una base por platillo sin el hi-hat
+BATERÍA
+1 Bombo 22"
+1 Redoblante 14"
+Hardware completo
+1 Hi-hat 14"
+1 Crash 16"
+1 Crash 18"
+1 Ride 20"
+=> 1 | Bombo 22"
+=> 1 | Redoblante 14"
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 3 | Bases de platillo
+=> 1 | Hi-hat 14"
+=> 1 | Crash 16"
+=> 1 | Crash 18"
+=> 1 | Ride 20"
+
+## hardware con marca: cada pieza la lleva, y lo que ya está pedido no se repite
+DRUMS
+1 Kick 22"
+Hardware DW 9000
+1 Doble pedal DW 9000
+1 Ride 21"
+=> 1 | Kick 22"
+=> 1 | Base de redoblante DW 9000
+=> 1 | Máquina de hi-hat DW 9000
+=> 1 | Base de platillo DW 9000
+=> 1 | Doble pedal DW 9000
+=> 1 | Ride 21"
+
+## full hardware sin platillos en el kit: las 2 bases de siempre (crash y ride)
+DRUMS
+1 Snare 14"
+Full hardware
+=> 1 | Snare 14"
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 2 | Bases de platillo
+
+## hardware con marca y los platillos en su subtítulo
+DRUMS
+Hardware completo DW
+CYMBALS
+1 Hi-hat 14"
+2 Crash 16" y 18"
+1 Ride 21"
+1 China 18"
+=> 1 | Base de redoblante DW
+=> 1 | Máquina de hi-hat DW
+=> 1 | Pedal de bombo DW
+=> 4 | Bases de platillo DW
+=> 1 | Hi-hat 14"
+=> 1 | Crash 16"
+=> 1 | Crash 18"
+=> 1 | Ride 21"
+=> 1 | China 18"
+
+## dos baterías, cada una con su hardware y sus platillos
+DRUMS 1 - ANA PÉREZ
+1 Ride 20"
+Full hardware
+DRUMS 2 - LUIS GÓMEZ
+1 Crash 16"
+1 Crash 18"
+1 Ride 20"
+Full hardware
+=> 1 | Ride 20"
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 1 | Base de platillo
+=> 1 | Crash 16"
+=> 1 | Crash 18"
+=> 1 | Ride 20"
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 3 | Bases de platillo
+
+## hardware con marca como subtítulo y cada pieza debajo: no se repite nada
+DRUMS
+1 Bombo 22"
+HARDWARE DW 9000
+1 Snare stand
+1 Hi-hat stand
+3 Boom stands
+1 Kick pedal
+=> 1 | Bombo 22"
+=> 1 | Snare stand
+=> 1 | Hi-hat stand
+=> 3 | Boom stands
+=> 1 | Kick pedal
+
+## hardware de la batería escrito en el renglón, sin título de batería
+BACKLINE
+Hardware completo para batería Tama
+=> 1 | Base de redoblante Tama
+=> 1 | Máquina de hi-hat Tama
+=> 1 | Pedal de bombo Tama
+=> 2 | Bases de platillo Tama
+
+## "HARDWARE SET" solo es el título de la sección
+DRUMS
+HARDWARE SET
+2 Boom stands
+=> 2 | Boom stands
+
+## bases contadas con el hardware entre paréntesis: son 5 bases
+DRUMS
+5 Bases (hardware completo DW, con una base extra)
+=> 5 | Bases (hardware completo DW, con una base extra)
+
+## timbales con dos medidas: un set, una fila
+PERCUSIÓN
+1 Timbales LP 14" y 15"
+=> 1 | Timbales LP 14" y 15"
+
+## timbales en inglés con su base: una fila
+PERCUSSION
+Timbales 14" & 15" with stand
+=> 1 | Timbales 14" & 15" with stand
+
+## congas con sus tambores entre paréntesis: una fila
+PERCUSIÓN
+1 Congas LP (quinto, conga y tumba)
+=> 1 | Congas LP (quinto, conga y tumba)
+
+## congas con sus medidas: una fila (no como los toms)
+PERCUSIÓN
+3 Congas 11", 11¾" y 12½"
+=> 3 | Congas 11", 11¾" y 12½"
+
+## congas con sus medidas en lista: una fila
+PERCUSIÓN
+3 Congas: 11" 11¾" 12½"
+=> 3 | Congas: 11" 11¾" 12½"
+
+## bongó con sus medidas y su base: una fila
+PERCUSIÓN
+1 Bongó 7" y 8" con base
+=> 1 | Bongó 7" y 8" con base
+
+## timbales con base y campanas: las campanas traen su cantidad
+PERCUSSION
+1 LP timbales 14" & 15" w/ stand and 2 cowbells
+=> 1 | LP timbales 14" & 15" w/ stand
+=> 2 | cowbells
+
+## set de congas sin decir cuántas: una fila, cantidad 1
+PERCUSIÓN
+1 Set de congas LP
+=> 1 | Set de congas LP
+
+## tumbadoras sin decir cuántas: una fila, cantidad 1
+PERCUSIÓN
+Tumbadoras con sus bases
+=> 1 | Tumbadoras con sus bases
+
+## la caja de parlantes adelante no es una cantidad
+BASS
+4x10 Aguilar DB 410
+8x10 Ampeg SVT-810E
+=> 1 | 4x10 Aguilar DB 410
+=> 1 | 8x10 Ampeg SVT-810E
+
+## dos cajas de 4x10
+BASS
+2 x 4x10 Ampeg SVT-410HE
+=> 2 | 4x10 Ampeg SVT-410HE
+
+## caja de guitarra 2x12
+GUITARS
+2x12 Marshall 1936
+=> 1 | 2x12 Marshall 1936
+
+## cabezal "and" caja 8x10: el 8 no es una cantidad, y la caja es otra pieza
+BASS
+1 Ampeg SVT Classic head and 8x10 cabinet
+=> 1 | Ampeg SVT Classic head
+=> 1 | 8x10 cabinet
+
+## "por" con medida: sí es cantidad
+CYMBALS
+2 x 14" Crash, 1 Ride 20"
+=> 2 | 14" Crash
+=> 1 | Ride 20"
+
+## el número de la generación del teclado no es otra pieza
+KEYS
+1 Nord Stage 3 Compact
+=> 1 | Nord Stage 3 Compact
+
+## generación, sufijo y teclas del teclado
+TECLADOS
+2 Nord Stage 2 EX 76
+1 Nord Stage 3 HA88
+=> 2 | Nord Stage 2 EX 76
+=> 1 | Nord Stage 3 HA88
+
+## 15" son 15 pulgadas, no 1 de 5"
+DRUMS
+2 Toms 10" y 12" con soporte
+=> 1 | Toms 10"
+=> 1 | Toms 12" con soporte
+
+## una medida de dos cifras sin cantidad
+DRUMS
+Tom 10" y 12" con soporte
+=> 1 | Tom 10"
+=> 1 | Tom 12" con soporte
+
+## otra pieza con la medida adelante
+DRUMS
+1 Bombo 22", 16" Floor tom
+=> 1 | Bombo 22"
+=> 1 | 16" Floor tom
+
+## la X del X-hat no es "por"
+DRUMS
+1 Hi-hat 14"
+1 X-hat con clamp
+=> 1 | Hi-hat 14"
+=> 1 | X-hat con clamp
+
+## la X del X stand no es "por"
+KEYBOARDS
+1 X stand
+2 X-Stands
+=> 1 | X stand
+=> 2 | X-Stands
+
+## una x minúscula sí es "por"
+DRUMS
+2 x snare stands
+=> 2 | snare stands
+
+# ---- Revisión de las respuestas del 2026-10-16: formas que se escapaban ----
+
+## hardware completo con silla y alfombra: cada una en su fila, no pegadas a las piezas
+DRUMS
+Hardware completo, silla y alfombra
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 2 | Bases de platillo
+=> 1 | silla
+=> 1 | alfombra
+
+## full hardware con throne y rug en inglés
+DRUMS
+Full hardware, drum throne and drum rug
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 2 | Bases de platillo
+=> 1 | drum throne
+=> 1 | drum rug
+
+## hardware completo sin pedal de bombo: esa pieza no va
+DRUMS
+Hardware completo DW, sin pedal de bombo
+=> 1 | Base de redoblante DW
+=> 1 | Máquina de hi-hat DW
+=> 2 | Bases de platillo DW
+
+## full hardware except el pedal que trae el baterista: el pedal queda, marcado (lo mira la prueba)
+DRUMS
+Full hardware (except kick pedal, drummer brings his own)
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 2 | Bases de platillo
+
+## full hardware incl. 4 boom stands: 4 bases de platillo
+DRUMS
+Full hardware incl. 4 boom stands
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 4 | Bases de platillo
+
+## hardware completo x2: dos sets
+DRUMS
+Hardware completo x2
+=> 2 | Base de redoblante
+=> 2 | Máquina de hi-hat
+=> 2 | Pedal de bombo
+=> 4 | Bases de platillo
+
+## hardware completo para 2 baterías: dos sets
+DRUMS
+Hardware completo para 2 baterías
+=> 2 | Base de redoblante
+=> 2 | Máquina de hi-hat
+=> 2 | Pedal de bombo
+=> 4 | Bases de platillo
+
+## hardware con las bases entre paréntesis: manda lo que dice el rider, no los platillos
+DRUMS
+Hardware Pearl completo (2 boom stands)
+1 Crash 16"
+1 Crash 18"
+1 Ride 20"
+1 China 18"
+=> 1 | Base de redoblante Pearl
+=> 1 | Máquina de hi-hat Pearl
+=> 1 | Pedal de bombo Pearl
+=> 2 | Bases de platillo Pearl
+=> 1 | Crash 16"
+=> 1 | Crash 18"
+=> 1 | Ride 20"
+=> 1 | China 18"
+
+## full hardware set con la marca y el modelo: "set" no es de la marca
+DRUMS
+1 Full hardware set Tama Iron Cobra
+=> 1 | Base de redoblante Tama Iron Cobra
+=> 1 | Máquina de hi-hat Tama Iron Cobra
+=> 1 | Pedal de bombo Tama Iron Cobra
+=> 2 | Bases de platillo Tama Iron Cobra
+
+## full drum hardware
+DRUMS
+Full drum hardware
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 2 | Bases de platillo
+
+## herrajes completos con marca
+BATERÍA
+Herrajes completos DW
+=> 1 | Base de redoblante DW
+=> 1 | Máquina de hi-hat DW
+=> 1 | Pedal de bombo DW
+=> 2 | Bases de platillo DW
+
+## dos sets de hardware con "x"
+DRUMS
+2 x Full hardware DW 5000
+=> 2 | Base de redoblante DW 5000
+=> 2 | Máquina de hi-hat DW 5000
+=> 2 | Pedal de bombo DW 5000
+=> 4 | Bases de platillo DW 5000
+
+## hardware completo en una lista numerada: el número es el orden
+DRUMS
+1. Kick 22"
+2. Snare 14"
+3. Hardware completo Tama
+=> 1 | Kick 22"
+=> 1 | Snare 14"
+=> 1 | Base de redoblante Tama
+=> 1 | Máquina de hi-hat Tama
+=> 1 | Pedal de bombo Tama
+=> 2 | Bases de platillo Tama
+
+## full hardware entre viñetas
+DRUMS
+• 1 Kick 22" • Full hardware • 1 Drum throne
+=> 1 | Kick 22"
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 2 | Bases de platillo
+=> 1 | Drum throne
+
+## una base de platillo extra se suma: no borra las del hardware
+DRUMS
+Hardware completo DW
+1 Crash 16"
+1 Crash 18"
+1 Ride 20"
+1 Boom stand extra
+=> 1 | Base de redoblante DW
+=> 1 | Máquina de hi-hat DW
+=> 1 | Pedal de bombo DW
+=> 3 | Bases de platillo DW
+=> 1 | Crash 16"
+=> 1 | Crash 18"
+=> 1 | Ride 20"
+=> 1 | Boom stand extra
+
+## hardware completo que trae la banda: se abre y va marcado (lo mira la prueba)
+DRUMS
+Hardware completo: lo trae la banda
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 2 | Bases de platillo
+
+## hardware completo with 3 boom stands: sin "stands" pegado a cada pieza
+DRUMS
+Hardware completo with 3 boom stands
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 3 | Bases de platillo
+
+## hardware completo que "lleva" sus bases: es cuántas trae el hardware
+DRUMS
+Hardware completo (lleva 3 boom stands)
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 3 | Bases de platillo
+
+## "Crash 16" x2" son dos crash, y el hardware cuenta sus dos bases
+DRUMS
+Hardware completo
+Crash 16" x2
+Ride 20"
+=> 1 | Base de redoblante
+=> 1 | Máquina de hi-hat
+=> 1 | Pedal de bombo
+=> 3 | Bases de platillo
+=> 2 | Crash 16"
+=> 1 | Ride 20"
+
+## teclado en inglés con keyboard stand y sustain pedal: tres filas
+KEYS
+1 Roland RD-2000 with keyboard stand and sustain pedal
+=> 1 | Roland RD-2000
+=> 1 | keyboard stand
+=> 1 | sustain pedal
+
+## teclado + Z stand + sustain
+KEYS
+1 Nord Stage 4 88 + Z stand + sustain
+=> 1 | Nord Stage 4 88
+=> 1 | Z stand
+=> 1 | sustain
+
+## teclado con base y dos pedales
+KEYS
+1 Yamaha Motif XF8 + stand + sustain pedal + volume pedal
+=> 1 | Yamaha Motif XF8
+=> 1 | stand
+=> 1 | sustain pedal
+=> 1 | volume pedal
+
+## teclado con stand, sustain y pedal de expresión, con comas
+KEYS
+1 Nord Electro 6D 73 with stand, sustain pedal and expression pedal
+=> 1 | Nord Electro 6D 73
+=> 1 | stand
+=> 1 | sustain pedal
+=> 1 | expression pedal
+
+## base doble en X: lo que describe la base va antes del nombre
+KEYS
+1 Korg Kronos 2 88 with double X stand and sustain pedal
+=> 1 | Korg Kronos 2 88
+=> 1 | double X stand
+=> 1 | sustain pedal
+
+## base con su marca antes del nombre
+KEYS
+1 Nord Piano 5 88 with Ultimate Apex stand and sustain pedal
+=> 1 | Nord Piano 5 88
+=> 1 | Ultimate Apex stand
+=> 1 | sustain pedal
+
+## doble base y pedal en español
+TECLADOS
+1 Teclado Roland Fantom 8 con doble base y pedal
+=> 1 | Teclado Roland Fantom 8
+=> 1 | doble base
+=> 1 | pedal
+
+## piano con banco y pedal triple
+KEYS
+1 Digital piano Kawai MP11SE with bench and triple pedal
+=> 1 | Digital piano Kawai MP11SE
+=> 1 | bench
+=> 1 | triple pedal
+
+## teclado con base, pedal y atril
+TECLADOS
+1 Nord Stage 3 88 + base + pedal sustain + atril
+=> 1 | Nord Stage 3 88
+=> 1 | base
+=> 1 | pedal sustain
+=> 1 | atril
+
+## la funda se queda con el teclado y no impide separar lo demás
+TECLADOS
+1 Nord Stage 3 88 con funda, base y pedal de sustain
+=> 1 | Nord Stage 3 88 con funda
+=> 1 | base
+=> 1 | pedal de sustain
+
+## órgano con Leslie, stand y pedal de expresión
+KEYS
+1 Hammond XK-5 with Leslie 3300, stand and expression pedal
+=> 1 | Hammond XK-5 with Leslie 3300
+=> 1 | stand
+=> 1 | expression pedal
+
+## los accesorios entre paréntesis también van aparte
+TECLADOS
+1 Nord Stage 3 88 (con base y pedal de sustain)
+=> 1 | Nord Stage 3 88
+=> 1 | base
+=> 1 | pedal de sustain
+
+## los accesorios entre paréntesis, con "sustain" a secas
+TECLADOS
+1 Teclado Yamaha Motif XF8 (con base y sustain)
+=> 1 | Teclado Yamaha Motif XF8
+=> 1 | base
+=> 1 | sustain
+
+## el Leslie con su propio número sigue con su órgano
+KEYS
+1 Hammond XK-5 + 1 Leslie 3300
+1 Hammond B3 and 1 Leslie 122
+=> 1 | Hammond XK-5 + Leslie 3300
+=> 1 | Hammond B3 and Leslie 122
+
+## "lo trae la banda" al final vale para las tres filas (lo mira la prueba)
+TECLADOS
+1 Nord Stage 3 88 con base y pedal de sustain (lo trae la banda)
+=> 1 | Nord Stage 3 88
+=> 1 | base
+=> 1 | pedal de sustain
+
+## en una tabla, la observación que es solo la lista de accesorios también va aparte
+TECLADOS
+1   Nord Stage 3 88   Con base tipo Z y pedal de sustain
+=> 1 | Nord Stage 3 88
+=> 1 | base tipo Z
+=> 1 | pedal de sustain
+
+## "Keyboard:" con el modelo y sus accesorios no es un título
+KEYS
+Keyboard: Nord Stage 4 88 with stand and sustain pedal
+=> 1 | Nord Stage 4 88
+=> 1 | stand
+=> 1 | sustain pedal
+
+## lista corrida de teclados: el número que sigue al modelo es la cantidad de lo siguiente
+KEYBOARDS
+1 Yamaha Motif 2 Keyboard stands 1 Sustain pedal
+=> 1 | Yamaha Motif
+=> 2 | Keyboard stands
+=> 1 | Sustain pedal
+
+## lista corrida de teclados y bases
+TECLADOS
+1 Nord Electro 1 Base doble
+=> 1 | Nord Electro
+=> 1 | Base doble
+
+## lista corrida de varios teclados
+KEYBOARDS
+1 Korg Kronos 1 Nord Lead 4 1 Roland Juno 2 Bases de teclado
+=> 1 | Korg Kronos
+=> 1 | Nord Lead 4
+=> 1 | Roland Juno
+=> 2 | Bases de teclado
+
+## congas con sus tambores entre paréntesis, solo con comas: una fila
+PERCUSION
+1 Congas LP Galaxy (quinto, conga, tumba) w/ stands
+=> 1 | Congas LP Galaxy (quinto, conga, tumba) w/ stands
+
+## set de congas con sus tambores entre paréntesis
+PERCUSION
+1 Set de congas LP (quinto, conga, tumba)
+=> 1 | Set de congas LP (quinto, conga, tumba)
+
+## congas y timbales en una lista numerada
+PERCUSION
+1. Congas LP (quinto, conga, tumba)
+2. Timbales LP 14" y 15"
+=> 1 | Congas LP (quinto, conga, tumba)
+=> 1 | Timbales LP 14" y 15"
+
+## timbales y bongó con tilde en el mismo renglón: un set cada uno
+PERCUSION
+Timbales 14", 15", Bongó 7" y 8"
+=> 1 | Timbales 14", 15"
+=> 1 | Bongó 7" y 8"
+
+## congas y bongó con tilde
+PERCUSION
+2 Congas 11" y 12", Bongó LP
+=> 2 | Congas 11" y 12"
+=> 1 | Bongó LP
+
+## timbales y djembé con tilde
+PERCUSION
+Timbales 14" y 15", djembé 12"
+=> 1 | Timbales 14" y 15"
+=> 1 | djembé 12"
+
+## set de congas, bongó y timbales: tres sets
+PERCUSION
+Set de congas LP, bongó y timbales
+=> 1 | Set de congas LP
+=> 1 | bongó
+=> 1 | timbales
+
+## congas y sus tambores después de dos puntos: una fila
+PERCUSION
+Congas: quinto, conga y tumba
+=> 1 | Congas (quinto, conga y tumba)
+
+## tumbadoras con las medidas de cada tambor: una fila
+PERCUSION
+Tumbadoras LP: quinto 11", conga 11 3/4", tumba 12 1/2"
+=> 1 | Tumbadoras LP (quinto 11", conga 11 3/4", tumba 12 1/2")
+
+## las congas y sus tambores separados por comas: una fila
+PERCUSION
+Congas LP, quinto, conga, tumba
+=> 1 | Congas LP, quinto, conga, tumba
+
+## pailas (los timbales de aquí): un set, una fila
+PERCUSIÓN
+Pailas 14" y 15"
+Pailas 13" y 14" con su base
+=> 1 | Pailas 14" y 15"
+=> 1 | Pailas 13" y 14" con su base
+
+## set of congas en inglés
+PERCUSSION
+1 set of congas (LP Matador) with stands
+Set de tumbas LP con sus bases
+=> 1 | set of congas (LP Matador) with stands
+=> 1 | Set de tumbas LP con sus bases
+
+## timbales con "inch": la medida no es una cantidad
+PERCUSSION
+Timbales LP 14 and 15 inch with cowbell
+=> 1 | Timbales LP 14 and 15 inch with cowbell
+
+## caja de bajo numerada: el 8x10 no es el capítulo 1.8 ni 10 cajas
+BASS
+1. 8x10 Ampeg SVT-810E
+2. Ampeg SVT-CL head
+=> 1 | 8x10 Ampeg SVT-810E
+=> 1 | Ampeg SVT-CL head
+
+## caja de 4x10 numerada
+BASS
+1. 4x10 Ampeg SVT-410HLF
+2. Ampeg SVT-CL head
+=> 1 | 4x10 Ampeg SVT-410HLF
+=> 1 | Ampeg SVT-CL head
+
+## caja de guitarra numerada en segundo lugar
+GUITARRA
+1. Fender Twin Reverb
+2. 2x12 Marshall cabinet
+=> 1 | Fender Twin Reverb
+=> 1 | 2x12 Marshall cabinet
+
+## el tamaño del redoblante con decimales no es una cantidad
+DRUMS
+14x6.5 Ludwig Supraphonic snare
+14 x 5.5 Snare
+=> 1 | 14x6.5 Ludwig Supraphonic snare
+=> 1 | 14 x 5.5 Snare
+
+## el tamaño del redoblante con coma decimal, debajo del título
+BATERIA
+14x6,5 Redoblante
+=> 1 | 14x6,5 Redoblante
+
+## el tamaño del bombo adelante no es una cantidad
+DRUMS
+22x18 Kick DW
+=> 1 | 22x18 Kick DW
+
+## el X-hat después de una coma o un "+" es otra pieza
+DRUMS
+Hi-hat 14", X-hat 10"
+1 Hi-hat 14" + X-hat 10"
+=> 1 | Hi-hat 14"
+=> 1 | X-hat 10"
+=> 1 | Hi-hat 14"
+=> 1 | X-hat 10"
+
+## combo con los parlantes adelante: no se pierde
+GUITARRA
+1x12 Roland Blues Cube
+1 Fender Twin Reverb 65
+2x12 Peavey 6505
+=> 1 | 1x12 Roland Blues Cube
+=> 1 | Fender Twin Reverb 65
+=> 1 | 2x12 Peavey 6505
+
+## cantidad por medida de platillo: no es una caja de parlantes
+CYMBALS
+1 Ride 20", 2x16 Crash, 1 Hi-hat 14"
+=> 1 | Ride 20"
+=> 2 | 16 Crash
+=> 1 | Hi-hat 14"
+
+## cantidad por medida de tom de piso
+DRUMS
+1 Kick 22 DW
+2x14 Floor Tom
+=> 1 | Kick 22 DW
+=> 2 | 14 Floor Tom
+
+## la profundidad del redoblante no es otro redoblante
+DRUMS
+1 Snare 14", 6.5" deep
+=> 1 | Snare 14", 6.5" deep
+
+## la profundidad en español, con coma decimal
+BATERIA
+1 Redoblante Ludwig 14", 6,5" de profundidad
+=> 1 | Redoblante Ludwig 14", 6,5" de profundidad
+
+## cabezal y caja con coma: dos piezas
+GUITARRA
+1 Orange Rockerverb 50 head, 2x12 cab
+=> 1 | Orange Rockerverb 50 head
+=> 1 | 2x12 cab
+
+## cabezal y gabinete sin cantidad: también dos piezas
+BAJO
+Cabezal Ampeg SVT-4 PRO y gabinete 8x10
+=> 1 | Cabezal Ampeg SVT-4 PRO
+=> 1 | gabinete 8x10
+
+## set de congas, bongo sin tilde y timbales: tres sets
+PERCUSION
+Set de congas LP, bongo y timbales
+=> 1 | Set de congas LP
+=> 1 | bongo
+=> 1 | timbales

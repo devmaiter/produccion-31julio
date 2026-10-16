@@ -61,12 +61,16 @@ describe("cantidades y medidas", () => {
   const leer = (t: string) => interpretar([{ nombre: "r.pdf", tipo: "pdf", avisos: [], lineas: lineasDeTexto(`RIDER TÉCNICO\nLOS RAYOS\nBACKLINE\n${t}`) }])
     .items.map(i => `${i.cantidad} ${i.descripcion}`);
 
-  it("'01 Pedal … 01 Set de hardware' son dos ítems", () => {
-    expect(leer("DRUMS\n01 Pedal de bombo Marca 900 01 Set de Hardware completo")).toEqual(["1 Pedal de bombo Marca 900", "1 Set de Hardware completo"]);
+  // El "hardware completo" se abre pieza por pieza (lo definió el usuario, 2026-10-16): el pedal que ya está
+  // pedido no se repite y, sin platillos en el kit, van las 2 bases de platillo de siempre.
+  it("'01 Pedal … 01 Set de hardware' son dos ítems: el pedal y el hardware abierto", () => {
+    expect(leer("DRUMS\n01 Pedal de bombo Marca 900 01 Set de Hardware completo")).toEqual([
+      "1 Pedal de bombo Marca 900", "1 Base de redoblante", "1 Máquina de hi-hat", "2 Bases de platillo",
+    ]);
   });
   it("el número después del platillo es su medida, también al final del renglón", () => {
     expect(leer("DRUMS\n01 Crash 14 Marca\n01 Plato efecto Marca k 16\nHardware completo con 2 soportes")).toEqual([
-      "1 Crash 14 Marca", "1 Plato efecto Marca k 16", "1 Hardware completo con 2 soportes",
+      "1 Crash 14 Marca", "1 Plato efecto Marca k 16", "1 Base de redoblante", "1 Máquina de hi-hat", "1 Pedal de bombo", "2 Bases de platillo",
     ]);
   });
 });
