@@ -16,6 +16,14 @@ describe("no es backline", () => {
     ["Extensión para pedal de bombo", null, false],
     ["Di la vuelta a la tarima", null, false],
     ["Fender Twin Reverb", null, false],
+    // Lo que el usuario dijo que no es backline (2026-10-16): es de sonido.
+    ["Audífonos in ear Shure SE215", null, true], ["2 Shure SE535", null, true],
+    ["Mezclador personal Behringer P16", null, true], ["Allen & Heath ME-1", null, true],
+    ["Inalámbrico para guitarra Shure GLXD16", null, true], ["Line 6 Relay G10", null, true],
+    ["Laptop para secuencias", null, true], ["Interfaz de audio Focusrite", null, true],
+    // …y lo que sí: la base para el laptop, la mesa del DJ y la caja de extensión de un ampli.
+    ["Base para laptop", null, false], ["Laptop stand", null, false], ["Mesa para DJ", null, false],
+    ["Caja de extensión 4x10", null, false],
   ])("%s (%s) → %s", (texto, grupo, esperado) => {
     expect(noEsBackline(texto, grupo)).toBe(esperado);
   });
@@ -68,7 +76,20 @@ describe("categorizar", () => {
     ["afinador de clip", "Guitarra"], ["2 juegos de cuerdas 10-46", "Guitarra"], ["1 bajo de repuesto", "Bajo"],
     // Otros bajos: van en Bajo. "Double bass pedal" sigue siendo de la batería.
     ["1 Contrabajo", "Bajo"], ["Baby bass", "Bajo"], ["Bajo sexto", "Bajo"], ["Upright bass", "Bajo"],
-    ["Double bass pedal", "Batería"],
+    ["Double bass pedal", "Batería"], ["Baby Bass Ampeg", "Bajo"], ["Bajo quinto", "Bajo"], ["Ampli de contrabajo", "Ampli bajo"],
+    // Amplis y accesorios de bajo que faltaban.
+    ["Darkglass Microtubes 900", "Ampli bajo"], ["Fender Bassman 800", "Ampli bajo"], ["Combo de bajo", "Ampli bajo"],
+    ["Bass amp", "Ampli bajo"], ["Amplificador para bajo", "Ampli bajo"], ["Caja de extensión 4x10", "Ampli bajo"],
+    ["Pedalera de bajo", "Bajo"], ["Afinador de bajo", "Bajo"], ["Cuerdas de bajo 45-105", "Bajo"], ["Pedalera", "Guitarra"],
+    // Cuerdas típicas con las guitarras; órgano y Leslie con los teclados.
+    ["Tiple", "Guitarra"], ["Requinto", "Guitarra"], ["Cuatro venezolano", "Guitarra"], ["Charango", "Guitarra"],
+    ["Hammond B3 con Leslie 122", "Teclado"], ["Leslie 122", "Teclado"], ["Órgano Nord C2D", "Teclado"], ["Fender Rhodes", "Teclado"],
+    // Percusión latina y colombiana.
+    ["Set de tumbadoras", "Percusión"], ["Bongó LP", "Percusión"], ["Campana de timbal", "Percusión"], ["Djembe", "Percusión"],
+    ["Caja vallenata", "Percusión"], ["Güira", "Percusión"], ["Pandereta", "Percusión"],
+    // El acrílico y las baterías electrónicas son batería.
+    ["Drum shield", "Batería"], ["Acrílico para batería", "Batería"], ["Plexiglass 5 paneles", "Batería"],
+    ["Roland TD-27", "Batería"], ["Batería electrónica Yamaha DTX", "Batería"],
   ])("%s → %s", (texto, cat) => expect(categorizar(texto)).toBe(cat));
 });
 

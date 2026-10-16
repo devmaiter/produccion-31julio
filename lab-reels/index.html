@@ -742,13 +742,15 @@ const festival = () => V?.modo === "festival";
    "DJ") no es un reel: cada ítem va por su categoría y lo que no es instrumento, a Extras. */
 const REELES = ["Batería", "Bajo", "Guitarra", "Teclado", "Percusión", "Platillos", "In ears", "Consolas", "Extras"];
 const GRUPOS = [[/bater|drum|\bkit\b/, "Batería"], [/platillo|cymbal/, "Platillos"], [/percus|\bperc\b/, "Percusión"],
-  [/teclad|\bkeys?\b|piano|synth|sintet/, "Teclado"], [/\bbajo|bass/, "Bajo"], [/guitar|\bgtr\b/, "Guitarra"]];
+  [/teclad|\bkeys?\b|piano|synth|sintet|organo|organ\b|hammond/, "Teclado"], [/\bbajo|bass|contrabajo/, "Bajo"],
+  [/guitar|\bgtr\b|tiple|requinto|cuatro|bandola|charango/, "Guitarra"], [/tumbador|conga|timbal|vallenat|tambora|folclor/, "Percusión"]];
 const POR_CATEGORIA = {"Batería": "Batería", "Platillos": "Platillos", "Percusión": "Percusión", "Teclado": "Teclado",
   "Ampli bajo": "Bajo", "Bajo": "Bajo", "Ampli guitarra": "Guitarra", "Guitarra": "Guitarra", "In ears": "In ears", "Consolas": "Consolas"};
 // Una base o un tapete sin grupo va con su instrumento: "Boom cymbal stand" a Batería.
 const DE_QUIEN = [[/cymbal|platillo|plato|hi ?-?hat|snare|redoblante|throne|drum|bater|tom stand|porter/, "Batería"],
   [/teclado|keyboard|\bks ?\d|ax-?\d|tipo z|\bkeys? stand/, "Teclado"], [/guitar|guitarrero/, "Guitarra"],
-  [/\bbajo|\bbass\b/, "Bajo"], [/conga|bongo|timbal|percus|cradle/, "Percusión"]];
+  [/\bbajo|\bbass\b|contrabajo/, "Bajo"], [/conga|tumbadora|bongo|timbal|percus|cradle|djembe|cajon/, "Percusión"],
+  [/tiple|requinto|cuatro|charango|bandola/, "Guitarra"]];
 function reelDe(it){
   const norm = t => (t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   // Los ventiladores siempre van a Extras, aunque est\u00e9n en el bloque del bajo o de la percusi\u00f3n (pedido del usuario).
@@ -1205,19 +1207,29 @@ const LLEVA = {
   // Bajo (lo dijo el usuario, 2026-10-16): siempre se avisa la base; el ampli no, porque cuál va depende del
   // evento. Si el bajista trae su cabezal, Circuito pone la caja y un cabezal de respaldo.
   "Bajo": [
-    {pieza: "Base para bajo", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|atril)\b/},
+    {pieza: "Base para bajo", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|guitarreros?)\b/},
     {pieza: "Caja de bajo", categoria: "Ampli bajo", cuando: bandaTraeCabezal, hay: /\b(caja|cabina|cabinet|cab|gabinete|bafle|combo|\d ?x ?1[025])\b/},
     {pieza: "Cabezal de bajo de respaldo", categoria: "Ampli bajo", cuando: bandaTraeCabezal, soloNuestro: true, hay: /\b(cabezal|head|cabeza|svt|combo|respaldo|backup|spare)\b/},
   ],
+  // Guitarra (2026-10-16): el ampli no se avisa, como en el bajo (cuál va lo define el evento).
   "Guitarra": [
-    {pieza: "Amplificador de guitarra", categoria: "Ampli guitarra", hay: /\b(ampli\w*|amp|cabezal|head|cabina|combo|twin|deville|hot rod|marshall|vox|orange|jc ?-?120)\b/},
-    {pieza: "Base para guitarra", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|guitarrero)\b/},
+    {pieza: "Base para guitarra", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|guitarreros?)\b/},
   ],
+  // "Atril" a secas es de partituras (lo dijo el usuario): no cuenta como base del teclado ni del bajo.
   "Teclado": [
-    {pieza: "Base de teclado", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|atril)\b/},
+    {pieza: "Base de teclado", categoria: "Bases", hay: /\b(bases?|stands?|soportes?)\b/},
     {pieza: "Pedal de sustain", categoria: "Teclado", hay: /\b(sustain|pedal(es)?|fc ?-?\d)\b/},
   ],
+  // Percusión (2026-10-16): solo se avisan las bases de las congas, y solo si hay congas.
+  "Percusión": [
+    {pieza: "Bases para congas", categoria: "Percusión", cuando: hayCongas, hay: /\b(bases?|stands?|soportes?)\b.{0,25}\b(congas?|tumbadoras?|tumbas?|quintos?)\b|\bcongas?\b.{0,40}\b(con|y|with|incl\w*) (sus |su |las |los )?(bases?|stands?|soportes?)\b|\bconga stands?\b/},
+  ],
 };
+// Batería electrónica (Roland TD, Yamaha DTX…): no se avisa nada, depende del rider (lo dijo el usuario).
+const ELECTRONICA = /\b(electronica|electronic|e-?drums?|roland td|td-?\d{1,2}|dtx|v-?drums|alesis|efnote)\b/;
+function hayCongas(items){
+  return items.some(x => /\b(congas?|tumbadoras?|quintos?)\b/.test(sinTildesL(`${x.referencia} ${x.descripcion || ""}`)));
+}
 const sinTildesL = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 // De qué instrumento es la sección: el reel que más se repite entre sus piezas.
 function instrumentoDe(items){
@@ -1230,6 +1242,7 @@ function faltantes(items){
   const inst = items.length && instrumentoDe(items); if (!inst) return [];
   const textoDe = xs => sinTildesL(xs.map(x => `${x.referencia} ${x.descripcion || ""} ${x.nota || ""}`).join(" · "));
   const texto = textoDe(items), nuestro = textoDe(items.filter(x => !loTraeLaBanda(x)));
+  if (inst === "Batería" && ELECTRONICA.test(texto)) return [];
   const descartadas = new Set(leer(claveNoFalta(), []));
   return LLEVA[inst].filter(r => (!r.cuando || r.cuando(items)) && !r.hay.test(r.soloNuestro ? nuestro : texto)
       && !(r.hardware && HARDWARE.test(texto)) && !descartadas.has(idFalta(items, r.pieza)))

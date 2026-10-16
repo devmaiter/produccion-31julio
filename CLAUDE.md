@@ -196,8 +196,18 @@ datos de contacto.
 
 **Rondas de preguntas por instrumento (2026-10-16, lo pidió el usuario):** se le pregunta instrumento por
 instrumento, con opciones para tocar en el celular, después de investigar el backline en la web. Bajo:
-respondido (contrabajo, baby bass y bajo sexto van en Bajo; el ampli depende del evento; ver `LLEVA`).
-Siguen guitarra, teclado, percusión, batería y platillos, y DJ.
+respondidas todas las rondas (bajo, guitarra, teclado, percusión, batería y lo del límite). Cuando contesta
+«depende del rider», la app no supone nada: sigue lo que diga el rider. Lo que quedó:
+- **Secciones:** contrabajo, baby bass y bajo sexto/quinto en Bajo; bajo de sintetizador en Teclado; tiple,
+  requinto, cuatro, bandola y charango con las guitarras; Hammond, Leslie, órgano y Rhodes en Teclado;
+  tumbadoras, campana, djembe, güira, caja vallenata y pandereta en Percusión; acrílico (drum shield) y
+  baterías electrónicas en Batería; mesa o cabina de DJ y base para laptop son backline.
+- **No es backline:** audífonos in ear (SE215…), mezcladores personales (P16, ME-1), inalámbricos de
+  instrumento (GLXD16…) y el computador o la interfaz sueltos. La «caja de extensión» de un ampli sí es backline.
+- **Filas:** teclado «con base … y pedal …» = 3 filas; Hammond con Leslie = 1 fila; «hardware completo» se
+  abre pieza por pieza; congas, timbales y bongó = una fila por set; «set de congas» sin número = 2 tambores.
+- La investigación de la web (catálogos de backline, nombres y modelos) quedó en el contexto de la sesión
+  del 2026-10-16; los hallazgos útiles ya están en `categorias.ts` y en los casos de entrenamiento.
 
 **IA de pago para leer (pendiente de que el usuario decida, 2026-10-16):** preguntó si conviene leer con IA
 (tokens) en vez de un OCR complejo. La recomendación fue un camino mixto: la IA lee el documento y devuelve
@@ -273,7 +283,9 @@ prueba (que el % suba sin romper los riders anteriores).
   hi-hat, platillos, alfombra y plásticos —así les dicen a los parches; cuenta también «parches» o una marca
   como Remo/Evans—; bajo: base —el ampli no se avisa porque cuál va depende del evento; si el bajista trae su
   cabezal («lo trae la banda»), se avisa caja de bajo y cabezal de respaldo, como hace Circuito (2026-10-16)—;
-  guitarra: ampli y base; teclado: base y pedal de sustain). Una regla puede tener `cuando` (solo aplica si
+  guitarra: solo la base —el ampli tampoco se avisa—; teclado: base y pedal de sustain; percusión: solo las bases
+  de las congas, cuando hay congas; batería electrónica: nada, depende del rider). Un «atril» a secas es de
+  partituras: no cuenta como base de teclado ni de bajo. Una regla puede tener `cuando` (solo aplica si
   pasa algo, como `bandaTraeCabezal`) y `soloNuestro` (solo cuenta lo que pone Circuito, no lo de la banda).
   «Hardware completo» cubre stands y pedal, no silla ni alfombra. Se avisa (⚠ en los botones de sección,
   «Revisa: no pidió…» en la portada de la sección, «Le falta» bajo el listado), nunca se agrega solo:

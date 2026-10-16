@@ -31,22 +31,29 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   // stands, banqueta y tapete). Va antes de "Escenario" (tapete) y de "Bases" (stands, throne).
   ["Batería",          /((snares?|redoblantes?|tarolas?|hi ?-?hats?|hihats?|charles|cymbals?|c[ií]mbal(es)?|platillos?|boom|toms?|bombos?|kicks?)\s*(stands?|soportes?|bases?)\b|\b(stands?|soportes?|bases?)\s+((de|para|del)\s+)?(redoblante|tarola|snare|hi ?-?hat|charles|platillos?|cymbals?|c[ií]mbal(es)?|toms?|bombo)\b|\bdouble tom\b|\bthrone\b|banqueta|silla de bater|drum (stool|carpet|rug|mat)|(tapete|alfombra) (de |para )?(la )?bater|pedal de bombo|kick pedal|(twin|doble|double) pedal|double bass (drum )?pedal)/i],
   // Pedales de efectos y pedalboards son de la guitarra (o del bajo si lo dice), no de la batería.
-  ["Bajo",             /((pedal(es)?|pedalboard|pedal ?board|efectos?|fx)\b.{0,25}\b(bajo|bass)\b|\bbass (pedals?|pedalboard|fx|effects?)\b)/i],
-  ["Guitarra",         /(pedal(es)? de efectos?|pedalboard|pedal ?board|effects? pedals?|fx pedals?|tuner pedal|pedal afinador|\bafinador(es)?\b|\btuners?\b|\bwah\b|overdrive|distorsi[oó]n|\bhelix\b|\bkemper\b)/i],
+  ["Bajo",             /((pedal(es)?|pedaleras?|pedalboard|pedal ?board|efectos?|fx|afinador(es)?|cuerdas)\b.{0,25}\b(bajo|bass)\b|\bbass (pedals?|pedalboard|fx|effects?|tuner|strings)\b)/i],
+  ["Guitarra",         /(pedal(es)? de efectos?|pedaleras?|pitchblack|polytune|\btu-?3\b|pedalboard|pedal ?board|effects? pedals?|fx pedals?|tuner pedal|pedal afinador|\bafinador(es)?\b|\btuners?\b|\bwah\b|overdrive|distorsi[oó]n|\bhelix\b|\bkemper\b)/i],
   // Parches por su marca o modelo ("Remo Coated Ambassador", "Evans G2") y baquetas: son de la batería.
   ["Batería",          /(\b(remo|evans|aquarian)\b|ambassador|emperor|powerstroke|pinstripe|\bemad\b|\bg(1|2|14)\b|drum ?heads?|pl[aá]sticos?|baquetas?|escobillas?|\bmallets?\b|drum ?sticks?|\bsticks\b|\bbrushes\b|vic firth)/i],
-  ["Escenario",        /(stage fan|cooler fan|tapete|\bfans?\b|ventilador|fald[oó]n|plexiglass|sand ?bags|sacos de arena|alfombra|carpet|\brug\b|stage ?dex|\briser|tarima)/i],
+  // El acrílico (drum shield) es backline y va con la batería (lo dijo el usuario, 2026-10-16); las baterías
+  // electrónicas también son batería aunque solo digan el modelo ("Roland TD-27").
+  ["Batería",          /(drum ?shields?|mamparas?|acr[ií]licos?|plexiglas+|roland td|\btd-?\d{1,2}\w*\b|\bdtx\b|v-?drums|alesis (strike|nitro|crimson|surge)|efnote|bater[ií]as? electr[oó]nicas?|electronic (drums?|kit)|e-?drums?)/i],
+  ["Escenario",        /(stage fan|cooler fan|tapete|\bfans?\b|ventilador|fald[oó]n|sand ?bags|sacos de arena|alfombra|carpet|\brug\b|stage ?dex|\briser|tarima)/i],
   ["Percusión",        /(magician|percussion tables?|toys tables?|trap tables?|cortina|bar chimes|mark tree|mesas? (de percusi[oó]n|tipo mago|de toys))/i],
   ["Batería",          /(\bx ?-?hat\b|\bkd\b|\bclamps?\b|boom arm|\bspd\b|sample ?pad|octapad)/i],
-  ["Cables y energía", /(\bcables?\b|transformador|convertidor|\bups\b|extensi[oó]n|regleta|power ?strip)/i],
+  ["Cables y energía", /(\bcables?\b|transformador|convertidor|\bups\b|(?<!(cajas?|gabinetes?|cabinas?|bafles?) (de )?)extensi[oó]n|regleta|power ?strip)/i],
   // Modelos de teclado: "YAMAHA MO6 STAND" es el teclado con su base, no una base.
-  ["Teclado",          /(\bnord (stage|electro|piano|lead|wave)|kronos|montage|\bmodx\b|\bmo ?[68]\b|motif|fantom|\bjuno\b|triton|kurzweil|\bcp-?(73|88)\b|rd-?(88|2000)|yamaha es7)/i],
+  ["Teclado",          /(hammond|\bnord (stage|electro|piano|lead|wave|c2d?)|kronos|montage|\bmodx\b|\bmo ?[68]\b|motif|fantom|\bjuno\b|triton|kurzweil|\bcp-?(73|88)\b|rd-?(88|2000)|yamaha es7)/i],
   ["Bases",            /(\bbases?\b|\bsoportes?\b|\batril|\bstands?\b|pie de micr[oó]|guitar boat|guitarrero|\bstool\b|\bsillas?\b|\bbancos?\b|\basientos?\b|\bthrone\b|laptop stand|mesa(?! ?boogie))/i],
-  ["Ampli bajo",       /(\b[48] ?x ?10\b|\bampeg\b|\bsvt\b|gallien|\bgk\b|markbass|hartke|\brumble\b|aguilar|ampli(ficador)? de bajo|cabezal de bajo|bass head|bass cab)/i],
+  // Contrabajo, baby bass y bajo sexto o quinto van en Bajo (lo dijo el usuario, 2026-10-16); su ampli es Ampli bajo.
+  ["Bajo",             /^(?!.*\b(ampli\w*|amps?|cabezal|head|combo|caja|cabina)\b).*(contrabajo|upright bass|baby ?bass|bajo (sexto|quinto))/i],
+  ["Ampli bajo",       /(\b[48] ?x ?10\b|\bampeg\b|\bsvt\b|gallien|\bg-?k\b|mark ?bass|hartke|\brumble\b|aguilar|darkglass|bassman|trace elliot|\bebs\b|\bswr\b|ashdown|orange ob1|terror bass|ampli(ficador)?(es)? (de|para) (contra)?bajo|\bamps? (de|para) bajo|combos? (de|para) bajo|cabezal de bajo|bass (heads?|cabs?|amps?|combos?))/i],
   ["Ampli guitarra",   /(hot ?rod|deville|blues junior|bassbreaker|twin reverb|deluxe reverb|jazz chorus|jc[- ]?120|marshall|vox ac|\borange\b|mesa ?boogie|princeton|katana|ampli(ficador)? de guitarra|cabezal de guitarra)/i],
-  ["Teclado",          /(montage|\bnord\b|fantom|\bjuno\b|motif|kurzweil|\bkorg\b|\bmoog\b|kronos|triton|rd-?88|cp-?88|yamaha es7|teclado|\bpiano\b|keyboard|sintetizador|\bsynth\b|sustain|\bfc[47]\b)/i],
+  // Tiple, requinto, cuatro, bandola, charango y tres van con las guitarras (2026-10-16).
+  ["Guitarra",         /(\btiples?\b|requintos?|\bbandolas?\b|charangos?|\btres cubanos?\b|\bcuatros? (venezolanos?|llaneros?|puertorrique\w*)\b|^\s*cuatro\s*$|ukeleles?|ukuleles?|mandolinas?)/i],
+  ["Teclado",          /(hammond|leslie|[oó]rganos?\b|\borgans?\b|rhodes|wurlitzer|clavinet|montage|\bnord\b|fantom|\bjuno\b|motif|kurzweil|\bkorg\b|\bmoog\b|kronos|triton|rd-?88|cp-?88|yamaha es7|teclado|\bpiano\b|keyboard|sintetizador|\bsynth\b|sustain|\bfc[47]\b)/i],
   ["Platillos",        /(\bh\/h\b|platillo|\bride\b|crash|splash|china|hi ?-?hat|hit hat|charles|c[ií]mbal|cymbal)/i],
-  ["Percusión",        /(conga|bongo|timbal|\bquinto\b|\btumba\b|cencerro|cowbell|shekere|g[uü]iro|maraca|chimes|surdo|\bclave\b|\btoys\b|cajón|cajon|\blp\b|percusi[oó]n|tambora|alegre|llamador|guacharaca)/i],
+  ["Percusión",        /(conga|tumbadoras?|bong[oó]|timbal|campanas?|djembes?|yembes?|g[uü]iras?|caja vallenata|panderetas?|panderos?|tambourines?|shakers?|cabasa|agog[oó]|\bclaves\b|\bquinto\b|\btumba\b|cencerro|cowbell|shekere|g[uü]iro|maraca|chimes|surdo|\bclave\b|\btoys\b|cajón|cajon|\blp\b|percusi[oó]n|tambora|alegre|llamador|guacharaca)/i],
   // Contrabajo, baby bass y bajo sexto también van en Bajo (lo dijo el usuario, 2026-10-16).
   // "Double bass" no entra: en batería es el doble pedal.
   ["Bajo",             /(bass guitar|jazz bass|precision bass|\b[pj]-?bass\b|bajo el[eé]ctrico|contrabajo|upright bass|baby ?bass|bajo sexto|^bass\b(?!.*\b(amp|head|cab|drum|pedal)))/i],
@@ -66,6 +73,9 @@ const HARDWARE = /\b(stands?|soportes?|bases?|sillas?|banquetas?|asientos?|thron
 const NUNCA_BACKLINE = new RegExp([
   "\\b(risers?|drum ?risers?|sobre ?-?tarimas?|sobretarimas?|stage ?dex|plataformas?)\\b",
   "\\bpies? de micr[oó]fonos?|\\bmic(rophone)? stands?\\b|\\bstands? (de |para )?(micr[oó]fonos?|mics?)\\b|\\bjirafas?\\b",
+  // Audífonos in ear, mezcladores personales e inalámbricos de instrumento son de sonido (lo dijo el usuario, 2026-10-16).
+  "aud[ií]fonos? (in ?-?ear|intraurales?)|in ?-?ear (headphones|earphones|buds)|\\bearphones?\\b|\\bse ?-?(215|315|425|535|846)\\b|mezcladore?s? personal(es)?|personal mix(er)?s?|\\bp-?16\\b|\\bme-?1\\b|\\baviom\\b|\\bmymix\\b",
+  "inal[aá]mbricos? (de|para) (la |el )?(guitarras?|bajos?|instrumentos?)|(guitar|bass|instrument) wireless|wireless (de|para|for) (guitar|bass|guitarra|bajo|instrumento)|\\bglxd ?1[46]\\b|relay g\\d+|\\bxsw-?d\\b",
   "\\bcajas? directas?|\\bdirect ?box(es)?\\b|\\bdi ?box(es)?\\b|\\bd\\.i\\.",
   "\\bcables?\\b|\\bcableado\\b|\\bregletas?\\b|\\bmultitomas?\\b|\\bpower ?strips?\\b|\\btransformador(es)?\\b|\\bconvertidor(es)?\\b|\\bups\\b",
   // Escenografía (plantas, lámparas, sofás, la sala): la piden con el backline, pero en la planilla no va.
@@ -78,11 +88,20 @@ const DI = /\bDIs?\b/;
  *  percusión es hardware de esa sección; una extensión en la sección del bajo sigue siendo corriente. */
 const PEDESTAL = /\bpedestal(es)?\b/i;
 const EXTENSION = /\bextensi[oó]n(es)?\b/i;
+/** "Caja de extensión 4x10": la caja de un ampli, no una extensión de corriente. */
+const CAJA_EXTENSION = /\b(cajas?|gabinetes?|cabinas?|bafles?) (de )?extensi[oó]n|\bextension cab(inet)?s?\b/i;
+/** El computador, la interfaz o la tarjeta de sonido no son backline; la base o bandeja para el laptop sí
+ *  (lo dijo el usuario, 2026-10-16). */
+const COMPUTADOR = /\b(laptops?|port[aá]til(es)?|computador(es|as?)?|macbooks?)\b|interfa(z|ces) de audio|\baudio interfaces?\b|tarjetas? de sonido|\bsound ?cards?\b/i;
+const BASE_COMPUTADOR = /\b(bases?|stands?|soportes?|bandejas?|mesas?)\b.{0,15}\b(laptops?|port[aá]til(es)?|computador(es|as?)?|macbooks?)\b|\blaptop (stands?|trays?|tables?)\b/i;
 const DE_INSTRUMENTO = /\b(platillos?|cymbals?|crash|ride|china|splash|hi-?hats?|redoblantes?|snares?|toms?|bombos?|kick|bater[ií]as?|drums?|percusi[oó]n|percussion|congas?|timbal(es)?|bong[oó]s?|teclados?|keyboards?|keys|guitarras?|guitars?|bajos?|bass|pedal(es)?|atriles?)\b/i;
 
 export function noEsBackline(texto: string, grupo?: string | null): boolean {
   if (NUNCA_BACKLINE.test(texto) || DI.test(texto)) return true;
+  if (CAJA_EXTENSION.test(texto)) return false;
+  // "Teclado con computador e interfaz" es el teclado: el computador solo sale cuando va suelto.
   if (DE_INSTRUMENTO.test(texto)) return false;
+  if (COMPUTADOR.test(texto) && !BASE_COMPUTADOR.test(texto)) return true;
   if (PEDESTAL.test(texto)) return !(grupo && (SECCION_BATERIA.test(grupo) || SECCION_PERCUSION.test(grupo)));
   return EXTENSION.test(texto);
 }
