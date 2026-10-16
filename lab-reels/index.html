@@ -1202,9 +1202,12 @@ const LLEVA = {
     // "Plásticos" = parches (así les dicen en tarima). Una marca o modelo de parche también cuenta.
     {pieza: "Plásticos (parches)", categoria: "Batería", hay: /\b(plasticos?|parches?|heads?|drumheads?|remo|evans|aquarian|ambassador|emperor|pinstripe|powerstroke|g[12])\b/},
   ],
+  // Bajo (lo dijo el usuario, 2026-10-16): siempre se avisa la base; el ampli no, porque cuál va depende del
+  // evento. Si el bajista trae su cabezal, Circuito pone la caja y un cabezal de respaldo.
   "Bajo": [
-    {pieza: "Amplificador de bajo", categoria: "Ampli bajo", hay: /\b(ampli\w*|amp|cabezal|head|cabina|caja|cabinet|combo|svt|gallien|ampeg|markbass|\d ?x ?1[05])\b/},
     {pieza: "Base para bajo", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|atril)\b/},
+    {pieza: "Caja de bajo", categoria: "Ampli bajo", cuando: bandaTraeCabezal, hay: /\b(caja|cabina|cabinet|cab|gabinete|bafle|combo|\d ?x ?1[025])\b/},
+    {pieza: "Cabezal de bajo de respaldo", categoria: "Ampli bajo", cuando: bandaTraeCabezal, soloNuestro: true, hay: /\b(cabezal|head|cabeza|svt|combo|respaldo|backup|spare)\b/},
   ],
   "Guitarra": [
     {pieza: "Amplificador de guitarra", categoria: "Ampli guitarra", hay: /\b(ampli\w*|amp|cabezal|head|cabina|combo|twin|deville|hot rod|marshall|vox|orange|jc ?-?120)\b/},
@@ -1225,10 +1228,20 @@ const claveNoFalta = () => "lab-reels:no-falta:" + (V?.doc?.nombre || "");
 const idFalta = (items, pieza) => `${items[0]?.artistaId || "sin-banda"}|${items[0]?.grupo || ""}|${pieza}`;
 function faltantes(items){
   const inst = items.length && instrumentoDe(items); if (!inst) return [];
-  const texto = sinTildesL(items.map(x => `${x.referencia} ${x.descripcion || ""} ${x.nota || ""}`).join(" · "));
+  const textoDe = xs => sinTildesL(xs.map(x => `${x.referencia} ${x.descripcion || ""} ${x.nota || ""}`).join(" · "));
+  const texto = textoDe(items), nuestro = textoDe(items.filter(x => !loTraeLaBanda(x)));
   const descartadas = new Set(leer(claveNoFalta(), []));
-  return LLEVA[inst].filter(r => !r.hay.test(texto) && !(r.hardware && HARDWARE.test(texto)) && !descartadas.has(idFalta(items, r.pieza)))
+  return LLEVA[inst].filter(r => (!r.cuando || r.cuando(items)) && !r.hay.test(r.soloNuestro ? nuestro : texto)
+      && !(r.hardware && HARDWARE.test(texto)) && !descartadas.has(idFalta(items, r.pieza)))
     .map(r => ({...r, instrumento: inst}));
+}
+// Lo que la banda trae ("lo trae la banda", "own", "propio"): no cuenta como algo que Circuito ya puso.
+function loTraeLaBanda(x){
+  return x.propietario?.nombre === "la banda" || /\b(lo trae|la trae|los trae|trae la banda|traen|brings?|own|propi[oa]s?|suy[oa]s?)\b/.test(sinTildesL(`${x.nota || ""} ${x.descripcion || ""}`));
+}
+// El bajista trae su cabezal: una pieza de la sección que es un cabezal (sin caja) y la trae la banda.
+function bandaTraeCabezal(items){
+  return items.some(x => loTraeLaBanda(x) && /\b(cabezal|head|cabeza|svt)\b/.test(sinTildesL(`${x.referencia} ${x.descripcion || ""}`)));
 }
 function htmlFaltan(items, conBotones){
   const f = faltantes(items); if (!f.length) return "";

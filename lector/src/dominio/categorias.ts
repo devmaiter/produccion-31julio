@@ -29,7 +29,7 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   ["Consolas",         CONSOLAS],
   // El HARDWARE de la batería es batería: así vienen los riders (DRUMS → HARDWARE con pedal,
   // stands, banqueta y tapete). Va antes de "Escenario" (tapete) y de "Bases" (stands, throne).
-  ["Batería",          /((snares?|redoblantes?|tarolas?|hi ?-?hats?|hihats?|charles|cymbals?|c[ií]mbal(es)?|platillos?|boom|toms?|bombos?|kicks?)\s*(stands?|soportes?|bases?)\b|\b(stands?|soportes?|bases?)\s+((de|para|del)\s+)?(redoblante|tarola|snare|hi ?-?hat|charles|platillos?|cymbals?|c[ií]mbal(es)?|toms?|bombo)\b|\bdouble tom\b|\bthrone\b|banqueta|silla de bater|drum (stool|carpet|rug|mat)|(tapete|alfombra) (de |para )?(la )?bater|pedal de bombo|kick pedal|(twin|doble|double) pedal)/i],
+  ["Batería",          /((snares?|redoblantes?|tarolas?|hi ?-?hats?|hihats?|charles|cymbals?|c[ií]mbal(es)?|platillos?|boom|toms?|bombos?|kicks?)\s*(stands?|soportes?|bases?)\b|\b(stands?|soportes?|bases?)\s+((de|para|del)\s+)?(redoblante|tarola|snare|hi ?-?hat|charles|platillos?|cymbals?|c[ií]mbal(es)?|toms?|bombo)\b|\bdouble tom\b|\bthrone\b|banqueta|silla de bater|drum (stool|carpet|rug|mat)|(tapete|alfombra) (de |para )?(la )?bater|pedal de bombo|kick pedal|(twin|doble|double) pedal|double bass (drum )?pedal)/i],
   // Pedales de efectos y pedalboards son de la guitarra (o del bajo si lo dice), no de la batería.
   ["Bajo",             /((pedal(es)?|pedalboard|pedal ?board|efectos?|fx)\b.{0,25}\b(bajo|bass)\b|\bbass (pedals?|pedalboard|fx|effects?)\b)/i],
   ["Guitarra",         /(pedal(es)? de efectos?|pedalboard|pedal ?board|effects? pedals?|fx pedals?|tuner pedal|pedal afinador|\bafinador(es)?\b|\btuners?\b|\bwah\b|overdrive|distorsi[oó]n|\bhelix\b|\bkemper\b)/i],
@@ -47,7 +47,9 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   ["Teclado",          /(montage|\bnord\b|fantom|\bjuno\b|motif|kurzweil|\bkorg\b|\bmoog\b|kronos|triton|rd-?88|cp-?88|yamaha es7|teclado|\bpiano\b|keyboard|sintetizador|\bsynth\b|sustain|\bfc[47]\b)/i],
   ["Platillos",        /(\bh\/h\b|platillo|\bride\b|crash|splash|china|hi ?-?hat|hit hat|charles|c[ií]mbal|cymbal)/i],
   ["Percusión",        /(conga|bongo|timbal|\bquinto\b|\btumba\b|cencerro|cowbell|shekere|g[uü]iro|maraca|chimes|surdo|\bclave\b|\btoys\b|cajón|cajon|\blp\b|percusi[oó]n|tambora|alegre|llamador|guacharaca)/i],
-  ["Bajo",             /(bass guitar|jazz bass|precision bass|\b[pj]-?bass\b|bajo el[eé]ctrico|^bass\b(?!.*\b(amp|head|cab|drum|pedal)))/i],
+  // Contrabajo, baby bass y bajo sexto también van en Bajo (lo dijo el usuario, 2026-10-16).
+  // "Double bass" no entra: en batería es el doble pedal.
+  ["Bajo",             /(bass guitar|jazz bass|precision bass|\b[pj]-?bass\b|bajo el[eé]ctrico|contrabajo|upright bass|baby ?bass|bajo sexto|^bass\b(?!.*\b(amp|head|cab|drum|pedal)))/i],
   ["Batería",          /(\bbd\b|\bsn\b|bater[ií]a|redoblante|tarola|bombo|\btoms?\b|snare|\bkick\b|drum|pedal|parches|\bspd\b|\bpad\b)/i],
   ["Ampli bajo",       /(\b\d+x\d+\b.*cabinet|cabinet)/i],
   ["Guitarra",         /(guitarra|guitar|telecaster|stratocaster|les paul|taylor|\bcuerdas\b)/i],

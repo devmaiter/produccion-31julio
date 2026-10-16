@@ -66,6 +66,9 @@ describe("categorizar", () => {
     // Repuestos y accesorios que sí son backline.
     ["2 pares de baquetas Vic Firth 5A", "Batería"], ["escobillas", "Batería"], ["mallets", "Batería"],
     ["afinador de clip", "Guitarra"], ["2 juegos de cuerdas 10-46", "Guitarra"], ["1 bajo de repuesto", "Bajo"],
+    // Otros bajos: van en Bajo. "Double bass pedal" sigue siendo de la batería.
+    ["1 Contrabajo", "Bajo"], ["Baby bass", "Bajo"], ["Bajo sexto", "Bajo"], ["Upright bass", "Bajo"],
+    ["Double bass pedal", "Batería"],
   ])("%s → %s", (texto, cat) => expect(categorizar(texto)).toBe(cat));
 });
 
