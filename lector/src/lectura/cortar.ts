@@ -24,7 +24,7 @@ const TIENE_MEDIDA = new RegExp(MEDIDA, "i");
 // Una cantidad no va seguida de una unidad: "86 cm", "5 strings", "16 CH" son medidas o partes del equipo.
 // Tampoco es cantidad el comienzo de una medida ("15”" son 15 pulgadas, no 1 de 5”): eso lo mira `medidaAlComienzo`.
 // ("2 x 14” crash" y "2 x 4x10" sí traen cantidad.)
-const CANTIDAD = /^(\d{1,3})(?!\d)\s*(?:x\s+)?(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|inch(?:es)?|hz|k|ch|cuerdas?|strings?|canales|channels|voltios|volts?|watts?|vatios)(?!\p{L}))(?=\p{L}|\d{1,3}(?:[.,]\d+)?\s*(?:["”″]|[’'′]{2})|\d{1,2}\s*[x×]\s*\d)/iu;
+const CANTIDAD = /^(\d{1,3})(?!\d)\s*(?:x\s+)?(?!(?:cm|mm|mts?|m|kg|w|v|ft|in|inch(?:es)?|hz|k|ch|mtrs?|metros?|cuerdas?|strings?|canales|channels|voltios|volts?|watts?|vatios|spaces?|espacios?|puestos?|slots?)(?!\p{L}))(?=\p{L}|\d{1,3}(?:[.,]\d+)?\s*(?:["”″]|[’'′]{2})|\d{1,2}\s*[x×]\s*\d)/iu;
 /** Una caja de parlantes: "4x10", "8x10 cabinet", "2x12", "1x15" (cuántos parlantes y de qué tamaño, no cuántas cajas). */
 const CONFIG_PARLANTES = /^[12468]\s*[x×]\s*(?:8|10|12|15|18)(?![\d.,x×"”″’'′])/i;
 /** "4x10", "8x10 cabinet", "14x6.5 snare", "22x18 Kick": el renglón empieza con una medida, no con una cantidad. Una caja

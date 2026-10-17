@@ -128,9 +128,9 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 425 pruebas en verde (las de categorías revisan también «plásticos», y que contrabajo, baby
+  inglés). Hay 429 pruebas en verde (las de categorías revisan también «plásticos», y que contrabajo, baby
   bass y bajo sexto van en Bajo; "double bass pedal" es el doble pedal de la batería). El entrenamiento va en
-  141/141 casos y 386/386 piezas. `tests/filas-respuestas.test.ts` cubre lo de las rondas del 2026-10-16.
+  145/145 casos y 391/391 piezas. `tests/filas-respuestas.test.ts` cubre lo de las rondas del 2026-10-16.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -327,7 +327,15 @@ prueba (que el % suba sin romper los riders anteriores).
   (falta / recibido / revisado) y el contra-rider. Se guarda en el dispositivo por ahora. «Ver en reels»
   abre `lab-reels/?rider=…&evento=…`.
 - **`?lista=listas/….txt`** abre los reels con una lista guardada en `lab-reels/listas/` (la hoja a mano
-  del usuario del 2026-10-08, pasada a texto: `lista-a-mano.txt`). El proveedor de cada pieza
+  del usuario del 2026-10-08, pasada a texto: `lista-a-mano.txt`). **Varias listas separadas por coma** son un
+  solo documento con una banda por lista, y `&doc=nombre` le da un nombre fijo (para que chulos, fotos y notas
+  no cambien de clave). **`hoy/`** es el link corto del evento del día: el 2026-10-17, la hoja «Salida de equipo»
+  de Circuito (Estadio de Techo) pasada a texto en `listas/fabulosos-cadillacs.txt` y `listas/2-minutos.txt`,
+  documento `salida-2026-10-17`. Lo escrito a mano en la hoja va como «(anotado a mano: …)» en la pieza; los
+  teléfonos y los nombres del encargado no se pasan. Para otro día, cambiar las listas y el `doc` en `hoy/index.html`.
+  La hoja de salida trae «GUITAR BOAT 6 SPACES» (capacidad, no cantidad), «CABLE 8 MTRS» (largo; el cable no es
+  backline), «EVANS HD DRY X2 14"» (2 parches), «MINI CHINESE» (platillo) y «+ STAND» (el set con su base): el
+  lector ya los lee bien. Una sección de puro hardware («MISC: boom stands y sillas») no pide piezas de batería. El proveedor de cada pieza
   ("Equipo   2   AUDIO ROOM") sale como «Proveedor: Audio Room» en la sección y «Lo trae …» en la pieza.
 - **Presentación para Backstage Company (2026-10-09, para Don John, el jefe):** link corto
   `backstage/` → `lab-reels/backstage.html?lista=listas/lista-a-mano.txt` (vista previa para WhatsApp).

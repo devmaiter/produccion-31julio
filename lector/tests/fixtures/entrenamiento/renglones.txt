@@ -1043,3 +1043,24 @@ Set de congas LP, bongo y timbales
 => 1 | Set de congas LP
 => 1 | bongo
 => 1 | timbales
+
+## hoja de salida: los espacios del guitar boat no son otra pieza
+GUITAR
+1 GUITAR BOAT 6 SPACES
+=> 1 | GUITAR BOAT 6 SPACES
+
+## hoja de salida: los metros del cable no son otra pieza (y el cable no es backline)
+MISC
+3 INSTRUMENT CABLE 8 MTRS
+=> (nada)
+
+## hoja de salida: "X2" antes de la medida es la cantidad de ese parche
+DRUMS
+1 EVANS HD DRY X2 14"
+=> 2 | EVANS HD DRY 14"
+
+## hoja de salida: teclado con su pedal y una anotación a mano al final
+KEYBOARDS
+1 NORD STAGE 2 W/ PEDAL SUSTAIN (anotado a mano: Colsubsidio)
+=> 1 | NORD STAGE 2 (anotado a mano: Colsubsidio)
+=> 1 | PEDAL SUSTAIN (anotado a mano: Colsubsidio)

@@ -1245,6 +1245,8 @@ function faltantes(items){
   const textoDe = xs => sinTildesL(xs.map(x => `${x.referencia} ${x.descripcion || ""} ${x.nota || ""}`).join(" · "));
   const texto = textoDe(items), nuestro = textoDe(items.filter(x => !loTraeLaBanda(x)));
   if (inst === "Batería" && ELECTRONICA.test(texto)) return [];
+  // Una sección de puro hardware ("MISC: 3 boom stands, 3 sillas") no es una batería: no se le piden sus piezas.
+  if (inst === "Batería" && !/\b(bombos?|kicks?|bd|redoblantes?|snares?|tarolas?|toms?|bateria|drum ?kit|kit|shells?)\b/.test(sinTildesL(items.map(x => x.referencia).join(" · ")))) return [];
   const descartadas = new Set(leer(claveNoFalta(), []));
   return LLEVA[inst].filter(r => (!r.cuando || r.cuando(items)) && !r.hay.test(r.soloNuestro ? nuestro : texto)
       && !(r.hardware && HARDWARE.test(texto)) && !descartadas.has(idFalta(items, r.pieza)))
@@ -2454,19 +2456,19 @@ function fallo(titulo, texto, avisos){
   reels[0]?.scrollIntoView();
 }
 
-async function subirArchivos(archivos, tipo = "cargar"){
+async function subirArchivos(archivos, tipo = "cargar", nombreDoc = null){
   if (!archivos.length) return;
   subida.estado = "leyendo";
   subida.archivos = archivos.map(f => ({nombre: f.name, estado: "en cola", clase: ""}));
   pintarSubir();
   reels[0]?.scrollIntoView();
   const lento = setTimeout(() => { const el = document.getElementById("lento"); if (el) el.textContent = "Sigue leyendo. Un PDF escaneado o una foto puede tardar hasta un minuto en el celular."; }, 12000);
-  try { await leerYArmar(archivos, tipo); }
+  try { await leerYArmar(archivos, tipo, nombreDoc); }
   catch (err) { fallo("No se pudo leer", (err && err.message) || "Algo falló leyendo el archivo. Prueba otra vez o con otro archivo."); }
   finally { clearTimeout(lento); }
 }
 
-async function leerYArmar(archivos, tipo = "cargar"){
+async function leerYArmar(archivos, tipo = "cargar", nombreDoc = null){
   if (V?.doc) await instantanea("antes de subir " + archivos.map(f => f.name).join(", "));
   let r;
   const traza = [];   // lo que el lector decidió de cada renglón: sirve para mostrar lo que pidió la banda
@@ -2488,7 +2490,7 @@ async function leerYArmar(archivos, tipo = "cargar"){
       [...errores, ...ext.avisos]);
   }
   const d = aDatos(ext, traza);
-  const nombre = archivos.length === 1 ? archivos[0].name.replace(/\.[^.]+$/, "") : archivos.length + " archivos";
+  const nombre = nombreDoc || (archivos.length === 1 ? archivos[0].name.replace(/\.[^.]+$/, "") : archivos.length + " archivos");
   // Las piezas que se agregaron a mano a este documento no se pierden al volver a leerlo.
   ponerAgregados(d, leer("backstage:agregados:" + nombre, []));
   ponerShow(d, await cargarShow(nombre));
@@ -2588,13 +2590,19 @@ function splash(){
    este dispositivo (IndexedDB "backstage-riders") y se lee aquí como cualquier documento. */
 async function riderDelCronograma(){
   const q = new URLSearchParams(location.search), id = q.get("rider");
-  // ?lista=listas/….txt: una lista guardada en el sitio (la hoja escrita a mano, ya pasada a texto).
-  const lista = q.get("lista");
-  if (lista && /^listas\/[\w.-]+\.(txt|pdf|xlsx|csv)$/.test(lista)) {
+  // ?lista=listas/….txt: una lista guardada en el sitio (la hoja escrita a mano, ya pasada a texto). Varias listas
+  // separadas por coma son un solo documento con una banda por lista (la hoja de salida de un evento con dos bandas);
+  // &doc=nombre le da al documento un nombre fijo, para que chulos, fotos y notas no cambien de clave.
+  const rutas = (q.get("lista") || "").split(",").map(r => r.trim()).filter(Boolean);
+  if (rutas.length && rutas.every(r => /^listas\/[\w.-]+\.(txt|pdf|xlsx|csv)$/.test(r))) {
+    const doc = /^[\w.-]{1,60}$/.test(q.get("doc") || "") ? q.get("doc") : null;
     history.replaceState(null, "", location.pathname);
     try {
-      const r = await fetch(lista, {cache: "no-store"}); if (!r.ok) throw 0;
-      return subirArchivos([new File([await r.blob()], lista.split("/").pop(), {type: r.headers.get("content-type") || "text/plain"})]);
+      const archivos = await Promise.all(rutas.map(async ruta => {
+        const r = await fetch(ruta, {cache: "no-store"}); if (!r.ok) throw 0;
+        return new File([await r.blob()], ruta.split("/").pop(), {type: r.headers.get("content-type") || "text/plain"});
+      }));
+      return subirArchivos(archivos, "cargar", doc);
     } catch { return aviso("No encontré esa lista"); }
   }
   if (q.get("evento")) escribir("backstage:evento", q.get("evento"));

@@ -52,7 +52,7 @@ const REGLAS: ReadonlyArray<readonly [Categoria, RegExp]> = [
   // Tiple, requinto, cuatro, bandola, charango y tres van con las guitarras (2026-10-16).
   ["Guitarra",         /(\btiples?\b|requintos?|\bbandolas?\b|charangos?|\btres cubanos?\b|\bcuatros? (venezolanos?|llaneros?|puertorrique\w*)\b|^\s*cuatro\s*$|ukeleles?|ukuleles?|mandolinas?)/i],
   ["Teclado",          /(hammond|leslie|[oó]rganos?\b|\borgans?\b|rhodes|wurlitzer|clavinet|montage|\bnord\b|fantom|\bjuno\b|motif|kurzweil|\bkorg\b|\bmoog\b|kronos|triton|rd-?88|cp-?88|yamaha es7|teclado|\bpiano\b|keyboard|sintetizador|\bsynth\b|sustain|\bfc[47]\b)/i],
-  ["Platillos",        /(\bh\/h\b|platillo|\bride\b|crash|splash|china|hi ?-?hat|hit hat|charles|c[ií]mbal|cymbal)/i],
+  ["Platillos",        /(\bh\/h\b|platillo|\bride\b|crash|splash|china|chinese|hi ?-?hat|hit hat|charles|c[ií]mbal|cymbal)/i],
   ["Percusión",        /(conga|tumbadoras?|bong[oó]|timbal|pailas?|campanas?|djemb[eé]s?|yemb[eé]s?|g[uü]iras?|caja vallenata|panderetas?|panderos?|tambourines?|shakers?|cabasa|agog[oó]|\bclaves\b|\bquinto\b|\btumba\b|cencerro|cowbell|shekere|g[uü]iro|maraca|chimes|surdo|\bclave\b|\btoys\b|cajón|cajon|\blp\b|percusi[oó]n|tambora|alegre|llamador|guacharaca)/i],
   // Contrabajo, baby bass y bajo sexto también van en Bajo (lo dijo el usuario, 2026-10-16).
   // "Double bass" no entra: en batería es el doble pedal.
@@ -111,7 +111,7 @@ export const CAJA_AMPLI = /\b(\d{1,2}\s*[x×]\s*(10|12|15)\b|cabinets?|\bcab\b|c
 
 export function categorizar(texto: string): Categoria {
   // "Congas LP con sus bases", "Timbales con base": la base viene con el instrumento, no es una base.
-  texto = texto.replace(/(?:\b(?:con|with|incl\.?|incluye|including)\s+|\bw\/\s*)(su|sus|its|their|el|la|los|las)?\s*(bases?|soportes?|stands?)\b/gi, " ");
+  texto = texto.replace(/(?:\b(?:con|with|incl\.?|incluye|including)\s+|\bw\/\s*|\+\s*\(?\s*)(su|sus|its|their|el|la|los|las)?\s*(bases?|soportes?|stands?)\b/gi, " ");
   for (const [cat, re] of REGLAS) {
     if (!re.test(texto)) continue;
     // Dentro de la sección de batería (el texto trae el grupo: "silla batería Baterías"), los stands,

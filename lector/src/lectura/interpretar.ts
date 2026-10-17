@@ -708,6 +708,9 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
         const medidas = descripcion.split(/\s+(?:o|or|u)\s+/i)[0]!.match(/\b\d{1,2}\s*(?:["”″]|pulg)/g) ?? [];
         if (medidas.length >= 2) cantidad = medidas.length;
       }
+      // "EVANS HD DRY X2 14"": dos parches de 14". La "x2" pegada antes de la medida es la cantidad.
+      const porN = descripcion.match(/\s[x×]\s?([2-9])(?=\s+\d{1,2}(?:[.,]\d)?\s*["”″])/i);
+      if (porN && cantidad === 1) { cantidad = Number(porN[1]); descripcion = descripcion.replace(porN[0], ""); }
       if ((letras(descripcion) < 3 && categorizar(`${descripcion} ${grupo ?? ""}`) === "Otro") || descripcion.replace(/\s*\([^)]*\)/g, "").length > (explicita || opcion !== null ? 140 : 90)) return false; // las opciones entre paréntesis no cuentan
       // "Pailas 14” y 15”", "Timbaletas", "djembé": percusión con su nombre de aquí (o con tilde) también es percusión.
       const setPercusion = (SET_PERCUSION.test(principal ?? descripcion) || /(?<![\p{L}])djemb[eé]s?(?![\p{L}])/iu.test(principal ?? descripcion)) && categorizar(principal ?? descripcion) === "Otro";
@@ -1009,6 +1012,9 @@ function filasTeclado(t: string): { filas: FilaTeclado[]; nota: string | null; t
       cuerpo = `${cuerpo.slice(0, fin.index).trim()} con ${lista}`;
     } else if (new RegExp(TRAE_LA_BANDA.source, "iu").test(dentro)) {
       cuerpo = cuerpo.slice(0, fin.index).trim(); trae = true;
+    } else if (/(?<![\p{L}])(anotad[oa]s?|a mano|viene de|vienen de|proveedor)(?![\p{L}])/iu.test(dentro)) {
+      // "(anotado a mano: Colsubsidio)": la anotación de la hoja vale para todo el renglón.
+      cuerpo = cuerpo.slice(0, fin.index).trim(); nota = dentro;
     } else if (/(?<![\p{L}])(similar|equivalentes?|parecido|preferibles?|preferiblemente|or similar|or equivalent)(?![\p{L}])/iu.test(dentro)) {
       // "(o similar)" vale para todo el renglón; otra nota ("(tipo piano)") se queda con la última pieza.
       cuerpo = cuerpo.slice(0, fin.index).trim(); nota = dentro;
@@ -1324,7 +1330,8 @@ function variosGrupos(t: string): string | null {
  * ni "88 keys" (minúscula o medida), ni "16 CH" / "4 RETORNOS" (unidades). */
 const MARCA_LISTA = /(?:^|\s)((?:0?[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]*))/gu;
 // "8 X 10" es una medida, no otra cantidad.
-const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|cm|mm|kg|hz|ft|x|voltios|volts?|vatios|watts?|amperios|amps?|inch(es)?|pulg(adas)?)$/i;
+// "GUITAR BOAT 6 SPACES", "CABLE 8 MTRS": la capacidad o el largo, no otra pieza (hoja de salida de Circuito, 2026-10-17).
+const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|mtrs?|metros?|cm|mm|kg|hz|ft|x|voltios|volts?|vatios|watts?|amperios|amps?|inch(es)?|pulg(adas)?|spaces?|espacios?|puestos?|slots?)$/i;
 /** Lo que sigue al número de un modelo: "SVT 4 PRO", "JCM 2000 DSL", "MK II". */
 const MODELO_SUFIJO = /^(pro|plus|classic|mk\w*|ii|iii|iv|xl|xt|se|ce|ex|hd|deluxe|custom|reverb|series|dsl|tsl|vr)$/i;
 function posicionesLista(t: string): number[] {
