@@ -743,7 +743,7 @@ const festival = () => V?.modo === "festival";
 const REELES = ["Batería", "Bajo", "Guitarra", "Teclado", "Percusión", "Platillos", "In ears", "Consolas", "Extras"];
 const GRUPOS = [[/bater|drum|\bkit\b/, "Batería"], [/platillo|cymbal/, "Platillos"], [/percus|\bperc\b/, "Percusión"],
   [/teclad|\bkeys?\b|piano|synth|sintet|organo|organ\b|hammond/, "Teclado"], [/\bbajo|bass|contrabajo/, "Bajo"],
-  [/guitar|\bgtr\b|tiple|requinto|cuatro|bandola|charango/, "Guitarra"], [/tumbador|conga|timbal|vallenat|tambora|folclor/, "Percusión"]];
+  [/guitar|\bgtr\b|tiple|requinto|cuatro|bandola|charango/, "Guitarra"], [/tumbador|conga|timbal|bongo|djembe|cajon|vallenat|tambora|folclor/, "Percusión"]];
 const POR_CATEGORIA = {"Batería": "Batería", "Platillos": "Platillos", "Percusión": "Percusión", "Teclado": "Teclado",
   "Ampli bajo": "Bajo", "Bajo": "Bajo", "Ampli guitarra": "Guitarra", "Guitarra": "Guitarra", "In ears": "In ears", "Consolas": "Consolas"};
 // Una base o un tapete sin grupo va con su instrumento: "Boom cymbal stand" a Batería.
@@ -1220,9 +1220,10 @@ const LLEVA = {
     {pieza: "Base de teclado", categoria: "Bases", hay: /\b(bases?|stands?|soportes?)\b/},
     {pieza: "Pedal de sustain", categoria: "Teclado", hay: /\b(sustain|pedal(es)?|fc ?-?\d)\b/},
   ],
-  // Percusión (2026-10-16): solo se avisan las bases de las congas, y solo si hay congas.
+  // Percusión (2026-10-16): solo se avisan las bases de las congas, y solo si hay congas. «Conga y tumba + Stand»
+  // o «Congas w/ stand» ya las traen.
   "Percusión": [
-    {pieza: "Bases para congas", categoria: "Percusión", cuando: hayCongas, hay: /\b(bases?|stands?|soportes?)\b.{0,25}\b(congas?|tumbadoras?|tumbas?|quintos?)\b|\bcongas?\b.{0,40}\b(con|y|with|incl\w*) (sus |su |las |los )?(bases?|stands?|soportes?)\b|\bconga stands?\b/},
+    {pieza: "Bases para congas", categoria: "Percusión", cuando: hayCongas, hay: /\b(bases?|stands?|soportes?)\b.{0,25}\b(congas?|tumbadoras?|tumbas?|quintos?)\b|\bcongas?\b.{0,40}\b(con|y|with|incl\w*) (sus |su |las |los )?(bases?|stands?|soportes?)\b|\bconga stands?\b|\b(congas?|tumbadoras?|tumbas?|quintos?)\b.{0,40}(\+|\bw\/) ?\(? ?(bases?|stands?|soportes?)\b/},
   ],
 };
 // Batería electrónica (Roland TD, Yamaha DTX…): no se avisa nada, depende del rider (lo dijo el usuario).
