@@ -19,7 +19,7 @@ SET BONGO:
 1 DRUM THRONE
 1 MAGICIAN PERCUSSION TABLE
 SET DE PIANO:
-1 YAMAHA MONTAGE 8 (anotado a mano: llega el viernes)
+1 YAMAHA MONTAGE 8 (anotado a mano: llega el viernes) (sin visto en la hoja)
 1 SINGLE KEYBOARD STAND KS120B
 1 PEDAL SUSTAIN
 SET DE BAJO:
@@ -28,6 +28,6 @@ SET DE BAJO:
 MISC
 10 MUSIC STAND W/ LIGHT
 IN EARS
-4 SHURE PSM 1000
+4 SHURE PSM 1000 (sin visto en la hoja)
 10 SHURE P10R+ (marcado con X en la hoja)
-1 COMBINADOR
+1 COMBINADOR (sin visto en la hoja)
