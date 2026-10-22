@@ -3,21 +3,41 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Salida de equipo · Felipe Peláez y Yuri Buenaventura</title>
-<meta name="description" content="Backline del evento en reels: Felipe Peláez (22 de octubre) y Yuri Buenaventura (23 de octubre), Teatro Colsubsidio.">
-<meta property="og:title" content="Salida de equipo · Felipe Peláez y Yuri Buenaventura">
-<meta property="og:description" content="Teatro Colsubsidio · 22 y 23 de octubre de 2026. El backline de las dos bandas, pieza por pieza.">
+<title>Backline de hoy</title>
+<meta name="description" content="El backline del evento del día en reels, pieza por pieza.">
+<meta property="og:title" content="Backline de hoy · Circuito Naranja">
+<meta property="og:description" content="La salida de equipo del evento del día, banda por banda.">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#000000">
-<meta http-equiv="refresh" content="0; url=../lab-reels/?lista=listas/felipe-pelaez.txt,listas/yuri-buenaventura.txt&doc=salida-2026-10-22">
-<style>html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui,sans-serif;display:grid;place-items:center}a{color:#ff6a1f}</style>
+<style>html,body{margin:0;height:100%;background:#000;color:#fff;font-family:system-ui,sans-serif;display:grid;place-items:center;text-align:center}a{color:#ff6a1f}p{margin:.6em 16px}</style>
 </head>
 <body>
-<!-- Link corto del evento de hoy: la hoja de salida de equipo pasada a texto, una lista por banda, en un solo documento.
-     Para otro evento, cambiar las listas y el nombre del documento (doc=salida-AAAA-MM-DD), y dejar el anterior en
-     hoy/<día>/ (como hoy/17-oct/) para no perder sus chulos, fotos y notas. -->
-<p><a href="../lab-reels/?lista=listas/felipe-pelaez.txt,listas/yuri-buenaventura.txt&doc=salida-2026-10-22">Abrir el backline de hoy</a></p>
-<p><a href="17-oct/">Evento anterior: 17 de octubre</a></p>
-<script>location.replace("../lab-reels/?lista=listas/felipe-pelaez.txt,listas/yuri-buenaventura.txt&doc=salida-2026-10-22");</script>
+<!-- Link corto del evento del día. Qué evento es lo dice hoy/evento.json (listas y nombre del documento), que se
+     lee sin caché cada vez: así el celular nunca se queda con el evento anterior aunque guarde esta página.
+     Para otro evento, cambiar solo evento.json y dejar el anterior en hoy/<día>/ (como hoy/17-oct/), para no
+     perder sus chulos, fotos y notas. -->
+<main>
+  <p id="msg">Abriendo el backline de hoy…</p>
+  <p><a id="ir" href="../lab-reels/?lista=listas/felipe-pelaez.txt,listas/yuri-buenaventura.txt&amp;doc=salida-2026-10-22">Abrir</a></p>
+  <p><a href="17-oct/">Evento anterior: 17 de octubre</a></p>
+</main>
+<script>
+(async () => {
+  const ir = document.getElementById("ir");
+  let destino = ir.href;   // si no hay señal, el último evento conocido
+  try {
+    const r = await fetch("evento.json?t=" + Date.now(), {cache: "no-store"});
+    if (r.ok) {
+      const e = await r.json();
+      if (Array.isArray(e.listas) && e.listas.length && /^[\w.-]{1,60}$/.test(e.doc || "")) {
+        destino = "../lab-reels/?lista=" + e.listas.join(",") + "&doc=" + e.doc;
+        if (e.titulo) document.getElementById("msg").textContent = "Abriendo " + e.titulo + "…";
+      }
+    }
+  } catch {}
+  ir.href = destino;
+  location.replace(destino);
+})();
+</script>
 </body>
 </html>

@@ -523,6 +523,8 @@ html.con-pestanas{--barra:88px}
 .resumen .c-foto.si{color:#1a8f3e;font-weight:700}
 .resumen li.hecho .c-ok::after{content:"✓";color:#1a8f3e;font-weight:800}
 .resumen .falta-aviso{font-size:13px;margin:6px 0 0}
+.evento-nuevo{position:fixed;z-index:9;left:16px;right:16px;top:calc(env(safe-area-inset-top) + 64px);display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--accent);background:rgba(0,0,0,.92);color:var(--ink);font:500 14px/1.25 "IBM Plex Sans",sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+.evento-nuevo b{color:var(--accent)}.evento-nuevo span{flex:1}.evento-nuevo a{flex:none;padding:8px 14px;border-radius:999px;background:var(--accent);color:#000;font-weight:700;text-decoration:none}.evento-nuevo button{flex:none;background:none;border:0;color:var(--ink);font-size:20px;padding:4px 6px}
 .pendiente{position:fixed;z-index:9;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 14px);padding:10px 16px;border-radius:999px;border:1px solid var(--accent);background:rgba(0,0,0,.85);color:var(--ink);font:600 14px/1.1 "IBM Plex Sans",sans-serif;white-space:nowrap;box-shadow:0 6px 20px rgba(0,0,0,.5)}
 .falta-aviso{margin:6px 0 8px;padding:8px 12px;border-radius:12px;background:rgba(255,190,60,.12);border:1px solid #f5b83d;color:#ffd27a;font-size:15px}
 .falta-aviso b{color:#fff}
@@ -2255,6 +2257,21 @@ async function traerDeCircuito(){
   cargarChulos(); pintar(actual?.id);
   return fotos;
 }
+/* El evento de hoy (hoy/evento.json, se lee sin caché): si la app abre con otro documento (un acceso guardado a
+   lab-reels/, o el celular guardó el link viejo), arriba sale «Evento de hoy · Abrir». No cambia nada solo: el
+   documento anterior queda como está, con sus chulos, fotos y notas. «×» lo esconde para ese evento. */
+async function avisarEventoNuevo(){
+  if (MARCA) return;
+  let e; try { const r = await fetch("../hoy/evento.json?t=" + Date.now(), {cache: "no-store"}); if (!r.ok) return; e = await r.json(); } catch { return; }
+  if (!Array.isArray(e?.listas) || !e.listas.length || !/^[\w.-]{1,60}$/.test(e.doc || "")) return;
+  if (!e.listas.every(r => /^listas\/[\w.-]+\.(txt|pdf|xlsx|csv)$/.test(r))) return;
+  if (V?.doc?.nombre === e.doc || leer("lab-reels:evento-visto", "") === e.doc) return;
+  document.getElementById("evento-nuevo")?.remove();
+  const el = Object.assign(document.createElement("div"), {id: "evento-nuevo", className: "evento-nuevo"});
+  el.innerHTML = `<span>📅 Evento de hoy: <b>${esc(e.titulo || e.doc)}</b></span><a href="?lista=${e.listas.map(encodeURIComponent).join(",")}&doc=${encodeURIComponent(e.doc)}">Abrir</a><button aria-label="Cerrar">×</button>`;
+  el.querySelector("button").addEventListener("click", () => { escribir("lab-reels:evento-visto", e.doc); el.remove(); });
+  document.body.append(el);
+}
 /* Aviso de cambios sin respaldo: cada chulo, foto o pieza agregada suma uno; al guardar el respaldo vuelve a 0. */
 function huboCambio(){ escribir("lab-reels:cambios", leer("lab-reels:cambios", 0) + 1); pintarPendiente(); }
 function pintarPendiente(){
@@ -2685,6 +2702,8 @@ enviar({tipo: "limpiar"});
     setTimeout(() => esperar(40), 1500);
   }
   pintarBarra();
+  // Si se abrió con ?lista= ya es el documento pedido; si no, se avisa si hay un evento de hoy distinto al abierto.
+  if (!new URLSearchParams(location.search).get("lista")) setTimeout(() => avisarEventoNuevo().catch(() => {}), 2500);
   riderDelCronograma();
   if (V.doc && !location.hash) introHecha = true;   // ya hay rider: sin la entrada
   pintar(location.hash.slice(1));

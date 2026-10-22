@@ -333,8 +333,12 @@ prueba (que el % suba sin romper los riders anteriores).
   de Circuito (Estadio de Techo) pasada a texto en `listas/fabulosos-cadillacs.txt` y `listas/2-minutos.txt`,
   documento `salida-2026-10-17` (ahora en `hoy/17-oct/`). El 2026-10-22 `hoy/` pasó a `felipe-pelaez.txt` (22/10) y
   `yuri-buenaventura.txt` (23/10), Teatro Colsubsidio, documento `salida-2026-10-22`. Lo escrito a mano en la hoja va como
-  «(anotado a mano: …)» en la pieza; los teléfonos y los nombres del encargado no se pasan. Para otro día, cambiar las
-  listas y el `doc` en `hoy/index.html` y dejar el anterior en `hoy/<día>/`, para no perder sus chulos, fotos y notas.
+  «(anotado a mano: …)» en la pieza; los teléfonos y los nombres del encargado no se pasan. Qué evento abre `hoy/` lo dice
+  **`hoy/evento.json`** (`titulo`, `doc`, `listas`), que se lee sin caché: el 2026-10-22 el celular del usuario guardó el
+  `hoy/` viejo (con la redirección fija) y seguía abriendo el evento anterior. Para otro día, cambiar solo `evento.json`
+  (y el enlace de respaldo de `hoy/index.html`) y dejar el anterior en `hoy/<día>/`, para no perder sus chulos, fotos y
+  notas. Si `lab-reels/` abre sin `?lista=` con otro documento (un acceso guardado), arriba sale «📅 Evento de hoy ·
+  Abrir» (`avisarEventoNuevo`; «×» lo esconde para ese evento en `lab-reels:evento-visto`; no sale en la copia con marca).
   Al pasar la hoja a texto: los títulos sin cantidad («Drum DW collector Series», «Set Cymbal A Custom») se escriben
   como el lector los toma por título («DW collector Series», «CYMBALS SET A Custom»); los «SET DE …» de la hoja llevan
   dos puntos («SET DE TIMBAL:») para que abran su sección; un título en minúscula («keys») va en mayúscula, porque si
