@@ -2470,7 +2470,7 @@ let lectorCargando = null;
 function cargarLector(){
   if (window.LectorBackline) return Promise.resolve(window.LectorBackline);
   return lectorCargando ??= new Promise((ok, mal) => {
-    const sc = document.createElement("script"); sc.src = LECTOR + "lector.js";
+    const sc = document.createElement("script"); sc.src = LECTOR + "lector.js?v=2026-10-24";   // con versión: el celular no se queda con un lector viejo guardado
     sc.onload = () => window.LectorBackline ? ok(window.LectorBackline) : mal(new Error("El lector no cargó."));
     sc.onerror = () => { lectorCargando = null; mal(new Error("No pude cargar el lector. Revisa la conexión y vuelve a intentar.")); };
     document.head.append(sc);
