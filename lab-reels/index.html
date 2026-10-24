@@ -2262,17 +2262,24 @@ async function traerDeCircuito(){
   return fotos;
 }
 /* El evento de hoy (hoy/evento.json, se lee sin caché): si la app abre con otro documento (un acceso guardado a
-   lab-reels/, o el celular guardó el link viejo), arriba sale «Evento de hoy · Abrir». No cambia nada solo: el
-   documento anterior queda como está, con sus chulos, fotos y notas. «×» lo esconde para ese evento. */
+   lab-reels/, o el celular guardó el link viejo), abre el de hoy si lo anterior vino de un link del sitio; si lo
+   subió el usuario, arriba sale «Evento de hoy · Abrir» («×» lo esconde para ese evento). Nada se borra. */
 async function avisarEventoNuevo(){
   if (MARCA) return;
   let e; try { const r = await fetch("../hoy/evento.json?t=" + Date.now(), {cache: "no-store"}); if (!r.ok) return; e = await r.json(); } catch { return; }
   if (!Array.isArray(e?.listas) || !e.listas.length || !/^[\w.-]{1,60}$/.test(e.doc || "")) return;
   if (!e.listas.every(r => /^listas\/[\w.-]+\.(txt|pdf|xlsx|csv)$/.test(r))) return;
-  if (V?.doc?.nombre === e.doc || leer("lab-reels:evento-visto", "") === e.doc) return;
+  if (V?.doc?.nombre === e.doc) return;
+  // Si lo abierto vino de un link del sitio (un evento anterior, otra lista) o no hay nada abierto, la app abre el de
+  // hoy sola (el usuario abría la app y le salía el evento anterior). Lo anterior no se borra: queda en su link
+  // (hoy/22-oct/…) con sus chulos, fotos y notas. Lo que el usuario subió a mano no se cambia: solo sale el aviso.
+  const delSitio = !V?.doc || leer("lab-reels:docs-de-lista", []).includes(V.doc.nombre) || /^(salida|listado)-\d{4}-\d{2}-\d{2}$|^(don-teto|lista-a-mano)$/.test(V.doc.nombre);
+  const ir = `?lista=${e.listas.map(encodeURIComponent).join(",")}&doc=${encodeURIComponent(e.doc)}`;
+  if (delSitio) { location.replace(ir); return; }
+  if (leer("lab-reels:evento-visto", "") === e.doc) return;
   document.getElementById("evento-nuevo")?.remove();
   const el = Object.assign(document.createElement("div"), {id: "evento-nuevo", className: "evento-nuevo"});
-  el.innerHTML = `<span>📅 Evento de hoy: <b>${esc(e.titulo || e.doc)}</b></span><a href="?lista=${e.listas.map(encodeURIComponent).join(",")}&doc=${encodeURIComponent(e.doc)}">Abrir</a><button aria-label="Cerrar">×</button>`;
+  el.innerHTML = `<span>📅 Evento de hoy: <b>${esc(e.titulo || e.doc)}</b></span><a href="${ir}">Abrir</a><button aria-label="Cerrar">×</button>`;
   el.querySelector("button").addEventListener("click", () => { escribir("lab-reels:evento-visto", e.doc); el.remove(); });
   document.body.append(el);
 }
@@ -2618,6 +2625,8 @@ async function riderDelCronograma(){
   if (/^(alistando|bandas)$/.test(q.get("pestana") || "")) escribir("lab-reels:pestana", q.get("pestana"));
   if (rutas.length && rutas.every(r => /^listas\/[\w.-]+\.(txt|pdf|xlsx|csv)$/.test(r))) {
     const doc = /^[\w.-]{1,60}$/.test(q.get("doc") || "") ? q.get("doc") : null;
+    // Los documentos que vienen de un link del sitio: al abrir la app sin link, se cambian solos por el de hoy.
+    if (doc) escribir("lab-reels:docs-de-lista", [...new Set([...leer("lab-reels:docs-de-lista", []), doc])].slice(-30));
     history.replaceState(null, "", location.pathname);
     try {
       const archivos = await Promise.all(rutas.map(async ruta => {
@@ -2709,7 +2718,7 @@ enviar({tipo: "limpiar"});
   }
   pintarBarra();
   // Si se abrió con ?lista= ya es el documento pedido; si no, se avisa si hay un evento de hoy distinto al abierto.
-  if (!new URLSearchParams(location.search).get("lista")) setTimeout(() => avisarEventoNuevo().catch(() => {}), 2500);
+  if (!new URLSearchParams(location.search).get("lista")) setTimeout(() => avisarEventoNuevo().catch(() => {}), 1200);
   riderDelCronograma();
   if (V.doc && !location.hash) introHecha = true;   // ya hay rider: sin la entrada
   pintar(location.hash.slice(1));
