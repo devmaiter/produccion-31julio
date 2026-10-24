@@ -259,6 +259,10 @@ prueba (que el % suba sin romper los riders anteriores).
   abajo (antes quedaban cortadas y el dedo cambiaba de reel); adentro no hay otro scroll y arriba se desvanecen
   bajo el título. Para probar el dedo en Playwright sirve `Input.dispatchTouchEvent` por CDP
   (`synthesizeScrollGesture` no mueve nada en este Chromium).
+- **Subir y bajar desde cualquier historia (2026-10-24, lo pidió el usuario):** antes había que volver a la portada de la
+  sección. En una historia de lado (`.slide.banda`), si está arriba del todo y se desliza hacia abajo, se pasa a la sección
+  anterior; si está abajo del todo y se desliza hacia arriba, a la siguiente (listener de toque en `#feed`). Una historia
+  larga primero se recorre y al llegar al final el siguiente deslizamiento cambia de sección.
 - **Chulo verde (2026-10-08, lo pidió el usuario):** tocar una pieza del listado la marca como lista (✓ verde)
   y otro toque la quita. Se guarda por pieza (banda|sección|nombre corto) en `lab-reels:chulos2:<documento>`, así
   sobrevive a volver a abrir la lista o a que cambie; las claves viejas `lab-reels:chulos:<doc>|<cuando>` se
