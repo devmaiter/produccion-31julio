@@ -128,7 +128,7 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 436 pruebas en verde (las de categorías revisan también «plásticos», y que contrabajo, baby
+  inglés). Hay 438 pruebas en verde (las de categorías revisan también «plásticos», y que contrabajo, baby
   bass y bajo sexto van en Bajo; "double bass pedal" es el doble pedal de la batería). El entrenamiento va en
   152/152 casos y 412/412 piezas. `tests/filas-respuestas.test.ts` cubre lo de las rondas del 2026-10-16.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
@@ -344,6 +344,13 @@ prueba (que el % suba sin romper los riders anteriores).
   dos puntos («SET DE TIMBAL:») para que abran su sección; un título en minúscula («keys») va en mayúscula, porque si
   no se pega al renglón de arriba; y «RF» va como «IN EARS» (si no, el combinador se pierde). Revisar con
   `npm run traza -- lista.txt --todo` que ningún título salga como pieza.
+  **Lista «tal cual» (2026-10-24, lo pidió el usuario: «lo que está ahí tal cual, solo agrupado y ya»):** una lista que
+  empieza con `#TAL CUAL` no la interpreta el lector (`talCual` en `interpretar.ts`): cada renglón con cantidad es una pieza
+  escrita como está, un renglón sin cantidad es el título de la sección, nada se parte, nada se quita (tampoco micrófonos
+  o cajas directas) y no se agregan piezas ni marcas. Para pasar a mano una hoja que manda el usuario, usar esto. El
+  2026-10-24 `hoy/` abre `listado-2026-10-24.txt` («Mi listado»: batería, platillos, bajo, percusión, teclado, atriles, in
+  ears, microfonería y consola; 41 piezas, 84 unidades); el evento anterior quedó en `hoy/22-oct/`. Ese día el usuario se
+  molestó porque ese rider se juntó con «Don Teto» y con el Excel de OML: no mezclar lo que manda con otra cosa si no lo pide.
   **Don Teto (2026-10-24):** link corto `don-teto/`, documento `don-teto` con tres listas: `lo-que-llevamos.txt` y
   `otras-bandas.txt` (el Excel «EQUIPO CORDILLERAS OML», hoja «Equipo solicitado», sin precios; las filas ocultas no
   entran; «CN» = es de Circuito Naranja; las de «otros escenarios» van en `otras-bandas.txt` por instrumento con la banda,

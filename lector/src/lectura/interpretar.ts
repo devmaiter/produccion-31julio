@@ -162,6 +162,8 @@ export function nombrePropio(s: string): string {
 }
 
 export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extraccion {
+  const tal = talCual(docs, ctx);
+  if (tal) return tal;
   const ext = interpretarCon(docs, ctx, true);
   if (ext.items.length) return ext;
   const trazaPrimera = ctx.traza ? [...ctx.traza] : null;
@@ -173,6 +175,41 @@ export function interpretar(docs: Documento[], ctx: ContextoLectura = {}): Extra
   for (const i of todo.items) { i.dudoso = true; i.nota = [i.nota, "no encontré la sección de backline: revisar"].filter(Boolean).join(" · "); }
   todo.avisos.push("No reconocí la sección de backline del documento; lo encontrado queda para revisar.");
   return todo;
+}
+
+/* Lista «tal cual» (2026-10-24, lo pidió el usuario: «lo que está ahí tal cual, solo agrupado y ya»): un texto que
+ * empieza con «#TAL CUAL» no se interpreta. Cada renglón con cantidad es una pieza, escrita como está; un renglón sin
+ * cantidad es el título de la sección que sigue; «RIDER TÉCNICO X» dice de quién es. No se parte nada, no se quita
+ * nada (tampoco lo que no es backline) y no se agregan piezas ni marcas. */
+const TAL_CUAL = /^\s*#\s*tal\s+cual\b/i;
+function talCual(docs: Documento[], ctx: ContextoLectura): Extraccion | null {
+  const primera = (d: Documento) => d.lineas.find(l => l.texto.trim())?.texto ?? "";
+  if (!docs.length || !docs.every(d => TAL_CUAL.test(primera(d)))) return null;
+  const ext: Extraccion = { evento: null, escenarios: [], dias: [], artistas: [], bloques: [], items: [], avisos: [], zonas: [], puestos: [], canales: [], requisitos: [], planos: [], comparaciones: [] };
+  const anotar = (doc: Documento, texto: string, etiqueta: Etiqueta, motivo: string, grupo: string | null) =>
+    ctx.traza?.push({ documento: doc.nombre, texto, etiqueta, motivo, seccion: "backline", grupo, item: etiqueta === "item" ? ext.items.length - 1 : null });
+  for (const doc of docs) {
+    let artista: string | null = ctx.artista ? nombrePropio(ctx.artista) : null, grupo: string | null = null;
+    const registrar = (n: string) => { if (!ext.artistas.includes(n)) ext.artistas.push(n); return n; };
+    if (artista) registrar(artista);
+    for (const l of doc.lineas) {
+      const t = l.texto.trim();
+      if (!t || TAL_CUAL.test(t)) continue;
+      const rider = t.match(/^(?:rider\s+t[eé]cnico|technical\s+rider)\s*[:\-–]?\s*(.+)$/i);
+      if (rider) { artista = registrar(nombrePropio(rider[1]!.trim())); anotar(doc, t, "banda", "tal cual: de quién es", null); continue; }
+      const m = t.match(/^(\d{1,4})\s+(\S.*)$/);
+      if (!m) { grupo = nombrePropio(t.replace(/[:\s]+$/, "")); anotar(doc, t, "grupo", "tal cual: título de sección", grupo); continue; }
+      if (!artista) artista = registrar(nombrePropio(doc.nombre.replace(/\.[^.]+$/, "")));
+      const descripcion = m[2]!.trim();
+      // La categoría solo sirve para saber a qué reel va; la sección manda en «In ears» y «Consola».
+      // Lo de la microfonía va como «Otro» («4 DPA 4099 para 2 congas» es un micrófono, no unas congas).
+      const g = grupo ?? "";
+      const categoria: Categoria = /\bin ?ears?\b/i.test(g) ? "In ears" : /\bconsolas?\b/i.test(g) ? "Consolas" : /micr[oó]fon|microphones?|\bmics?\b/i.test(g) ? "Otro" : categorizar(descripcion);
+      ext.items.push({ artista, fecha: ctx.fecha ?? null, grupo, descripcion, cantidad: Number(m[1]), categoria, proveedor: null, dudoso: false, nota: null });
+      anotar(doc, t, "item", "tal cual", grupo);
+    }
+  }
+  return ext;
 }
 
 function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: boolean): Extraccion {
