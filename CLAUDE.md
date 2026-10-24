@@ -348,7 +348,9 @@ prueba (que el % suba sin romper los riders anteriores).
   `otras-bandas.txt` (el Excel «EQUIPO CORDILLERAS OML», hoja «Equipo solicitado», sin precios; las filas ocultas no
   entran; «CN» = es de Circuito Naranja; las de «otros escenarios» van en `otras-bandas.txt` por instrumento con la banda,
   el día y el escenario) van en 📦 Alistando, y `don-teto.txt` (su rider, pasado a una pieza por renglón) en 🎤 Bandas,
-  porque `don-teto.show.json` marca esa banda como del show (sin piezas propias). Los títulos de cada batería y set de
+  porque `don-teto.show.json` marca esa banda como del show (sin piezas propias). El link abre en 🎤 Bandas
+  (`&pestana=bandas`, que también sirve con `alistando`), con las secciones del rider: Batería, Platillos Zildjian, Bajo,
+  Percusión, Teclado, Varios, In ears y Consola (la microfonía no es backline: no entra). Los títulos de cada batería y set de
   platillos llevan dos puntos («BATERÍA MAPEX SATURN:», «PLATILLOS SET SABIAN AAX:») para que cada uno sea su sección; un
   título con números no abre sección («PAISTE 2002» se escribió «PAISTE DOS MIL DOS»). En una sección del show, lo que no es
   del show sale con la etiqueta «📦 Bodega». Lector (ese día): «MOTIF 8 O MONTAGE» no parte en el 8; «MICROFONERÍA» es

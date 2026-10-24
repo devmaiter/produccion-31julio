@@ -2614,6 +2614,8 @@ async function riderDelCronograma(){
   // separadas por coma son un solo documento con una banda por lista (la hoja de salida de un evento con dos bandas);
   // &doc=nombre le da al documento un nombre fijo, para que chulos, fotos y notas no cambien de clave.
   const rutas = (q.get("lista") || "").split(",").map(r => r.trim()).filter(Boolean);
+  // &pestana=bandas: el link abre directo en 🎤 Bandas (o en 📦 Alistando).
+  if (/^(alistando|bandas)$/.test(q.get("pestana") || "")) escribir("lab-reels:pestana", q.get("pestana"));
   if (rutas.length && rutas.every(r => /^listas\/[\w.-]+\.(txt|pdf|xlsx|csv)$/.test(r))) {
     const doc = /^[\w.-]{1,60}$/.test(q.get("doc") || "") ? q.get("doc") : null;
     history.replaceState(null, "", location.pathname);
