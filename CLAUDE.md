@@ -128,9 +128,9 @@ Piezas, en `lector/src/lectura/`:
   (`tests/fixtures/riders/`, generados desde `fuentes/*.html` imprimiendo a PDF
   con Chromium), y `rider-secciones.test.ts` dos riders inventados con la forma
   de dos riders reales (secciones a su manera, logo sin nombre, rider de gira en
-  inglés). Hay 429 pruebas en verde (las de categorías revisan también «plásticos», y que contrabajo, baby
+  inglés). Hay 436 pruebas en verde (las de categorías revisan también «plásticos», y que contrabajo, baby
   bass y bajo sexto van en Bajo; "double bass pedal" es el doble pedal de la batería). El entrenamiento va en
-  145/145 casos y 391/391 piezas. `tests/filas-respuestas.test.ts` cubre lo de las rondas del 2026-10-16.
+  152/152 casos y 412/412 piezas. `tests/filas-respuestas.test.ts` cubre lo de las rondas del 2026-10-16.
 - En la terminal: `npm run texto -- rider.pdf` (el texto tal como se leyó),
   `npm run traza -- rider.pdf` (qué decidió de cada renglón) y
   `npm run planilla -- rider.pdf --banda "…" --escenario "Stage 4" --fecha AAAA-MM-DD`
@@ -344,6 +344,19 @@ prueba (que el % suba sin romper los riders anteriores).
   dos puntos («SET DE TIMBAL:») para que abran su sección; un título en minúscula («keys») va en mayúscula, porque si
   no se pega al renglón de arriba; y «RF» va como «IN EARS» (si no, el combinador se pierde). Revisar con
   `npm run traza -- lista.txt --todo` que ningún título salga como pieza.
+  **Don Teto (2026-10-24):** link corto `don-teto/`, documento `don-teto` con tres listas: `lo-que-llevamos.txt` y
+  `otras-bandas.txt` (el Excel «EQUIPO CORDILLERAS OML», hoja «Equipo solicitado», sin precios; las filas ocultas no
+  entran; «CN» = es de Circuito Naranja; las de «otros escenarios» van en `otras-bandas.txt` por instrumento con la banda,
+  el día y el escenario) van en 📦 Alistando, y `don-teto.txt` (su rider, pasado a una pieza por renglón) en 🎤 Bandas,
+  porque `don-teto.show.json` marca esa banda como del show (sin piezas propias). Los títulos de cada batería y set de
+  platillos llevan dos puntos («BATERÍA MAPEX SATURN:», «PLATILLOS SET SABIAN AAX:») para que cada uno sea su sección; un
+  título con números no abre sección («PAISTE 2002» se escribió «PAISTE DOS MIL DOS»). En una sección del show, lo que no es
+  del show sale con la etiqueta «📦 Bodega». Lector (ese día): «MOTIF 8 O MONTAGE» no parte en el 8; «MICROFONERÍA» es
+  sección de audio; «NORD STAGE 4» o «AMPEG SVT 2» al final del renglón no cuelgan con el de abajo; «PAISTE 2002» no es el
+  año de un evento; «14" X 6 GRETSCH» y «HI HAT STAND 3 LEGS» no traen otra cantidad; «stage deck» es tarima; y dos baterías
+  con el mismo hardware bajo títulos con dos puntos distintos ya no se toman por página repetida (antes se borraban sus
+  boom stands, silla y alfombra). «Le falta»: «5 sillas de batería» sueltas no hacen una batería, «batería … completa» trae
+  su hardware y un «dummie de piano» no es un teclado.
   La hoja de salida trae «GUITAR BOAT 6 SPACES» (capacidad, no cantidad), «CABLE 8 MTRS» (largo; el cable no es
   backline), «EVANS HD DRY X2 14"» (2 parches), «MINI CHINESE» (platillo) y «+ STAND» (el set con su base): el
   lector ya los lee bien. Una sección de puro hardware («MISC: boom stands y sillas») no pide piezas de batería. El proveedor de cada pieza

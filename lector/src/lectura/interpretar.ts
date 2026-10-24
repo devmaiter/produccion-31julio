@@ -98,7 +98,7 @@ const PROVEEDOR_SUELTO = /^(cn|oml|backline( cop)?|propio|banda)$/i;
  * Esas secciones tienen cantidades ("1 VAN para 15 personas", "27 SNARE 2 SM57")
  * que no son backline; dentro de ellas no se leen ítems. */
 const SECCION_BACKLINE = /^(backline|back line|instrumentos|requerimientos? de backline|equipos? de backline|listado de backline|lista de backline)\b/i;
-const SECCION_AUDIO = /^(input(s| list)?|mixers? de monitores?|requerimientos? de (sala|audio|sonido)|amplificaci[oó]n de sala|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|monitor world|mezclas?( de monitores)?|pa\b|p\.\s?a\.?|sistema de (sonido|pa)|sonido|audio|foh|front of house|control (foh|monitor(es|s)?)|microfon[ií]a|micr[oó]fonos|microphones?|mic (list|packages?)|stands? de mic(r[oó]fonos?)?|mic stands?|microphone stands?|cue monitor|arreglo principal|(sub ?)?snakes?|multipares?|wireless|inal[aá]mbricos|rf\b)/i;
+const SECCION_AUDIO = /^(input(s| list)?|mixers? de monitores?|requerimientos? de (sala|audio|sonido)|amplificaci[oó]n de sala|channel list|lista(do)? de canales|patch|output(s| list| mix)?|monitor(es|eo)?|monitor mix|monitor world|mezclas?( de monitores)?|pa\b|p\.\s?a\.?|sistema de (sonido|pa)|sonido|audio|foh|front of house|control (foh|monitor(es|s)?)|microfon[ií]a|microfoner[ií]a|micr[oó]fonos|microphones?|mic (list|packages?)|stands? de mic(r[oó]fonos?)?|mic stands?|microphone stands?|cue monitor|arreglo principal|(sub ?)?snakes?|multipares?|wireless|inal[aá]mbricos|rf\b)/i;
 /* In ears y consolas: secciones propias (las pidió el usuario). Lo que viene debajo se lee como el
  * backline, en su grupo: "IN EARS" → "16 Shure PSM 1000"; "CONSOLAS" → "2 Yamaha DM7". */
 const SECCION_IN_EARS = /^((sistemas?|equipos?|requerimientos?) (de )?)?(iems?|in ?-?ears?|monitoreo (personal|inal[aá]mbrico)|personal monitors?)(\s+(de\s+|para\s+)?(la banda|banda|m[uú]sicos|artistas?))?$/i;
@@ -848,6 +848,8 @@ function interpretarCon(docs: Documento[], ctx: ContextoLectura, usarSecciones: 
 
   function tituloEvento(t: string): boolean {
     if (!EVENTO.test(t) && !/\b20\d\d\b/.test(t)) return false;
+    // "PLATILLOS PAISTE 2002": el número es la serie de los platillos, no el año de un evento.
+    if (!EVENTO.test(t) && /\b(paiste|zildjian|sabian|meinl|platillos?|cymbals?)\b/i.test(t)) return false;
     if (buscarFecha(t, 2000) || t.length > 160) return false;
     let candidato = t.replace(/^(re|fw|rv|fwd):\s*/i, "");
     // En una frase ("Te comparto la programación del Festival X 2026.") se toma solo el nombre.
@@ -1089,7 +1091,9 @@ export function unirRenglones(lineas: Linea[]): Linea[] {
     // o "4 Boom Stand 3" + "Snare Stand 1 Hi" + "Hat Stand 1 Kick". Se junta todo y se corta en cada cantidad.
     // "Plato efecto Zildjian k 16" no cuelga: el 16 es la medida (platillo o tambor en el renglón y 10 o más).
     const medida = (x: string) => /\b(crash|ride|splash|china|hi-?hats?|hit hats?|platos?|platillos?|cymbals?|toms?|bombo|kick|snare|tambor|redoblante|zildjian|sabian|paiste|meinl)\b/i.test(x) && /\s(1\d|2\d)$/.test(x.trim());
-    const colgando = (x: string) => /\s\d{1,2}(\s+\p{Lu}\p{L}*)?$/u.test(x.trim()) && !medida(x);
+    // "1 NORD STAGE 4", "1 YAMAHA MONTAGE 7", "1 AMPEG SVT 2": el número del final es el modelo, no la cantidad de lo de abajo.
+    const modelo = (x: string) => /\b(nord\s+(stage|electro|piano|lead|grand|wave)|kronos|montage|modx|motif|fantom|juno|prophet|triton|krome|nautilus|svt|jcm|ksm|beta|sm|xf|xp|ks|ax)\s*-?\s*\d{1,2}$/i.test(x.trim());
+    const colgando = (x: string) => /\s\d{1,2}(\s+\p{Lu}\p{L}*)?$/u.test(x.trim()) && !medida(x) && !modelo(x);
     if (!/\s{3}/.test(t) && (marcas(t) >= 2 || (/^\d{1,2}\s+\p{Lu}/u.test(t) && colgando(t)))) {
       let j = i;
       while (j + 1 < lineas.length) {
@@ -1295,6 +1299,14 @@ export function sinRepetidos(lineas: Linea[]): Linea[] {
   // Sin espacios: la misma página repetida puede venir con "61STAND" en una y "61 STAND" en otra.
   const norm = (l: Linea | undefined) => (l?.texto ?? "").replace(/\s+/g, "").toUpperCase();
   const claves = lineas.map(norm);
+  // Dos baterías distintas pueden traer el mismo hardware ("5 boom stands, silla, alfombra"): eso no es una página
+  // repetida. Si los dos bloques van bajo títulos explícitos distintos ("BATERÍA MAPEX SATURN:" y "BATERÍA DW
+  // COLLECTORS PERFORMANCE:", con dos puntos), cada uno cuenta.
+  const esTitulo = (t: string) => /:\s*$/.test(t) && !/^\s*[\d•·*-]/.test(t) && letras(t) >= 3;
+  const titulos: string[] = [];
+  let tituloActual = "";
+  for (let i = 0; i < lineas.length; i++) { titulos.push(tituloActual); if (esTitulo(lineas[i]!.texto)) tituloActual = claves[i]!; }
+  const mismoTitulo = (a: number, i: number) => !titulos[a] || !titulos[i] || titulos[a] === titulos[i];
   const vistos = new Map<string, number[]>();
   const fuera = new Set<number>();
   let j = -1; // renglón anterior que el bloque repetido va siguiendo
@@ -1304,7 +1316,7 @@ export function sinRepetidos(lineas: Linea[]): Linea[] {
     else {
       j = -1;
       if (letras(k) >= 3) {
-        const antes = (vistos.get(k) ?? []).find(a => a + 2 < i && claves[a + 1] === claves[i + 1] && claves[a + 2] === claves[i + 2] && letras(claves[a + 1]!) >= 2);
+        const antes = (vistos.get(k) ?? []).find(a => a + 2 < i && claves[a + 1] === claves[i + 1] && claves[a + 2] === claves[i + 2] && letras(claves[a + 1]!) >= 2 && mismoTitulo(a, i));
         if (antes !== undefined) { j = antes; fuera.add(i); }
       }
     }
@@ -1331,7 +1343,7 @@ function variosGrupos(t: string): string | null {
 const MARCA_LISTA = /(?:^|\s)((?:0?[1-9]|1\d|2[0-4])\s+(?!["”″])(\p{Lu}[\p{L}]*))/gu;
 // "8 X 10" es una medida, no otra cantidad.
 // "GUITAR BOAT 6 SPACES", "CABLE 8 MTRS": la capacidad o el largo, no otra pieza (hoja de salida de Circuito, 2026-10-17).
-const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|mtrs?|metros?|cm|mm|kg|hz|ft|x|voltios|volts?|vatios|watts?|amperios|amps?|inch(es)?|pulg(adas)?|spaces?|espacios?|puestos?|slots?)$/i;
+const UNIDADES = /^(ch|canales|channels|retornos|returns|w|v|mts?|mtrs?|metros?|cm|mm|kg|hz|ft|x|voltios|volts?|vatios|watts?|amperios|amps?|inch(es)?|pulg(adas)?|spaces?|espacios?|puestos?|slots?|legs|patas)$/i;
 /** Lo que sigue al número de un modelo: "SVT 4 PRO", "JCM 2000 DSL", "MK II". */
 const MODELO_SUFIJO = /^(pro|plus|classic|mk\w*|ii|iii|iv|xl|xt|se|ce|ex|hd|deluxe|custom|reverb|series|dsl|tsl|vr)$/i;
 function posicionesLista(t: string): number[] {
@@ -1349,14 +1361,16 @@ function posicionesLista(t: string): number[] {
     if (/\/\s*$/.test(antes) || (/\p{Ll}/u.test(t) && /\b[A-Z]{2,4}\s+$/.test(antes))) continue;
     // "AMPEG SVT 4 PRO" en un renglón todo en mayúsculas: el 4 sigue siendo del modelo (SVT-4 PRO, un cabezal).
     if (/\b[A-Z]{2,4}\s+$/.test(antes) && MODELO_SUFIJO.test(m[2]!)) continue;
-    // "8 x 10 Ampeg": el 10 es de la medida, no otra cantidad.
-    if (/\d\s*[x×]\s*$/i.test(antes)) continue;
+    // "8 x 10 Ampeg": el 10 es de la medida, no otra cantidad. "SNARE 14\" X 6 GRETSCH": tampoco el 6 (la hoja olvidó la comilla).
+    if (/\d\s*(?:["”″]|[’'′]{2})?\s*[x×]\s*$/i.test(antes)) continue;
     // "Nord Stage 3 Compact", "Nord Stage 2 EX 76", "Nord Stage 3 HA88": el número es la generación del teclado. Pero en
     // "1 Yamaha Motif 2 Keyboard stands" el 2 es la cantidad de lo que sigue.
     if (/\b(nord\s+(stage|electro|piano|lead|grand|wave)|kronos|montage|modx|motif|fantom|juno|prophet|triton|krome|nautilus)\s+$/i.test(antes)
       && /^(compact|ex|ha|hp|sw|xf|xs|xl|es|se|ls|le|mk\w*|pro|plus|rack|classic|d|m|r|x)$/i.test(m[2]!)) continue;
     // "NORD STAGE 2 MODEL SW73 OR HA76": lo que sigue al número es el modelo, no otro ítem.
     if (/^(model|modelo|version|versi[oó]n|series|serie|edition|edici[oó]n)$/i.test(m[2]!)) continue;
+    // "PIANO YAMAHA MOTIF 8 O MONTAGE": después del número viene una alternativa ("o"), no otro ítem.
+    if (/^(o|ó|u|or)$/i.test(m[2]!)) continue;
     // "YAMAHA MOTIF 8 XF": número y código corto del modelo (XF8) detrás del nombre del equipo. Los códigos
     // van sin vocales (XF, CS, MX); "2 STANDS 1 HI HAT" sí son dos ítems.
     if (/^[B-DF-HJ-NP-TV-Z]{1,3}$/.test(m[2]!) && /\b[A-ZÁÉÍÓÚÑ]{3,}\s+$/.test(antes)) continue;

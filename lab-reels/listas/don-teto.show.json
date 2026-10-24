@@ -1,0 +1,6 @@
+{
+ "_": "Documento don-teto: «Lo que llevamos» y «Otras bandas» (el listado del Excel de OML) van en la pestaña 📦 Alistando; el rider de Don Teto (lista don-teto.txt) va en 🎤 Bandas. Aquí solo se marca qué banda es del show: sus piezas vienen de la lista.",
+ "bandas": [
+  {"id": "don-teto", "nombre": "Don Teto", "nota": "Rider", "piezas": []}
+ ]
+}

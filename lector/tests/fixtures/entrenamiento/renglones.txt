@@ -1064,3 +1064,74 @@ KEYBOARDS
 1 NORD STAGE 2 W/ PEDAL SUSTAIN (anotado a mano: Colsubsidio)
 => 1 | NORD STAGE 2 (anotado a mano: Colsubsidio)
 => 1 | PEDAL SUSTAIN (anotado a mano: Colsubsidio)
+
+## un teclado con alternativa: el número es del modelo, no otra pieza
+TECLADO
+1 PIANO YAMAHA MOTIF 8 O MONTAGE
+=> 1 | PIANO YAMAHA MOTIF 8 O MONTAGE
+
+## "MICROFONERÍA" es una sección de audio: lo de abajo no es backline
+IN EARS:
+12 IN EARS SHURE PSM1000
+MICROFONERIA:
+1 SHURE BETA 91
+4 DPA 4099 PARA: 2 CONGAS, ALEGRE, BONGO
+=> 12 | IN EARS SHURE PSM1000
+
+## un teclado o un cabezal cuyo modelo termina en número: no cuelga con el renglón de abajo
+KEYBOARDS
+1 NORD STAGE 4
+1 NORD STAGE 3
+1 YAMAHA MONTAGE 7
+2 PIANO BENCH
+BASS
+1 AMPEG SVT 2
+1 AMPEG SVT 3 PRO BASS HEAD
+=> 1 | NORD STAGE 4
+=> 1 | NORD STAGE 3
+=> 1 | YAMAHA MONTAGE 7
+=> 2 | PIANO BENCH
+=> 1 | AMPEG SVT 2
+=> 1 | AMPEG SVT 3 PRO BASS HEAD
+
+## "PAISTE 2002" es la serie de los platillos, no el año de un evento
+PLATILLOS PAISTE 2002:
+1 RIDE 22"
+1 CRASH 20"
+=> 1 | RIDE 22"
+=> 1 | CRASH 20"
+
+## dos baterías con el mismo hardware: no es una página repetida, cada una lleva el suyo
+BATERÍA MAPEX SATURN:
+1 kick 24"
+HARDWARE
+5 BOOM CYMBALS STAND
+1 DRUM THRONE
+1 DRUM CARPET
+BATERÍA DW COLLECTORS PERFORMANCE:
+1 22" kick
+HARDWARE
+5 boom cymbals stand
+1 Drum throne
+1 Drum carpet
+=> 1 | kick 24"
+=> 5 | BOOM CYMBALS STAND
+=> 1 | DRUM THRONE
+=> 1 | DRUM CARPET
+=> 1 | 22" kick
+=> 5 | boom cymbals stand
+=> 1 | Drum throne
+=> 1 | Drum carpet
+
+## la medida sin comilla después de la X y las patas del stand no son cantidades
+DRUMS
+1 SNARE 14" X 6 GRETSCH MAPLE
+1 HI HAT STAND 3 LEGS
+=> 1 | SNARE 14" X 6 GRETSCH MAPLE
+=> 1 | HI HAT STAND 3 LEGS
+
+## una tarima (stage deck) no es backline
+MISC
+1 Prolyte Stage Deck 2m x 1m x 1m
+6 STAGE FAN
+=> 6 | STAGE FAN

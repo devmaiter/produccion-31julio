@@ -1196,7 +1196,8 @@ function chipsFotos(x){
 /* ── Lo que lleva cada instrumento (lo pidió el usuario: "una batería debe llevar silla y él no puso silla; ese
    tipo de cosas las tiene que hacer la app"). Si la sección no lo nombra, se avisa para revisar; no se agrega
    solo. "Hardware completo" cubre los stands y el pedal, pero no la silla ni la alfombra. ── */
-const HARDWARE = /hardware (completo|set|full)|full hardware|hardware de (la )?bater/;
+// «Batería Pearl Master completa con todas sus medidas»: la batería entera, con su hardware.
+const HARDWARE = /hardware (completo|set|full)|full hardware|hardware de (la )?bater|\bbateria\b.{0,40}\bcomplet[ao]/;
 const LLEVA = {
   "Batería": [
     {pieza: "Silla de batería", categoria: "Batería", hay: /\b(sillas?|banquetas?|butacas?|thrones?|stools?|asientos?)\b/},
@@ -1238,7 +1239,8 @@ function hayCongas(items){
 const sinTildesL = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 // De qué instrumento es la sección: el reel que más se repite entre sus piezas.
 function instrumentoDe(items){
-  const n = {}; for (const x of items) { const r = reelDe(x); n[r] = (n[r] || 0) + 1; }
+  // Un «dummie de piano» es utilería, no un teclado: no se le piden base ni pedal.
+  const n = {}; for (const x of items) { if (/\bdumm(y|ie)s?\b/i.test(x.referencia)) continue; const r = reelDe(x); n[r] = (n[r] || 0) + 1; }
   return Object.keys(LLEVA).filter(r => n[r]).sort((a, b) => n[b] - n[a])[0] || null;
 }
 const claveNoFalta = () => "backstage:no-falta:" + (V?.doc?.nombre || "");
@@ -1249,7 +1251,8 @@ function faltantes(items){
   const texto = textoDe(items), nuestro = textoDe(items.filter(x => !loTraeLaBanda(x)));
   if (inst === "Batería" && ELECTRONICA.test(texto)) return [];
   // Una sección de puro hardware ("MISC: 3 boom stands, 3 sillas") no es una batería: no se le piden sus piezas.
-  if (inst === "Batería" && !/\b(bombos?|kicks?|bd|redoblantes?|snares?|tarolas?|toms?|bateria|drum ?kit|kit|shells?)\b/.test(sinTildesL(items.map(x => x.referencia).join(" · ")))) return [];
+  // «5 Sillas de batería» tampoco hace una batería.
+  if (inst === "Batería" && !/\b(bombos?|kicks?|bd|redoblantes?|snares?|tarolas?|toms?|bateria|drum ?kit|kit|shells?)\b/.test(sinTildesL(items.map(x => x.referencia).join(" · ")).replace(/\b(sillas?|banquetas?|alfombras?|tapetes?) de bateria\b/g, ""))) return [];
   const descartadas = new Set(leer(claveNoFalta(), []));
   return LLEVA[inst].filter(r => (!r.cuando || r.cuando(items)) && !r.hay.test(r.soloNuestro ? nuestro : texto)
       && !(r.hardware && HARDWARE.test(texto)) && !descartadas.has(idFalta(items, r.pieza)))
@@ -1383,7 +1386,8 @@ function ponerShow(d, bandas){
 function capituloDe(b){
   const show = showSitio.bandas.find(x => x.id === b.artistaId);
   if (show) return `<p class="capitulo show">🎤 Show${show.nota ? ` · ${esc(show.nota)}` : ""}</p>`;
-  return showSitio.bandas.length && b.nombre === "Lista de bodega" ? `<p class="capitulo">📦 Bodega</p>` : "";
+  // Lo que no es del show es lo que se alista en bodega («Lista de bodega», «Lo que llevamos»…).
+  return showSitio.bandas.length ? `<p class="capitulo">📦 Bodega</p>` : "";
 }
 /* Dos páginas, como las pestañas de arriba de una red social (lo pidió el usuario): «Alistando» (la lista
    de bodega) y «Bandas» (el show). Solo salen cuando el documento tiene bandas del show. */

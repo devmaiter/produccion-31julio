@@ -71,7 +71,7 @@ const HARDWARE = /\b(stands?|soportes?|bases?|sillas?|banquetas?|asientos?|thron
 /** Lo que nunca es backline aunque venga con el backline (lo definió el usuario): risers y sobretarimas,
  *  pedestales de micrófono, cajas directas, cables y la corriente en tarima. */
 const NUNCA_BACKLINE = new RegExp([
-  "\\b(risers?|drum ?risers?|sobre ?-?tarimas?|sobretarimas?|stage ?dex|plataformas?)\\b",
+  "\\b(risers?|drum ?risers?|sobre ?-?tarimas?|sobretarimas?|stage ?dex|stage ?decks?|plataformas?)\\b",
   "\\bpies? de micr[oó]fonos?|\\bmic(rophone)? stands?\\b|\\bstands? (de |para )?(micr[oó]fonos?|mics?)\\b|\\bjirafas?\\b",
   // Audífonos in ear, mezcladores personales e inalámbricos de instrumento son de sonido (lo dijo el usuario, 2026-10-16).
   "aud[ií]fonos? (in ?-?ear|intraurales?)|in ?-?ear (headphones|earphones|buds)|\\bearphones?\\b|\\bse ?-?(215|315|425|535|846)\\b|mezcladore?s? personal(es)?|personal mix(er)?s?|\\bp-?16\\b|\\bme-?1\\b|\\baviom\\b|\\bmymix\\b",
