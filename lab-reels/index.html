@@ -1810,7 +1810,7 @@ document.addEventListener("visibilitychange", () => {
 const feed = document.getElementById("feed");
 /* Subir y bajar desde cualquier historia (lo pidió el usuario: antes había que volver a la portada de la sección).
    En una historia de lado, al estar arriba del todo (o abajo del todo) y deslizar hacia abajo (o hacia arriba), se
-   pasa a la sección anterior (o siguiente), como desde la portada. */
+   pasa a la sección anterior (o siguiente), en la misma historia (de la lista a la lista). */
 (function(){
   let ini = null;
   feed.addEventListener("touchstart", e => {
@@ -1826,7 +1826,15 @@ const feed = document.getElementById("feed");
     const reel = s.sl.closest(".reel"); if (!reel) return;
     const otro = el => { while (el && !(el.classList?.contains("reel") && el.offsetParent !== null)) el = dy < 0 ? el.nextElementSibling : el.previousElementSibling; return el; };
     const destino = dy < 0 && s.abajo ? otro(reel.nextElementSibling) : dy > 0 && s.arriba ? otro(reel.previousElementSibling) : null;
-    destino?.scrollIntoView({behavior: "smooth"});
+    if (!destino) return;
+    // Se llega a la misma historia de la otra sección (de la lista a la lista), no a su portada.
+    const de = reel.querySelector(".slides"), a = destino.querySelector(".slides");
+    if (de && a) {
+      const i = Math.round(de.scrollLeft / Math.max(1, de.clientWidth));
+      a.scrollTo({left: Math.min(i, a.children.length - 1) * a.clientWidth, behavior: "instant"});
+      const h = a.children[i]; if (h?.classList.contains("banda")) h.scrollTop = 0;
+    }
+    destino.scrollIntoView({behavior: "smooth"});
   }, {passive: true});
 })();
 let cats = [], entradas = [], reels = [], actual = null, io = null;
