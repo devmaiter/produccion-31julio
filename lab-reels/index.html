@@ -1244,6 +1244,7 @@ function instrumentoDe(items){
 const claveNoFalta = () => "lab-reels:no-falta:" + (V?.doc?.nombre || "");
 const idFalta = (items, pieza) => `${items[0]?.artistaId || "sin-banda"}|${items[0]?.grupo || ""}|${pieza}`;
 function faltantes(items){
+  if (V?.doc && leer("lab-reels:tal-cual", []).includes(V.doc.nombre)) return [];
   const inst = items.length && instrumentoDe(items); if (!inst) return [];
   const textoDe = xs => sinTildesL(xs.map(x => `${x.referencia} ${x.descripcion || ""} ${x.nota || ""}`).join(" · "));
   const texto = textoDe(items), nuestro = textoDe(items.filter(x => !loTraeLaBanda(x)));
@@ -2631,7 +2632,10 @@ async function riderDelCronograma(){
     try {
       const archivos = await Promise.all(rutas.map(async ruta => {
         const r = await fetch(ruta, {cache: "no-store"}); if (!r.ok) throw 0;
-        return new File([await r.blob()], ruta.split("/").pop(), {type: r.headers.get("content-type") || "text/plain"});
+        const blob = await r.blob();
+        // Una lista «tal cual» es la hoja del usuario como está: no se le avisa nada («⚠ 1» se leía como «falta una batería»).
+        if (doc && /^\s*#\s*tal\s+cual/i.test(await blob.slice(0, 40).text())) escribir("lab-reels:tal-cual", [...new Set([...leer("lab-reels:tal-cual", []), doc])].slice(-30));
+        return new File([blob], ruta.split("/").pop(), {type: r.headers.get("content-type") || "text/plain"});
       }));
       return subirArchivos(archivos, "cargar", doc);
     } catch { return aviso("No encontré esa lista"); }
