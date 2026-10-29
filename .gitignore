@@ -2,3 +2,8 @@
 # Enlace a lector/ocr (datos del OCR, no se suben): lo crea construir-sitio.sh.
 # Subido, queda roto en GitHub y Pages no puede empaquetar el sitio.
 extractor-fuente/public/ocr
+
+# Red de seguridad: dependencias y salidas locales
+pruebas/node_modules/
+pruebas/*.json
+!pruebas/package.json
