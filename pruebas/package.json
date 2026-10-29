@@ -5,7 +5,10 @@
   "description": "Red de seguridad de los reels: guarda lo que la app muestra y guarda en cada escenario, para comparar antes y después de un cambio.",
   "scripts": {
     "base": "node red-de-seguridad.mjs base.json",
-    "comparar": "node red-de-seguridad.mjs nuevo.json && node comparar.mjs base.json nuevo.json"
+    "comparar": "node red-de-seguridad.mjs nuevo.json && node comparar.mjs base.json nuevo.json",
+    "reglas": "node --test reglas.test.mjs"
   },
-  "dependencies": { "playwright": "^1.64.0" }
+  "dependencies": {
+    "playwright": "^1.64.0"
+  }
 }

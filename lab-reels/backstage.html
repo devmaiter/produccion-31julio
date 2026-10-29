@@ -625,6 +625,7 @@ li.pide.nota .t{color:var(--ink3);font-style:italic}
 <script>window.MARCA = {"nombre": "Backstage Company", "logo": "marca/backstage.png", "prefijo": "backstage"};</script>
 <script src="entorno.js"></script>
 <script src="plataforma/almacen.js"></script>
+<script src="backline/reglas.js"></script>
 <script src="tablero.js?v=2"></script>
 <script>
 /* El lector de PDF usa Map.getOrInsert(Computed), que solo traen los navegadores más nuevos. */
@@ -700,7 +701,7 @@ tablero.ports.vista.subscribe(v => {
    la misma lista o a que la lista se actualice. Antes se guardaban por "nombre|cuando" + "doc-N"; esos se
    recuperan al cargar (ver migrarChulos). */
 const claveChulos = () => P + "chulos2:" + (V?.doc ? V.doc.nombre : "");
-const piezaDe = x => `${x.artistaId || "sin-banda"}|${x.grupo || ""}|${corto(x.referencia).toLowerCase()}`;
+
 let chulos = new Set();   // ids de ítems del documento abierto que tienen chulo
 function cargarChulos(){
   const d = V?.doc ? datos() : null; if (!d) { chulos = new Set(); return; }
@@ -748,30 +749,6 @@ const festival = () => V?.modo === "festival";
    pidió en el bloque del bajo (una mesa de percusión) se queda en Bajo, y los platillos del
    bloque de batería, en Batería. Un grupo que no es de un instrumento ("Tarimas", "Vientos",
    "DJ") no es un reel: cada ítem va por su categoría y lo que no es instrumento, a Extras. */
-const REELES = ["Batería", "Bajo", "Guitarra", "Teclado", "Percusión", "Platillos", "In ears", "Consolas", "Extras"];
-const GRUPOS = [[/bater|drum|\bkit\b/, "Batería"], [/platillo|cymbal/, "Platillos"], [/percus|\bperc\b/, "Percusión"],
-  [/teclad|\bkeys?\b|piano|synth|sintet|organo|organ\b|hammond/, "Teclado"], [/\bbajo|bass|contrabajo/, "Bajo"],
-  [/guitar|\bgtr\b|tiple|requinto|cuatro|bandola|charango/, "Guitarra"], [/tumbador|conga|timbal|bongo|djembe|cajon|vallenat|tambora|folclor/, "Percusión"]];
-const POR_CATEGORIA = {"Batería": "Batería", "Platillos": "Platillos", "Percusión": "Percusión", "Teclado": "Teclado",
-  "Ampli bajo": "Bajo", "Bajo": "Bajo", "Ampli guitarra": "Guitarra", "Guitarra": "Guitarra", "In ears": "In ears", "Consolas": "Consolas"};
-// Una base o un tapete sin grupo va con su instrumento: "Boom cymbal stand" a Batería.
-const DE_QUIEN = [[/cymbal|platillo|plato|hi ?-?hat|snare|redoblante|throne|drum|bater|tom stand|porter/, "Batería"],
-  [/teclado|keyboard|\bks ?\d|ax-?\d|tipo z|\bkeys? stand/, "Teclado"], [/guitar|guitarrero/, "Guitarra"],
-  [/\bbajo|\bbass\b|contrabajo/, "Bajo"], [/conga|tumbadora|bongo|timbal|percus|cradle|djembe|cajon/, "Percusión"],
-  [/tiple|requinto|cuatro|charango|bandola/, "Guitarra"]];
-function reelDe(it){
-  const norm = t => (t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-  // Los ventiladores siempre van a Extras, aunque est\u00e9n en el bloque del bajo o de la percusi\u00f3n (pedido del usuario).
-  if (/\b(fans?|ventiladore?s?|cooler)\b/.test(norm(it.referencia))) return "Extras";
-  // Los in ears y las consolas van a su reel aunque vengan en el bloque de un instrumento.
-  if (it.categoria === "In ears" || it.categoria === "Consolas") return it.categoria;
-  const n = norm(it.grupo);
-  const g = n && GRUPOS.find(([re]) => re.test(n))?.[1];
-  if (g) return g;
-  if (POR_CATEGORIA[it.categoria]) return POR_CATEGORIA[it.categoria];
-  if (["Bases", "Escenario"].includes(it.categoria)) { const t = norm(it.referencia); return DE_QUIEN.find(([re]) => re.test(t))?.[1] || "Extras"; }
-  return "Extras";
-}
 /* El holograma de cada reel: el del equipo principal del grupo (en "Teclado" sin teclados,
    solo bases, salen las bases) y armado solo con lo que pide ese grupo. */
 const PRINCIPAL = {"Batería": ["Batería", "Platillos"], "Bajo": ["Ampli bajo", "Bajo"], "Guitarra": ["Ampli guitarra", "Guitarra"], "Teclado": ["Teclado"]};
@@ -1197,80 +1174,17 @@ async function cargarFotosSitio(){
 function chipsFotos(x){
   return MOMENTOS.map(([m, t]) => { const n = fotosPieza(x, m).length; return n ? `<span class="chip foto">📷 ${t.replace("En b", "B").replace("En e", "E")} ${n}</span>` : ""; }).join("");
 }
-/* ── Lo que lleva cada instrumento (lo pidió el usuario: "una batería debe llevar silla y él no puso silla; ese
-   tipo de cosas las tiene que hacer la app"). Si la sección no lo nombra, se avisa para revisar; no se agrega
-   solo. "Hardware completo" cubre los stands y el pedal, pero no la silla ni la alfombra. ── */
-// «Batería Pearl Master completa con todas sus medidas»: la batería entera, con su hardware.
-const HARDWARE = /hardware (completo|set|full)|full hardware|hardware de (la )?bater|\bbateria\b.{0,40}\bcomplet[ao]/;
-const LLEVA = {
-  "Batería": [
-    {pieza: "Silla de batería", categoria: "Batería", hay: /\b(sillas?|banquetas?|butacas?|thrones?|stools?|asientos?)\b/},
-    {pieza: "Pedal de bombo", categoria: "Batería", hay: /\b(pedal(es)?|kick pedal)\b(?! de (sustain|expresi|efecto))/, hardware: true},
-    {pieza: "Base de redoblante", categoria: "Batería", hay: /\b(bases?|stands?|soportes?)\b.{0,15}\b(redoblante|snare|tarola|caja)\b|snare stand/, hardware: true},
-    {pieza: "Máquina de hi-hat", categoria: "Batería", hay: /hi ?-?hat|charles|contratiempo|\bhh\b/, hardware: true},
-    {pieza: "Platillos", categoria: "Platillos", hay: /\b(platos?|platillos?|cymbals?|crash|ride|china|splash)\b/},
-    {pieza: "Alfombra para batería", categoria: "Batería", hay: /\b(alfombras?|tapetes?|rugs?|carpets?|mats?)\b/},
-    // "Plásticos" = parches (así les dicen en tarima). Una marca o modelo de parche también cuenta.
-    {pieza: "Plásticos (parches)", categoria: "Batería", hay: /\b(plasticos?|parches?|heads?|drumheads?|remo|evans|aquarian|ambassador|emperor|pinstripe|powerstroke|g[12])\b/},
-  ],
-  // Bajo (lo dijo el usuario, 2026-10-16): siempre se avisa la base; el ampli no, porque cuál va depende del
-  // evento. Si el bajista trae su cabezal, Circuito pone la caja y un cabezal de respaldo.
-  "Bajo": [
-    {pieza: "Base para bajo", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|guitarreros?)\b/},
-    {pieza: "Caja de bajo", categoria: "Ampli bajo", cuando: bandaTraeCabezal, hay: /\b(caja|cabina|cabinet|cab|gabinete|bafle|combo|\d ?x ?1[025])\b/},
-    {pieza: "Cabezal de bajo de respaldo", categoria: "Ampli bajo", cuando: bandaTraeCabezal, soloNuestro: true, hay: /\b(cabezal|head|cabeza|svt|combo|respaldo|backup|spare)\b/},
-  ],
-  // Guitarra (2026-10-16): el ampli no se avisa, como en el bajo (cuál va lo define el evento).
-  "Guitarra": [
-    {pieza: "Base para guitarra", categoria: "Bases", hay: /\b(bases?|stands?|soportes?|guitarreros?)\b/},
-  ],
-  // "Atril" a secas es de partituras (lo dijo el usuario): no cuenta como base del teclado ni del bajo.
-  "Teclado": [
-    {pieza: "Base de teclado", categoria: "Bases", hay: /\b(bases?|stands?|soportes?)\b/},
-    {pieza: "Pedal de sustain", categoria: "Teclado", hay: /\b(sustain|pedal(es)?|fc ?-?\d)\b/},
-  ],
-  // Percusión (2026-10-16): solo se avisan las bases de las congas, y solo si hay congas. «Conga y tumba + Stand»
-  // o «Congas w/ stand» ya las traen.
-  "Percusión": [
-    {pieza: "Bases para congas", categoria: "Percusión", cuando: hayCongas, hay: /\b(bases?|stands?|soportes?)\b.{0,25}\b(congas?|tumbadoras?|tumbas?|quintos?)\b|\bcongas?\b.{0,40}\b(con|y|with|incl\w*) (sus |su |las |los )?(bases?|stands?|soportes?)\b|\bconga stands?\b|\b(congas?|tumbadoras?|tumbas?|quintos?)\b.{0,40}(\+|\bw\/) ?\(? ?(bases?|stands?|soportes?)\b/},
-  ],
-};
-// Batería electrónica (Roland TD, Yamaha DTX…): no se avisa nada, depende del rider (lo dijo el usuario).
-const ELECTRONICA = /\b(electronica|electronic|e-?drums?|roland td|td-?\d{1,2}|dtx|v-?drums|alesis|efnote)\b/;
-function hayCongas(items){
-  return items.some(x => /\b(congas?|tumbadoras?|quintos?)\b/.test(sinTildesL(`${x.referencia} ${x.descripcion || ""}`)));
-}
-const sinTildesL = t => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-// De qué instrumento es la sección: el reel que más se repite entre sus piezas.
-function instrumentoDe(items){
-  // Un «dummie de piano» es utilería, no un teclado: no se le piden base ni pedal.
-  const n = {}; for (const x of items) { if (/\bdumm(y|ie)s?\b/i.test(x.referencia)) continue; const r = reelDe(x); n[r] = (n[r] || 0) + 1; }
-  return Object.keys(LLEVA).filter(r => n[r]).sort((a, b) => n[b] - n[a])[0] || null;
+// Las reglas del backline (qué lleva cada instrumento, a qué reel va cada pieza) viven en backline/reglas.js:
+// sin pantalla ni almacenamiento, se pueden probar solas y usar en cualquier entorno.
+const { REELES, GRUPOS, POR_CATEGORIA, DE_QUIEN, reelDe, HARDWARE, LLEVA, ELECTRONICA, hayCongas, sinTildesL, instrumentoDe,
+  loTraeLaBanda, bandaTraeCabezal, corto, piezaDe, idFalta } = ReglasBackline;
+/** Lo que le falta a una sección, con lo de este documento: una lista «tal cual» no se avisa, y lo descartado con
+ *  «No hace falta» tampoco. */
+function faltantes(items){
+  const talCual = !!V?.doc && leer(P + "tal-cual", []).includes(V.doc.nombre);
+  return ReglasBackline.faltantesDe(items, {talCual, descartadas: new Set(leer(claveNoFalta(), []))});
 }
 const claveNoFalta = () => P + "no-falta:" + (V?.doc?.nombre || "");
-const idFalta = (items, pieza) => `${items[0]?.artistaId || "sin-banda"}|${items[0]?.grupo || ""}|${pieza}`;
-function faltantes(items){
-  if (V?.doc && leer(P + "tal-cual", []).includes(V.doc.nombre)) return [];
-  const inst = items.length && instrumentoDe(items); if (!inst) return [];
-  const textoDe = xs => sinTildesL(xs.map(x => `${x.referencia} ${x.descripcion || ""} ${x.nota || ""}`).join(" · "));
-  const texto = textoDe(items), nuestro = textoDe(items.filter(x => !loTraeLaBanda(x)));
-  if (inst === "Batería" && ELECTRONICA.test(texto)) return [];
-  // Una sección de puro hardware ("MISC: 3 boom stands, 3 sillas") no es una batería: no se le piden sus piezas.
-  // «5 Sillas de batería» tampoco hace una batería.
-  if (inst === "Batería" && !/\b(bombos?|kicks?|bd|redoblantes?|snares?|tarolas?|toms?|bateria|drum ?kit|kit|shells?)\b/.test(sinTildesL(items.map(x => x.referencia).join(" · ")).replace(/\b(sillas?|banquetas?|alfombras?|tapetes?) de bateria\b/g, ""))) return [];
-  const descartadas = new Set(leer(claveNoFalta(), []));
-  return LLEVA[inst].filter(r => (!r.cuando || r.cuando(items)) && !r.hay.test(r.soloNuestro ? nuestro : texto)
-      && !(r.hardware && HARDWARE.test(texto)) && !descartadas.has(idFalta(items, r.pieza)))
-    .map(r => ({...r, instrumento: inst}));
-}
-// Lo que la banda trae ("lo trae la banda", "own", "propio"): no cuenta como algo que Circuito ya puso.
-function loTraeLaBanda(x){
-  return x.propietario?.nombre === "la banda" || /\b(lo trae|la trae|los trae|trae la banda|traen|brings?|own|propi[oa]s?|suy[oa]s?)\b/.test(sinTildesL(`${x.nota || ""} ${x.descripcion || ""}`));
-}
-// El bajista trae su cabezal: una pieza de la sección que es un cabezal (sin caja) y la trae la banda.
-function bandaTraeCabezal(items){
-  return items.some(x => loTraeLaBanda(x) && /\b(cabezal|head|cabeza|svt)\b/.test(sinTildesL(`${x.referencia} ${x.descripcion || ""}`)));
-}
 function htmlFaltan(items, conBotones){
   const f = faltantes(items); if (!f.length) return "";
   if (!conBotones) return `<p class="falta-aviso">⚠ Revisa: no pidió <b>${f.map(r => esc(r.pieza)).join("</b>, <b>")}</b></p>`;
@@ -1588,7 +1502,7 @@ const pasar = `
     <button class="pasar ant" aria-label="Anterior" disabled>‹</button>
     <button class="pasar sig" aria-label="Siguiente">›</button>`;
 // En los listados compactos va el equipo; las opciones entre paréntesis quedan para el detalle.
-const corto = t => String(t).replace(/\s*\([^)]*\)/g, "").trim() || t;
+
 const piezasDe = items => items.reduce((s, x) => s + x.cantidad, 0);
 const conSeccionesDe = b => b.secciones.filter(s => s.items.length);
 const idSeccion = (b, j) => `${idBanda(b)}-s${j + 1}`;
