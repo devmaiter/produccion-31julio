@@ -246,6 +246,19 @@ prueba (que el % suba sin romper los riders anteriores).
 
 ## `lab-reels/`
 
+**Arquitectura (2026-10-29, lo pidió el usuario: SOLID y lista para mudarse a cualquier entorno).** Detalle en
+`docs/arquitectura.md`. En corto:
+- `entorno.js` (`ENTORNO`): claves, bases de IndexedDB, rutas y marca. Lo que cambia de un entorno a otro va aquí.
+- `plataforma/almacen.js` (`Almacen`): la única puerta a `localStorage` e IndexedDB. Para guardar en la nube
+  se le pasa otro adaptador con `Almacen.usar({datos, archivos})`; la app no cambia.
+- `backline/reglas.js` (`ReglasBackline`): reglas puras (reels, `LLEVA`, `faltantesDe`…), sirven en el
+  navegador y en Node (`pruebas/reglas.test.mjs`). Otro instrumento: `ReglasBackline.registrar`.
+- **La pantalla se edita en `lab-reels/src/NN-*.js`** (16 archivos por tema). `python3 lab-reels/armar.py` los
+  junta en `app.js` (no editar `app.js` a mano); `construir-sitio.sh` lo corre antes de `hacer-marcas.py`.
+- `hacer-marcas.py` ya no reemplaza texto: solo cambia el título e inyecta `window.MARCA` (con su `prefijo`).
+- **Red de seguridad** (`pruebas/`): antes de un cambio `npm run base`, después `npm run comparar` (con
+  `python3 -m http.server 8000` en la raíz). 15 escenarios; debe decir «Igual: nada cambió» salvo lo que se quiso cambiar.
+
 **Lo nuevo (2026-10-07), y manda sobre lo de abajo si chocan:**
 - **Entrada.** El saludo se escribe solo, letra por letra, y después se borra: va según la hora, nombra el
   evento del día y el cierre cambia en cada visita. Al final quedan dos recuadros con íconos de línea,
