@@ -82,6 +82,14 @@ await escenario("chulo-y-nota", async p => {
   await p.reload(); await esperar(p, 15000);
   return { ...(await estado(p)), chulosTrasRecargar: await p.evaluate(() => [...chulos].length), feed: await texto(p, "#feed") };
 });
+await escenario("respaldo", async p => {
+  await p.goto(BASE + "/hoy/22-oct/"); await esperar(p, 16000);
+  // una foto de prueba en el almacén y un chulo, y se arma el respaldo
+  await p.evaluate(async () => { const b = await (await fetch("listas/fotos/hardware-1.jpg")).blob(); await idb("readwrite", st => st.put(b, "foto-prueba")); marcarChulo(V.doc.datos.items[0].id); });
+  const [dl] = await Promise.all([p.waitForEvent("download", { timeout: 20000 }), p.evaluate(() => guardarRespaldo())]);
+  const r = JSON.parse(fs.readFileSync(await dl.path(), "utf8"));
+  return { formato: r.formato, claves: Object.keys(r.localStorage).sort(), fotos: Object.keys(r.fotos).sort(), tamFoto: (r.fotos["foto-prueba"] || "").length > 1000 };
+});
 await escenario("subir-rider", async p => {
   await p.goto(BASE + "/lab-reels/#intro"); await esperar(p, 6000);
   const [fc] = await Promise.all([p.waitForEvent("filechooser", { timeout: 15000 }), p.evaluate(() => document.getElementById("archivo").click())]);

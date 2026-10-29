@@ -4,6 +4,6 @@
 extractor-fuente/public/ocr
 
 # Red de seguridad: dependencias y salidas locales
-pruebas/node_modules/
+pruebas/node_modules
 pruebas/*.json
 !pruebas/package.json

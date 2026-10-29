@@ -624,6 +624,7 @@ li.pide.nota .t{color:var(--ink3);font-style:italic}
 <!-- Copia armada por hacer-marcas.py desde index.html: no editar a mano. -->
 <script>window.MARCA = {"nombre": "Backstage Company", "logo": "marca/backstage.png", "prefijo": "backstage"};</script>
 <script src="entorno.js"></script>
+<script src="plataforma/almacen.js"></script>
 <script src="tablero.js?v=2"></script>
 <script>
 /* El lector de PDF usa Map.getOrInsert(Computed), que solo traen los navegadores más nuevos. */
@@ -649,8 +650,8 @@ const DEMO = MARCA ? "backstage" : new URLSearchParams(location.search).get("dem
 
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const slug = s => String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-const leer = (k, def) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } };
-const escribir = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+// Todo lo guardado pasa por el almacén (plataforma/almacen.js): la app no sabe si queda en el celular o en un servidor.
+const leer = Almacen.leer, escribir = Almacen.escribir;
 // Las ayudas ("Baja con ↓…", "Pasa con ›…") salen solo la primera vez que se abren los reels (lo pidió el usuario).
 const AYUDA = !leer(P + "ayuda-vista", false);
 escribir(P + "ayuda-vista", true);
@@ -708,7 +709,7 @@ function cargarChulos(){
   chulos = new Set(d.items.filter(x => guardadas.has(piezaDe(x))).map(x => x.id));
 }
 function migrarChulos(d, guardadas){
-  const viejas = Object.keys(localStorage).filter(k => k.startsWith(P + "chulos:" + V.doc.nombre + "|"));
+  const viejas = Almacen.claves().filter(k => k.startsWith(P + "chulos:" + V.doc.nombre + "|"));
   if (!viejas.length) return;
   const porId = new Map(d.items.map(x => [x.id, x]));
   for (const k of viejas) {
@@ -1326,14 +1327,12 @@ async function piezasRecuperables(){
   }
   // b) en la copia con marca: lo de la app de Circuito (su tablero y sus copias internas)
   if (MARCA) {
-    deTablero(localStorage.getItem(CLAVE_CIRCUITO + "tablero"));
-    const db = await new Promise(ok => { try { const r = indexedDB.open(FOTOS_CIRCUITO, 1); r.onupgradeneeded = () => r.result.createObjectStore("fotos"); r.onsuccess = () => ok(r.result); r.onerror = () => ok(null); } catch { ok(null); } });
-    if (db) {
-      const claves = await new Promise(ok => { try { const q = db.transaction("fotos").objectStore("fotos").getAllKeys(); q.onsuccess = () => ok(q.result || []); q.onerror = () => ok([]); } catch { ok([]); } });
-      for (const k of claves.filter(k => String(k).startsWith("instantanea-"))) {
-        const b = await new Promise(ok => { try { const q = db.transaction("fotos").objectStore("fotos").get(k); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); } catch { ok(null); } });
-        try { deTablero(JSON.parse(await b.text()).ls?.[CLAVE_CIRCUITO + "tablero"]); } catch {}
-      }
+    deTablero(Almacen.crudo(CLAVE_CIRCUITO + "tablero"));
+    const deCircuito = Almacen.archivos(FOTOS_CIRCUITO);
+    const claves = await deCircuito("readonly", st => st.getAllKeys()).catch(() => []) || [];
+    for (const k of claves.filter(k => String(k).startsWith("instantanea-"))) {
+      const b = await deCircuito("readonly", st => st.get(k)).catch(() => null);
+      try { deTablero(JSON.parse(await b.text()).ls?.[CLAVE_CIRCUITO + "tablero"]); } catch {}
     }
   }
   // c) fotos y chulos que quedaron sin pieza: la pieza se arma con lo que dice su clave
@@ -1546,7 +1545,7 @@ async function guardarNota(sec){
   const b = leer(claveBorrador(sec), {}), texto = (document.querySelector(`[data-nota-texto="${CSS.escape(sec)}"]`)?.value || b.texto || "").trim();
   if (!texto && !b.audio && !b.foto) return aviso("Escribe algo, graba un audio o toma una foto");
   escribir(claveNotas(), [...todasNotas(), {id: "n-" + Date.now().toString(36), seccion: sec, texto, audio: b.audio || null, foto: b.foto || null, cuando: new Date().toISOString()}]);
-  localStorage.removeItem(claveBorrador(sec));
+  Almacen.quitar(claveBorrador(sec));
   huboCambio(); aviso("Nota guardada"); repintarQuieto();
 }
 
@@ -2114,7 +2113,7 @@ function pintarFiltros(){
     <div class="botones"><button class="btn sec" data-respaldo="guardar">💾 Guardar respaldo</button><button class="btn sec" data-respaldo="cargar">📂 Cargar respaldo</button></div>
     ${leer(P + "ultimo-respaldo", "") ? `<p class="nota">Último respaldo: ${esc(cuandoSeSubio(leer(P + "ultimo-respaldo", "")) || "")}.</p>` : `<p class="nota"><b>Todavía no has guardado ningún respaldo.</b></p>`}
     ${leer(P + "papelera", []).length ? `<div class="botones"><button class="btn sec" data-respaldo="papelera">♻️ Recuperar ${leer(P + "papelera", []).length} ${leer(P + "papelera", []).length === 1 ? "foto quitada" : "fotos quitadas"}</button></div>` : ""}
-    ${Object.keys(localStorage).filter(k => k.startsWith(P + "notas:")).flatMap(k => leer(k, [])).some(n => n.quitada) ? `<div class="botones"><button class="btn sec" data-respaldo="notas">♻️ Recuperar notas quitadas</button></div>` : ""}
+    ${Almacen.claves().filter(k => k.startsWith(P + "notas:")).flatMap(k => leer(k, [])).some(n => n.quitada) ? `<div class="botones"><button class="btn sec" data-respaldo="notas">♻️ Recuperar notas quitadas</button></div>` : ""}
     <div class="botones"><button class="btn sec" data-respaldo="instantanea">🕘 Volver a una copia interna</button></div>
     ${MARCA ? `<div class="botones"><button class="btn sec" data-respaldo="circuito">📥 Traer fotos y chulos de la app de Circuito</button></div>` : ""}
     <div class="botones"><button class="btn" data-cerrar>Ver ${V.encontrados} ${V.encontrados === 1 ? "ítem" : "ítems"}</button>${V.hayFiltro ? '<button class="btn sec" data-limpiar>Quitar filtros</button>' : ""}</div>`;
@@ -2131,7 +2130,7 @@ $b("filtros").addEventListener("click", e => {
   }
   if (t.dataset.respaldo === "instantanea") return elegirInstantanea();
   if (t.dataset.respaldo === "notas") {
-    for (const k of Object.keys(localStorage).filter(k => k.startsWith(P + "notas:"))) escribir(k, leer(k, []).map(({quitada, ...n}) => n));
+    for (const k of Almacen.claves().filter(k => k.startsWith(P + "notas:"))) escribir(k, leer(k, []).map(({quitada, ...n}) => n));
     e.currentTarget.hidden = true; huboCambio(); aviso("Notas recuperadas"); return repintarQuieto();
   }
   if (t.dataset.respaldo === "circuito") { e.currentTarget.hidden = true; return traerDeCircuito().then(f => aviso(f ? `Traje ${f} ${f === 1 ? "foto" : "fotos"} y los chulos` : "Ya estaba todo: chulos al día")); }
@@ -2144,21 +2143,9 @@ $b("filtros").addEventListener("click", e => {
 });
 
 /* ── Fotos de las bandas: la imagen queda en este dispositivo (IndexedDB) y el núcleo guarda de qué banda es. ── */
-const fotosDB = new Promise((ok, mal) => {
-  try {
-    const r = indexedDB.open(ENTORNO.bases.fotos, 1);
-    r.onupgradeneeded = () => r.result.createObjectStore("fotos");
-    r.onsuccess = () => ok(r.result); r.onerror = () => mal(r.error);
-  } catch (err) { mal(err); }
-});
-fotosDB.catch(() => {});
-async function idb(modo, accion){
-  const db = await fotosDB;
-  return new Promise((ok, mal) => {
-    const tx = db.transaction("fotos", modo), q = accion(tx.objectStore("fotos"));
-    tx.oncomplete = () => ok(q?.result); tx.onerror = () => mal(tx.error);
-  });
-}
+const idb = Almacen.archivos(ENTORNO.bases.fotos);
+// Los riders que el cronograma guardó en este dispositivo.
+const riders = Almacen.archivos(ENTORNO.bases.riders, "archivos");
 const urlsFotos = new Map();
 async function cargarFotos(raiz = feed){
   for (const img of raiz.querySelectorAll("img[data-foto]")) {
@@ -2205,15 +2192,15 @@ const blobADataURL = b => new Promise(ok => { const r = new FileReader(); r.onlo
 function sumarEstado(otro){
   const unir = (a, b) => [...new Map([...a, ...b].map(x => [JSON.stringify(x), x])).values()];
   for (const [k, v] of Object.entries(otro)) {
-    const actual = localStorage.getItem(k);
+    const actual = Almacen.crudo(k);
     try {
-      if (actual === null) { localStorage.setItem(k, v); continue; }
+      if (actual === null) { Almacen.ponerCrudo(k, v); continue; }
       const A = JSON.parse(actual), B = JSON.parse(v);
-      if (Array.isArray(A) && Array.isArray(B)) { localStorage.setItem(k, JSON.stringify(unir(A, B))); continue; }
+      if (Array.isArray(A) && Array.isArray(B)) { Almacen.ponerCrudo(k, JSON.stringify(unir(A, B))); continue; }
       if (k === P + "tablero" && A && B) {
         const fotos = {...(B.fotos || {})};
         for (const [c, fs] of Object.entries(A.fotos || {})) fotos[c] = unir(fotos[c] || [], fs);
-        localStorage.setItem(k, JSON.stringify({...B, ...A, pruebas: A.pruebas || B.pruebas, evento: A.evento || B.evento, fotos}));
+        Almacen.ponerCrudo(k, JSON.stringify({...B, ...A, pruebas: A.pruebas || B.pruebas, evento: A.evento || B.evento, fotos}));
       }
       // Cualquier otro valor que ya existe se deja como está (lo de ahora manda).
     } catch {}
@@ -2224,7 +2211,7 @@ function sumarEstado(otro){
 async function instantanea(motivo){
   try {
     const ls = {};
-    for (const k of Object.keys(localStorage)) if (PREFIJOS.test(k)) ls[k] = localStorage.getItem(k);
+    for (const k of Almacen.claves()) if (PREFIJOS.test(k)) ls[k] = Almacen.crudo(k);
     const clave = "instantanea-" + new Date().toISOString();
     await idb("readwrite", st => st.put(new Blob([JSON.stringify({motivo, ls})], {type: "application/json"}), clave));
     const todas = (await idb("readonly", st => st.getAllKeys())).filter(k => String(k).startsWith("instantanea-")).sort();
@@ -2269,22 +2256,22 @@ async function traerDeCircuito(){
   const unir = (a, b) => [...new Set([...(a || []), ...(b || [])])];
   let fotos = 0;
   // Chulos, chulos viejos y "no hace falta": se unen con los de aquí.
-  for (const k of Object.keys(localStorage)) {
+  for (const k of Almacen.claves()) {
     if (!k.startsWith(CLAVE_CIRCUITO)) continue;
     const resto = k.slice(CLAVE_CIRCUITO.length);
     if (!/^(chulos2?:|no-falta:)/.test(resto)) continue;
-    try { escribir(P + resto, unir(leer(P + resto, []), JSON.parse(localStorage.getItem(k)))); } catch {}
+    try { escribir(P + resto, unir(leer(P + resto, []), JSON.parse(Almacen.crudo(k)))); } catch {}
   }
   // Fotos de las piezas: la imagen se copia a la base de aquí y se agrega a la pieza.
   let deAlla = {};
-  try { deAlla = JSON.parse(localStorage.getItem(CLAVE_CIRCUITO + "tablero") || "{}").fotos || {}; } catch {}
+  try { deAlla = JSON.parse(Almacen.crudo(CLAVE_CIRCUITO + "tablero") || "{}").fotos || {}; } catch {}
   const pendientes = Object.entries(deAlla).filter(([k]) => k.startsWith("pieza|"));
   if (pendientes.length) {
-    const db = await new Promise(ok => { try { const r = indexedDB.open(FOTOS_CIRCUITO, 1); r.onupgradeneeded = () => r.result.createObjectStore("fotos"); r.onsuccess = () => ok(r.result); r.onerror = () => ok(null); } catch { ok(null); } });
+    const deCircuito = Almacen.archivos(FOTOS_CIRCUITO);
     for (const [clave, ids] of pendientes) {
       for (const id of ids) {
         if ((V?.fotos?.[clave] || []).includes(id)) continue;
-        const blob = db ? await new Promise(ok => { try { const q = db.transaction("fotos").objectStore("fotos").get(id); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null); } catch { ok(null); } }) : null;
+        const blob = await deCircuito("readonly", st => st.get(id)).catch(() => null) || null;
         if (!blob) continue;
         try { await idb("readwrite", st => st.put(blob, id)); } catch { continue; }
         enviar({tipo: "foto", banda: clave, foto: id});
@@ -2324,7 +2311,7 @@ function pintarPendiente(){
   let el = document.getElementById("pendiente");
   const n = leer(P + "cambios", 0);
   // Nunca se ha guardado un respaldo y ya hay chulos o fotos: también se avisa.
-  const hayDatos = Object.keys(localStorage).some(k => k.startsWith(P + "chulos") && (localStorage.getItem(k) || "[]") !== "[]") || Object.keys(V?.fotos || {}).length > 0;
+  const hayDatos = Almacen.claves().some(k => k.startsWith(P + "chulos") && (Almacen.crudo(k) || "[]") !== "[]") || Object.keys(V?.fotos || {}).length > 0;
   const primero = !n && !leer(P + "ultimo-respaldo", "") && hayDatos;
   if (!n && !primero) { el?.remove(); return; }
   if (!el) { el = Object.assign(document.createElement("button"), {id: "pendiente", className: "pendiente"}); el.addEventListener("click", guardarRespaldo); document.body.append(el); }
@@ -2333,17 +2320,10 @@ function pintarPendiente(){
 async function guardarRespaldo(){
   aviso("Armando el respaldo…");
   const ls = {};
-  for (const k of Object.keys(localStorage)) if (PREFIJOS.test(k)) ls[k] = localStorage.getItem(k);
+  for (const k of Almacen.claves()) if (PREFIJOS.test(k)) ls[k] = Almacen.crudo(k);
   const fotos = {};
   try {
-    const db = await fotosDB;
-    await new Promise((ok, mal) => {
-      const tx = db.transaction("fotos"), st = tx.objectStore("fotos"), q = st.openCursor();
-      const pendientes = [];
-      q.onsuccess = () => { const c = q.result; if (c) { pendientes.push([c.key, c.value]); c.continue(); } };
-      tx.oncomplete = async () => { for (const [k, v] of pendientes) if (!String(k).startsWith("instantanea-")) fotos[k] = await blobADataURL(v); ok(); };
-      tx.onerror = () => mal(tx.error);
-    });
+    for (const [k, v] of await Almacen.listarArchivos(ENTORNO.bases.fotos)) if (!String(k).startsWith("instantanea-")) fotos[k] = await blobADataURL(v);
   } catch {}
   const hoy = new Date(), f = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}-${String(hoy.getHours()).padStart(2, "0")}${String(hoy.getMinutes()).padStart(2, "0")}`;
   const archivo = new File([JSON.stringify({formato: "respaldo-lab-reels/1", cuando: hoy.toISOString(), localStorage: ls, fotos})], `respaldo-reels-${f}.json`, {type: "application/json"});
@@ -2677,12 +2657,7 @@ async function riderDelCronograma(){
   if (q.get("evento")) escribir(P + "evento", q.get("evento"));
   if (!id) return;
   history.replaceState(null, "", location.pathname);
-  const guardado = await new Promise(ok => {
-    const r = indexedDB.open(ENTORNO.bases.riders, 1);
-    r.onupgradeneeded = () => r.result.createObjectStore("archivos");
-    r.onerror = () => ok(null);
-    r.onsuccess = () => { const q2 = r.result.transaction("archivos").objectStore("archivos").get(id); q2.onsuccess = () => ok(q2.result); q2.onerror = () => ok(null); };
-  });
+  const guardado = await riders("readonly", st => st.get(id)).catch(() => null);
   if (!guardado) return aviso("No encontré ese rider en este dispositivo");
   subirArchivos([new File([guardado.blob], guardado.nombre, {type: guardado.tipo})], "cargar-evento");
 }
@@ -2694,17 +2669,13 @@ async function eventoDeHoy(){
   const hoy = new Date(), iso = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
   const ev = leer(ENTORNO.claves.cronograma + ":eventos", []).find(e => e.desde <= iso && iso <= e.hasta);
   if (!ev) return false;
-  const riders = ev.escenarios.flatMap(e => e.bandas).map(b => b.rider?.archivoId).filter(Boolean);
-  if (!riders.length) return false;
+  const idsRiders = ev.escenarios.flatMap(e => e.bandas).map(b => b.rider?.archivoId).filter(Boolean);
+  if (!idsRiders.length) return false;
   escribir(P + "evento", ev.nombre);
-  const clave = ev.id + ":" + riders.join(",");
+  const clave = ev.id + ":" + idsRiders.join(",");
   if (leer(P + "evento-cargado", "") === clave && V.hay?.evento) return true;
-  const archivos = (await Promise.all(riders.map(id => new Promise(ok => {
-    const r = indexedDB.open(ENTORNO.bases.riders, 1);
-    r.onupgradeneeded = () => r.result.createObjectStore("archivos");
-    r.onerror = () => ok(null);
-    r.onsuccess = () => { const q = r.result.transaction("archivos").objectStore("archivos").get(id); q.onsuccess = () => ok(q.result); q.onerror = () => ok(null); };
-  })))).filter(Boolean).map(g => new File([g.blob], g.nombre, {type: g.tipo}));
+  const archivos = (await Promise.all(idsRiders.map(id => riders("readonly", st => st.get(id)).catch(() => null))))
+    .filter(Boolean).map(g => new File([g.blob], g.nombre, {type: g.tipo}));
   if (!archivos.length) return false;
   escribir(P + "evento-cargado", clave);
   introHecha = true;
